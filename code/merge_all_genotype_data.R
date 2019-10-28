@@ -1,0 +1,11 @@
+#goal: merge all of the EUR, AFR, LAC genotyped data
+setwd('/spin1/users/zhangh24/breast_cancer_data_analysis')
+load("/spin1/users/zhangh24/KG.vcf/MAF_result/pruned_MAF_permu.Rdata")
+load(paste0("./multi_ethnic/result/y_",1))
+n.snp <- nrow(pruned.snp.permu)
+n.EUR <- nrow(y[[1]])
+n.AFR <- nrow(y[[2]])
+n.LAC <- nrow(y[[3]])
+library(bigmemory)
+library(bigalgebra)
+G.EUR <- big.matrix(n.EUR,n.snp,type='integer')
