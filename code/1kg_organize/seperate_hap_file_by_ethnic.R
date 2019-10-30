@@ -10,7 +10,7 @@ country <- names(table(sample$GROUP))
 #hap file is coded with row as SNP, columns as subjects
 #two continious columns represent one subject
 library(data.table)
-haplotype <- as.data.frame(fread("/spin1/users/zhangh24/KG.impute2/1000GP_Phase3/1000GP_Phase3_chr",i2,".hap",header=F))
+haplotype <- as.data.frame(fread(paste0("/spin1/users/zhangh24/KG.impute2/1000GP_Phase3/1000GP_Phase3_chr",i2,".hap"),header=F))
 
 #find all the id in specific country group
 idx <- which(sample$GROUP%in%country[i1])
