@@ -24,8 +24,9 @@ for(i in 1:length(idx)){
   temp <- temp+1
 }
 
-hap.sub <- haplotype[,idx.sub,drop=F]
+hap.sub <- haplotype[,..idx.sub]
 fwrite(hap.sub,file =paste0("/spin1/users/zhangh24/KG.impute2/",country[i1],"/chr",i2,".hap"),
             row.names = F,
             col.names=F,
-            quote=F)
+            quote=F,
+            sep=" ")
