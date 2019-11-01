@@ -2,7 +2,7 @@
 #get the total number of snps
 n.snp <- 0
 k <- 1
-setwd('/spin1/users/zhangh24/breast_cancer_data_analysis')
+setwd('/data/zhangh24/breast_cancer_data_analysis')
 for(i1 in 1:500){
   if(i1%%50==0){
     print(i1)  

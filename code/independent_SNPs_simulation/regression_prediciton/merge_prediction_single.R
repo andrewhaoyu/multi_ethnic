@@ -1,6 +1,6 @@
 #Goal: merge prediction single result
 #simulation number 100
-setwd('/spin1/users/zhangh24/breast_cancer_data_analysis')
+setwd('/data/zhangh24/breast_cancer_data_analysis')
 
 n.s <- 100
 pop.ind <- 1

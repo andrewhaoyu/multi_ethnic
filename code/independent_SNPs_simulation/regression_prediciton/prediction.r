@@ -9,7 +9,7 @@ i1 <- as.numeric(arg[[1]])
 pop.ind <- as.numeric(arg[[2]])
 #gr represent gentic correlation
 gr <- as.numeric(arg[[3]])
-setwd('/spin1/users/zhangh24/breast_cancer_data_analysis')
+setwd('/data/zhangh24/breast_cancer_data_analysis')
 load(paste0("./multi_ethnic/result/y_",i1,"_",gr))
 load(paste0("./multi_ethnic/result/pruned_geno/beta_all_",i1,"_",gr,".Rdata"))
 

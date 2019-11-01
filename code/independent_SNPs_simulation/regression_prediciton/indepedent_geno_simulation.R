@@ -8,13 +8,13 @@
 #4000 shared causal SNPs
 #Genetic correlation for the shared SNPs is 0.6
 #1000 SNPs for each as independent causal
-# load("/spin1/users/zhangh24/KG.vcf/MAF_result/pruned_MAF.Rdata")
+# load("/data/zhangh24/KG.vcf/MAF_result/pruned_MAF.Rdata")
 #  set.seed(666)
 #  n.snp <- nrow(pruned.snp.clean)
 #  pruned.snp.permu <- pruned.snp.clean[sample(c(1:n.snp),n.snp),]
-#  save(pruned.snp.permu,file = "/spin1/users/zhangh24/KG.vcf/MAF_result/pruned_MAF_permu.Rdata")
+#  save(pruned.snp.permu,file = "/data/zhangh24/KG.vcf/MAF_result/pruned_MAF_permu.Rdata")
 
-load("/spin1/users/zhangh24/KG.vcf/MAF_result/pruned_MAF_permu.Rdata")
+load("/data/zhangh24/KG.vcf/MAF_result/pruned_MAF_permu.Rdata")
 set.seed(666)
 idx <- which.min(pruned.snp.permu$all.snp.AFR.MAF.AFR[1:5000])
 pruned.snp.permu[idx,]

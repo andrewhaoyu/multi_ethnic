@@ -5,7 +5,7 @@ r2.2 <- rep(0,n.s)
 r2.3 <- rep(0,n.s)
 gr <- 2
 for(i1 in 1:100){
-  setwd('/spin1/users/zhangh24/breast_cancer_data_analysis')
+  setwd('/data/zhangh24/breast_cancer_data_analysis')
   pop.ind <- 1
   load(paste0("./multi_ethnic/result/y_",i1,"_",gr))
   y_all = y

@@ -12,7 +12,7 @@
 #Genetic correlation for the between EUR and AFR is 0.4
 #Genetic correlation for the between EUR and LAC is 0.6
 #Genetic correlation for the between LAC and AFR is 0.6
-setwd('/spin1/users/zhangh24/breast_cancer_data_analysis')
+setwd('/data/zhangh24/breast_cancer_data_analysis')
 library(RcppArmadillo)
 
 FitLinearmodel <- function(y,x){

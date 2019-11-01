@@ -1,6 +1,6 @@
 #goal: merge all of the EUR, AFR, LAC genotyped data
-setwd('/spin1/users/zhangh24/breast_cancer_data_analysis')
-load("/spin1/users/zhangh24/KG.vcf/MAF_result/pruned_MAF_permu.Rdata")
+setwd('/data/zhangh24/breast_cancer_data_analysis')
+load("/data/zhangh24/KG.vcf/MAF_result/pruned_MAF_permu.Rdata")
 load(paste0("./multi_ethnic/result/y_",1))
 n.snp <- nrow(pruned.snp.permu)
 n.EUR <- nrow(y[[1]])

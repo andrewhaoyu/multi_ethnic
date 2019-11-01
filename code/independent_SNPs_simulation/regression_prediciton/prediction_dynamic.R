@@ -277,8 +277,8 @@ i3 <- as.numeric(arg[[3]])
 #i4 represent genetic correlation pattern
 gr <- as.numeric(arg[[4]])
 
-setwd('/spin1/users/zhangh24/breast_cancer_data_analysis')
-load("/spin1/users/zhangh24/KG.vcf/MAF_result/pruned_MAF_permu.Rdata")
+setwd('/data/zhangh24/breast_cancer_data_analysis')
+load("/data/zhangh24/KG.vcf/MAF_result/pruned_MAF_permu.Rdata")
 MAF.EUR <- pruned.snp.permu$MAF.EUR
 MAF.AFR <- pruned.snp.permu$MAF.AFR
 MAF.LAC <- pruned.snp.permu$MAF.LAC

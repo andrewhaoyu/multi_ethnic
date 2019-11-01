@@ -5,17 +5,17 @@
 
 result <- matrix("c",22,1)
 for(i in 1:22){
-  result[i,1] <- paste0("/spin1/users/zhangh24/plink --vcf ALL.chr",i,".phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz --keep /spin1/users/zhangh24/KG.vcf/ID.EUR --indep-pairwise 1000'kb' 1 0.1 --out /spin1/users/zhangh24/KG.vcf/prunded_result/chr_",i)
+  result[i,1] <- paste0("/data/zhangh24/plink --vcf ALL.chr",i,".phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz --keep /data/zhangh24/KG.vcf/ID.EUR --indep-pairwise 1000'kb' 1 0.1 --out /data/zhangh24/KG.vcf/prunded_result/chr_",i)
 }
 write.table(result,
-  file="/spin1/users/zhangh24/KG.vcf/LD_pruned.sh",
+  file="/data/zhangh24/KG.vcf/LD_pruned.sh",
   row.names = F,
   col.names = F,
   quote=F)
 ########read in phenotype information
 library(data.table)
-phenotype_ori <- as.data.frame(fread("/spin1/users/zhangh24/KG.vcf/integrated_call_samples_v2.20130502.ALL.ped"),stringasFactors=F)
-phenotype_update <- as.data.frame(fread("/spin1/users/zhangh24/KG.vcf/integrated_call_samples_v3.20130502.ALL.panel"),stringasFactors=F)
+phenotype_ori <- as.data.frame(fread("/data/zhangh24/KG.vcf/integrated_call_samples_v2.20130502.ALL.ped"),stringasFactors=F)
+phenotype_update <- as.data.frame(fread("/data/zhangh24/KG.vcf/integrated_call_samples_v3.20130502.ALL.panel"),stringasFactors=F)
 
 phenotype <- merge(phenotype_update,phenotype_ori,
                   by.x="sample",
@@ -43,34 +43,34 @@ ID.AFR <- CreateIDfile(phenotype,"AFR")
 
 ID.AMR <- CreateIDfile(phenotype,"AMR")
 
-write.table(ID.EUR,file = "/spin1/users/zhangh24/KG.vcf/ID.EUR",row.names = F,
+write.table(ID.EUR,file = "/data/zhangh24/KG.vcf/ID.EUR",row.names = F,
             col.names = F,quote=F)
-write.table(ID.AFR,file = "/spin1/users/zhangh24/KG.vcf/ID.AFR",row.names = F,
+write.table(ID.AFR,file = "/data/zhangh24/KG.vcf/ID.AFR",row.names = F,
             col.names = F,quote=F)
-write.table(ID.AMR,file = "/spin1/users/zhangh24/KG.vcf/ID.AMR",row.names = F,
+write.table(ID.AMR,file = "/data/zhangh24/KG.vcf/ID.AMR",row.names = F,
             col.names = F,quote=F)
 
 
 #####calculate the MAF for all of the SNPs for EUR and AFR
 result <- matrix("c",66,1)
 for(i in 1:22){
-  result[i,1] <- paste0("/spin1/users/zhangh24/plink --vcf ALL.chr",i,".phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz --keep /spin1/users/zhangh24/KG.vcf/ID.EUR --freq --out /spin1/users/zhangh24/KG.vcf/MAF_result/EUR_chr_",i)
+  result[i,1] <- paste0("/data/zhangh24/plink --vcf ALL.chr",i,".phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz --keep /data/zhangh24/KG.vcf/ID.EUR --freq --out /data/zhangh24/KG.vcf/MAF_result/EUR_chr_",i)
 }
 
 for(i in 1:22){
-  result[i+22,1] <- paste0("/spin1/users/zhangh24/plink --vcf ALL.chr",i,".phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz --keep /spin1/users/zhangh24/KG.vcf/ID.AFR --freq --out /spin1/users/zhangh24/KG.vcf/MAF_result/AFR_chr_",i)
+  result[i+22,1] <- paste0("/data/zhangh24/plink --vcf ALL.chr",i,".phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz --keep /data/zhangh24/KG.vcf/ID.AFR --freq --out /data/zhangh24/KG.vcf/MAF_result/AFR_chr_",i)
 }
 write.table(result,
-            file="/spin1/users/zhangh24/KG.vcf/MAF_cal.sh",
+            file="/data/zhangh24/KG.vcf/MAF_cal.sh",
             row.names = F,
             col.names = F,
             quote=F)
 
 for(i in 1:22){
-  result[i+44,1] <- paste0("/spin1/users/zhangh24/plink --vcf ALL.chr",i,".phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz --keep /spin1/users/zhangh24/KG.vcf/ID.AMR --freq --out /spin1/users/zhangh24/KG.vcf/MAF_result/AMR_chr_",i)
+  result[i+44,1] <- paste0("/data/zhangh24/plink --vcf ALL.chr",i,".phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz --keep /data/zhangh24/KG.vcf/ID.AMR --freq --out /data/zhangh24/KG.vcf/MAF_result/AMR_chr_",i)
 }
 write.table(result,
-            file="/spin1/users/zhangh24/KG.vcf/MAF_cal.sh",
+            file="/data/zhangh24/KG.vcf/MAF_cal.sh",
             row.names = F,
             col.names = F,
             quote=F)
@@ -89,7 +89,7 @@ write.table(result,
 #####read in the LD pruned SNPs
 num.snp = rep(0,22)
 for(i in 1:22){
-  geno.file = paste0("/spin1/users/zhangh24/KG.vcf/prunded_result/chr_",i,".prune.in")
+  geno.file = paste0("/data/zhangh24/KG.vcf/prunded_result/chr_",i,".prune.in")
   temp = system(paste0("wc -l ",geno.file),intern=T)
   temp = as.numeric(gsub(geno.file,"",temp))
   num.snp[i] = temp
@@ -98,7 +98,7 @@ snp.pruned <- data.frame(rep("c",sum(num.snp)),stringsAsFactors = F)
 library(data.table)
 total <- 0
 for(i in 1:22){
-  snp.temp <- as.data.frame(fread(paste0("/spin1/users/zhangh24/KG.vcf/prunded_result/chr_",i,".prune.in"),header=F))
+  snp.temp <- as.data.frame(fread(paste0("/data/zhangh24/KG.vcf/prunded_result/chr_",i,".prune.in"),header=F))
   snp.pruned[(total+1):(total+num.snp[i]),1] <- snp.temp
   total <- total+num.snp[i]
   
@@ -107,11 +107,11 @@ for(i in 1:22){
 
 colnames(snp.pruned) <- "rs_id"
 
-all.snp.EUR <- as.data.frame(fread("/spin1/users/zhangh24/KG.vcf/MAF_result/all_EUR.freq",header=T))
+all.snp.EUR <- as.data.frame(fread("/data/zhangh24/KG.vcf/MAF_result/all_EUR.freq",header=T))
 colnames(all.snp.EUR)[5] <- "MAF.EUR"
 
-all.snp.AFR <-  as.data.frame(fread("/spin1/users/zhangh24/KG.vcf/MAF_result/all_AFR.freq",header=T))
-all.snp.AMR <- as.data.frame(fread("/spin1/users/zhangh24/KG.vcf/MAF_result/all_AMR.freq",header=T))
+all.snp.AFR <-  as.data.frame(fread("/data/zhangh24/KG.vcf/MAF_result/all_AFR.freq",header=T))
+all.snp.AMR <- as.data.frame(fread("/data/zhangh24/KG.vcf/MAF_result/all_AMR.freq",header=T))
 colnames(all.snp.AFR)[5] <- "MAF.AFR"
 colnames(all.snp.AMR)[5] <- "MAF.AMR"
 all.equal(all.snp.AFR$SNP,all.snp.EUR$SNP)
@@ -131,17 +131,17 @@ pruned.snp.clean= pruned.snp.infor %>%
         rs_id!="."&
         MAF.AFR!=0&
         MAF.AMR!=0)
-save(pruned.snp.clean,file= "/spin1/users/zhangh24/KG.vcf/MAF_result/pruned_MAF.Rdata")
+save(pruned.snp.clean,file= "/data/zhangh24/KG.vcf/MAF_result/pruned_MAF.Rdata")
 colnames(all.snp)[c(7,8)] <- c("MAF.AFR",
                                "MAF.AMR")
 all.snp <- all.snp[,-6]
 all.snp.update = all.snp %>% 
   filter(MAF.EUR>=0.05)
-save(all.snp.update,file = "/spin1/users/zhangh24/KG.vcf/MAF_result/all_snp_MAF.Rdata")
+save(all.snp.update,file = "/data/zhangh24/KG.vcf/MAF_result/all_snp_MAF.Rdata")
 # all.snp.update = %>% all.snp %>% 
 #   select(c(CHR,SNP,A1,A2,MAF.EUR,
 #            all.snp.AFR.MAF.AFR))
-#load("/spin1/users/zhangh24/KG.vcf/MAF_result/pruned_MAF.Rdata")
+#load("/data/zhangh24/KG.vcf/MAF_result/pruned_MAF.Rdata")
 
 # x= matrix(rnorm(1000),ncol=1)
 # x = rep(1,1000)
