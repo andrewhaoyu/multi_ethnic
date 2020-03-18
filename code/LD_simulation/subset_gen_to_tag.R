@@ -8,7 +8,6 @@ library(data.table)
 
 #eth <- c("AFR","AMR","EAS","EUR","SAS")
 eth <- c("EUR","AFR","AMR","EAS")
-tag_all <- list()
 args = commandArgs(trailingOnly = T)
 #i1 represent ethnic groups
 #i2 represent chromosome
@@ -22,7 +21,7 @@ tag <- read.table(paste0("/data/zhangh24/KG.impute2/tag/",eth[i1],"_chr",i2,".ta
   
 library(dplyr)
     
-      gen <- as.data.frame(fread(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/chr",i2,"_",i3,".controls.gen"),header=F))
+      gen <- as.data.frame(fread(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i1],"/chr",i2,"_",i3,".controls.gen"),header=F))
       colnames(tag) <- "position"
       colnames(gen)[3] <- "position"
       tag.gen <- left_join(tag,gen,by="position")
