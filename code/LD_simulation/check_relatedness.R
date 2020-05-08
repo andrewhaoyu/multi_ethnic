@@ -23,13 +23,13 @@ save(result,file = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/EUR/
 
 
 #merge the result
-# result_all <- rep(0,100000)
-# total <- 0
-# for(k in 1:1000){
-#   load(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/EUR/relatedness.rdata"))
-#   temp <- length(result)
-#   result_all[total+(1:temp)] <- result
-# }
+result_all <- rep(0,100000)
+total <- 0
+for(k in 1:1000){
+  load(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/EUR/relatedness_",i1,".rdata"))
+  temp <- length(result)
+  result_all[total+(1:temp)] <- result
+}
 
 #temp <- apply(genotype_standard,1,sd)
 #temp2 <- apply(genotype_standard,1,mean)
