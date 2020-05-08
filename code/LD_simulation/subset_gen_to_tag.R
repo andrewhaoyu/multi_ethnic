@@ -28,6 +28,8 @@ library(dplyr)
       #reorder the column back to the original order
       tag.gen <- tag.gen[,c(6:ncol(tag.gen))]
       write.table(tag.gen,paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i1],"/chr",i2,"_",i3,".controls.tag.gen"),quote = F,col.names = F,row.names = F)
+      
+      #we will need to combine tag info file with tag gen file for each ethnic groups
     
 
 

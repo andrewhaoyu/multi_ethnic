@@ -26,7 +26,7 @@ LDheatmap(CEUSNP, CEUDist, LDmeasure="r",
           #SNP.name=c("rs2283092", "rs6979287"),
           color=grey.colors(20), 
           name="myLDgrob",
-          add.key=TRUE
+          add.key=TRUE)
 
 
 data <- as.data.frame(fread("/Users/zhangh24/Desktop/1000GP_Phase3_chr22_tag_100.gen"))

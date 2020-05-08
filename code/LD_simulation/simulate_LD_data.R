@@ -29,7 +29,7 @@ for(i in 1:length(eth)){
 for(k in 1:100){
   for(j in 1:22){
     
-    for(i in 1:length(eth)){    
+    for(i in 3:3){    
       tag <- tag_all[[i]][[j]]
       code[temp] <- paste0("/data/zhangh24/software/hapgen2 -m /data/zhangh24/KG.impute2/1000GP_Phase3/genetic_map_chr",j,"_combined_b37.txt -l /data/zhangh24/KG.impute2/1000GP_Phase3/1000GP_Phase3_chr",j,".legend -h /data/zhangh24/KG.impute2/",eth[i],"/chr",j,".hap -o /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/chr",j,"_",k," -n ",n[i]," 1 -dl ",tag[1,1]," 1 1 1 -no_haps_output"
       )  
@@ -47,13 +47,15 @@ code <- code[1:(temp-1)]
 write.table(code,file = paste0("/data/zhangh24/multi_ethnic/code/LD_simulation/simulate_LD_data_other_eth.sh"),row.names = F,col.names = F,quote=F)
 
 
+
+
 #simulate data for EUR
 
 eth <- c("EUR")
 
 code <- rep("c",length(eth)*10000)
 temp <- 1
-n <- c(120)
+n <- c(240)
 tag_all <- list()
 for(i in 1:length(eth)){
   tag_temp <- list()
@@ -66,7 +68,7 @@ for(i in 1:length(eth)){
 
 #for put chr and ethnic groups in inner loop to aviod the same start time for hapgen2
 #hapgen2 use the start time to set random seed
-for(k in 1:1000){
+for(k in 1:500){
   for(j in 1:22){
     
     for(i in 1:length(eth)){    

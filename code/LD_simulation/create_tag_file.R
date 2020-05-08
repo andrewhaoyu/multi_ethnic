@@ -3,7 +3,7 @@
 #tag files are created seperately for each chr
 library(data.table)
 library(dplyr)
-eth <- c("AFR","AMR","EAS","EUR","SAS")
+eth <- c("EUR","AFR","AMR","EAS")
 for(i in 1:22){
   leg <- as.data.frame(fread(paste0("/data/zhangh24/KG.impute2/1000GP_Phase3/1000GP_Phase3_chr",i,".legend"),header=T))
   TYPE = leg$TYPE
@@ -32,23 +32,24 @@ eth <- c("EUR","AFR","AMR","EAS")
 #in gen file
 #create tag info file first
 library(dplyr)
-for(i in 1:4){
+for(i1 in 1:1){
   for(j in 1:22){
+    #since the SNP code is the same, just need the first one
+    k <- 1
+    tag <- read.table(paste0("/data/zhangh24/KG.impute2/tag/",eth[i1],"_chr",j,".tag"),header=F)
     
-    tag <- tag_all[[j]]
-    gen <- as.data.frame(fread(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i1],"/chr",j,"_",k,".controls.gen"),header=F))
+    gen <- as.data.frame(fread(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i1],"/chr",j,"_",k,".cases.gen"),header=F))
     colnames(tag) <- "position"
     colnames(gen)[3] <- "position"
     tag.gen <- left_join(tag,gen,by="position")
     #reorder the column back to the original order
-    tag.gen <- tag.gen[,c(2,3,1,4,5)]
-    write.table(tag.gen,paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/chr",j,".tag.info.txt"),quote = F,col.names = F,row.names = F)
+    tag.info <- tag.gen[,c(2,3,1,4,5)]
+    write.table(tag.info,paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i1],"/chr",j,".tag.info.txt"),quote = F,col.names = F,row.names = F)
   }
   
   
   
 }
-  
 
 
 
@@ -56,3 +57,44 @@ for(i in 1:4){
 
 
 
+#count the number of SNPs in each ethnic group
+eth <- c("EUR","AFR","AMR","EAS")
+SNP.number <- matrix(0,22,4)
+for(i1 in 1:4){
+  for(i2 in 1:22){
+    file <- paste0(" /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i1],"/chr",i2,".tag.info.txt")  
+    code <- paste0("wc -l",file)
+    SNP.number[i2,i1] <- as.numeric(gsub(file,"",system(code,intern=T)))
+  }
+}
+
+
+
+
+#generate all SNPs information list
+library(data.table)
+library(dplyr)
+eth <- c("EUR","AFR","AMR","EAS")
+snp.infor.list <- list()
+for(i in 1:22){
+  leg <- as.data.frame(fread(paste0("/data/zhangh24/KG.impute2/1000GP_Phase3/1000GP_Phase3_chr",i,".legend"),header=T))
+  TYPE = leg$TYPE
+  MAF <- leg[,c(9,6,7,8)]
+  MAF.Bi <- MAF
+  for(k in 1:4){
+  MAF.Bi[,k] <- ifelse(MAF[,k]>=0.01&
+                     MAF[,k]<=0.99,1,0)
+  }
+    idx <- which((MAF.Bi[,1]==1|
+                    MAF.Bi[,2]==1|
+                    MAF.Bi[,3]==1|
+                    MAF.Bi[,4]==1)&
+              (TYPE=="Biallelic_SNP"))
+    CHR <- rep(i,length(idx))
+    snp.infor.temp <- cbind(leg[idx,],CHR)
+    snp.infor.list[[i]] <- snp.infor.temp
+    
+}
+
+snp.infor <- rbindlist( snp.infor.list)
+save(snp.infor,file =  "/data/zhangh24/multi_ethnic/result/LD_simulation/snp.infor.rdata")
