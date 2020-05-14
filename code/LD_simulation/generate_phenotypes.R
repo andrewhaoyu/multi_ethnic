@@ -131,8 +131,18 @@ for(k in 1:n){
   MAF_EUR <- EUR.snp$EUR
   
   sum(genotype[1,])/(2*ncol(genotype))
+  #MAF_test <- rowSums(genotype)/(2*ncol(genotype))
   
-  y = t(genotype)%*%(beta_EUR/sqrt(2*MAF_EUR*(1-MAF_EUR)))+rnorm(n,mean=0,sd = sqrt(1-sigma))
+  
+  genotype_standard <- genotype
+  for(k in 1:nrow(genotype_standard)){
+    genotype_standard[k,] = (genotype[k,]-2*MAF_EUR[k])/sqrt(2*MAF_EUR[k]*(1-MAF_EUR[k]))
+  }
+  y = t(genotype_standard)%*%(beta_EUR)+rnorm(n,mean=0,sd = sqrt(1-sigma))
+mean(y)
+var(y)
+
+sample <- read.table("/data/zhangh24/multi_ethnic/result/LD_simulation/EUR/sample.txt",header=T)
 
   
 save(y,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/EUR/phenotype.rdata")
@@ -191,14 +201,18 @@ row.names(genotype) <- AFR.snp$id
 beta_AFR <- AFR.snp$beta_AFR
 MAF_AFR <- AFR.snp$AFR
 
-y = t(genotype)%*%(beta_AFR/sqrt(2*MAF_AFR*(1-MAF_AFR)))+rnorm(n,mean=0,sd = sqrt(1-sigma))
+genotype_standard <- genotype
+for(k in 1:nrow(genotype_standard)){
+  genotype_standard[k,] = (genotype[k,]-2*MAF_AFR[k])/sqrt(2*MAF_AFR[k]*(1-MAF_AFR[k]))
+}
+
+
+y = t(genotype_standard)%*%(beta_AFR)+rnorm(n,mean=0,sd = sqrt(1-sigma))
+mean(y)
 var(y)
 
 save(y,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/AFR/phenotype.rdata")
 save(genotype,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/AFR/causal_genotype.rdata")
-
-
-
 
 
 
@@ -252,9 +266,17 @@ row.names(genotype) <- AMR.snp$id
 beta_AMR <- AMR.snp$beta_AMR
 MAF_AMR <- AMR.snp$AMR
 
-y = t(genotype)%*%(beta_AMR/sqrt(2*MAF_AMR*(1-MAF_AMR)))+rnorm(n,mean=0,sd = sqrt(1-sigma))
-var(y)
 
+genotype_standard <- genotype
+for(k in 1:nrow(genotype_standard)){
+  genotype_standard[k,] = (genotype[k,]-2*MAF_AMR[k])/sqrt(2*MAF_AMR[k]*(1-MAF_AMR[k]))
+}
+
+
+
+y = t(genotype_standard)%*%(beta_AMR)+rnorm(n,mean=0,sd = sqrt(1-sigma))
+mean(y)
+var(y)
 save(y,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/AMR/phenotype.rdata")
 save(genotype,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/AMR/causal_genotype.rdata")
 
@@ -309,10 +331,29 @@ row.names(genotype) <- EAS.snp$id
 beta_EAS <- EAS.snp$beta_EAS
 MAF_EAS <- EAS.snp$EAS
 
-y = t(genotype)%*%(beta_EAS/sqrt(2*MAF_EAS*(1-MAF_EAS)))+rnorm(n,mean=0,sd = sqrt(1-sigma))
-var(y)
+genotype_standard <- genotype
+for(k in 1:nrow(genotype_standard)){
+  genotype_standard[k,] = (genotype[k,]-2*MAF_EAS[k])/sqrt(2*MAF_EAS[k]*(1-MAF_EAS[k]))
+}
 
+
+y = t(genotype_standard)%*%(beta_EAS)+rnorm(n,mean=0,sd = sqrt(1-sigma))
+mean(y)
+var(y)
 save(y,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/EAS/phenotype.rdata")
 save(genotype,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/EAS/causal_genotype.rdata")
 
+load("/data/zhangh24/multi_ethnic/result/LD_simulation/EAS/phenotype.rdata")
+load("/data/zhangh24/multi_ethnic/result/LD_simulation/EAS/causal_genotype.rdata")
 
+p_e <- rep(0,nrow(genotype))
+for(k in 1:length(p_e)){
+  print(k)
+  model <- lm(y[1:n.train]~genotype[k,1:n.train])
+  p_e[k] <- coefficients(summary(model))[2,4]
+}
+
+p_e_order <- p_e[order(p_e)]
+
+p_order <- p[order(p)]
+p_a_order <- p_a[order(p_a)]

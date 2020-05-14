@@ -24,16 +24,16 @@ save(result,file = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/EUR/
 
 
 #merge the result
-# result_all <- rep(0,100000)
-# total <- 0
-# for(i1 in 1:100){
-#   load(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/EUR/relatedness_",i1,".rdata"))
-#   temp <- length(result)
-#   result_all[total+(1:temp)] <- result
-#   total <- total+temp
-# }
-# 
-# idx <- which(result_all>=0.1)
+result_all <- rep(0,10000)
+total <- 0
+for(i1 in 1:100){
+  load(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/EUR/relatedness_",i1,".rdata"))
+  temp <- length(result)
+  result_all[total+(1:temp)] <- result
+  total <- total+temp
+}
+
+idx.EUR <- which(result_all>=0.1)
 # 
 # 
 # #temp <- apply(genotype_standard,1,sd)

@@ -9,13 +9,28 @@ temp <- 1
 eth <- c("EUR","AFR","AMR","EAS")
 for(i in 1:4){
   for(j in 1:22){
-    code[temp] <- paste0("/data/zhangh24/software/plink2 --gen /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/chr",j,".plink.tag.gen --sample /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/sample.txt --out /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/summary_chr",j,".out --linear ")
+    #code[temp] <- paste0("/data/zhangh24/software/plink2 --gen /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/chr",j,".plink.tag.gen --sample /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/sample.txt --out /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/summary_chr",j,".out --linear --allow-no-sex")
+    code[temp] <- paste0("/data/zhangh24/software/plink2 --bfile /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/chr",j,".tag --out /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/summary_chr",j,".out --linear --allow-no-sex")
     temp <- temp+1
   }
 }
 
 code <- code[1:(temp-1)]
 write.table(code,file = "/data/zhangh24/multi_ethnic/code/LD_simulation/run_gwas.sh",quote=F,row.names = F,col.names = F)
+
+
+code <- rep("c",1000)
+temp <- 1
+eth <- c("EAS")
+for(i in 1:1){
+  for(j in 1:22){
+    code[temp] <- paste0("/data/zhangh24/software/plink2 --gen /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/chr",j,".plink.tag.gen --sample /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/sample.txt --out /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/summary_chr",j,".out --linear ")
+    temp <- temp+1
+  }
+}
+
+code <- code[1:(temp-1)]
+write.table(code,file = "/data/zhangh24/multi_ethnic/code/LD_simulation/test.sh",quote=F,row.names = F,col.names = F)
 
 
 
