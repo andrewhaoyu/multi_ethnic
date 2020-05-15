@@ -68,6 +68,7 @@ n4 = n.EAS.snp
 Sigma <- GenSigma(sigma,n1,n2,n3,n4,
                   gr12,gr13,g14,
                   gr23,g24,g34)
+save(Sigma,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/causal_Sigma.rdata")
 library(mvtnorm)
 #beta represent standarize scale effect-size
 set.seed(666)

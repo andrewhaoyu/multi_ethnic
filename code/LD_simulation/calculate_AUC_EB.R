@@ -53,7 +53,7 @@ for(i in 2:length(eth)){
         n.snp.total<-0
         for(j in c(1:22)){
           setwd(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/prs/"))
-          filename <- paste0("chr",j,"_prs_",k,"_",l,".profile")
+          filename <- paste0("chr",j,"_prs_eb_",k,"_",l,".profile")
           idx <- which(prs.file$CHR==j)
           n.snp.total=n.snp.total+length(idx)
           if(length(idx)>0){
@@ -82,4 +82,5 @@ for(i in 1:3){
   r2.max[i] = max(r2.mat[,i+2])  
 }
 
-write.csv(r2.max,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/r2.max_two_dim.csv")
+
+write.csv(r2.mat,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/r2.max_eb.csv")

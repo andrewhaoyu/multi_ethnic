@@ -63,6 +63,9 @@ summary.eur.select = summary.eur %>%
       #get the prior estimate using all the SNPs effect size
       prior.sigma = cov(cbind(prs.select$beta_st,
                         prs.select$beta_eur_st),use="complete.obs")
+      load("/data/zhangh24/multi_ethnic/result/LD_simulation/causal_Sigma.rdata")
+      true_sigma = Sigma
+      prior.sigma = (Sigma[c(i,1),c(i,1)])
       #implement the emprical Bayes
       #train is the target population
       #ref is EUR population
@@ -102,22 +105,22 @@ summary.eur.select = summary.eur %>%
 #write.csv(n.snp.mat,file =paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/n_snp_mat.csv"))
 
 #use plink score funciton to get prs
-# code <- rep("c",10000)
-# temp <- 1
-# for(i in 2:length(eth)){
-#   for(j in 1:22){
-#     for(k in 1:length(pthres)){
-#       for(l in 1:length(pthres)){
-#         temp.code <- paste0("/data/zhangh24/software/plink2 --score /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/prs/prs_file_pvalue_eb_",k,"_",l," no-sum no-mean-imputation  --allow-no-sex --bfile /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/chr",j,".tag --exclude /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/duplicated.id  --out /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/prs/chr",j,"_prs_eb_",k,"_",l)
-#         code[temp] <- temp.code
-#         temp <- temp+1
-#       }
-#     }
-#   }
-# 
-# }
-# code <- code[1:(temp-1)]
-# write.table(code,file = paste0("/data/zhangh24/multi_ethnic/code/LD_simulation/calculate_prs_eb.sh"),col.names = F,row.names = F,quote=F)
+code <- rep("c",10000)
+temp <- 1
+for(i in 2:length(eth)){
+  for(j in 1:22){
+    for(k in 1:length(pthres)){
+      for(l in 1:length(pthres)){
+        temp.code <- paste0("/data/zhangh24/software/plink2 --score /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/prs/prs_file_pvalue_eb_",k,"_",l," no-sum no-mean-imputation  --allow-no-sex --bfile /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/chr",j,".tag --exclude /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/duplicated.id  --out /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/prs/chr",j,"_prs_eb_",k,"_",l)
+        code[temp] <- temp.code
+        temp <- temp+1
+      }
+    }
+  }
+
+}
+code <- code[1:(temp-1)]
+write.table(code,file = paste0("/data/zhangh24/multi_ethnic/code/LD_simulation/calculate_prs_eb.sh"),col.names = F,row.names = F,quote=F)
 # 
 # 
 # write.table(code,file = paste0("/data/zhangh24/multi_ethnic/code/LD_simulation/test.sh"),col.names = F,row.names = F,quote=F)
