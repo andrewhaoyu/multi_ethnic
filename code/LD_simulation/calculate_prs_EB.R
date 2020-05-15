@@ -39,7 +39,7 @@ summary.eur.select = summary.eur %>%
   sum.data <- as.data.frame(fread(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/summary.out")))
   colnames(sum.data)[2] <- "SNP"
   #get standarize the effect and sd
-  sum.data.all = left_join(sum.data,snp.infor.select,byb=SNP)
+  sum.data.all = left_join(sum.data,snp.infor.select,by="SNP")
   
   sum.data.all = sum.data.all %>% 
     mutate(beta_st=BETA*sqrt(2*.[[9+i]]*(1-.[[9+i]])),
@@ -110,17 +110,17 @@ summary.eur.select = summary.eur %>%
 #       for(l in 1:length(pthres)){
 #         temp.code <- paste0("/data/zhangh24/software/plink2 --score /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/prs/prs_file_pvalue_eb_",k,"_",l," no-sum no-mean-imputation  --allow-no-sex --bfile /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/chr",j,".tag --exclude /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/duplicated.id  --out /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/prs/chr",j,"_prs_eb_",k,"_",l)
 #         code[temp] <- temp.code
-#         temp <- temp+1  
+#         temp <- temp+1
 #       }
 #     }
 #   }
-#   
+# 
 # }
 # code <- code[1:(temp-1)]
 # write.table(code,file = paste0("/data/zhangh24/multi_ethnic/code/LD_simulation/calculate_prs_eb.sh"),col.names = F,row.names = F,quote=F)
-
-
-
+# 
+# 
+# write.table(code,file = paste0("/data/zhangh24/multi_ethnic/code/LD_simulation/test.sh"),col.names = F,row.names = F,quote=F)
 
 
 
