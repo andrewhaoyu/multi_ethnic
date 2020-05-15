@@ -62,7 +62,7 @@ summary.eur.select = summary.eur %>%
                            peur<=pthres[l]) 
       #get the prior estimate using all the SNPs effect size
       prior.sigma = cov(cbind(prs.select$beta_st,
-                        prs.select$beta_eur_st))
+                        prs.select$beta_eur_st),use="complete.obs")
       #implement the emprical Bayes
       #train is the target population
       #ref is EUR population
