@@ -28,7 +28,7 @@ for(i in 2:4){
 
 dim(summary)
 head(summary)
-pthr = 0.5
+pthr = 0.1
 r2thr = 0.1
 kbpthr = 500
 eth <- c("EUR","AFR","AMR","EAS")

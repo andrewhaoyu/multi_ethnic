@@ -25,7 +25,6 @@ for(i in 2:length(eth)){
   y.test <- y[(n.train[i]+1):(n.train[i]+n.test[i])]
   n <- length(y)
   #read LD clumped SNPs
-  clump.snp <- LD[,3,drop=F] 
   LD <- as.data.frame(fread(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/LD_clump_two_dim.clumped")))
   clump.snp <- LD[,3,drop=F]  
   #read the target ethnic group summary level statistics
@@ -83,4 +82,4 @@ for(i in 1:3){
 }
 
 
-write.csv(r2.mat,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/r2.max_eb.csv")
+write.csv(r2.max,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/r2.max_eb.csv")
