@@ -1,5 +1,10 @@
 #goal merge gwas summary level statistics
 #merge the subfiles together
+
+
+
+
+
 eth <- c("EUR","AFR","AMR","EAS")
 code <- c("c",4)
 for(i in 1:4){

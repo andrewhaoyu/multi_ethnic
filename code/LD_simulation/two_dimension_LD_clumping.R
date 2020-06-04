@@ -5,16 +5,18 @@ library(data.table)
 library(dplyr)
 #update the summary results to make it work for plink clumping command
 eth <- c("EUR","AFR","AMR","EAS")
-summary.eur <- as.data.frame(fread(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[1],"/summary.out"),header=T))
+#summary.eur <- as.data.frame(fread(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[1],"/summary.out"),header=T))
+summary.eur <- as.data.frame(fread(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[1],"/summary_MAF.out"),header=T))
 colnames(summary.eur)[9] = "peur"
 #only keep snpid and p-value for future combination
 summary.eur.select = summary.eur %>% 
   select(SNP,peur)
 for(i in 2:4){
-  summary <- as.data.frame(fread(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/summary.out"),header=T))
+  #summary <- as.data.frame(fread(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/summary.out"),header=T))
+  summary <- as.data.frame(fread(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/summary_MAF.out"),header=T))
   #find the shared SNPs between target ethnic group and EUR
   #get the min p-value for between the target ethnic group and EUR for shared snp
-  summary.com <- left_join(summary,summary.eur.select,by="SNP")
+  summary.com <- full_join(summary,summary.eur.select,by="SNP")
   summary.com = summary.com %>% 
     mutate(p_update=pmin(P,peur,na.rm = T))
   assoc = summary.com %>%

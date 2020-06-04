@@ -55,12 +55,12 @@ GenSigma <- function(sigma,n1,n2,n3,n4,
   
 }
 sigma = 0.4
-gr12 = 0.4
-gr13 = 0.6
+gr12 = 0.8
+gr13 = 0.8
 gr14 = 0.8
-gr23 = 0.6
-gr24 = 0.6
-gr34 = 0.6
+gr23 = 0.8
+gr24 = 0.8
+gr34 = 0.8
 n1 = n.EUR.snp
 n2 = n.AFR.snp
 n3 = n.AMR.snp

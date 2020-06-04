@@ -70,28 +70,37 @@ gr14 = 0.8
 gr23 = 0.8
 gr24 = 0.8
 gr34 = 0.8
-n1 = n.all.shared
+n1 = n.EUR.snp
 n2 = n.AFR.snp
-n3 = n.all.shared
-n4 = n.all.shared
+n3 = n.AMR.snp
+n4 = n.EAS.snp
+# n1 = n.all.shared
+# n2 = n.AFR.snp
+# n3 = n.all.shared
+# n4 = n.all.shared
 Sigma <- GenSigma(sigma,n1,n2,n3,n4,
                   gr12,gr13,g14,
                   gr23,g24,g34)
 
+save(Sigma, file ="/data/zhangh24/multi_ethnic/result/LD_simulation/causal_Sigma.rdata")
+# beta_shared =  rmvnorm(n.all.shared,c(0,0,0,0),
+#                 sigma=Sigma)
+# beta[all.shared,] = beta_shared
+# colnames(beta) <- paste0("beta_",c("EUR","AFR","AMR","EAS"))
+# 
+# AFR.specific = AFR.idx[AFR.idx%in%all.shared==F]
+# n.AFR.specific = length(AFR.specific)
+# beta_AFR_specific = rnorm(n.AFR.specific,mean = 0,
+#                             sd = sqrt(sigma*1/n.AFR.snp))
+
+#beta[AFR.specific,2] = beta_AFR_specific
+#beta represent standarize scale effect-size
 beta <- matrix(0,n.total.snp,4)
-colnames(beta) <- paste0("beta_",c("EUR","AFR","AMR","EAS"))
 set.seed(666)
-beta_shared =  rmvnorm(n.all.shared,c(0,0,0,0),
+beta =  rmvnorm(n.total.snp,c(0,0,0,0),
                 sigma=Sigma)
-beta[all.shared,] = beta_shared
 colnames(beta) <- paste0("beta_",c("EUR","AFR","AMR","EAS"))
 
-AFR.specific = AFR.idx[AFR.idx%in%all.shared==F]
-n.AFR.specific = length(AFR.specific)
-beta_AFR_specific = rnorm(n.AFR.specific,mean = 0,
-                            sd = sqrt(sigma*1/n.AFR.snp))
-
-beta[AFR.specific,2] = beta_AFR_specific
 cau.snp.infor <- cbind(cau.snp.infor,beta)
 #transform the genfile to additive genotype file in EUR
 

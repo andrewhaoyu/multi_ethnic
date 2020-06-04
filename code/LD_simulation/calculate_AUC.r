@@ -10,12 +10,17 @@ n.test <- c(10000,1500,1500,1500)
 #r2 mat represent the r2 matrix for the testing dataset
 #column represent the ethnic groups
 #row represent different p-value threshold
-r2.mat <- matrix(0,length(pthres),4)
+r2.mat.test <- matrix(0,length(pthres),4)
+r2.mat.vad <- matrix(0,length(pthres),4)
 for(i in 1:length(eth)){
   #load the phenotype file
   load(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/phenotype.rdata"))
-  y.test <- y[(n.train[i]+1):(n.train[i]+n.test[i])]
   n <- length(y)
+  y.test <- y[(n.train[i]+1):(n.train[i]+n.test[i])]
+  y.vad <- y[(n.train[i]+n.test[i]+1):n]
+  
+  
+  
   
   LD <- as.data.frame(fread(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/LD_clump.clumped")))
   clump.snp <- LD[,3,drop=F]  
@@ -44,16 +49,27 @@ for(i in 1:length(eth)){
       prs.score = prs.score/(2*n.snp.total)
       #prs.score.mat[,k] = prs.score
       prs.test <- prs.score[(n.train[i]+1):(n.train[i]+n.test[i])]
-      
+      prs.vad <- prs.score[(n.train[i]+n.test[i]+1):n]
+      #model = lm(y~prs.score)
       model1 <- lm(y.test~prs.test)
-      r2.mat[k,i] <- summary(model1)$r.square
+      r2.mat.test[k,i] <- summary(model1)$r.square
+      model2 <- lm(y.vad~prs.vad)
+      r2.mat.vad[k,i] <- summary(model2)$r.square
     }else{
-      r2.mat[k,i]=0
+      r2.mat.test[k,i] = 0
+      r2.mat.vad[k,i] = 0
       }
     
   }
 }
-colnames(r2.mat) <- eth
-rownames(r2.mat) <- pthres
-save(r2.mat,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/r2.mat.eur.rdata")
+colnames(r2.mat.test) <- colnames(r2.mat.vad) <- eth
+rownames(r2.mat.test) <- rownames(r2.mat.vad) <- pthres
+
+r2.mat <- rep(0,length(eth))
+#evaluate the best prs performance on the validation
+for(k in 1:length(eth)){
+  idx <- which.max(r2.mat.test[,k])
+  r2.mat[k] <- r2.mat.vad[idx,k]
+}
+save(r2.mat.test,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/r2.mat.eur.rdata")
 write.csv(r2.mat,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/ld.clump.auc.csv")
