@@ -14,8 +14,8 @@ colnames(summary.eur)[7] = "beta_eur"
 summary.eur.select = summary.eur %>% 
   select(SNP,beta_eur,peur)
 for(i in 2:length(eth)){
-  #read LD clumped SNPs
-  LD <- as.data.frame(fread(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/LD_clump_two_dim.clumped")))
+  #read LD clumped SNPs from EUR
+  LD <- as.data.frame(fread(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[1],"/LD_clump.clumped")))
   clump.snp <- LD[,3,drop=F] 
   #read the target ethnic group summary level statistics
   sum.data <- as.data.frame(fread(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/summary.out")))
@@ -25,12 +25,12 @@ for(i in 2:length(eth)){
   #combine the statistics with SNPs after clumping
   prs.all <- left_join(clump.snp,summary.com,by="SNP") 
   #save the prs information for easier filter
-  save(prs.all,file = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/LD_clump_two_dim.clumped_all_infor"))
+  save(prs.all,file = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/LD_clump_two_dim.clumped_all_infor_eurp_eurref"))
   
 }
 
 for(i in 2:length(eth)){
-  load(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/LD_clump_two_dim.clumped_all_infor"))
+  load(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/LD_clump_two_dim.clumped_all_infor_eurp_eurref"))
   #k for the p-value threshold on the target population
   #l for the p-value threshold on the eur population
   for(k in 1:length(pthres)){
@@ -40,14 +40,14 @@ for(i in 2:length(eth)){
         select(SNP,A1,BETA)
       dim(prs.file)
       
-#       prs.file.new <- prs.all %>% filter(peur<=pthres[l]) %>% 
-#         select(SNP,A1,BETA)
-# dim(prs.file.new)      
+      #       prs.file.new <- prs.all %>% filter(peur<=pthres[l]) %>% 
+      #         select(SNP,A1,BETA)
+      # dim(prs.file.new)      
       
       
       jdx = which(n.snp.mat[,1]==pthres[k]&n.snp.mat[,2]==pthres[l])
       n.snp.mat[jdx,i+1] = nrow(prs.file)
-      write.table(prs.file,file = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/prs/prs_file_pvalue_two_dim",k,"_",l),col.names = T,row.names = F,quote=F)  
+      write.table(prs.file,file = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/prs/prs_file_pvalue_two_dim_eurp_eurref",k,"_",l),col.names = T,row.names = F,quote=F)  
     }
     
   }
@@ -62,7 +62,7 @@ for(i in 2:length(eth)){
   for(j in 1:22){
     for(k in 1:length(pthres)){
       for(l in 1:length(pthres)){
-        temp.code <- paste0("/data/zhangh24/software/plink2 --score /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/prs/prs_file_pvalue_two_dim",k,"_",l," no-sum no-mean-imputation  --allow-no-sex --bfile /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/chr",j,".tag --exclude /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/duplicated.id  --out /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/prs/chr",j,"_prs_",k,"_",l)
+        temp.code <- paste0("/data/zhangh24/software/plink2 --score /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/prs/prs_file_pvalue_two_dim_eurp_eurref",k,"_",l," no-sum no-mean-imputation  --allow-no-sex --bfile /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/chr",j,".tag --exclude /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/duplicated.id  --out /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/prs/chr_eurp_eurref",j,"_prs_",k,"_",l)
         code[temp] <- temp.code
         temp <- temp+1  
       }
@@ -71,7 +71,7 @@ for(i in 2:length(eth)){
   
 }
 code <- code[1:(temp-1)]
-write.table(code,file = paste0("/data/zhangh24/multi_ethnic/code/LD_simulation/calculate_prs_two_dim.sh"),col.names = F,row.names = F,quote=F)
+write.table(code,file = paste0("/data/zhangh24/multi_ethnic/code/LD_simulation/calculate_prs_two_dim_eurp_eurref.sh"),col.names = F,row.names = F,quote=F)
 
 
 

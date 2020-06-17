@@ -6,7 +6,7 @@ pthres <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01)
 #n <- 120000
 n.train <- c(100000,15000,15000,15000)
 n.test <- c(10000,1500,1500,1500)
-
+n.rep = 100
 #r2 mat represent the r2 matrix for the testing dataset
 #column represent the ethnic groups
 #row represent different p-value threshold
@@ -16,10 +16,10 @@ for(i in 1:length(eth)){
   #load the phenotype file
   load(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/phenotype.rdata"))
   n <- length(y)
-  y.test <- y[(n.train[i]+1):(n.train[i]+n.test[i])]
-  y.vad <- y[(n.train[i]+n.test[i]+1):n]
-  
-  
+  # y.test <- y[(n.train[i]+1):(n.train[i]+n.test[i])]
+  # y.vad <- y[(n.train[i]+n.test[i]+1):n]
+  # 
+  load(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/phenotype_test_mat.rdata"))
   
   
   LD <- as.data.frame(fread(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/LD_clump.clumped")))
@@ -51,10 +51,18 @@ for(i in 1:length(eth)){
       prs.test <- prs.score[(n.train[i]+1):(n.train[i]+n.test[i])]
       prs.vad <- prs.score[(n.train[i]+n.test[i]+1):n]
       #model = lm(y~prs.score)
-      model1 <- lm(y.test~prs.test)
-      r2.mat.test[k,i] <- summary(model1)$r.square
-      model2 <- lm(y.vad~prs.vad)
-      r2.mat.vad[k,i] <- summary(model2)$r.square
+      r2.test.rep = rep(0,n.rep)
+      r2.vad.rep = rep(0,n.rep)
+      for(l in 1:n.rep){
+        y.test = y_test_mat[1:n.test[i],l]
+        y.vad = y_test_mat[(n.test[i]+1):(nrow(y_test_mat)),l]
+        model1 <- lm(y.test~prs.test)
+        r2.test.rep[l] <- summary(model1)$r.square
+        model2 <- lm(y.vad~prs.vad)
+        r2.vad.rep[l]<- summary(model2)$r.square
+      }
+      r2.mat.test[k,i] <- mean(r2.test.rep)
+      r2.mat.vad[k,i] <- mean(r2.vad.rep)
     }else{
       r2.mat.test[k,i] = 0
       r2.mat.vad[k,i] = 0

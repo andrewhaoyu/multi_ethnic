@@ -13,27 +13,23 @@ n.test <- c(10000,1500,1500,1500)
 #row represent different p-value threshold
 np = nrow(expand.grid(pthres,pthres))
 r2.mat <- cbind(expand.grid(pthres,pthres),0,0,0)
-summary.eur <- as.data.frame(fread(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[1],"/summary.out"),header=T))
-colnames(summary.eur)[9] = "peur"
-colnames(summary.eur)[7] = "beta_eur"
-summary.eur.select = summary.eur %>% 
-  select(SNP,beta_eur,peur)
+r2.mat.test <- cbind(expand.grid(pthres,pthres),0,0,0)
+r2.mat.vad <- cbind(expand.grid(pthres,pthres),0,0,0)
 
+# summary.eur <- as.data.frame(fread(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[1],"/summary.out"),header=T))
+# colnames(summary.eur)[9] = "peur"
+# colnames(summary.eur)[7] = "beta_eur"
+# summary.eur.select = summary.eur %>% 
+#   select(SNP,beta_eur,peur)
+n.rep = 100
 for(i in 2:length(eth)){
   #load the phenotype file
   load(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/phenotype.rdata"))
-  y.test <- y[(n.train[i]+1):(n.train[i]+n.test[i])]
   n <- length(y)
-  #read LD clumped SNPs
-  LD <- as.data.frame(fread(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/LD_clump_two_dim.clumped")))
-  clump.snp <- LD[,3,drop=F]  
-  #read the target ethnic group summary level statistics
-  sum.data <- as.data.frame(fread(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/summary.out")))
-  colnames(sum.data)[2] <- "SNP"
-  #combine the target level summary stat with EUR
-  summary.com <- left_join(sum.data,summary.eur.select,by="SNP")
-  #combine the statistics with SNPs after clumping
-  prs.all <- left_join(clump.snp,summary.com,by="SNP") 
+  # y.test <- y[(n.train[i]+1):(n.train[i]+n.test[i])]
+  # y.vad <- y[(n.train[i]+n.test[i]+1):n]
+  load(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/phenotype_test_mat.rdata"))
+  load(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/LD_clump_two_dim.clumped_all_infor"))
   #k for the p-value threshold on the target population
   #l for the p-value threshold on the eur population
   
@@ -61,24 +57,44 @@ for(i in 2:length(eth)){
           }
         }
         prs.score = prs.score/(2*n.snp.total)
-        
         prs.test <- prs.score[(n.train[i]+1):(n.train[i]+n.test[i])]
+        prs.vad <- prs.score[(n.train[i]+n.test[i]+1):n]
+        r2.test.rep = rep(0,n.rep)
+        r2.vad.rep = rep(0,n.rep)
+        for(m in 1:n.rep){
+          y.test = y_test_mat[1:n.test[i],m]
+          y.vad = y_test_mat[(n.test[i]+1):(nrow(y_test_mat)),m]
+          model1 <- lm(y.test~prs.test)
+          r2.test.rep[m] <- summary(model1)$r.square
+          model2 <- lm(y.vad~prs.vad)
+          r2.vad.rep[m]<- summary(model2)$r.square
+        }
+        jdx = which(r2.mat.test[,1]==pthres[k]&r2.mat.test[,2]==pthres[l])
+        r2.mat.test[jdx,i+1] <- mean(r2.test.rep)
+        r2.mat.vad[jdx,i+1] <- mean(r2.vad.rep)
         
-        model1 <- lm(y.test~prs.test)
-        jdx = which(r2.mat[,1]==pthres[k]&r2.mat[,2]==pthres[l])
-        r2.mat[jdx,i+1] <- summary(model1)$r.square
+        # prs.test <- prs.score[(n.train[i]+1):(n.train[i]+n.test[i])]
+        # prs.vad <- prs.score[(n.train[i]+n.test[i]+1):n]
+        # model1 <- lm(y.test~prs.test)
+        # jdx = which(r2.mat.test[,1]==pthres[k]&r2.mat.test[,2]==pthres[l])
+        # r2.mat.test[jdx,i+1] <- summary(model1)$r.square
+        # model2 <- lm(y.vad~prs.vad)
+        # jdx = which(r2.mat.vad[,1]==pthres[k]&r2.mat.vad[,2]==pthres[l])
+        # r2.mat.vad[jdx,i+1] <- summary(model1)$r.square
       }else{
-        r2.mat[jdx,i+1]=0
+        r2.mat.test[jdx,i+1]=0
+        r2.mat.vad[jdx,i+1] = 0
       }
       
     }
     
   }
 }
-colnames(r2.mat)[3:5] <- eth[2:4]
+colnames(r2.mat.test)[3:5] <- colnames(r2.mat.vad)[3:5] <- eth[2:4]
 r2.max <- rep(0,3)
 for(i in 1:3){
-  r2.max[i] = max(r2.mat[,i+2])  
+  jdx <- which.max(r2.mat.test[,i+2])
+  r2.max[i] = max(r2.mat.vad[jdx,i+2])  
 }
 
 

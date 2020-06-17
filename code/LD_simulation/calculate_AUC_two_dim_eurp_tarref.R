@@ -4,8 +4,8 @@ library(data.table)
 
 eth <- c("EUR","AFR","AMR","EAS")
 #pthres <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01)
+pthres <- c(1E-10,1E-09,5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03)
 #pthres <- c(1E-10,1E-09,5E-08,1E-07,2.5E-07,5E-07,7.5E-07,1E-06,2.5E-06,5E-06,7.5E-06,1E-05,2.5e-05,5E-05,7.5e-05,1E-04,2.5E-04,5E-04,7.5E-04,1E-03)
-pthres <- c(1E-10,1E-09,5E-08,1E-07,2.5E-07,5E-07,7.5E-07,1E-06,2.5E-06,5E-06,7.5E-06,1E-05,2.5e-05,5E-05,7.5e-05,1E-04,2.5E-04,5E-04,7.5E-04,1E-03)
 #n <- 120000
 n.train <- c(100000,15000,15000,15000)
 n.test <- c(10000,1500,1500,1500)
@@ -16,15 +16,15 @@ n.test <- c(10000,1500,1500,1500)
 np = nrow(expand.grid(pthres,pthres))
 r2.mat.test <- cbind(expand.grid(pthres,pthres),0,0,0)
 r2.mat.vad <- cbind(expand.grid(pthres,pthres),0,0,0)
-
+n.rep = 100
 for(i in 2:length(eth)){
   #load the phenotype file
   load(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/phenotype.rdata"))
   n <- length(y)
-#  y.test <- y[(n.train[i]+1):(n.train[i]+n.test[i])]
-#  y.vad <- y[(n.train[i]+n.test[i]+1):n]
+  #y.test <- y[(n.train[i]+1):(n.train[i]+n.test[i])]
+ # y.vad <- y[(n.train[i]+n.test[i]+1):n]
   load(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/phenotype_test_mat.rdata"))
-  load(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/LD_clump_two_dim.clumped_all_infor"))
+  load(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/LD_clump_two_dim.clumped_all_infor_eur"))
   #k for the p-value threshold on the target population
   #l for the p-value threshold on the eur population
   
@@ -43,7 +43,7 @@ for(i in 2:length(eth)){
         n.snp.total<-0
         for(j in c(1:22)){
           setwd(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/prs/"))
-          filename <- paste0("chr",j,"_prs_",k,"_",l,".profile")
+          filename <- paste0("chr_eurp_tarref",j,"_prs_",k,"_",l,".profile")
           idx <- which(prs.file$CHR==j)
           n.snp.total=n.snp.total+length(idx)
           if(length(idx)>0){
@@ -52,6 +52,15 @@ for(i in 2:length(eth)){
           }
         }
         prs.score = prs.score/(2*n.snp.total)
+        
+        # prs.test <- prs.score[(n.train[i]+1):(n.train[i]+n.test[i])]
+        # prs.vad <- prs.score[(n.train[i]+n.test[i]+1):n]
+        # model1 <- lm(y.test~prs.test)
+        # jdx = which(r2.mat.test[,1]==pthres[k]&r2.mat.test[,2]==pthres[l])
+        # r2.mat.test[jdx,i+1] <- summary(model1)$r.square
+        # model2 <- lm(y.vad~prs.vad)
+        # jdx = which(r2.mat.vad[,1]==pthres[k]&r2.mat.vad[,2]==pthres[l])
+        # r2.mat.vad[jdx,i+1] <- summary(model1)$r.square
         prs.test <- prs.score[(n.train[i]+1):(n.train[i]+n.test[i])]
         prs.vad <- prs.score[(n.train[i]+n.test[i]+1):n]
         r2.test.rep = rep(0,n.rep)
@@ -67,15 +76,7 @@ for(i in 2:length(eth)){
         jdx = which(r2.mat.test[,1]==pthres[k]&r2.mat.test[,2]==pthres[l])
         r2.mat.test[jdx,i+1] <- mean(r2.test.rep)
         r2.mat.vad[jdx,i+1] <- mean(r2.vad.rep)
-        
-        
-        # model1 <- lm(y.test~prs.test)
-        # jdx = which(r2.mat.test[,1]==pthres[k]&r2.mat.test[,2]==pthres[l])
-        # r2.mat.test[jdx,i+1] <- summary(model1)$r.square
-        # model2 <- lm(y.vad~prs.vad)
-        # jdx = which(r2.mat.vad[,1]==pthres[k]&r2.mat.vad[,2]==pthres[l])
-        # r2.mat.vad[jdx,i+1] <- summary(model1)$r.square
-      }else{
+         }else{
         r2.mat.test[jdx,i+1]=0
         r2.mat.vad[jdx,i+1] = 0
       }

@@ -46,3 +46,9 @@ write.table(code,file = "/data/zhangh24/multi_ethnic/code/LD_simulation/LD_clump
 #if the SNP only exist
 
 
+
+data <- fread(paste0("/data/zhangh24/KG.plink/",eth[i],"/chr_all.bim"))
+
+temp = seq(-0.01788854,0.01788854,by=0.0001)
+p.vec = mean(pnorm(-abs(sqrt(15000)*temp),lower.tail = T)/pnorm(-abs(sqrt(100000)*temp),lower.tail = T))
+
