@@ -12,10 +12,10 @@ i = as.numeric(args[[1]])
 j = as.numeric(args[[2]])
 k = as.numeric(args[[3]])
 library(data.table)
-eth <- c("EUR","AFR","AMR","EAS")
+eth <- c("EUR","AFR","AMR","EAS","SAS")
 sid<-Sys.getenv('SLURM_JOB_ID')
 dir.create(paste0('/lscratch/',sid,'/test'))
-n <- c(120,120,120,120)
+n <- c(120,120,120,120,120)
 
 tag<- read.table(paste0("/data/zhangh24/KG.impute2/tag/",eth[i],"_chr",j,".tag"),header=F)
 
@@ -29,9 +29,9 @@ system(paste0("/data/zhangh24/software/hapgen2 -m /data/zhangh24/KG.impute2/1000
 #tag info file is created for all the snps information
 
 library(data.table)
-
-#eth <- c("AFR","AMR","EAS","EUR","SAS")
-eth <- c("EUR","AFR","AMR","EAS")
+library(dplyr)
+eth <- c("AFR","AMR","EAS","EUR","SAS")
+#eth <- c("EUR","AFR","AMR","EAS")
 
 
 gen <- as.data.frame(fread(paste0("/lscratch/",sid,"/test/",eth[i],"_chr",j,"_",k,".controls.gen"),header=F))

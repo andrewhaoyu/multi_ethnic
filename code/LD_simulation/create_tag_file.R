@@ -3,12 +3,15 @@
 #tag files are created seperately for each chr
 library(data.table)
 library(dplyr)
-eth <- c("EUR","AFR","AMR","EAS")
+eth <- c("EUR","AFR","AMR","EAS","SAS")
 for(i in 1:22){
+  print(i)
   leg <- as.data.frame(fread(paste0("/data/zhangh24/KG.impute2/1000GP_Phase3/1000GP_Phase3_chr",i,".legend"),header=T))
   TYPE = leg$TYPE
   MAF <- leg[,c(6:10)]
+
   for(k in 1:length(eth)){
+  if(k==1){
     idx <- which(MAF[,k]>=0.01&
                    MAF[,k]<=0.99&
                    TYPE=="Biallelic_SNP")
@@ -16,6 +19,17 @@ for(i in 1:22){
     
     
     write.table(leg_chr,file = paste0("/data/zhangh24/KG.impute2/tag/",eth[k],"_chr",i,".tag"),row.names = F,col.names = F,quote=F)
+    
+  }else{
+    idx <- which(MAF[,k]>=0.005&
+                   MAF[,k]<=0.995&
+                   TYPE=="Biallelic_SNP")
+    leg_chr = leg$position[idx] 
+    
+    
+    write.table(leg_chr,file = paste0("/data/zhangh24/KG.impute2/tag/",eth[k],"_chr",i,".tag"),row.names = F,col.names = F,quote=F)
+    
+  }
     
   }
   
