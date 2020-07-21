@@ -30,7 +30,7 @@ system(paste0("/data/zhangh24/software/hapgen2 -m /data/zhangh24/KG.impute2/1000
 
 library(data.table)
 library(dplyr)
-eth <- c("AFR","AMR","EAS","EUR","SAS")
+eth <- c("EUR","AFR","AMR","EAS","SAS")
 #eth <- c("EUR","AFR","AMR","EAS")
 
 
