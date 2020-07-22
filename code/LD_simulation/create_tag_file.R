@@ -8,7 +8,7 @@ for(i in 1:22){
   print(i)
   leg <- as.data.frame(fread(paste0("/data/zhangh24/KG.impute2/1000GP_Phase3/1000GP_Phase3_chr",i,".legend"),header=T))
   TYPE = leg$TYPE
-  MAF <- leg[,c(6:10)]
+  MAF <- leg[,c(9,6,7,8,10)]
 
   for(k in 1:length(eth)){
   if(k==1){
