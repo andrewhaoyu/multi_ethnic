@@ -39,8 +39,12 @@ colnames(tag) <- "position"
 colnames(gen)[3] <- "position"
 tag.gen <- left_join(tag,gen,by="position")
 #reorder the column back to the original order
-tag.gen <- tag.gen[,c(6:ncol(tag.gen))]
-write.table(tag.gen,paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_new/",eth[i],"/chr",j,"_",k,".controls.tag.gen"),quote = F,col.names = F,row.names = F)
+#tag.gen <- tag.gen[,c(6:ncol(tag.gen))]
+write.table(tag.gen,paste0("/lscratch/",sid,"/test/",eth[i],"_chr",j,"_",k,".controls.tag.gen"),quote = F,col.names = F,row.names = F)
+
+system(paste0("/data/zhangh24/software/plink2 --gen /lscratch/",sid,"/test/",eth[i],"_chr",j,"_",k,".controls.tag.gen --sample /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/sample_small.txt --make-bed --out /data/zhangh24/multi_ethnic/result/LD_simulation_new/",eth[i],"/chr",j,"_",k,".tag"))
+#system(paste0("/data/zhangh24/software/plink2 --gen /data/zhangh24/multi_ethnic/result/LD_simulation_new/",eth[i],"/chr",j,"_",k,".controls.tag.gen --sample /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/sample_small.txt --make-bed --out /data/zhangh24/multi_ethnic/result/LD_simulation_new/",eth[i],"/chr",j,"_",k,".tag"))
+
 system(paste0("rm -r /lscratch/",sid,"/test"))
 #we will need to combine tag info file with tag gen file for each ethnic groups
 

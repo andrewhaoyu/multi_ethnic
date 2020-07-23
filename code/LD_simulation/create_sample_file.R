@@ -7,6 +7,8 @@ load("/data/zhangh24/multi_ethnic/result/LD_simulation/EUR/phenotype.rdata")
 #sample file contains ID_1,ID_2,missing,pheno1
 #the first row represent variable status 0,0,0,P
 n <- length(y)
+#first create plain sample files for transforming gen data to bim data
+#n <- 120000
 ID_1 = c(0,c(1:n))
 ID_2  = c(0,c(1:n))
 missing = rep(0,n+1)
