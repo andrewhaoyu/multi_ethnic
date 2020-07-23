@@ -16,7 +16,7 @@ eth <- c("EUR","AFR","AMR","EAS","SAS")
 sid<-Sys.getenv('SLURM_JOB_ID')
 dir.create(paste0('/lscratch/',sid,'/test'),showWarnings = FALSE)
 n <- c(120,120,120,120,120)
-
+n = rep(10,5)
 tag<- read.table(paste0("/data/zhangh24/KG.impute2/tag/",eth[i],"_chr",j,".tag"),header=F)
 
 system(paste0("/data/zhangh24/software/hapgen2 -m /data/zhangh24/KG.impute2/1000GP_Phase3/genetic_map_chr",j,"_combined_b37.txt -l /data/zhangh24/KG.impute2/1000GP_Phase3/1000GP_Phase3_chr",j,".legend -h /data/zhangh24/KG.impute2/",eth[i],"/chr",j,".hap -o /lscratch/",sid,"/test/",eth[i],"_chr",j,"_",k," -n ",n[i]," 1 -dl ",tag[1,1]," 1 1 1 -no_haps_output"))  
@@ -38,10 +38,14 @@ gen <- as.data.frame(fread(paste0("/lscratch/",sid,"/test/",eth[i],"_chr",j,"_",
 colnames(tag) <- "position"
 colnames(gen)[3] <- "position"
 tag.gen <- left_join(tag,gen,by="position")
+tag.gen <- tag.gen[,c(2,3,1,4:ncol(tag.gen))]
+#plink require CHR number in the first column for transformation
+tag.gen[,1] <- rep(j,nrow(tag.gen))
 #reorder the column back to the original order
 #tag.gen <- tag.gen[,c(6:ncol(tag.gen))]
 write.table(tag.gen,paste0("/lscratch/",sid,"/test/",eth[i],"_chr",j,"_",k,".controls.tag.gen"),quote = F,col.names = F,row.names = F)
 
+write.table(tag.gen,paste0("/data/zhangh24/example/temp.txt"),row.names = F,col.names = F,quote = F)
 system(paste0("/data/zhangh24/software/plink2 --gen /lscratch/",sid,"/test/",eth[i],"_chr",j,"_",k,".controls.tag.gen --sample /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/sample_small.txt --make-bed --out /data/zhangh24/multi_ethnic/result/LD_simulation_new/",eth[i],"/chr",j,"_",k,".tag"))
 #system(paste0("/data/zhangh24/software/plink2 --gen /data/zhangh24/multi_ethnic/result/LD_simulation_new/",eth[i],"/chr",j,"_",k,".controls.tag.gen --sample /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/sample_small.txt --make-bed --out /data/zhangh24/multi_ethnic/result/LD_simulation_new/",eth[i],"/chr",j,"_",k,".tag"))
 
