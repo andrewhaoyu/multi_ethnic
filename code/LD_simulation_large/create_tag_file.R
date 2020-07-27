@@ -62,6 +62,6 @@ for(i in 1:22){
     snp.infor.list[[i]] <- snp.infor.temp
     
 }
-
+library(data.table)
 snp.infor <- rbindlist(snp.infor.list)
-save(snp.infor,file =  "/data/zhangh24/multi_ethnic/result/LD_simulation/snp.infor.rdata")
+save(snp.infor,file =  "/data/zhangh24/multi_ethnic/result/LD_simulation_new/snp.infor.rdata")
