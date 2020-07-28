@@ -31,7 +31,7 @@ write.table(merge_list,file = paste0("/lscratch/",sid,"/test/",eth[i],"_all_file
             quote=F)
 #merge all the seperate sample into one
 #merge the seperate genotype data into one file
-system(paste0("/data/zhangh24/software/plink2 --bfile /data/zhangh24/multi_ethnic/result/LD_simulation_new/EUR/chr2_1.tag --merge-list /lscratch/",sid,"/test/",eth[i],"_all_files_chr_",j, " --make-bed --out /data/zhangh24/multi_ethnic/result/LD_simulation_new/",eth[i],"/chr",j,".tag"))
+system(paste0("/data/zhangh24/software/plink2 --bfile /data/zhangh24/multi_ethnic/result/LD_simulation_new/EUR/chr",j,"_1.tag --merge-list /lscratch/",sid,"/test/",eth[i],"_all_files_chr_",j, " --make-bed --out /data/zhangh24/multi_ethnic/result/LD_simulation_new/",eth[i],"/chr",j,".tag"))
 
 
 
