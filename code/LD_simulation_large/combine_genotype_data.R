@@ -5,6 +5,8 @@ n <- 22
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 merge_list = rep("c",21)
 temp = 1
+sid<-Sys.getenv('SLURM_JOB_ID')
+dir.create(paste0('/lscratch/',sid,'/test'),showWarnings = FALSE)
 for(j in 2:n){
   merge_list[temp] <- paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_new/",eth[i],"/chr",j,".tag")
   temp = temp+1
