@@ -29,7 +29,7 @@ temp = 1
       if(i==1&j!=2){
         
       }else{
-        code[temp] <- paste0("Rscript /data/zhangh24/multi_ethnic/code/LD_simulation/merge_genotype_data.R ",i," ",j)
+        code[temp] <- paste0("Rscript /data/zhangh24/multi_ethnic/code/LD_simulation_large/merge_genotype_data.R ",i," ",j)
         temp = temp+1
       }
       
@@ -37,7 +37,7 @@ temp = 1
   }
 
 code <- code[1:(temp-1)]
-write.table(code,file = "/data/zhangh24/multi_ethnic/code/LD_simulation/merge_genotype_data.sh",col.names = F,row.names = F,quote=F)
+write.table(code,file = "/data/zhangh24/multi_ethnic/code/LD_simulation_large/merge_genotype_data.sh",col.names = F,row.names = F,quote=F)
 
 
 
