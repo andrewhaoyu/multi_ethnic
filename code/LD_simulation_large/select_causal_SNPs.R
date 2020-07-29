@@ -40,7 +40,7 @@ SAS.bi <-  snp.infor$SAS>=0.01&
                 snp.infor$SAS<=0.99
 eth.bi <- cbind(EUR.bi,AFR.bi,AMR.bi,EAS.bi,SAS.bi)
 #rho is the proportion of causal SNPs among all the SNPs
-rho <- c(0.1,0.01,0.001,0.0001)
+rho <- c(0.01,0.001,0.0005)
 cau.snp.infor.list <- list()
 
   set.seed(666)
@@ -49,7 +49,6 @@ cau.snp.infor.list <- list()
   eth.id <- c(1:5)
   #four sub list for four different proportions
   all.cau.list <- list(list(),
-                       list(),
                        list(),
                        list())
   temp <- 1
