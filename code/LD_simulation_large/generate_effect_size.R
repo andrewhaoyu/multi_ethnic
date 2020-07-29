@@ -118,9 +118,9 @@ for(l in 1:3){
   MAF <- as.data.frame(MAF)
   for(i in 1:5){
     idx <- which(eth.bi[,i]==1)
-    beta.ori <- beta[idx,i]/sqrt(2*MAF[idx,i]*(1-MAF[idx,i]))
+    #beta.ori <- beta[idx,i]/sqrt(2*MAF[idx,i]*(1-MAF[idx,i]))
     select.cau <- cbind(cau.snp.infor[idx,1],
-                        beta.ori)
+                        beta[idx,i])
     write.table(select.cau,file = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_new/",eth[i],"/select.cau_rho",l),row.names = F,col.names = F,quote=F)
   }
   

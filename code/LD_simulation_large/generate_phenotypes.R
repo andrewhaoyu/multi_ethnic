@@ -4,12 +4,12 @@ i = as.numeric(args[[1]])
 l = as.numeric(args[[2]])
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
-system(paste0("/data/zhangh24/software/gcta_1.93.2beta/gcta64 --bfile ",cur.dir,eth[i],"/select.cau.snp --simu-qt --simu-causal-loci ",cur.dir,eth[i],"/select.cau_rho",l, " --simu-hsq 0.4 --out ",cur.dir,eth[i],"/phenotypes_rho",l))
+system(paste0("/data/zhangh24/software/gcta_1.93.2beta/gcta64 --bfile ",cur.dir,eth[i],"/select.cau.snp --simu-qt --simu-causal-loci ",cur.dir,eth[i],"/select.cau_rho",l, " --simu-hsq 0.4 --simu-rep 100 --out ",cur.dir,eth[i],"/phenotypes_rho",l))
 
 
 
-
-
+# data <- read.table("/data/zhangh24/multi_ethnic/result/LD_simulation_new/EUR/phenotypes_rho3.phen")
+# var(data[,3])
 
 
 
