@@ -27,4 +27,4 @@ cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
   select.cau.snp <- cbind(cau.snp.infor[idx,1])
   write.table(select.cau.snp,file = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_new/",eth[i],"/select.cau.snp.txt"),row.names = F,col.names = F,quote=F)
 
-  system(paste0("/data/zhangh24/software/plink2 --bfile ",cur.dir,eth[i],"/all_chr.tag --extract ",cur.dir,eth[i],"/select.cau.snp.txt --make-bed --out select.cau.snp"))
+  system(paste0("/data/zhangh24/software/plink2 --bfile ",cur.dir,eth[i],"/all_chr.tag --extract ",cur.dir,eth[i],"/select.cau.snp.txt --make-bed --out ",cur.dir,eth[i],"/select.cau.snp"))
