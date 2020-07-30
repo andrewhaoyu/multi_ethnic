@@ -8,7 +8,7 @@ i = as.numeric(args[[1]])
 j = as.numeric(args[[2]])
 l = as.numeric(args[[3]])
 #load the phenotpypes data and use plink to run
-eth <- c("EUR","AFR","AMR","EAS")
+eth <- c("EUR","AFR","AMR","EAS","SAS")
 library(data.table)
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
 
