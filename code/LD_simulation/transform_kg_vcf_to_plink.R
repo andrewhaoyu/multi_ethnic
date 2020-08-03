@@ -1,11 +1,11 @@
 #LD clumping require process vcf (hap,lengend) to plink
 #use qctool version 2 to process it
 #merge all the 22 chr vcf files to one file for each ethnic group
-eth <- c("EUR","AFR","AMR","EAS")
+eth <- c("EUR","AFR","AMR","EAS","SAS")
 code <- rep("c",1000)
 temp <- 1
 #merge hap files together by ethnic groups
-for(i in 1:4){
+for(i in 1:5){
   temp.code <- paste0("cat ")
   for(j in 1:22){
    temp.code <- paste0(temp.code," /data/zhangh24/KG.impute2/",eth[i],"/chr",j,".hap") 
@@ -39,7 +39,7 @@ write.table(code,file = "/data/zhangh24/multi_ethnic/code/LD_simulation/merge_ha
 #use gtool to transform vcf (hap,legend) to plink
 code <- rep("c",1000)
 temp <- 1
-for(i in 1:4){
+for(i in 5:5){
     code[temp] <- paste0("/data/zhangh24/software/qctool/qctool -g /data/zhangh24/KG.impute2/",eth[i],"/chr_all.hap -filetype impute_haplotypes -og /data/zhangh24/KG.plink/",eth[i],"/chr_all  -ofiletype binary_ped")
     temp <- temp+1
   
