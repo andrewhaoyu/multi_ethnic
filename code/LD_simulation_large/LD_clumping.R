@@ -1,9 +1,9 @@
 #LD_clumping for different ethnic groups
 #load the p-value results
 args = commandArgs(trailingOnly = T)
-i = args[[1]]
-l = args[[2]]
-m = args[[3]]
+i = as.numeric(args[[1]])
+l = as.numeric(args[[2]])
+m = as.numeric(args[[3]])
 library(data.table)
 library(dplyr)
 #update the summary results to make it work for plink clumping command
