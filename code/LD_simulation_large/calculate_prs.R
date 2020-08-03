@@ -22,7 +22,8 @@ cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
     write.table(prs.file,file = paste0(cur.dir,eth[i],"/prs/prs_file_pvalue_",k,"_rho_",l,"_size_",m),col.names = T,row.names = F,quote=F)
   }
   
-system(paste0("/data/zhangh24/software/plink2 --score ",cur.dir,eth[i],"/prs/prs_file_pvalue_",k,"_rho_",l,"_size_",m," no-sum no-mean-imputation --bfile ",cur.dir,eth[i],"/chr",j,".tag --exclude /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/duplicated.id  --out ",cur.dir,eth[i],"/prs/chr",j,"_prs_",k,"_rho_",l,"_size_",m))
+system(paste0("/data/zhangh24/software/plink2 --score ",cur.dir,eth[i],"/prs/prs_file_pvalue_",k,"_rho_",l,"_size_",m," no-sum no-mean-imputation --bfile ",cur.dir,eth[i],"/chr",j,".tag --exclude /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/duplicated.id  --out ",cur.dir,eth[i],"/prs/chr",j,"_prs_",k,"_rho_",l,"_size_",m),
+       intern=T)
 
 
 
