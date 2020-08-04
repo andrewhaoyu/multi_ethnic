@@ -55,8 +55,8 @@ setwd("/data/zhangh24/multi_ethnic/")
           prs.score <- prs.temp$SCORE*2*length(jdx)
         
       #prs.score.mat[,k] = prs.score
-      prs.test <- prs.score[(n.train[i]+1):(n.train[i]+n.test[i])]
-      prs.vad <- prs.score[(n.train[i]+n.test[i]+1):n]
+      prs.test <- prs.score[(n.train+1):(n.train+n.test)]
+      prs.vad <- prs.score[(n.train+n.test+1):n]
       #model = lm(y~prs.score)
       r2.test.rep = rep(0,n.rep)
       r2.vad.rep = rep(0,n.rep)
