@@ -29,7 +29,7 @@ setwd("/data/zhangh24/multi_ethnic/")
   y <- as.data.frame(fread(paste0(cur.dir,eth[i],"/phenotypes_rho",l,".phen")))
   y <- y[,2+(1:n.rep)]
   n <- nrow(y)
-  y_test_mat <- y[(n.train[i]+1):nrow(y),]
+  y_test_mat <- y[(n.train+1):nrow(y),]
   #y.test <- y[(n.train[i]+1):(n.train[i]+n.test[i])]
   # y.vad <- y[(n.train[i]+n.test[i]+1):n]
   #
