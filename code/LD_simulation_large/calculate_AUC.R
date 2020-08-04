@@ -85,5 +85,5 @@ names(r2.mat.test) <- names(r2.mat.vad) <- pthres
   idx <- which.max(r2.mat.test)
   r2 <- r2.mat.vad[idx]
 r2.list <- list(r2,r2.mat.test,r2.mat.vad)
-save(r2.list,file = paste0(cur.dir,eth[i],"/r2.list"))
+save(r2.list,file = paste0(cur.dir,eth[i],"/r2.list_rho_",l,"_size_",m))
 #write.csv(r2.mat,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/ld.clump.auc.csv")
