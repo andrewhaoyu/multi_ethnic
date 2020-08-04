@@ -13,7 +13,7 @@ code <- c("c",5*3*3)
 temp = 1
 for(i in 1:5){
   for(l in 1:3){
-    for(m in 1:3){
+    for(m in 1:4){
       temp.code <- paste0("head -1 ",cur.dir,eth[i],"/summary_chr1_rho_",l,".out.P",m,".assoc.linear > ",cur.dir,eth[i],"/summary_out_rho_",l,"_size_",m,"; awk 'FNR>1'")
       for(j in 1:22){
         temp.code <- paste0(temp.code, " ",cur.dir,eth[i],"/summary_chr",j,"_rho_",l,".out.P",m,".assoc.linear")

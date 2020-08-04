@@ -27,7 +27,7 @@ for(i in 1:length(eth)){
   sum.data <- as.data.frame(fread(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/summary.out")))
   colnames(sum.data)[2] <- "SNP"
   prs.all <- left_join(clump.snp,sum.data,by="SNP")
-   
+  
   for(k in 1:length(pthres)){
     filedir <- paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/prs/")
     files <- dir(filedir,pattern = paste0("_prs_",k,".profile"))
@@ -66,7 +66,7 @@ for(i in 1:length(eth)){
     }else{
       r2.mat.test[k,i] = 0
       r2.mat.vad[k,i] = 0
-      }
+    }
     
   }
 }

@@ -45,7 +45,7 @@ r2thr = 0.1
 kbpthr = 500
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
-code <- rep("c",5*3*3)
+#code <- rep("c",5*3*3)
   system(paste0("/data/zhangh24/software/plink2 --bfile /data/zhangh24/KG.plink/",eth[i],"/chr_all --clump ",cur.dir,eth[i],"/summary_MAF_rho_",l,"_size_",m,".out --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out ",cur.dir,eth[i],"/LD_clump_rho_",l,"_size_",m))
 #       temp = temp +1 
 #     }
