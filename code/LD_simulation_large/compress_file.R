@@ -10,3 +10,4 @@ system(paste0("cp summary_MAF_* pheno_summary_stat"))
 system(paste0("cp pheno_plink* pheno_summary_stat"))
 system(paste0("cp phenotypes_*.phen pheno_summary_stat"))
 system(paste0("tar -zcvf pheno_summary_stat.tar.gz pheno_summary_stat"))
+c 

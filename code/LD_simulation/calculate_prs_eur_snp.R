@@ -20,12 +20,12 @@ n.snp.mat <- matrix(0,1,4)
 #use EUR regression coefficients
 for(i in 2:length(eth)){
   
-    prs.file <- prs.all %>% filter(P<=pthres[jdx]) %>% 
-      select(SNP,A1,BETA)
-    SNP = prs.file[,1,drop=F]
-    save(SNP,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/EUR/EUR_best_PRS.rdata")
-    #n.snp.mat[1,i] <- nrow(prs.file)
-    write.table(prs.file,file = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/prs/prs_eursnp_eurcoef"),col.names = T,row.names = F,quote=F)
+  prs.file <- prs.all %>% filter(P<=pthres[jdx]) %>% 
+    select(SNP,A1,BETA)
+  SNP = prs.file[,1,drop=F]
+  save(SNP,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/EUR/EUR_best_PRS.rdata")
+  #n.snp.mat[1,i] <- nrow(prs.file)
+  write.table(prs.file,file = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/prs/prs_eursnp_eurcoef"),col.names = T,row.names = F,quote=F)
   
   
 }
@@ -191,7 +191,6 @@ for(i in 2:length(eth)){
 
 code <- code[1:(temp-1)]
 write.table(code,file = paste0("/data/zhangh24/multi_ethnic/code/LD_simulation/calculate_prs_eursnp_eb.sh"),col.names = F,row.names = F,quote=F)
-
 
 
 
