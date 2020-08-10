@@ -9,7 +9,7 @@ m = as.numeric(args[[3]])
 library(dplyr)
 library(data.table)
 eth <- c("EUR","AFR","AMR","EAS","SAS")
-pthres <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01,0.5)
+pthres <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01)
 #n.snp.mat <- matrix(0,length(pthres),4)
 #load EUR r2 result
 setwd("/data/zhangh24/multi_ethnic/")
