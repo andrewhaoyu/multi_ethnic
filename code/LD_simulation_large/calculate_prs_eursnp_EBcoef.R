@@ -103,7 +103,7 @@ summary.tar.select = summary.tar %>%
   prs.file = prs.file[complete.cases(prs.file),]
   write.table(prs.file,file = paste0(cur.dir,eth[i],"/prs/prs_file_eursnp_eb_rho_",l,"_size_",m),col.names = T,row.names = F,quote=F)    
 
-  system(paste0("/data/zhangh24/software/plink2 --score ",cur.dir,eth[i],"/prs/prs_file_eursnp_eb_rho_",l,"_size_",m," no-sum no-mean-imputation --bfile ",cur.dir,eth[i],"/all_chr.tag --exclude /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/duplicated.id  --out ",cur.dir,eth[i],"/prs/prs_eursnp_eb_rho_",l,"_size_",m))
+  system(paste0("/data/zhangh24/software/plink2 --score ",cur.dir,eth[i],"/prs/prs_file_eursnp_eb_rho_",l,"_size_",m," no-sum no-mean-imputation --bfile ",cur.dir,eth[i],"/chr",j,".tag --exclude /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/duplicated.id  --out ",cur.dir,eth[i],"/prs/prs_eursnp_eb_rho_",l,"_size_",m))
 
 
 
