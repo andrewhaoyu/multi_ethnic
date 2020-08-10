@@ -51,7 +51,7 @@ summary.tar$BETA[idx] <- -summary.tar$BETA[idx]
 load("/data/zhangh24/multi_ethnic/result/LD_simulation_new/snp.infor.rdata")
 colnames(snp.infor)[1] <- "SNP"
 snp.infor.select = snp.infor %>% 
-  select(SNP,EUR,AFR,AMR,EAS)
+  select(SNP,EUR,AFR,AMR,EAS,SAS)
 
 #use EB regresssion coefficients
 #get the number of SNPs in different population
