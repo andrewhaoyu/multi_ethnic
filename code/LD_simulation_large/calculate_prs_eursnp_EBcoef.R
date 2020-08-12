@@ -75,6 +75,7 @@ summary.tar.select = summary.tar %>%
                           summary.tar.select$beta_st),use="complete.obs")
   load("/data/zhangh24/multi_ethnic/result/LD_simulation_new/causal_Sigma.rdata")
   prior.sigma = Sigma
+  prior.sigma = (Sigma[c(i,1),c(i,1)])
   #implement the emprical Bayes
   #train is the target population
   #ref is EUR population
