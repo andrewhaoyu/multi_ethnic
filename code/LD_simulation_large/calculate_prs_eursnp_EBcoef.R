@@ -73,6 +73,8 @@ summary.tar.select = summary.tar %>%
 #read the target ethnic group summary level statistics
   prior.sigma = cov(cbind(summary.eur.select$beta_st,
                           summary.tar.select$beta_st),use="complete.obs")
+  load("/data/zhangh24/multi_ethnic/result/LD_simulation_new/causal_Sigma.rdata")
+  prior.sigma = Sigma
   #implement the emprical Bayes
   #train is the target population
   #ref is EUR population
@@ -85,16 +87,16 @@ summary.tar.select = summary.tar %>%
     return(beta_post)
   }
   post_beta_target = summary.tar.select$beta_st
-  for(m in 1:nrow(summary.tar.select)){
-    Sigma = diag(c(summary.tar.select$sd_st[m]^2,
-                   summary.eur.select$sd_st[m]^2))
-    beta = c(summary.tar.select$beta_st[m],
-             summary.eur.select$beta_st[m])
-    MAF.train = summary.tar.select$MAF[m]
-    MAF.ref = summary.eur.select$MAF[m]
+  for(m_i in 1:nrow(summary.tar.select)){
+    Sigma = diag(c(summary.tar.select$sd_st[m_i]^2,
+                   summary.eur.select$sd_st[m_i]^2))
+    beta = c(summary.tar.select$beta_st[m_i],
+             summary.eur.select$beta_st[m_i])
+    MAF.train = summary.tar.select$MAF[m_i]
+    MAF.ref = summary.eur.select$MAF[m_i]
     
     if(is.na(Sigma[2,2])==0){
-      post_beta_target[m] = PostBeta(beta,Sigma,prior.sigma,MAF.train,MAF.ref)[1] 
+      post_beta_target[m_i] = PostBeta(beta,Sigma,prior.sigma,MAF.train,MAF.ref)[1] 
     }
   }
   summary.tar.select$BETA = post_beta_target
