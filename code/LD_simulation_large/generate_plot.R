@@ -57,12 +57,12 @@ LD.clump.result <- cbind(LD.clump.result,sample_size,cau_vec)
 
 
   
-  p <- ggplot(LD.clump.result,aes(x= -log10(pthres.vec),y=r2.vec,group=eth.vec))+
+  p <- ggplot(LD.clump.result,aes(x= log10(pthres.vec),y=r2.vec,group=eth.vec))+
     geom_line(aes(color=eth.vec))+
     geom_point(aes(color=eth.vec))+
     theme_Publication()+
     ylab("R2")+
-    xlab("-log10(P-value)")+
+    xlab("log10(P-value)")+
     guides(color=guide_legend(title="Ethnic group"))+
     facet_grid(vars(cau_vec),vars(sample_size))+
     scale_color_nejm()
@@ -85,7 +85,13 @@ LD.clump.result <- cbind(LD.clump.result,sample_size,cau_vec)
   LD.clump.result$method_vec = method_vec
   LD.clump.result.PT <- LD.clump.result
   load("best_eur_snp_result.rdata")
-  LD.clump.result$method_vec <- "Best EUR PRS"
+  method <- c("eurcoef","tarcoef","eb")
+  method_nameupdate <- c("Best EUR PRS","Best EUR SNP + target coefficients","Best EUR SNP + EB")
+  for(q in 1:length(method)){
+    idx <- which(LD.clump.result$method_vec==method[q])
+    LD.clump.result$method_vec[idx] <-   method_nameupdate[q]
+  }
+  
   LD.clump.result <- rbind(LD.clump.result,LD.clump.result.PT)
   for(l in 1:3){
     idx <- which(LD.clump.result$l_vec==l)
@@ -106,10 +112,10 @@ LD.clump.result <- cbind(LD.clump.result,sample_size,cau_vec)
     guides(color=guide_legend(title="Method"))+
     facet_grid(vars(cau_vec),vars(eth.vec))+
     scale_color_nejm()
-  png(file = paste0("./LD_clumping_result_p_thres.png"),
-      width = 15, height = 10, res = 300,units = "in")
+  png(file = paste0("./method_compare_result_summary.png"),
+      width = 12, height = 8, res = 300,units = "in")
   p
   dev.off()
   
-  dev.off()
+  
   

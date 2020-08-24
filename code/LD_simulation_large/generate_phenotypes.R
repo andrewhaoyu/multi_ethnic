@@ -6,25 +6,10 @@ eth <- c("EUR","AFR","AMR","EAS","SAS")
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
 system(paste0("/data/zhangh24/software/gcta_1.93.2beta/gcta64 --bfile ",cur.dir,eth[i],"/select.cau.snp --simu-qt --simu-causal-loci ",cur.dir,eth[i],"/select.cau_rho",l, " --simu-hsq 0.4 --simu-rep 100 --out ",cur.dir,eth[i],"/phenotypes_rho",l))
 
-#create eht phenotypes file for plink to run
+
 
 # for(i in 1:5){
 #   for(l in 1:3){
-    all.pheno <- as.data.frame(fread(paste0(cur.dir,eth[i],"/phenotypes_rho",l,".phen")))
-    n.train <- c(15000,45000,80000,100000)
-    fam <- as.data.frame(fread(paste0(cur.dir,eth[i],"/all_chr.tag.fam")))
-    n <- nrow(fam)
-    pheno <- fam[,1:2]
-    for(m in 1:length(n.train)){
-      #only use the first set of all pheno as training
-      #all the others are used for testing
-      
-      temp <- all.pheno[,3]
-      temp[(n.train[m]+1):n] <- NA
-      pheno <- cbind(pheno,temp)
-    }
-    write.table(pheno,file = paste0(cur.dir,eth[i],"/pheno_plink_rho",l),row.names = F,col.names = F,quote=F)
-    
 #   }
 # }
 
