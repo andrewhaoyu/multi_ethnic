@@ -6,6 +6,28 @@ eth <- c("EUR","AFR","AMR","EAS","SAS")
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
 system(paste0("/data/zhangh24/software/gcta_1.93.2beta/gcta64 --bfile ",cur.dir,eth[i],"/select.cau.snp --simu-qt --simu-causal-loci ",cur.dir,eth[i],"/select.cau_rho",l, " --simu-hsq 0.4 --simu-rep 100 --out ",cur.dir,eth[i],"/phenotypes_rho",l))
 
+library(data.table)    
+all.pheno <- as.data.frame(fread(paste0(cur.dir,eth[i],"/phenotypes_rho",l,".phen")))
+n.train <- c(15000,45000,80000,100000)
+fam <- as.data.frame(fread(paste0(cur.dir,eth[i],"/all_chr.tag.fam")))
+n <- nrow(fam)
+pheno <- fam[,1:2]
+#for(i_rep in cut.point[k]:(cut.point[k+1]-1)){
+for(i_rep in 1:100){ 
+  print(i_rep)
+  pheno <- NULL
+  for(m in 1:length(n.train)){
+    #only use the first set of all pheno as training
+    #all the others are used for testing
+    
+    temp <- all.pheno[,2+i_rep]
+    temp[(n.train[m]+1):n] <- NA
+    pheno <- cbind(pheno,temp)
+  }
+  write.table(pheno,file = paste0(cur.dir,eth[i],"/pheno_plink_rho_",i_rep,"_",l),row.names = F,col.names = F,quote=F)
+  
+}
+
 
 
 # for(i in 1:5){
