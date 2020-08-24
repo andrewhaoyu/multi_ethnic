@@ -7,12 +7,13 @@ args  = commandArgs(trailingOnly = T)
 i = as.numeric(args[[1]])
 j = as.numeric(args[[2]])
 l = as.numeric(args[[3]])
+i_rep = as.numeric(args[[4]])
 #load the phenotpypes data and use plink to run
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 library(data.table)
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
 
-system(paste0("/data/zhangh24/software/plink2 --bfile ",cur.dir,eth[i],"/chr",j,".tag --out ",cur.dir,eth[i],"/summary_chr",j,"_rho_",l,".out --linear --all-pheno --allow-no-sex --pheno ",cur.dir,eth[i],"/pheno_plink_rho",l))
+system(paste0("/data/zhangh24/software/plink2 --threads 2 --bfile ",cur.dir,eth[i],"/chr",j,".tag --out ",cur.dir,eth[i],"/summary_chr_",j,"_rho_",l,"_rep_",i_rep,".out --linear --all-pheno --allow-no-sex --pheno ",cur.dir,eth[i],"/pheno_plink_rho_",l,"_rep_",i_rep))
 
 
 # for(i in 1:5){

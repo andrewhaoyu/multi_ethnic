@@ -11,11 +11,11 @@ all.pheno <- as.data.frame(fread(paste0(cur.dir,eth[i],"/phenotypes_rho",l,".phe
 n.train <- c(15000,45000,80000,100000)
 fam <- as.data.frame(fread(paste0(cur.dir,eth[i],"/all_chr.tag.fam")))
 n <- nrow(fam)
-pheno <- fam[,1:2]
+
 #for(i_rep in cut.point[k]:(cut.point[k+1]-1)){
 for(i_rep in 1:100){ 
   print(i_rep)
-  pheno <- NULL
+  pheno <- fam[,1:2]
   for(m in 1:length(n.train)){
     #only use the first set of all pheno as training
     #all the others are used for testing
@@ -24,11 +24,20 @@ for(i_rep in 1:100){
     temp[(n.train[m]+1):n] <- NA
     pheno <- cbind(pheno,temp)
   }
-  write.table(pheno,file = paste0(cur.dir,eth[i],"/pheno_plink_rho_",i_rep,"_",l),row.names = F,col.names = F,quote=F)
+  write.table(pheno,file = paste0(cur.dir,eth[i],"/pheno_plink_rho_",l,"_rep_",i_rep),row.names = F,col.names = F,quote=F)
   
 }
 
 
+
+# for(i in 1:5){
+#   for(l in 1:3){
+#     for(i_rep in 1:100){
+#       
+#       system(paste0("mv ",cur.dir,eth[i],"/pheno_plink_rho_",i_rep,"_",l," ",cur.dir,eth[i],"/pheno_plink_rho_",l,"_rep_",i_rep))    }
+#   }
+# }
+# 
 
 # for(i in 1:5){
 #   for(l in 1:3){
