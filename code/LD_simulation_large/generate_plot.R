@@ -19,6 +19,8 @@ cau_vec <- factor(cau_vec,
 LD.clump.result <- cbind(LD.clump.result,sample_size,cau_vec)
 
 
+
+
 p <- ggplot(LD.clump.result,aes(x= sample_size,y=r2.vec,group=eth.vec))+
   geom_line(aes(color=eth.vec))+
   geom_point(aes(color=eth.vec))+
@@ -75,6 +77,7 @@ LD.clump.result <- cbind(LD.clump.result,sample_size,cau_vec)
 #Best EUR result
   load("LD.clump.result.rdata")
   LD.clump.result <- LD.result.list[[1]]
+  save(LD.clump.result,file = "LD.clump.result_082420.rdata")
   sample_size <- factor(rep(c("15000","45000","80000","100000"),4*3*2),
                         levels=c("15000","45000","80000","100000"))
   
@@ -104,14 +107,17 @@ LD.clump.result <- cbind(LD.clump.result,sample_size,cau_vec)
   
   
   p <- ggplot(LD.clump.result,aes(x= sample_size,y=r2.vec,group=method_vec))+
-    geom_line(aes(color=method_vec))+
-    geom_point(aes(color=method_vec))+
+    geom_bar(aes(fill=method_vec),
+             stat="identity",
+             position = position_dodge())+
+    #geom_point(aes(color=method_vec))+
     theme_Publication()+
     ylab("R2")+
     xlab("Sample Size")+
     guides(color=guide_legend(title="Method"))+
     facet_grid(vars(cau_vec),vars(eth.vec))+
-    scale_color_nejm()
+    scale_fill_gsea()
+  p
   png(file = paste0("./method_compare_result_summary.png"),
       width = 12, height = 8, res = 300,units = "in")
   p
