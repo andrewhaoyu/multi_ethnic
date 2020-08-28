@@ -1,5 +1,5 @@
 #goal remove extra files
-
+args = commandArgs(trailingOnly = T)
 
 i = as.numeric(args[[1]])
 j = as.numeric(args[[2]])
