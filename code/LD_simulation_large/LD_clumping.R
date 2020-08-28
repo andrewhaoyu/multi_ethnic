@@ -4,6 +4,7 @@ args = commandArgs(trailingOnly = T)
 i = as.numeric(args[[1]])
 l = as.numeric(args[[2]])
 m = as.numeric(args[[3]])
+i_rep = as.numeric(args[[4]])
 library(data.table)
 library(dplyr)
 #update the summary results to make it work for plink clumping command
@@ -25,7 +26,7 @@ MAF = snp.infor[,..eth]
 MAF = cbind(snp.infor$id,MAF)
 colnames(MAF)[1] <- "SNP"
 MAF_var = list('EUR','AFR','AMR','EAS',"SAS")
-      sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_new/",eth[i],"/summary_out_rho_",l,"_size_",m)))  
+      sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_new/",eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep)))  
       var_name = colnames(sum.data)
       sum.data.com = left_join(sum.data,MAF,bY="SNP")
       # idx <- which(sum.data.com$EAS>=0.05&sum.data.com$EAS<=0.95)
@@ -35,18 +36,18 @@ MAF_var = list('EUR','AFR','AMR','EAS',"SAS")
         select(all_of(var_name))
       #idx.order <- order(sum.data.MAF$P)
       #sum.data.MAF.new <- sum.data.MAF[idx.order,]
-      write.table(sum.data.MAF,file = paste0("./result/LD_simulation_new/",eth[i],"/summary_MAF_rho_",l,"_size_",m,".out")
+      write.table(sum.data.MAF,file = paste0("./result/LD_simulation_new/",eth[i],"/summary_out_MAF_rho_",l,"_size_",m,"_rep_",i_rep,".out")
                   ,col.names = T,row.names = F,quote=F) 
     
 # dim(summary)
 # head(summary)
-pthr = 0.1
+pthr = 0.5
 r2thr = 0.1
 kbpthr = 500
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
 #code <- rep("c",5*3*3)
-  system(paste0("/data/zhangh24/software/plink2 --bfile /data/zhangh24/KG.plink/",eth[i],"/chr_all --clump ",cur.dir,eth[i],"/summary_MAF_rho_",l,"_size_",m,".out --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out ",cur.dir,eth[i],"/LD_clump_rho_",l,"_size_",m))
+  system(paste0("/data/zhangh24/software/plink2 --bfile /data/zhangh24/KG.plink/",eth[i],"/chr_all --clump ",cur.dir,eth[i],"/summary_out_MAF_rho_",l,"_size_",m,"_rep_",i_rep,".out --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out ",cur.dir,eth[i],"/LD_clump_rho_",l,"_size_",m,"_rep_",i_rep))
 #       temp = temp +1 
 #     }
 #   }
