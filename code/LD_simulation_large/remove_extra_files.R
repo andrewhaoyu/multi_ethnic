@@ -2,9 +2,9 @@
 args = commandArgs(trailingOnly = T)
 
 i = as.numeric(args[[1]])
-j = as.numeric(args[[2]])
-l = as.numeric(args[[3]])
-m = as.numeric(args[[4]])
+#j = as.numeric(args[[2]])
+#l = as.numeric(args[[3]])
+#m = as.numeric(args[[4]])
 
 
 
@@ -16,6 +16,6 @@ eth <- c("EUR","AFR","AMR","EAS","SAS")
 
 
         for(i_rep in 11:100){
-          system(paste0("rm ",cur.dir,eth[i],"/summary_chr_",j,"_rho_",l,"_rep_",i_rep,".out.P",m,".assoc.linear"))  
+          system(paste0("rm ",cur.dir,eth[i],"/summary_chr_*_rho_*_rep_",i_rep,".out.P*.assoc.linear"))  
         }
         
