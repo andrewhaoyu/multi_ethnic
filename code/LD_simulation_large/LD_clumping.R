@@ -41,7 +41,7 @@ MAF_var = list('EUR','AFR','AMR','EAS',"SAS")
     
 # dim(summary)
 # head(summary)
-pthr = 0.1
+pthr = 0.5
 r2thr = 0.1
 kbpthr = 500
 eth <- c("EUR","AFR","AMR","EAS","SAS")
