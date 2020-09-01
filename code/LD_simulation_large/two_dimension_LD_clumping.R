@@ -10,6 +10,12 @@ library(data.table)
 library(dplyr)
 #update the summary results to make it work for plink clumping command
 eth <- c("EUR","AFR","AMR","EAS","SAS")
+sid<-Sys.getenv('SLURM_JOB_ID')
+dir.create(paste0('/lscratch/',sid,'/test'),showWarnings = FALSE)
+eth <- c("EUR","AFR","AMR","EAS","SAS")
+system(paste0("cp /data/zhangh24/KG.plink/",eth[i],"/chr_all.bed /lscratch/",sid,"/test/",eth[i],"_chr_all.bed"))
+system(paste0("cp /data/zhangh24/KG.plink/",eth[i],"/chr_all.bim /lscratch/",sid,"/test/",eth[i],"_chr_all.bim"))
+system(paste0("cp /data/zhangh24/KG.plink/",eth[i],"/chr_all.fam /lscratch/",sid,"/test/",eth[i],"_chr_all.fam"))
 setwd("/data/zhangh24/multi_ethnic/")
 #summary.eur <- as.data.frame(fread(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[1],"/summary.out"),header=T))
 summary.eur <- as.data.frame(fread(paste0("./result/LD_simulation_new/",eth[1],"/summary_out_rho_",1,"_size_",4,"_rep_",i_rep)))  
@@ -40,7 +46,7 @@ pthr = 0.5
 r2thr = 0.1
 kbpthr = 500
 eth <- c("EUR","AFR","AMR","EAS")
-system(paste0("/data/zhangh24/software/plink2 --threads 2 --bfile /data/zhangh24/KG.plink/",eth[i],"/chr_all --clump /data/zhangh24/multi_ethnic/result/LD_simulation_new/",eth[i],"/assoc.out_rho_",l,"_size_",m,"_rep_",i_rep," --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out /data/zhangh24/multi_ethnic/result/LD_simulation_new/",eth[i],"/LD_clump_two_dim_rho_",l,"_size_",m,"_rep_",i_rep))
+system(paste0("/data/zhangh24/software/plink2 --threads 2 --bfile /lscratch/",sid,"/test/",eth[i],"_chr_all --clump /data/zhangh24/multi_ethnic/result/LD_simulation_new/",eth[i],"/assoc.out_rho_",l,"_size_",m,"_rep_",i_rep," --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out /data/zhangh24/multi_ethnic/result/LD_simulation_new/",eth[i],"/LD_clump_two_dim_rho_",l,"_size_",m,"_rep_",i_rep))
   
 # }
 # #no need for rerunning in EUR
@@ -51,8 +57,8 @@ system(paste0("/data/zhangh24/software/plink2 --threads 2 --bfile /data/zhangh24
 # 
 
 
-data <- fread(paste0("/data/zhangh24/KG.plink/",eth[i],"/chr_all.bim"))
-
-temp = seq(-0.01788854,0.01788854,by=0.0001)
-p.vec = mean(pnorm(-abs(sqrt(15000)*temp),lower.tail = T)/pnorm(-abs(sqrt(100000)*temp),lower.tail = T))
-
+# data <- fread(paste0("/data/zhangh24/KG.plink/",eth[i],"/chr_all.bim"))
+# 
+# temp = seq(-0.01788854,0.01788854,by=0.0001)
+# p.vec = mean(pnorm(-abs(sqrt(15000)*temp),lower.tail = T)/pnorm(-abs(sqrt(100000)*temp),lower.tail = T))
+# 
