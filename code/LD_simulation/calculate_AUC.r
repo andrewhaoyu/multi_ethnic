@@ -2,7 +2,7 @@
 library(dplyr)
 library(data.table)
 eth <- c("EUR","AFR","AMR","EAS")
-pthres <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01)
+pthres <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01,0.5)
 #n <- 120000
 n.train <- c(100000,15000,15000,15000)
 n.test <- c(10000,1500,1500,1500)
