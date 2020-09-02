@@ -11,7 +11,7 @@ i = as.numeric(args[[2]])
 l = as.numeric(args[[3]])
 m = as.numeric(args[[4]])
 k = as.numeric(args[[5]])
-j = as.nunmeric(args[[6]])
+j = as.numeric(args[[6]])
 
 #j = as.numeric(args[[3]])
 library(dplyr)
