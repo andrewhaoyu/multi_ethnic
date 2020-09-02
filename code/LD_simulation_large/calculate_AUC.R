@@ -6,7 +6,7 @@ args = commandArgs(trailingOnly = T)
 i = as.numeric(args[[1]])
 l = as.numeric(args[[2]])
 m = as.numeric(args[[3]])
-#k = as.numeric(args[[4]])
+k = as.numeric(args[[4]])
 
 library(dplyr)
 library(data.table)
@@ -21,8 +21,6 @@ n.rep = 10
 #r2 mat represent the r2 matrix for the testing dataset
 #column represent the ethnic groups
 #row represent different p-value threshold
-r2.mat.test <- rep(0,length(pthres))
-r2.mat.vad <- rep(0,length(pthres))
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
 setwd("/data/zhangh24/multi_ethnic/")
 
@@ -41,44 +39,46 @@ setwd("/data/zhangh24/multi_ethnic/")
   clump.snp <- LD[,3,drop=F]  
   sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_new/",eth[i],"/summary_out_rho_",l,"_size_",m)))  
   colnames(sum.data)[2] <- "SNP"
-  prs.all <- left_join(clump.snp,sum.data,by="SNP")  %>% 
-    filter(P<=pthres[k])
   
   #for(k in 1:length(pthres)){
-  r2.test.rep = rep(0,n.rep)
-  r2.vad.rep = rep(0,n.rep)
+  r2.vec.test <- rep(0,i_rep)
+  r2.vec.vad <- rep(0,i_rep)
   for(i_rep in 1:n.rep){
-  for(k in 1:length(pthres)){
+  #for(k in 1:length(pthres)){
     n.snp.total <- 0
     prs.score <- rep(0,n)  
-    for(j in 1:22){
-      
-      #get the number of
-      idx <- which(prs.all$CHR==j)
-      n.snp.total = n.snp.total+length(idx)
-      if(length(idx)>0){
+    prs.all <- left_join(clump.snp,sum.data,by="SNP")  %>% 
+    filter(P<=pthres[k])
+    if(nrow(prs.all)>0){
+      for(j in 1:22){
         
-        
-        filename <- paste0(cur.dir,eth[i],"/prs/prs_rho_",l,"_size_",m,"_chr_",j,"_rep_",i_rep,".profile")
-        
-        prs.temp <- fread(filename)  
-        prs.score <- prs.temp$SCORE*2*length(idx)+prs.score
+        #get the number of
+        idx <- which(prs.all$CHR==j)
+        n.snp.total = n.snp.total+length(idx)
+        if(length(idx)>0){
+          
+          
+          filename <- paste0(cur.dir,eth[i],"/prs/prs_rho_",l,"_size_",m,"_chr_",j,"_rep_",i_rep,".profile")
+          
+          prs.temp <- fread(filename)  
+          prs.score <- prs.temp$SCORE*2*length(idx)+prs.score
+        }
       }
+      #prs.score.mat[,k] = prs.score
+      prs.test <- prs.score[(n.train+1):(n.train+n.test)]
+      prs.vad <- prs.score[(n.train+n.test+1):n]
+      #model = lm(y~prs.score)
+      y.test = y_test_mat[1:n.test,i_rep]
+      y.vad = y_test_mat[(n.test+1):(nrow(y_test_mat)),i_rep]
+      model1 <- lm(y.test~prs.test)
+      r2.test.rep[i_rep] <- summary(model1)$r.square
+      model2 <- lm(y.vad~prs.vad)
+      r2.mat.test[i_rep,k] = summary(model1)$r.square
+      r2.mat.vad[i_rep,k] = summary(model2)$r.square
     }
-    #prs.score.mat[,k] = prs.score
-    prs.test <- prs.score[(n.train+1):(n.train+n.test)]
-    prs.vad <- prs.score[(n.train+n.test+1):n]
-    #model = lm(y~prs.score)
-    y.test = y_test_mat[1:n.test,i_rep]
-    y.vad = y_test_mat[(n.test+1):(nrow(y_test_mat)),i_rep]
-    model1 <- lm(y.test~prs.test)
-    r2.test.rep[i_rep] <- summary(model1)$r.square
-    model2 <- lm(y.vad~prs.vad)
-    r2.vad.rep[i_rep]<- summary(model2)$r.square
-    
-    r2.mat.test[k] <- mean(r2.test.rep)
-    r2.mat.vad[k] <- mean(r2.vad.rep)
-  }
+    r2.mat.test[i_rep,k] = 0
+    r2.mat.vad[i_rep,k] = 0
+   # }
     
   }
       
