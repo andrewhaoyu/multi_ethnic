@@ -16,6 +16,7 @@ library(data.table)
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 pthres <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01,0.5)
 #n.snp.mat <- matrix(0,length(pthres),4)
+cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
 sid <- Sys.getenv("SLURM_JOB_ID")
 dir.create(paste0('/lscratch/',sid,'/',eth[i],"/"),showWarnings = F)
 temp.dir <- paste0('/lscratch/',sid,'/',eth[i],"/")
@@ -23,7 +24,7 @@ system(paste0("cp ",cur.dir,eth[i],"/chr",j,".tag.* ",temp.dir,"."))
 system(paste0("ls ",temp.dir))
 for(l in 1:3){
   for(m in 1:4){
-    cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
+    
     setwd("/data/zhangh24/multi_ethnic/")
     
     LD <- as.data.frame(fread(paste0(cur.dir,eth[i],"/LD_clump_rho_",l,"_size_",m,"_rep_",i_rep,".clumped")))

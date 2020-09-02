@@ -50,14 +50,16 @@ for(l in 1:1){
     for(k1 in 1:length(pthres)){
       for(k2 in 1:length(pthres)){
         
-        prs.file <- prs.all %>% filter(P<=pthres[k1]|
-                                         peur<=pthres[k2]) %>% 
+        prs.file <- prs.all %>% filter((P<=pthres[k1]|
+                                         peur<=pthres[k2])&
+                                         CHR==j) %>% 
           select(SNP,A1,BETA)
         #setwd(temp.dir)
-        write.table(prs.file,file = paste0(temp.dir,"prs_pvalue_two_dim_",k,"_rho_",l,"_size_",m,"_rep_",i_rep),col.names = T,row.names = F,quote=F)
+        
         #}
         #for(j in 1:22){
         if(nrow(prs.file)>0){
+          write.table(prs.file,file = paste0(temp.dir,"prs_pvalue_two_dim_",k1,"_",k2,"_rho_",l,"_size_",m,"_rep_",i_rep),col.names = T,row.names = F,quote=F)
           system(paste0("/data/zhangh24/software/plink2 --threads 2 --score ",temp.dir,"prs_pvalue_two_dim_",k,"_rho_",l,"_size_",m,"_rep_",i_rep," no-sum no-mean-imputation --bfile ",temp.dir,"chr",j,".tag --exclude /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/duplicated.id  --out ",cur.dir,eth[i],"/prs/prs_two_dim_rho_",l,"_size_",m,"_chr_",j,"_rep_",i_rep))
           #system(paste0("/data/zhangh24/software/plink2 --score ",cur.dir,eth[i],"/prs/prs_file_pvalue_",k,"_rho_",l,"_size_",m,,"_rep_",i_rep," no-sum no-mean-imputation --bfile ",cur.dir,eth[i],"/all_chr.tag --exclude /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/duplicated.id  --out ",cur.dir,eth[i],"/prs/prs_",k,"_rho_",l,"_size_",m))
         }

@@ -45,7 +45,6 @@ head(summary)
 pthr = 0.5
 r2thr = 0.1
 kbpthr = 500
-eth <- c("EUR","AFR","AMR","EAS")
 system(paste0("/data/zhangh24/software/plink2 --threads 2 --bfile /lscratch/",sid,"/test/",eth[i],"_chr_all --clump /data/zhangh24/multi_ethnic/result/LD_simulation_new/",eth[i],"/assoc.out_rho_",l,"_size_",m,"_rep_",i_rep," --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out /data/zhangh24/multi_ethnic/result/LD_simulation_new/",eth[i],"/LD_clump_two_dim_rho_",l,"_size_",m,"_rep_",i_rep))
   
 # }
