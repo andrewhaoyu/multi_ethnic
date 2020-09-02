@@ -18,7 +18,7 @@ system(paste0("cp /data/zhangh24/KG.plink/",eth[i],"/chr_all.bim /lscratch/",sid
 system(paste0("cp /data/zhangh24/KG.plink/",eth[i],"/chr_all.fam /lscratch/",sid,"/test/",eth[i],"_chr_all.fam"))
 setwd("/data/zhangh24/multi_ethnic/")
 #summary.eur <- as.data.frame(fread(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[1],"/summary.out"),header=T))
-summary.eur <- as.data.frame(fread(paste0("./result/LD_simulation_new/",eth[1],"/summary_out_rho_",1,"_size_",4,"_rep_",i_rep)))  
+summary.eur <- as.data.frame(fread(paste0("./result/LD_simulation_new/",eth[1],"/summary_out_rho_",l,"_size_",4,"_rep_",i_rep)))  
 colnames(summary.eur)[9] = "peur"
 #only keep snpid and p-value for future combination
 summary.eur.select = summary.eur %>% 
