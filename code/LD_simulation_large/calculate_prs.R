@@ -28,7 +28,9 @@ for(l in 1:3){
     setwd("/data/zhangh24/multi_ethnic/")
     
     LD <- as.data.frame(fread(paste0(cur.dir,eth[i],"/LD_clump_rho_",l,"_size_",m,"_rep_",i_rep,".clumped")))
-    clump.snp <- LD[,3,drop=F]  
+    clump.snp <- LD[,3,drop=F] 
+    #here use summary_out or summary_MAF_out doesn't make difference
+    #since the LD_clumping step only include MAF_out
     sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_new/",eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep)))  
     colnames(sum.data)[2] <- "SNP"
     prs.all <- left_join(clump.snp,sum.data,by="SNP") 

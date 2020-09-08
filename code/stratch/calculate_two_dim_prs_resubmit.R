@@ -15,13 +15,13 @@ start = start.end[1]
 end = start.end[2]
 for(row_ind in start:end){
   ind.vec = mis_mat[row_ind,]
-  i = ind.vec[1]
-  i_rep = ind.vec[2]
-  l = ind.vec[3]
-  m = ind.vec[4]
-  j = ind.vec[5]
-  k1 = ind.vec[6]
-  k2 = ind.vec[7]
+  i = ind.vec[2]
+  i_rep = ind.vec[3]
+  j = ind.vec[4]
+  l = ind.vec[5]
+  m = ind.vec[6]
+  k1 = ind.vec[7]
+  k2 = ind.vec[8]
   eth <- c("EUR","AFR","AMR","EAS","SAS")
   cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
   #j = as.numeric(args[[3]])

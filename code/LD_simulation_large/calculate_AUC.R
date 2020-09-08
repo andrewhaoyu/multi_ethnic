@@ -35,9 +35,9 @@ setwd("/data/zhangh24/multi_ethnic/")
   
   
   
-  LD <- as.data.frame(fread(paste0(cur.dir,eth[i],"/LD_clump_rho_",l,"_size_",m,".clumped")))
+  LD <- as.data.frame(fread(paste0(cur.dir,eth[i],"/LD_clump_rho_",l,"_size_",m,"_rep_",i_rep,".clumped")))
   clump.snp <- LD[,3,drop=F]  
-  sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_new/",eth[i],"/summary_out_rho_",l,"_size_",m)))  
+  sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_new/",eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep)))  
   colnames(sum.data)[2] <- "SNP"
   n_rep = 10
   #for(k in 1:length(pthres)){

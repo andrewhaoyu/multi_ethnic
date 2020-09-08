@@ -18,6 +18,7 @@ cau_vec <- factor(cau_vec,
 
 LD.clump.result <- cbind(LD.clump.result,sample_size,cau_vec)
 save(LD.clump.result,file = "LD.clump.result_090420_P+T.rdata")
+load("LD.clump.result_090420_P+T.rdata")
 
 
 
