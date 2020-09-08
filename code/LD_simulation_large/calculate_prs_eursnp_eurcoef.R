@@ -43,7 +43,7 @@ for(l in 1:3){
       select(SNP,A1,BETA)
     write.table(prs.file,file = paste0(cur.dir,eth[i],"/prs/prs_eursnp_eurcoef_rho_",l,"_size_",m,"_rep_",i_rep),col.names = T,row.names = F,quote=F)
     system(paste0("/data/zhangh24/software/plink2 --threads 2 --score ",cur.dir,eth[i],"/prs/prs_eursnp_eurcoef_rho_",l,"_size_",m,"_rep_",i_rep," no-sum no-mean-imputation --bfile ",cur.dir,eth[i],"/chr",j,".tag --exclude /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/duplicated.id  --out ",cur.dir,eth[i],"/prs/prs_eursnp_eurcoef_rho_",l,"_size_",m,"_",j,"_rep_",i_rep))
-    system(paste0('rm -r /lscratch/',sid,'/',eth[i],'/'))
+    
     system(paste0("rm ",cur.dir,eth[i],"/prs/prs_eursnp_eurcoef_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,".nosex"))
     system(paste0("rm ",cur.dir,eth[i],"/prs/prs_eursnp_eurcoef_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,".log"))
     system(paste0("rm ",cur.dir,eth[i],"/prs/prs_eursnp_eurcoef_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,".nopred"))
@@ -51,4 +51,4 @@ for(l in 1:3){
     #system(paste0('ls/lscratch/',sid,"/"))
   }
 }
-
+system(paste0('rm -r /lscratch/',sid,'/',eth[i],'/'))
