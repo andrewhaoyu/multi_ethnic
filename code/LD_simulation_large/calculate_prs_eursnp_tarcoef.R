@@ -49,8 +49,11 @@ for(l in 1:3){
       select(SNP)
     sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_new/",eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep)))  
     #combine the prs with the target population coefficients
+    #idx <- which(prs.file$SNP%in%sum.data$SNP==F)
+    #length(idx)
     prs.file.com <- left_join(prs.file,sum.data,by="SNP")
     prs.file <- prs.file.com %>% select(SNP,A1,BETA)
+    #prs.file[14,]
     prs.file <- prs.file[complete.cases(prs.file),]
     write.table(prs.file,file = paste0(cur.dir,eth[i],"/prs/prs_eursnp_tarcoef_rho_",l,"_size_",m,"_rep_",i_rep),col.names = T,row.names = F,quote=F)
     system(paste0("/data/zhangh24/software/plink2 --threads 2 --score ",cur.dir,eth[i],"/prs/prs_eursnp_tarcoef_rho_",l,"_size_",m,"_rep_",i_rep," no-sum no-mean-imputation --bfile ",cur.dir,eth[i],"/chr",j,".tag --exclude /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/duplicated.id  --out ",cur.dir,eth[i],"/prs/prs_eursnp_tarcoef_rho_",l,"_size_",m,"_",j,"_rep_",i_rep))
@@ -62,5 +65,10 @@ for(l in 1:3){
   }
 #n.snp.mat <- matrix(0,length(pthres),4)
 #load EUR r2 result
-
+# bim.file <- fread(paste0(temp.dir,"/chr",j,".tag.bim"),header=F)
+# colnames(bim.file)[2] <- "SNP"
+# new.file <- inner_join(prs.file,bim.file,by="SNP")
+# dim(new.file)
+#idx <- which(prs.file$SNPas.character(bim.file[,2]))
+#length(idx)
 system(paste0('rm -r /lscratch/',sid,'/',eth[i],'/'))
