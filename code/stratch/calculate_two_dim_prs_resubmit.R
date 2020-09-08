@@ -23,6 +23,10 @@ eth <- c("EUR","AFR","AMR","EAS","SAS")
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
 #j = as.numeric(args[[3]])
 sid <- Sys.getenv("SLURM_JOB_ID")
+dir.create(paste0('/lscratch/',sid,'/',eth[i_temp],"/"),showWarnings = F)
+temp.dir <- paste0('/lscratch/',sid,'/',eth[i_temp],"/")
+system(paste0("cp ",cur.dir,eth[i_temp],"/chr",j_temp,".tag.* ",temp.dir,"."))
+system(paste0("ls ",temp.dir))
 
 
 
