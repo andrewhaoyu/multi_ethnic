@@ -29,7 +29,7 @@ r2.mat <- as.data.frame(LD.result.list[[2]]) %>%
 k = which.max(r2.mat$r2.vec)
 LD <- as.data.frame(fread(paste0(cur.dir,eth[1],"/LD_clump_rho_",l,"_size_",4,".clumped")))
 clump.snp <- LD[,3,drop=F]  
-sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_new/",eth[1],"/summary_out_rho_",l,"_size_",4)))  
+sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_new/",eth[i],"/summary_out_rho_",l,"_size_",4,"_rep_",i_rep)))  
 colnames(sum.data)[2] <- "SNP"
 prs.all <- left_join(clump.snp,sum.data,by="SNP") 
 
