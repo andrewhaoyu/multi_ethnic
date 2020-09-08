@@ -13,8 +13,8 @@ size = 1000
 start.end = startend(nrow(mis_mat),1000,ind)
 start = start.end[1]
 end = start.end[2]
-
 row_ind =1 
+ind.vec = mis_mat[row_ind,]
 i_temp = ind.vec[2]
 
 j_temp = ind.vec[4]
