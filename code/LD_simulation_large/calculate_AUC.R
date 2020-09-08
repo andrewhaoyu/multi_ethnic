@@ -62,7 +62,7 @@ setwd("/data/zhangh24/multi_ethnic/")
           if(length(idx)>0){
             
             
-            filename <- paste0(cur.dir,eth[i],"/prs/prs_chr_",j,"_pvalue_",k,"rho_",l,"_size_",m,"_chr_",j,"_rep_",i_rep,".profile")
+            filename <- paste0(cur.dir,eth[i],"/prs/prs_chr_",j,"_pvalue_",k,"_rho_",l,"_size_",m,"_chr_",j,"_rep_",i_rep,".profile")
             
             prs.temp <- fread(filename)  
             prs.score <- prs.temp$SCORE*2*length(idx)+prs.score
@@ -94,12 +94,12 @@ setwd("/data/zhangh24/multi_ethnic/")
     #}
 
 
-names(r2.mat.test) <- names(r2.mat.vad) <- pthres
+names(r2.vec.test) <- names(r2.vec.vad) <- pthres
 
 #evaluate the best prs performance on the validation
 
-  idx <- which.max(r2.mat.test)
-  r2 <- r2.mat.vad[idx]
-r2.list <- list(r2,r2.mat.test,r2.mat.vad)
-save(r2.list,file = paste0(cur.dir,eth[i],"/r2.list_rho_",l,"_size_",m))
+  idx <- which.max(r2.vec.test)
+  r2 <- r2.vec.vad[idx]
+r2.list <- list(r2,r2.vec.test,r2.vec.vad)
+save(r2.list,file = paste0(cur.dir,eth[i],"/r2.list_rho_",l,"_size_",m,"_rep_",i_rep))
 #write.csv(r2.mat,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/ld.clump.auc.csv")
