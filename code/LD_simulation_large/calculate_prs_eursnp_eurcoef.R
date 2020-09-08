@@ -24,7 +24,7 @@ for(l in 1:3){
     setwd("/data/zhangh24/multi_ethnic/")
     
     load(paste0(cur.dir,"LD.clump.result.rdata"))
-    LD.
+    
     #load("/data/zhangh24/multi_ethnic/result/LD_simulation/r2.mat.eur.rdata")
     #keep the EUR results with sample size at 100,000 (m = 4)
     r2.mat <- as.data.frame(LD.result.list[[3]]) %>% 
