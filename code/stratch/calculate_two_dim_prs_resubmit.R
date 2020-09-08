@@ -13,6 +13,19 @@ size = 1000
 start.end = startend(nrow(mis_mat),1000,ind)
 start = start.end[1]
 end = start.end[2]
+
+row_ind =1 
+i_temp = ind.vec[2]
+
+j_temp = ind.vec[4]
+
+eth <- c("EUR","AFR","AMR","EAS","SAS")
+cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
+#j = as.numeric(args[[3]])
+sid <- Sys.getenv("SLURM_JOB_ID")
+
+
+
 for(row_ind in start:end){
   ind.vec = mis_mat[row_ind,]
   i = ind.vec[2]
@@ -22,15 +35,16 @@ for(row_ind in start:end){
   m = ind.vec[6]
   k1 = ind.vec[7]
   k2 = ind.vec[8]
-  eth <- c("EUR","AFR","AMR","EAS","SAS")
-  cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
+  if(i!=i_temp|j!=j_temp){
+    system(paste0('rm -r /lscratch/',sid,'/',eth[i_temp],'/'))
+    i_temp = i
+    j_temp = j
+    dir.create(paste0('/lscratch/',sid,'/',eth[i_temp],"/"),showWarnings = F)
+    temp.dir <- paste0('/lscratch/',sid,'/',eth[i_temp],"/")
+    system(paste0("cp ",cur.dir,eth[i_temp],"/chr",j_temp,".tag.* ",temp.dir,"."))
+    system(paste0("ls ",temp.dir))
+    }
   #j = as.numeric(args[[3]])
-  sid <- Sys.getenv("SLURM_JOB_ID")
-  dir.create(paste0('/lscratch/',sid,'/',eth[i],"/"),showWarnings = F)
-  temp.dir <- paste0('/lscratch/',sid,'/',eth[i],"/")
-  
-  system(paste0("cp ",cur.dir,eth[i],"/chr",j,".tag.* ",temp.dir,"."))
-  system(paste0("ls ",temp.dir))
   
   library(dplyr)
   library(data.table)
@@ -91,7 +105,7 @@ for(row_ind in start:end){
   
   #pthres <- c(1E-10,1E-09,5E-08,1E-07,2.5E-07,5E-07,7.5E-07,1E-06,2.5E-06,5E-06,7.5E-06,1E-05,2.5e-05,5E-05,7.5e-05,1E-04,2.5E-04,5E-04,7.5E-04,1E-03)
   
-  system(paste0('rm -r /lscratch/',sid,'/',eth[i],'/'))
+  
   gc()
 }
 
