@@ -10,7 +10,7 @@ ind = as.numeric(args[[1]])
 load("/data/zhangh24/multi_ethnic/result/LD_simulation_new/mis_mat.rdata")
 library(bc2,lib.loc = "/home/zhangh24/R/x86_64-pc-linux-gnu-library/4.0/")
 size = 1000
-start.end = startend(nrow(mis_mat),1000,1)
+start.end = startend(nrow(mis_mat),1000,ind)
 start = start.end[1]
 end = start.end[2]
 for(row_ind in start:end){
