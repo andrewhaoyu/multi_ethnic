@@ -17,7 +17,7 @@ cau_vec <- factor(cau_vec,
                   levels = paste0("Causal SNPs Proportion = ",csp))
 
 LD.clump.result <- cbind(LD.clump.result,sample_size,cau_vec)
-
+save(LD.clump.result,file = "LD.clump.result_090420_P+T.rdata")
 
 
 
@@ -77,7 +77,7 @@ LD.clump.result <- cbind(LD.clump.result,sample_size,cau_vec)
 #Best EUR result
   load("LD.clump.result.rdata")
   LD.clump.result <- LD.result.list[[1]]
-  save(LD.clump.result,file = "LD.clump.result_082420.rdata")
+  
   sample_size <- factor(rep(c("15000","45000","80000","100000"),4*3*2),
                         levels=c("15000","45000","80000","100000"))
   
