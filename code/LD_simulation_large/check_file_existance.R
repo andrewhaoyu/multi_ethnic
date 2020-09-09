@@ -1,8 +1,6 @@
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
 
-paste0(cur.dir,"check_mat_rep",i_rep,"_i_",i,"_chr_",j)
-
 
 mis_mat <- NULL
 
