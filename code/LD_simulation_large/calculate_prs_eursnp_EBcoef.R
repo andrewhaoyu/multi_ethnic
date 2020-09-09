@@ -116,9 +116,9 @@ summary.tar.select = summary.tar %>%
   write.table(prs.file,file = paste0(cur.dir,eth[i],"/prs/prs_file_eursnp_eb_rho_",l,"_size_",m,"_rep_",i_rep),col.names = T,row.names = F,quote=F)    
 
   system(paste0("/data/zhangh24/software/plink2 --threads 2 --score ",cur.dir,eth[i],"/prs/prs_file_eursnp_eb_rho_",l,"_size_",m,"_rep_",i_rep," no-sum no-mean-imputation --bfile ",cur.dir,eth[i],"/chr",j,".tag --exclude /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/duplicated.id  --out ",cur.dir,eth[i],"/prs/prs_eursnp_eb_rho_",l,"_size_",m,"_",j,"_rep_",i_rep))
-  sytem(pasete0("rm ",cur.dir,eth[i],"/prs/prs_eursnp_eb_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,".log"))
-  sytem(pasete0("rm ",cur.dir,eth[i],"/prs/prs_eursnp_eb_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,".nosex"))
-  sytem(pasete0("rm ",cur.dir,eth[i],"/prs/prs_eursnp_eb_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,".nopred"))
+  system(pasete0("rm ",cur.dir,eth[i],"/prs/prs_eursnp_eb_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,".log"))
+  system(pasete0("rm ",cur.dir,eth[i],"/prs/prs_eursnp_eb_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,".nosex"))
+  system(pasete0("rm ",cur.dir,eth[i],"/prs/prs_eursnp_eb_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,".nopred"))
   gc()
   }
 }
