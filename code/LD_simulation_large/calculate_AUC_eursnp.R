@@ -95,5 +95,5 @@ for(i_rep in 1:n.rep){
   
 }
 
-save(r2,file = paste0(cur.dir,eth[i],"/r2_eursnp_",method[q],"_rho_",l,"_size_",m))
+save(r2.vec,file = paste0(cur.dir,eth[i],"/r2_eursnp_",method[q],"_rho_",l,"_size_",m))
 #write.csv(r2.mat,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/ld.clump.auc.csv")
