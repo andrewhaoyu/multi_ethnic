@@ -55,16 +55,18 @@ colnames(sum.data)[2] <- "SNP"
 #combine the target level summary stat with EUR
 summary.com <- left_join(sum.data,summary.eur.select,by="SNP")
 #combine the statistics with SNPs after clumping
-prs.all <- left_join(clump.snp,summary.com,by="SNP") 
+prs.clump <- left_join(clump.snp,summary.com,by="SNP") 
 r2.vec.test <- rep(0,length(pthres))
 r2.vec.vad <- rep(0,length(pthres))
 pthres1.vec <- rep(0,length(pthres))
 pthres2.vec <- rep(0,length(pthres))
-
+temp =1 
 for(k1 in 1:length(pthres)){
   for(k2 in 1:length(pthres)){
-    prs.all <- prs.clump %>% 
-      filter(P<=pthres[k])
+    
+        prs.all <- prs.clump %>% 
+          filter((P<=pthres[k1]|
+                    peur<=pthres[k2]))
     if(nrow(prs.all)>0){
       n.snp.total <- 0
       prs.score <- rep(0,n)
@@ -76,7 +78,7 @@ for(k1 in 1:length(pthres)){
         if(length(idx)>0){
           
           
-          filename <- paste0(cur.dir,eth[i],"/prs/prs_chr_",j,"_pvalue_",k,"_rho_",l,"_size_",m,"_chr_",j,"_rep_",i_rep,".profile")
+          filename <- paste0(cur.dir,eth[i],"/prs/prs_two_dim_",k1,"_",k2,"_rho_",l,"_size_",m,"_chr_",j,"_rep_",i_rep,".profile")
           
           prs.temp <- fread(filename)  
           prs.score <- prs.temp$SCORE*2*length(idx)+prs.score
@@ -91,11 +93,18 @@ for(k1 in 1:length(pthres)){
       model1 <- lm(y.test~prs.test)
       #r2.test.rep[i_rep] <- summary(model1)$r.square
       model2 <- lm(y.vad~prs.vad)
-      r2.vec.test[k] = summary(model1)$r.square
-      r2.vec.vad[k] = summary(model2)$r.square
+      
+      r2.vec.test[temp] = summary(model1)$r.square
+      r2.vec.vad[temp] = summary(model2)$r.square
+      pthres1.vec[temp] = pthres[k1]
+      pthres2.vec[temp] = pthres[k2]
+      temp = temp + 1
     }else{
-      r2.vec.test[k] = 0
-      r2.vec.vad[k] = 0  
+      r2.vec.test[temp] = 0
+      r2.vec.vad[temp] = 0  
+      pthres1.vec[temp] = pthres[k1]
+      pthres2.vec[temp] = pthres[k2]
+      temp = temp + 1
     }
     
   }
@@ -117,5 +126,5 @@ for(k1 in 1:length(pthres)){
 idx <- which.max(r2.vec.test)
 r2 <- r2.vec.vad[idx]
 r2.list <- list(r2,r2.vec.test,r2.vec.vad)
-save(r2.list,file = paste0(cur.dir,eth[i],"/r2.list_rho_",l,"_size_",m,"_rep_",i_rep))
+save(r2.list,file = paste0(cur.dir,eth[i],"/r2.list_two_dim_rho_",l,"_size_",m,"_rep_",i_rep))
 #write.csv(r2.mat,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/ld.clump.auc.csv")
