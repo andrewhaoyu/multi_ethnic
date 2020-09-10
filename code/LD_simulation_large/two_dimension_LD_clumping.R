@@ -28,7 +28,7 @@ summary.eur.select = summary.eur %>%
   summary <- as.data.frame(fread(paste0("./result/LD_simulation_new/",eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep)))  
   #find the shared SNPs between target ethnic group and EUR
   #get the min p-value for between the target ethnic group and EUR for shared snp
-  summary.com <- full_join(summary,summary.eur.select,by="SNP")
+  summary.com <- left_join(summary,summary.eur.select,by="SNP")
   summary.com = summary.com %>% 
     mutate(p_update=pmin(P,peur,na.rm = T))
   assoc = summary.com %>%
