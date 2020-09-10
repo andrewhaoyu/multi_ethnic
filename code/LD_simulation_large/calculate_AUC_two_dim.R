@@ -49,6 +49,7 @@ summary.eur.select = summary.eur %>%
 #read LD clumped SNPs
 LD <- as.data.frame(fread(paste0(cur.dir,eth[i],"/LD_clump_two_dim_rho_",l,"_size_",m,"_rep_",i_rep,".clumped")))
 clump.snp <- LD[,3,drop=F] 
+#idx <- which(clump.snp%in%sum.data$SNP==F)
 #read the target ethnic group summary level statistics
 sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_new/",eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep))) 
 colnames(sum.data)[2] <- "SNP"
