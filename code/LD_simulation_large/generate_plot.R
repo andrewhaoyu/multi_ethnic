@@ -95,17 +95,41 @@ LD.clump.result <- cbind(LD.clump.result,sample_size,cau_vec)
     idx <- which(LD.clump.result$method_vec==method[q])
     LD.clump.result$method_vec[idx] <-   method_nameupdate[q]
   }
+  LD.clump.result.EUR <- LD.clump.result
+  # 
+  # 
   
-  LD.clump.result <- rbind(LD.clump.result,LD.clump.result.PT)
+  # 
+  load("LD.clump.result.two.dim.rdata")
+  
+  LD.clump.result <- LD.result.list[[1]]
+  
+  sample_size <- factor(rep(c("15000","45000","80000","100000"),4*3*2),
+                        levels=c("15000","45000","80000","100000"))
+  
+  cau_vec <- as.character(LD.clump.result$l_vec)
+  csp <- c(0.01,0.001,0.0005)
+  #LD.clump.result <- LD.clump.result[LD.clump.result$eth.vec!="EUR",]
+  method_vec <- rep("LD-double",nrow(LD.clump.result))
+  LD.clump.result$method_vec = method_vec
+  LD.clump.result.L2 <- LD.clump.result
+  
+  LD.clump.result <- rbind(LD.clump.result.L2,LD.clump.result.EUR,LD.clump.result.PT)
   for(l in 1:3){
     idx <- which(LD.clump.result$l_vec==l)
     cau_vec[idx] <- paste0("Causal SNPs Proportion = ",csp[l])
   }
-  cau_vec <- factor(cau_vec,
-                    levels = paste0("Causal SNPs Proportion = ",csp))
+  cau_vec <- factor(cau_vec,levels = paste0("Causal SNPs Proportion = ",csp))
+  sample_size <- as.character(LD.clump.result$m_vec)
+  sample_option = c("15000","45000","80000","100000")
+  for(m in 1:4){
+    idx <- which(LD.clump.result$m_vec==m)
+    sample_size[idx] <- paste0(sample_option[m])
+  }
   
-  LD.clump.result <- cbind(LD.clump.result,sample_size,cau_vec)
+  sample_size = factor(sample_size,levels=c("15000","45000","80000","100000"))
   
+  LD.clump.result <- cbind(LD.clump.result,cau_vec,sample_size)
   
   p <- ggplot(LD.clump.result,aes(x= sample_size,y=r2.vec,group=method_vec))+
     geom_bar(aes(fill=method_vec),
@@ -117,7 +141,7 @@ LD.clump.result <- cbind(LD.clump.result,sample_size,cau_vec)
     xlab("Sample Size")+
     guides(color=guide_legend(title="Method"))+
     facet_grid(vars(cau_vec),vars(eth.vec))+
-    scale_fill_gsea()
+    scale_fill_nejm()
   p
   png(file = paste0("./method_compare_result_summary.png"),
       width = 12, height = 8, res = 300,units = "in")

@@ -15,8 +15,8 @@ for(i in 1:22){
     idx <- which(MAF[,k]>=0.01&
                    MAF[,k]<=0.99&
                    TYPE=="Biallelic_SNP")
-    leg_chr = leg$position[idx] 
-    
+    # leg_chr = leg$position[idx] 
+    # idx <- which(leg$position==80294998)
     
     write.table(leg_chr,file = paste0("/data/zhangh24/KG.impute2/tag/",eth[k],"_chr",i,".tag"),row.names = F,col.names = F,quote=F)
     
