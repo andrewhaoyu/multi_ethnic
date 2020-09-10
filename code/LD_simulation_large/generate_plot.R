@@ -148,5 +148,21 @@ LD.clump.result <- cbind(LD.clump.result,sample_size,cau_vec)
   p
   dev.off()
   
-  
+  idx <- which(LD.clump.result$m_vec==1)
+  p <- ggplot(LD.clump.result[idx,],aes(x= sample_size,y=r2.vec,group=method_vec))+
+    geom_bar(aes(fill=method_vec),
+             stat="identity",
+             position = position_dodge())+
+    #geom_point(aes(color=method_vec))+
+    theme_Publication()+
+    ylab("R2")+
+    xlab("Sample Size")+
+    guides(color=guide_legend(title="Method"))+
+    facet_grid(vars(cau_vec),vars(eth.vec))+
+    scale_fill_nejm()
+  p
+  png(file = paste0("./method_compare_result_summary_15000.png"),
+      width = 12, height = 8, res = 300,units = "in")
+  p
+  dev.off()
   
