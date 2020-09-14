@@ -146,5 +146,5 @@ for(k1 in 1:length(pthres)){
 idx <- which.max(r2.vec.test)
 r2 <- r2.vec.vad[idx]
 r2.list <- list(r2,r2.vec.test,r2.vec.vad)
-save(r2.list,file = paste0(cur.dir,eth[i],"/r2.list_two_dim_rho_",l,"_size_",m,"_rep_",i_rep))
+save(r2.list,file = paste0(cur.dir,eth[i],"/r2.list_eb_rho_",l,"_size_",m,"_rep_",i_rep))
 #write.csv(r2.mat,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/ld.clump.auc.csv")
