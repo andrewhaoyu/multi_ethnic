@@ -21,16 +21,19 @@ save(LD.clump.result,file = "LD.clump.result_090420_P+T.rdata")
 load("LD.clump.result_090420_P+T.rdata")
 
 
-
+LD.clump.result$eth.vec <- factor(LD.clump.result$eth.vec,
+                                  levels =c("EUR","AFR","AMR","EAS","SAS"))
 p <- ggplot(LD.clump.result,aes(x= sample_size,y=r2.vec,group=eth.vec))+
   geom_line(aes(color=eth.vec))+
   geom_point(aes(color=eth.vec))+
   theme_Publication()+
   ylab("R2")+
   xlab("Training sample size")+
-  guides(color=guide_legend(title="Ethnic group"))+
+  labs(color = "Ethnic group")+
   facet_grid(cols=vars(cau_vec))+
-  scale_color_nejm()
+  scale_color_nejm()+
+  ggtitle("Prediction performance across ethnic groups using P+T")
+p
 png(file = paste0("./LD_clumping_result_summary.png"),
     width = 10, height = 8, res = 300,units = "in")
 p
@@ -66,9 +69,10 @@ LD.clump.result <- cbind(LD.clump.result,sample_size,cau_vec)
     theme_Publication()+
     ylab("R2")+
     xlab("log10(P-value)")+
-    guides(color=guide_legend(title="Ethnic group"))+
+    labs(color = "Ethnic group")+
     facet_grid(vars(cau_vec),vars(sample_size))+
     scale_color_nejm()
+  p
   png(file = paste0("./LD_clumping_result_p_thres.png"),
       width = 15, height = 10, res = 300,units = "in")
   p
@@ -110,7 +114,7 @@ LD.clump.result <- cbind(LD.clump.result,sample_size,cau_vec)
   cau_vec <- as.character(LD.clump.result$l_vec)
   csp <- c(0.01,0.001,0.0005)
   #LD.clump.result <- LD.clump.result[LD.clump.result$eth.vec!="EUR",]
-  method_vec <- rep("LD-double",nrow(LD.clump.result))
+  method_vec <- rep("2DLD",nrow(LD.clump.result))
   LD.clump.result$method_vec = method_vec
   LD.clump.result.L2 <- LD.clump.result
   
@@ -131,6 +135,14 @@ LD.clump.result <- cbind(LD.clump.result,sample_size,cau_vec)
   
   LD.clump.result <- cbind(LD.clump.result,cau_vec,sample_size)
   
+  LD.clump.result$method_vec <- factor(LD.clump.result$method_vec,
+                                       levels = c("P+T",
+                                                  "Best EUR PRS",
+                                                  "Best EUR SNP + target coefficients",
+                                                  "Best EUR SNP + EB",
+                                       "2DLD"))
+  
+  
   p <- ggplot(LD.clump.result,aes(x= sample_size,y=r2.vec,group=method_vec))+
     geom_bar(aes(fill=method_vec),
              stat="identity",
@@ -139,12 +151,15 @@ LD.clump.result <- cbind(LD.clump.result,sample_size,cau_vec)
     theme_Publication()+
     ylab("R2")+
     xlab("Sample Size")+
-    guides(color=guide_legend(title="Method"))+
+    labs(fill = "Method")+
     facet_grid(vars(cau_vec),vars(eth.vec))+
-    scale_fill_nejm()
+    scale_fill_nejm()+
+    theme(axis.text = element_text(size = rel(0.9)),
+      legend.text = element_text(size = rel(0.9)))+
+  ggtitle("Prediction performance comparasion (Sample Size for EUR = 100k)")
   p
   png(file = paste0("./method_compare_result_summary.png"),
-      width = 12, height = 8, res = 300,units = "in")
+      width = 13, height = 8, res = 300,units = "in")
   p
   dev.off()
   
@@ -159,8 +174,12 @@ LD.clump.result <- cbind(LD.clump.result,sample_size,cau_vec)
     xlab("Sample Size")+
     guides(color=guide_legend(title="Method"))+
     facet_grid(vars(cau_vec),vars(eth.vec))+
-    scale_fill_nejm()
+    scale_fill_nejm()+
+    ggtitle("Prediction comparasion (Sample Size for EUR = 100k)")
   p
+  
+  
+  
   png(file = paste0("./method_compare_result_summary_15000.png"),
       width = 12, height = 8, res = 300,units = "in")
   p

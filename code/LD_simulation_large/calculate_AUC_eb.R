@@ -62,15 +62,23 @@ r2.vec.vad <- rep(0,length(pthres)^2)
 pthres1.vec <- rep(0,length(pthres)^2)
 pthres2.vec <- rep(0,length(pthres)^2)
 temp =1 
+
+all.files <- dir(path=paste0(cur.dir,eth[i],"/prs"),
+                 pattern="prs_eb_(.*).profile",
+                 full.names = T)
+
 for(k1 in 1:length(pthres)){
   for(k2 in 1:length(pthres)){
     
-        prs.all <- prs.clump %>% 
-          filter((P<=pthres[k1]|
-                    peur<=pthres[k2]))
+    prs.all <- prs.clump %>% 
+      filter((P<=pthres[k1]|
+                peur<=pthres[k2]))
     if(nrow(prs.all)>0){
       n.snp.total <- 0
       prs.score <- rep(0,n)
+      
+      count.index <- 1
+      
       for(j in 1:22){
         
         #get the number of
@@ -79,10 +87,16 @@ for(k1 in 1:length(pthres)){
         if(length(idx)>0){
           
           
-          filename <- paste0(cur.dir,eth[i],"/prs/prs_two_dim_",k1,"_",k2,"_rho_",l,"_size_",m,"_chr_",j,"_rep_",i_rep,".profile")
+          filename <- paste0(cur.dir,eth[i],"/prs/prs_eb_",k1,"_",k2,"_rho_",l,"_size_",m,"_chr_",j,"_rep_",i_rep,".profile")
+          if(filename%in%all.files==T){
+            prs.temp <- fread(filename)  
+            prs.score <- prs.temp$SCORE*2*length(idx)+prs.score  
+            print(count.index)
+          }else{
+            count.index =0
+            print(count.index)
+          }
           
-          prs.temp <- fread(filename)  
-          prs.score <- prs.temp$SCORE*2*length(idx)+prs.score
         }
       }
       #prs.score.mat[,k] = prs.score
@@ -99,6 +113,11 @@ for(k1 in 1:length(pthres)){
       r2.vec.vad[temp] = summary(model2)$r.square
       pthres1.vec[temp] = pthres[k1]
       pthres2.vec[temp] = pthres[k2]
+      #some jobs haven't finished yet
+      if(count.index==0){
+        r2.vec.test[temp] = NA
+        r2.vec.vad[temp] = NA
+      }
       temp = temp + 1
     }else{
       r2.vec.test[temp] = 0
