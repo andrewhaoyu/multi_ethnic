@@ -16,10 +16,15 @@ for(i in 2:5){
       r2.temp <- rep(0,10)
       for(i_rep in 1:10){
         load(paste0(cur.dir,eth[i],"/r2.list_eb_rho_",l,"_size_",m,"_rep_",i_rep))
-        r2.temp[i_rep] = r2.list[[1]]
+        if(length(r2.list[[1]])==0){
+          r2.temp[i_rep] = NA  
+        }else{
+          r2.temp[i_rep] = r2.list[[1]]
+        }
+        
       }
       eth.vec[temp] = eth[i]
-      r2.vec[temp] <- mean(r2.temp)
+      r2.vec[temp] <- mean(r2.temp,na.rm=T)
       l_vec[temp] <- l
       m_vec[temp] <- m
       
@@ -104,4 +109,5 @@ LD.result.list = list(LD.clump.result,LD.clump.result.p)
 # cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
 # LD.result.list = list(LD.clump.result,LD.clump.result.p,
 #                       LD.clump.result.p.rep)
-save(LD.result.list,file = paste0(cur.dir,"LD.clump.result.two.dim.rdata"))
+#LD.result.list = list(LD.clump.result)
+save(LD.result.list,file = paste0(cur.dir,"LD.clump.result.eb.rdata"))

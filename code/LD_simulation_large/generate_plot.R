@@ -118,7 +118,33 @@ LD.clump.result <- cbind(LD.clump.result,sample_size,cau_vec)
   LD.clump.result$method_vec = method_vec
   LD.clump.result.L2 <- LD.clump.result
   
-  LD.clump.result <- rbind(LD.clump.result.L2,LD.clump.result.EUR,LD.clump.result.PT)
+  
+  
+  load("LD.clump.result.eb.rdata")
+  
+  LD.clump.result <- LD.result.list[[1]]
+  
+  sample_size <- factor(rep(c("15000","45000","80000","100000"),4*3*2),
+                        levels=c("15000","45000","80000","100000"))
+  
+  cau_vec <- as.character(LD.clump.result$l_vec)
+  csp <- c(0.01,0.001,0.0005)
+  #LD.clump.result <- LD.clump.result[LD.clump.result$eth.vec!="EUR",]
+  method_vec <- rep("2DLD-EB",nrow(LD.clump.result))
+  LD.clump.result$method_vec = method_vec
+  LD.clump.result.L2EB <- LD.clump.result
+  
+  LD.clump.result <- rbind(LD.clump.result.L2EB,LD.clump.result.L2,LD.clump.result.EUR,LD.clump.result.PT)
+  
+  
+  
+  
+  
+  #LD.clump.result <- rbind(LD.clump.result.L2,LD.clump.result.EUR,LD.clump.result.PT)
+  
+  
+  
+  
   for(l in 1:3){
     idx <- which(LD.clump.result$l_vec==l)
     cau_vec[idx] <- paste0("Causal SNPs Proportion = ",csp[l])
@@ -140,7 +166,7 @@ LD.clump.result <- cbind(LD.clump.result,sample_size,cau_vec)
                                                   "Best EUR PRS",
                                                   "Best EUR SNP + target coefficients",
                                                   "Best EUR SNP + EB",
-                                       "2DLD"))
+                                       "2DLD","2DLD-EB"))
   
   
   p <- ggplot(LD.clump.result,aes(x= sample_size,y=r2.vec,group=method_vec))+
@@ -172,7 +198,7 @@ LD.clump.result <- cbind(LD.clump.result,sample_size,cau_vec)
     theme_Publication()+
     ylab("R2")+
     xlab("Sample Size")+
-    guides(color=guide_legend(title="Method"))+
+    labs(fill = "Method")+
     facet_grid(vars(cau_vec),vars(eth.vec))+
     scale_fill_nejm()+
     ggtitle("Prediction comparasion (Sample Size for EUR = 100k)")
@@ -182,6 +208,73 @@ LD.clump.result <- cbind(LD.clump.result,sample_size,cau_vec)
   
   png(file = paste0("./method_compare_result_summary_15000.png"),
       width = 12, height = 8, res = 300,units = "in")
+  p
+  dev.off()
+  
+  
+  
+  #load Jin's results
+  load("results.hapmap3.RData")
+  res$cau_vec <- as.character(res$cau_vec)
+  idx <- which(res$cau_vec=="Causal SNPs Proportion = 5e-4")
+  res$cau_vec[idx] <- "Causal SNPs Proportion = 5e-04"
+  res <- res[,-6]
+  colnames(res) <- colnames(LD.clump.result)
+  res$method_vec <- paste0(res$method_vec," (hap3)")
+  LD.clump.result <- rbind(LD.clump.result,res)
+  LD.clump.result$method_vec <- factor(LD.clump.result$method_vec,
+                            levels = c("P+T",
+                                       "P+T (hap3)",
+                                       "Best EUR PRS",
+                                       "EUR P+T (hap3)",
+                                       "Best EUR SNP + target coefficients",
+                                       "Best EUR SNP + EB",
+                                       "LDpred (hap3)",
+                                       "EUR LDpred (hap3)",
+                                       "ME-Bayes (hap3)",
+                                       "2DLD",
+                                       "2DLD-EB"))
+  idx <- which(LD.clump.result$m_vec==1&
+                 LD.clump.result$eth.vec!="SAS")
+  library(RColorBrewer)
+  colourCount = length(unique(LD.clump.result$method_vec))
+  getPalette = colorRampPalette(brewer.pal(9, "Set1"))
+  p <- ggplot(LD.clump.result[idx,],aes(x= sample_size,y=r2.vec,group=method_vec))+
+    geom_bar(aes(fill=method_vec),
+             stat="identity",
+             position = position_dodge())+
+    #geom_point(aes(color=method_vec))+
+    theme_Publication()+
+    ylab("R2")+
+    xlab("Sample Size")+
+    labs(fill = "Method")+
+    facet_grid(vars(cau_vec),vars(eth.vec))+
+    scale_fill_manual(values = getPalette(colourCount))+
+    ggtitle("Prediction comparasion (Sample Size for EUR = 100k)")
+  p
+  png(file = paste0("./all_method_compare_result_summary_15000.png"),
+      width = 13, height = 8, res = 300,units = "in")
+  p
+  dev.off()
+  
+  
+  idx <- which(LD.clump.result$m_vec==2&
+                 LD.clump.result$eth.vec!="SAS")
+  p <- ggplot(LD.clump.result[idx,],aes(x= sample_size,y=r2.vec,group=method_vec))+
+    geom_bar(aes(fill=method_vec),
+             stat="identity",
+             position = position_dodge())+
+    #geom_point(aes(color=method_vec))+
+    theme_Publication()+
+    ylab("R2")+
+    xlab("Sample Size")+
+    labs(fill = "Method")+
+    facet_grid(vars(cau_vec),vars(eth.vec))+
+    scale_fill_manual(values = getPalette(colourCount))+
+    ggtitle("Prediction comparasion (Sample Size for EUR = 100k)")
+  p
+  png(file = paste0("./all_method_compare_result_summary_15000.png"),
+      width = 13, height = 8, res = 300,units = "in")
   p
   dev.off()
   
