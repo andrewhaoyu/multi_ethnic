@@ -6,7 +6,7 @@ i = as.numeric(args[[1]])
 #l represent causal snps proportion
 l = as.numeric(args[[2]])
 #i1 represent genetic architecture
-i1 = as.nueric(args[[3]])
+i1 = as.numeric(args[[3]])
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
 out.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
