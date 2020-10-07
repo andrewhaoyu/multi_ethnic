@@ -10,8 +10,18 @@ i1 = as.numeric(args[[3]])
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
 out.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
-system(paste0("/data/zhangh24/software/gcta_1.93.2beta/gcta64 --bfile ",cur.dir,eth[i],"/select.cau.snp --simu-qt --simu-causal-loci ",out.dir,eth[i],"/select.cau_rho",l,"_",i1," --simu-hsq 0.4 --simu-rep 100 --out ",out.dir,eth[i],"/phenotypes_rho",l,"_",i1))
 
+
+sid<-Sys.getenv('SLURM_JOB_ID')
+dir.create(paste0('/lscratch/',sid,'/test'),showWarnings = FALSE)
+eth <- c("EUR","AFR","AMR","EAS","SAS")
+system(paste0("cp", cur.dir,eth[i],"/select.cau.snp.bed /lscratch/",sid,"/test/",eth[i],"_select.cau.snp.bed"))
+system(paste0("cp", cur.dir,eth[i],"/select.cau.snp.bim /lscratch/",sid,"/test/",eth[i],"_select.cau.snp.bim"))
+system(paste0("cp", cur.dir,eth[i],"/select.cau.snp.fam /lscratch/",sid,"/test/",eth[i],"_select.cau.snp.fam"))
+
+
+
+system(paste0("/data/zhangh24/software/gcta_1.93.2beta/gcta64 --bfile /lscratch/",sid,"/test/",eth[i],"_select.cau.snp --simu-qt --simu-causal-loci ",out.dir,eth[i],"/select.cau_rho",l,"_",i1," --simu-hsq 0.4 --simu-rep 100 --out ",out.dir,eth[i],"/phenotypes_rho",l,"_",i1))
 library(data.table)    
 all.pheno <- as.data.frame(fread(paste0(out.dir,eth[i],"/phenotypes_rho",l,"_",i1,".phen")))
 n.train <- c(15000,45000,80000,100000)
