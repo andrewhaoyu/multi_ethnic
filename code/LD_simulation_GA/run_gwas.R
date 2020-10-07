@@ -26,7 +26,7 @@ system(paste0("cp ", cur.dir,eth[i],"/chr",j,".tag.fam /lscratch/",sid,"/test/",
 
 system(paste0("/data/zhangh24/software/plink2 --threads 2 --bfile /lscratch/",sid,"/test/",eth[i],"_chr",j,".tag --out ",out.dir,eth[i],"/summary_chr_",j,"_rho_",l,"_rep_",i_rep,"_GA_",i1,".out --linear --all-pheno --allow-no-sex --pheno ",out.dir,eth[i],"/pheno_plink_rho_",l,"_rep_",i_rep,"_GA_",i1))
 
-
+system(paste0('rm -rf /lscratch/',sid,'/test'))
 # for(i in 1:5){
 #   fam <- data.frame(fread(paste0(cur.dir,eth[i],"/all_chr.tag.fam")))
 #     for(j in 1:22){
