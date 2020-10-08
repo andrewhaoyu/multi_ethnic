@@ -41,7 +41,7 @@ MAF = snp.infor[,..eth]
 MAF = cbind(snp.infor$id,MAF)
 colnames(MAF)[1] <- "SNP"
 MAF_var = list('EUR','AFR','AMR','EAS',"SAS")
-sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_GA/",eth[i],"summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))  
+sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_GA/",eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))  
 var_name = colnames(sum.data)
 sum.data.com = left_join(sum.data,MAF,bY="SNP")
 # idx <- which(sum.data.com$EAS>=0.05&sum.data.com$EAS<=0.95)
