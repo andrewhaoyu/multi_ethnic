@@ -41,7 +41,7 @@ MAF = snp.infor[,..eth]
 MAF = cbind(snp.infor$id,MAF)
 colnames(MAF)[1] <- "SNP"
 MAF_var = list('EUR','AFR','AMR','EAS',"SAS")
-sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_GA/",eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))  
+sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_GA/",eth[i],"summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))  
 var_name = colnames(sum.data)
 sum.data.com = left_join(sum.data,MAF,bY="SNP")
 # idx <- which(sum.data.com$EAS>=0.05&sum.data.com$EAS<=0.95)
@@ -51,7 +51,7 @@ sum.data.MAF = sum.data.com %>% filter(get(eth[i])>=0.01&get(eth[i])<=0.99) %>%
   select(all_of(var_name))
 #idx.order <- order(sum.data.MAF$P)
 #sum.data.MAF.new <- sum.data.MAF[idx.order,]
-write.table(sum.data.MAF,file = paste0("./result/LD_simulation_GA/",eth[i],"/summary_out_MAF_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".out")
+write.table(sum.data.MAF,file = paste0("/lscratch/",sid,"/test/",eth[i],"_summary_out_MAF_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".out")
             ,col.names = T,row.names = F,quote=F) 
 
 # dim(summary)
@@ -63,7 +63,8 @@ eth <- c("EUR","AFR","AMR","EAS","SAS")
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
 #code <- rep("c",5*3*3)
 #system(paste0("/data/zhangh24/software/plink2 --bfile /data/zhangh24/KG.plink/",eth[i],"/chr_all --clump ",cur.dir,eth[i],"/summary_out_MAF_rho_",l,"_size_",m,"_rep_",i_rep,".out --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out ",cur.dir,eth[i],"/LD_clump_rho_",l,"_size_",m,"_rep_",i_rep))
-system(paste0("/data/zhangh24/software/plink2 --threads 2 --bfile /lscratch/",sid,"/test/",eth[i],"_chr_all --clump ",cur.dir,eth[i],"/summary_out_MAF_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".out --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out ",cur.dir,eth[i],"/LD_clump_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
+system(paste0("/data/zhangh24/software/plink2 --threads 2 --bfile /lscratch/",sid,"/test/",eth[i],"_chr_all --clump /lscratch/",sid,"/test/",eth[i],"_summary_out_MAF_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".out --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out ",cur.dir,eth[i],"/LD_clump_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
+system(paste0("rm ",cur.dir,eth[i],"/LD_clump_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".log"))
 #       temp = temp +1 
 #     }
 #   }
