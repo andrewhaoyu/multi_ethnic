@@ -17,7 +17,7 @@ for(i1 in 1:2){
       for(i_rep in 1:10){
         for(m in 1:4){
           
-          temp.code <- paste0("head -1 ",cur.dir,eth[i],"/summary_chr_",1,"_rho_",l,"_rep_",i_rep,"_GA_",i1,".out.P",m,".assoc.linear > ",cur.dir,eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"; awk 'FNR>1'")
+          temp.code <- paste0("head -1 ",cur.dir,eth[i],"/summary_chr_",1,"_rho_",l,"_rep_",i_rep,"_GA_",i1,".out.P",m,".assoc.linear > ",cur.dir,eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"; awk 'FNR>1'")
           for(j in 1:22){
             temp.code <- paste0(temp.code, " ",cur.dir,eth[i],"/summary_chr_",j,"_rho_",l,"_rep_",i_rep,"_GA_",i1,".out.P",m,".assoc.linear")
           }
