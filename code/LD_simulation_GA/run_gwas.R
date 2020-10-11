@@ -7,7 +7,7 @@ args  = commandArgs(trailingOnly = T)
 #i_rep represent simulation replication
 #i1 represent the genetic architecture
 i1 = as.numeric(args[[1]])
-i_rep = as.numeric(ars[[2]])
+i_rep = as.numeric(args[[2]])
 l = as.numeric(args[[3]])
 i = as.numeric(args[[4]])
 j = as.numeric(args[[5]])
