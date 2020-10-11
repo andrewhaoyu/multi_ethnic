@@ -6,11 +6,14 @@ args  = commandArgs(trailingOnly = T)
 #l represent the causal SNPs proportion
 #i_rep represent simulation replication
 #i1 represent the genetic architecture
-i = as.numeric(args[[1]])
-j = as.numeric(args[[2]])
+i1 = as.numeric(args[[1]])
+i_rep = as.numeric(ars[[2]])
 l = as.numeric(args[[3]])
-i_rep = as.numeric(args[[4]])
-i1 = as.numeric(args[[5]])
+i = as.numeric(args[[4]])
+j = as.numeric(args[[5]])
+
+
+
 #load the phenotpypes data and use plink to run
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 library(data.table)
