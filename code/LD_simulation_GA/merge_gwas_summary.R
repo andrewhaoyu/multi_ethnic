@@ -9,9 +9,9 @@ eth <- c("EUR","AFR","AMR","EAS","SAS")
 #three different causal proportion l
 #three different training sample sizes m
 #22 chr
-code <- c("c",5*3*3*10*2)
+code <- c("c",5*3*3*10*1)
 temp = 1
-for(i1 in 1:2){
+for(i1 in 2:2){
   for(i in 1:5){
     for(l in 1:3){
       for(i_rep in 1:10){
