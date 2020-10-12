@@ -12,6 +12,7 @@ j = as.numeric(args[[2]])
 l = as.numeric(args[[3]])
 m = as.numeric(args[[4]])
 i1 = 2
+i_rep = 1
 
 #j = as.numeric(args[[3]])
 library(dplyr)
