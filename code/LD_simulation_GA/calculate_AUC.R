@@ -6,7 +6,7 @@ args = commandArgs(trailingOnly = T)
 i = as.numeric(args[[1]])
 l = as.numeric(args[[2]])
 m = as.numeric(args[[3]])
-i_rep = as.numeric(args[[4]])
+i_rep = 1
 i1 = 2
 
 library(dplyr)
@@ -18,7 +18,7 @@ n.train.vec <- c(15000,45000,80000,100000)
 n.train <- n.train.vec[m]
 n.test <- (120000-n.train)/2
 n.vad <- n.test
-n.rep = 2
+n.rep = 1
 #r2 mat represent the r2 matrix for the testing dataset
 #column represent the ethnic groups
 #row represent different p-value threshold
@@ -40,7 +40,7 @@ LD <- as.data.frame(fread(paste0(cur.dir,eth[i],"/LD_clump_rho_",l,"_size_",m,"_
 clump.snp <- LD[,3,drop=F]  
 sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_GA/",eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))  
 colnames(sum.data)[2] <- "SNP"
-n_rep = 2
+n_rep = 1
 #for(k in 1:length(pthres)){
 r2.vec.test <- rep(0,length(pthres))
 r2.vec.vad <- rep(0,length(pthres))
