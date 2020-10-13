@@ -15,6 +15,7 @@ eth <- c("EUR","AFR","AMR","EAS","SAS")
 pthres <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01,0.5)
 #n <- 120000
 n.train.vec <- c(15000,45000,80000,100000)
+for(m in 1:4){
 n.train <- n.train.vec[m]
 n.test <- (120000-n.train)/2
 n.vad <- n.test
@@ -35,7 +36,7 @@ y_test_mat <- y[(n.train+1):nrow(y),,drop=F]
 #
 
 
-for(m in 1:4){
+
   LD <- as.data.frame(fread(paste0(cur.dir,eth[i],"/LD_clump_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".clumped")))
   clump.snp <- LD[,3,drop=F]  
   sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_GA/",eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))  
