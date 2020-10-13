@@ -2,7 +2,7 @@
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 pthres <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01,0.5)
 
-total <- 2*3*2
+total <- 2*3*1
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
 eth.vec <- rep(0,total)
 r2.vec <- rep(0,total)
@@ -10,11 +10,11 @@ l_vec <- rep(0,total)
 m_vec <- rep(0,total)
 r2.mat <- matrix(0,length(pthres),total)
 temp = 1
-for(i in 1:2){
+for(i in 1:5){
   for(l in 1:3){
     for(m in 1:4){
-      r2.temp <- rep(0,2)
-      for(i_rep in 1:2){
+      r2.temp <- rep(0,1)
+      for(i_rep in 1:1){
         load(paste0(cur.dir,eth[i],"/r2.list_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
         r2.temp[i_rep] = r2.list[[1]]
       }
@@ -43,8 +43,8 @@ for(i in 1:5){
   for(l in 1:3){
     for(m in 1:4){
       r2.temp <- matrix(0,10,length(pthres))
-      for(i_rep in 1:10){
-        load(paste0(cur.dir,eth[i],"/r2.list_rho_",l,"_size_",m,"_rep_",i_rep))
+      for(i_rep in 1:1){
+        load(paste0(cur.dir,eth[i],"/r2.list_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
         r2.temp[i_rep,] = r2.list[[2]]
       }
       temp = length(pthres)
@@ -60,7 +60,7 @@ for(i in 1:5){
 
 LD.clump.result.p <- data.frame(eth.vec,r2.vec,l_vec,m_vec,pthres.vec)
 
-cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
+cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
 LD.result.list = list(LD.clump.result,LD.clump.result.p)
 
 
@@ -99,6 +99,6 @@ for(i in 1:5){
 LD.clump.result.p.rep <- data.frame(eth.vec,r2.vec,l_vec,m_vec,pthres.vec,rep.vec)
 
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
-LD.result.list = list(LD.clump.result,LD.clump.result.p,
-                      LD.clump.result.p.rep)
+LD.result.list = list(LD.clump.result,LD.clump.result.p)
+                      #LD.clump.result.p.rep)
 save(LD.result.list,file = paste0(cur.dir,"LD.clump.result.rdata"))

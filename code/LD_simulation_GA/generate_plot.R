@@ -4,10 +4,10 @@ library(ggsci)
 #standard LD clumping results
 load("LD.clump.result.rdata")
 LD.clump.result <- LD.result.list[[1]]
-#sample_size <- factor(rep(c("15000","45000","80000","100000"),15),
- #                     levels=c("15000","45000","80000","100000"))
-sample_size <- factor(rep(c("15000","45000","80000","100000"),6),
-                                           levels=c("15000","45000","80000","100000"))
+sample_size <- factor(rep(c("15000","45000","80000","100000"),15),
+                    levels=c("15000","45000","80000","100000"))
+# sample_size <- factor(rep(c("15000","45000","80000","100000"),6),
+#                                            levels=c("15000","45000","80000","100000"))
 cau_vec <- as.character(LD.clump.result$l_vec)
 csp <- c(0.01,0.001,0.0005)
 for(l in 1:3){
@@ -79,6 +79,52 @@ png(file = paste0("./LD_clumping_result_p_thres.png"),
     width = 15, height = 10, res = 300,units = "in")
 p
 dev.off()
+
+
+
+setwd("/Users/zhangh24/GoogleDrive/multi_ethnic/result/LD_simulation_GA")
+library(ggplot2)
+library(ggsci)
+#standard heritability
+herita.table
+# sample_size <- factor(rep(c("15000","45000","80000","100000"),6),
+#                                            levels=c("15000","45000","80000","100000"))
+cau_vec <- as.character(LD.clump.result$l_vec)
+csp <- c(0.01,0.001,0.0005)
+for(l in 1:3){
+  idx <- which(LD.clump.result$l_vec==l)
+  cau_vec[idx] <- paste0("Causal SNPs Proportion = ",csp[l])
+}
+cau_vec <- factor(cau_vec,
+                  levels = paste0("Causal SNPs Proportion = ",csp))
+
+herita.table <- cbind(herita.table,sample_size,cau_vec)
+# save(LD.clump.result,file = "LD.clump.result_090420_P+T.rdata")
+# load("LD.clump.result_090420_P+T.rdata")
+
+
+herita.table$eth_vec <- factor(herita.table$eth_vec,
+                                  #levels =c("EUR","AFR","AMR","EAS","SAS"))
+                                  levels =c("EUR","AFR","AMR","EAS","SAS"))
+p <- ggplot(herita.table,aes(x= cau_vec,y=herit_vec))+
+  geom_bar(aes(fill=eth_vec),
+           stat="identity",
+           position = position_dodge())+
+  theme_Publication()+
+  ylab("R2")+
+  xlab("Training sample size")+
+  labs(color = "Ethnic group")+
+  #facet_grid(cols=vars(cau_vec))+
+  scale_fill_nejm()+
+  ggtitle("Underlying heritability for different ethnic groups")
+p
+png(file = paste0("./heritability.png"),
+    width = 10, height = 8, res = 300,units = "in")
+p
+dev.off()
+
+
+
 
 
 #Best EUR result

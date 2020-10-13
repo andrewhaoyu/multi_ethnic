@@ -49,6 +49,38 @@ for(i_rep in 1:10){
 
 
 
+
+
+
+
+
+
+# total <- 5*3*4
+# eth_vec <- rep("c",total)
+# l_vec <- rep(0,total)
+# m_vec <- rep(0,total)
+# herit_vec <- rep(0,total)
+# eth <- c("EUR","AFR","AMR","EAS","SAS")
+# cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
+# out.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
+# eth <- c("EUR","AFR","AMR","EAS","SAS")
+# temp <- 1
+# 
+# for(i in 1:5){
+#   for(l in 1:3){
+#     for(m in 1:4){
+#       select.cau <- read.table(paste0(out.dir,eth[i],"/select.cau_rho",l,"_",i1),header=F)
+#       eth_vec[temp] <- eth[i]
+#       l_vec[temp] <- l
+#       m_vec[temp] <- m
+#       herit_vec[temp] <- nrow(select.cau)*var(select.cau$V2)
+#       temp = temp + 1
+#     }
+#   }
+# }
+# herita.table <- data.frame(eth_vec,l_vec,m_vec,herit_vec)
+# save(herita.table,file = paste0(out.dir,"herit_table.rdata"))
+
 # for(i in 1:5){
 #   for(l in 1:3){
 #     for(i_rep in 1:100){

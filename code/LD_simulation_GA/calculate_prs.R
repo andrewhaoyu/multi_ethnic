@@ -12,7 +12,7 @@ m = as.numeric(args[[3]])
 j = as.numeric(args[[4]])
 #l = as.numeric(args[[3]])
 #m = as.numeric(args[[4]])
-i_rep = 1
+i_rep = 2
 i1 = 2
 #i_rep = 1
 
