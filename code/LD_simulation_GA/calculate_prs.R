@@ -6,11 +6,13 @@
 #k is the p value thres
 #j is the number of chromsome
 args = commandArgs(trailingOnly = T)
-i_rep = as.numeric(args[[1]])
-i = as.numeric(args[[2]])
-j = as.numeric(args[[3]])
+i = as.numeric(args[[1]])
+l = as.numeric(args[[2]])
+m = as.numeric(args[[3]])
+j = as.numeric(args[[4]])
 #l = as.numeric(args[[3]])
 #m = as.numeric(args[[4]])
+i_rep = 1
 i1 = 2
 #i_rep = 1
 
@@ -27,8 +29,8 @@ dir.create(paste0('/lscratch/',sid,'/',eth[i],"/"),showWarnings = F)
 temp.dir <- paste0('/lscratch/',sid,'/',eth[i],"/")
 system(paste0("cp ",cur.dir,eth[i],"/chr",j,".tag.* ",temp.dir,"."))
 system(paste0("ls ",temp.dir))
-for(l in 1:3){
-  for(m in 1:4){
+#for(l in 1:3){
+ # for(m in 1:4){
     
     setwd("/data/zhangh24/multi_ethnic/")
     
@@ -55,6 +57,6 @@ for(l in 1:3){
       
     }
     
-  }
-}
+#  }
+#}
 system(paste0('rm -r /lscratch/',sid,'/',eth[i],'/'))
