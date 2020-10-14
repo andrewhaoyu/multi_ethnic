@@ -39,6 +39,7 @@ print("step1 finished")
     clump.snp <- LD[,3,drop=F] 
     #here use summary_out or summary_MAF_out doesn't make difference
     #since the LD_clumping step only include MAF_out
+    
     sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_GA/",eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))  
     colnames(sum.data)[2] <- "SNP"
     prs.all <- left_join(clump.snp,sum.data,by="SNP") 
@@ -62,3 +63,19 @@ print("step1 finished")
 #}
 print("step3 finished")
     system(paste0('rm -r /lscratch/',sid,'/',eth[i],'/'))
+
+    
+    
+    
+    
+    
+    
+    result.matrix <- matrix(0,3,1)
+    for(l in 1:3){
+      #for(i1 in 1:2){
+        sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_new/",eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep)))
+        idx <- which(sum.data$P<=5E-08)
+
+        result.matrix[l,i1] <- length(idx)
+      #}
+    }

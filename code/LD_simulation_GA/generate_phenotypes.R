@@ -68,14 +68,14 @@ for(i_rep in 1:10){
 # 
 # for(i in 1:5){
 #   for(l in 1:3){
-#     for(m in 1:4){
+#     #for(m in 1:4){
 #       select.cau <- read.table(paste0(out.dir,eth[i],"/select.cau_rho",l,"_",i1),header=F)
 #       eth_vec[temp] <- eth[i]
 #       l_vec[temp] <- l
 #       m_vec[temp] <- m
 #       herit_vec[temp] <- nrow(select.cau)*var(select.cau$V2)
 #       temp = temp + 1
-#     }
+#     #}
 #   }
 # }
 # herita.table <- data.frame(eth_vec,l_vec,m_vec,herit_vec)
