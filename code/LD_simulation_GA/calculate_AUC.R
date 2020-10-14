@@ -6,7 +6,7 @@ args = commandArgs(trailingOnly = T)
 i = as.numeric(args[[1]])
 l = as.numeric(args[[2]])
 #m = as.numeric(args[[3]])
-i_rep = 2
+#i_rep = 2
 i1 = 2
 
 library(dplyr)
@@ -19,7 +19,7 @@ for(m in 1:4){
 n.train <- n.train.vec[m]
 n.test <- (120000-n.train)/2
 n.vad <- n.test
-n.rep = 1
+n.rep = 2
 #r2 mat represent the r2 matrix for the testing dataset
 #column represent the ethnic groups
 #row represent different p-value threshold
@@ -41,11 +41,11 @@ y_test_mat <- y[(n.train+1):nrow(y),,drop=F]
   clump.snp <- LD[,3,drop=F]  
   sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_GA/",eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))  
   colnames(sum.data)[2] <- "SNP"
-  n_rep = 1
+  n_rep = 2
   #for(k in 1:length(pthres)){
   r2.vec.test <- rep(0,length(pthres))
   r2.vec.vad <- rep(0,length(pthres))
-  #for(i_rep in 1:n.rep){
+  for(i_rep in 1:n.rep){
   #for(k in 1:length(pthres)){
   
   prs.clump = left_join(clump.snp,sum.data,by="SNP")
@@ -104,6 +104,6 @@ y_test_mat <- y[(n.train+1):nrow(y),,drop=F]
   r2 <- r2.vec.vad[idx]
   r2.list <- list(r2,r2.vec.test,r2.vec.vad)
   save(r2.list,file = paste0(cur.dir,eth[i],"/r2.list_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
-  
+  }
 }
 #write.csv(r2.mat,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/ld.clump.auc.csv")
