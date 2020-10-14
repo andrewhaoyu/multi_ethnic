@@ -23,7 +23,10 @@ select.cau <- read.table(paste0(out.dir,eth[i],"/select.cau_rho",l,"_",i1),heade
 
 herit <- nrow(select.cau)*var(select.cau$V2)
 
-system(paste0("/data/zhangh24/software/gcta_1.93.2beta/gcta64 --bfile /lscratch/",sid,"/test/",eth[i],"_select.cau.snp --simu-qt --simu-causal-loci ",out.dir,eth[i],"/select.cau_rho",l,"_",i1," --simu-hsq ",herit," --simu-rep 100 --out ",out.dir,eth[i],"/phenotypes_rho",l,"_",i1))
+res <- system(paste0("/data/zhangh24/software/gcta_1.93.2beta/gcta64 --bfile /lscratch/",sid,"/test/",eth[i],"_select.cau.snp --simu-qt --simu-causal-loci ",out.dir,eth[i],"/select.cau_rho",l,"_",i1," --simu-hsq ",herit," --simu-rep 100 --out ",out.dir,eth[i],"/phenotypes_rho",l,"_",i1))
+if(res==2){
+  stop()
+}
 library(data.table)    
 all.pheno <- as.data.frame(fread(paste0(out.dir,eth[i],"/phenotypes_rho",l,"_",i1,".phen")))
 n.train <- c(15000,45000,80000,100000)
