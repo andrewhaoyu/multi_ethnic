@@ -6,13 +6,13 @@
 #k is the p value thres
 #j is the number of chromsome
 args = commandArgs(trailingOnly = T)
+
 i = as.numeric(args[[1]])
 l = as.numeric(args[[2]])
-m = as.numeric(args[[3]])
+i_rep = as.numeric(args[[3]])
 j = as.numeric(args[[4]])
 #l = as.numeric(args[[3]])
 #m = as.numeric(args[[4]])
-i_rep = 2
 i1 = 2
 #i_rep = 1
 
@@ -31,7 +31,7 @@ system(paste0("cp ",cur.dir,eth[i],"/chr",j,".tag.* ",temp.dir,"."))
 system(paste0("ls ",temp.dir))
 print("step1 finished")
 #for(l in 1:3){
- # for(m in 1:4){
+  for(m in 1:4){
     
     setwd("/data/zhangh24/multi_ethnic/")
     
@@ -62,7 +62,7 @@ print("step1 finished")
       
     }
     
-#  }
+ }
 #}
 print("step3 finished")
     system(paste0('rm -r /lscratch/',sid,'/',eth[i],'/'))
@@ -73,12 +73,12 @@ print("step3 finished")
     
     
     
-    result.matrix <- matrix(0,3,1)
-    for(l in 1:3){
-      #for(i1 in 1:2){
-        sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_new/",eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep)))
-        idx <- which(sum.data$P<=5E-08)
-
-        result.matrix[l,i1] <- length(idx)
-      #}
-    }
+    # result.matrix <- matrix(0,3,1)
+    # for(l in 1:3){
+    #   #for(i1 in 1:2){
+    #     sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_new/",eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep)))
+    #     idx <- which(sum.data$P<=5E-08)
+    # 
+    #     result.matrix[l,i1] <- length(idx)
+    #   #}
+    # }
