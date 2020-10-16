@@ -19,7 +19,7 @@ for(m in 1:4){
 n.train <- n.train.vec[m]
 n.test <- (120000-n.train)/2
 n.vad <- n.test
-n.rep = 2
+n.rep = 3
 #r2 mat represent the r2 matrix for the testing dataset
 #column represent the ethnic groups
 #row represent different p-value threshold
