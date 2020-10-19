@@ -133,7 +133,8 @@ for(l in 1:3){
 i1 = 1
 select.cau <- read.table(paste0(cur.dir,eth[i],"/select.cau_rho",l,"_",i1),header=F)
 select.cau1 = select.cau
-
+herit <- nrow(select.cau)*var(select.cau$V2)
+print(herit)
 
 
 
