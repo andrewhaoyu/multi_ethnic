@@ -239,7 +239,41 @@ LD.clump.result <- cbind(LD.clump.result,sample_size,cau_vec)
   library(RColorBrewer)
   colourCount = length(unique(LD.clump.result$method_vec))
   getPalette = colorRampPalette(brewer.pal(9, "Set1"))
-  p <- ggplot(LD.clump.result[idx,],aes(x= sample_size,y=r2.vec,group=method_vec))+
+  LD.clump.result.plot <- LD.clump.result[idx,]
+  jdx <- which(LD.clump.result.plot$method_vec%in%
+                 c("P+T","Best EUR PRS","Best EUR SNP + target coefficients",
+                   "Best EUR SNP + EB","LDpred (hap3)","EUR LDpred (hap3)","ME-Bayes (hap3)","2DLD","2DLD-EB"))
+  LD.clump.result.plot <- LD.clump.result.plot[jdx,]
+  
+  #update some of the names
+  method <- as.character(LD.clump.result.plot$method_vec)
+  kdx <- which(method =="LDpred (hap3)")
+  method[kdx] <- "LDpred"
+  kdx <- which(method =="EUR LDpred (hap3)")
+  method[kdx] <- "EUR LDpred PRS"
+  kdx <- which(method =="ME-Bayes (hap3)")
+  method[kdx] <- "ME-Bayes"
+  kdx <- which(method =="Best EUR PRS")
+  method[kdx] <- "EUR P+T PRS"
+  kdx <- which(method =="Best EUR SNP + target coefficients")
+  method[kdx] <- "SNPs in EUR P+T + target coefficients"
+  kdx <- which(method =="Best EUR SNP + EB")
+  method[kdx] <- "SNPs in EUR P+T + EB coefficients"
+  method.fac <- factor(method,
+                       levels = c("P+T",
+                                  "LDpred",
+                                  "EUR P+T PRS",
+                                  "EUR LDpred PRS",
+                                  "SNPs in EUR P+T + target coefficients",
+                                  "SNPs in EUR P+T + EB coefficients",
+                                  "ME-Bayes",
+                                  "2DLD",
+                                  "2DLD-EB"))
+  LD.clump.result.plot$method_vec <- method.fac
+  
+  
+  save(LD.clump.result.plot,file ="data_for_plot.rdata")
+  p <- ggplot(LD.clump.result.plot,aes(x= sample_size,y=r2.vec,group=method_vec))+
     geom_bar(aes(fill=method_vec),
              stat="identity",
              position = position_dodge())+

@@ -31,7 +31,18 @@ for(i in 1:5){
 #best r2 result by varying the p-value threshold
 LD.clump.result <- data.frame(eth.vec,r2.vec,l_vec,m_vec)
 
+#something wrong with i_rep = 2 i = 4 l = 3 m = 4
+#remove the error one
+i = 4
+l = 3
+m = 4
+r2.temp <- rep(0,3)
+for(i_rep in 1:3){
+  load(paste0(cur.dir,eth[i],"/r2.list_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
+  r2.temp[i_rep] = r2.list[[1]]
+}
 
+LD.clump.result[48,2] <- mean(r2.temp[c(1,3)])
 #r2 result for different p-value threshold
 r2.vec <- rep(0,length(pthres)*total)
 l_vec <- rep(0,length(pthres)*total)
@@ -43,7 +54,7 @@ num = 0
 for(i in 1:5){
   for(l in 1:3){
     for(m in 1:4){
-      r2.temp <- matrix(0,n_rep,length(pthres))
+      r2.temp <- matrix(0,1,length(pthres))
       for(i_rep in 1:1){
         load(paste0(cur.dir,eth[i],"/r2.list_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
         r2.temp[i_rep,] = r2.list[[2]]

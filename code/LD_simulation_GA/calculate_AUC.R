@@ -41,7 +41,6 @@ for(i_rep in 1:n.rep){
   clump.snp <- LD[,3,drop=F]  
   sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_GA/",eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))  
   colnames(sum.data)[2] <- "SNP"
-  n_rep = 2
   #for(k in 1:length(pthres)){
   r2.vec.test <- rep(0,length(pthres))
   r2.vec.vad <- rep(0,length(pthres))

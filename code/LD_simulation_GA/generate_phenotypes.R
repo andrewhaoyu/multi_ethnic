@@ -20,10 +20,28 @@ system(paste0("cp ",cur.dir,eth[i],"/select.cau.snp.bim /lscratch/",sid,"/test/"
 system(paste0("cp ",cur.dir,eth[i],"/select.cau.snp.fam /lscratch/",sid,"/test/",eth[i],"_select.cau.snp.fam"))
 
 select.cau <- read.table(paste0(out.dir,eth[i],"/select.cau_rho",l,"_",i1),header=F)
+colnames(select.cau) <- c("snpid","effect_size")
+#plink format used minor allele as coding allele
+#the fifth column is minor allele
+#need to match the minor allele with the coding allele
+snp.infor <- read.table(paste0("/lscratch/",sid,"/test/",eth[i],"_select.cau.snp.bim"))
+colnames(snp.infor) <- c("chr","snpid","nonthing","position","minor allele","major allele")
+library(tidyr)
+library(dplyr)
+select.cau.infor <- left_join(select.cau,snp.infor,by="snpid")
 
-herit <- nrow(select.cau)*var(select.cau$V2)
+select.cau.infor.split <- select.cau.infor %>% separate(snpid,into=c("rsid","position2","noncoding","coding"),sep=":")
+idx <- which(select.cau.infor.split$coding!=select.cau.infor.split$minor)
+coding_effect_size <- select.cau$effect_size
+minor_effect_size <- coding_effect_size
+minor_effect_size[idx] <- -coding_effect_size[idx]
+herit <- nrow(select.cau)*var(minor_effect_size)
 
-res <- system(paste0("/data/zhangh24/software/gcta_1.93.2beta/gcta64 --bfile /lscratch/",sid,"/test/",eth[i],"_select.cau.snp --simu-qt --simu-causal-loci ",out.dir,eth[i],"/select.cau_rho",l,"_",i1," --simu-hsq ",herit," --simu-rep 100 --out ",out.dir,eth[i],"/phenotypes_rho",l,"_",i1))
+select.cau.GCTA <- select.cau
+select.cau.GCTA$effect_size = minor_effect_size
+write.table(select.cau.GCTA,file = paste0("/lscratch/",sid,"/test/",eth[i],"_select.cau.GCTA",l,"_",i1),row.names = F,col.names = F,quote=F)
+
+res <- system(paste0("/data/zhangh24/software/gcta_1.93.2beta/gcta64 --bfile /lscratch/",sid,"/test/",eth[i],"_select.cau.snp --simu-qt --simu-causal-loci /lscratch/",sid,"/test/",eth[i],"_select.cau.GCTA",l,"_",i1," --simu-hsq ",herit," --simu-rep 100 --out ",out.dir,eth[i],"/phenotypes_rho",l,"_",i1))
 if(res==2){
   stop()
 }
