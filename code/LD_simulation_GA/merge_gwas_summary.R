@@ -9,12 +9,12 @@ eth <- c("EUR","AFR","AMR","EAS","SAS")
 #three different causal proportion l
 #three different training sample sizes m
 #22 chr
-code <- c("c",5*3*3*3*1)
+code <- c("c",2*5*3*10*4)
 temp = 1
-for(i1 in 2:2){
+for(i1 in 1:2){
   for(i in 1:5){
     for(l in 1:3){
-      for(i_rep in 1:3){
+      for(i_rep in 1:10){
         for(m in 1:4){
           
           temp.code <- paste0("head -1 ",cur.dir,eth[i],"/summary_chr_",1,"_rho_",l,"_rep_",i_rep,"_GA_",i1,".out.P",m,".assoc.linear > ",cur.dir,eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"; awk 'FNR>1'")

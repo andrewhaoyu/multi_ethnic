@@ -13,7 +13,7 @@ i_rep = as.numeric(args[[3]])
 j = as.numeric(args[[4]])
 #l = as.numeric(args[[3]])
 #m = as.numeric(args[[4]])
-i1 = 2
+i1 = as.numeric(args[[5]])
 #i_rep = 1
 
 #j = as.numeric(args[[3]])
