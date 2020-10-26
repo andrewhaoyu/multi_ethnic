@@ -6,6 +6,7 @@ args = commandArgs(trailingOnly = T)
 i_rep = as.numeric(args[[1]])
 i = as.numeric(args[[2]])
 j = as.numeric(args[[3]])
+i1 = as.numeric(args[[4]])
 setwd("/data/zhangh24/multi_ethnic/")
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
 out.dir <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
@@ -51,7 +52,7 @@ for(l in 1:3){
     prs.file <- prs.file.com %>% select(SNP,A1,BETA)
     #prs.file[14,]
     prs.file <- prs.file[complete.cases(prs.file),]
-    write.table(prs.file,file = paste0("/lscratch/",sid,"/",eth[i],"/prs_eursnp_tarcoef_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,),col.names = T,row.names = F,quote=F)
+    write.table(prs.file,file = paste0("/lscratch/",sid,"/",eth[i],"/prs_eursnp_tarcoef_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1),col.names = T,row.names = F,quote=F)
     res = system(paste0("/data/zhangh24/software/plink2 --threads 2 --score /lscratch/",sid,'/',eth[i],"/prs_eursnp_tarcoef_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1, " no-sum no-mean-imputation --bfile ",temp.dir,"/chr",j,".tag --exclude ",out.dir,eth[i],"/duplicated.id  --out ",out.dir,eth[i],"/prs/prs_eursnp_tarcoef_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,"_GA_",i1))
     if(res==2){
       stop()
