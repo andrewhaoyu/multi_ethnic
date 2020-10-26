@@ -57,9 +57,9 @@ for(l in 1:3){
     if(res==2){
       stop()
     }
-    system(paste0("rm ",cur.dir,eth[i],"/prs/prs_eursnp_tarcoef_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,"_GA_",i1,".log"))
-    system(paste0("rm ",cur.dir,eth[i],"/prs/prs_eursnp_tarcoef_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,"_GA_",i1,".nosex"))
-    system(paste0("rm ",cur.dir,eth[i],"/prs/prs_eursnp_tarcoef_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,"_GA_",i1,".nopred"))
+    system(paste0("rm ",out.dir,eth[i],"/prs/prs_eursnp_tarcoef_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,"_GA_",i1,".log"))
+    system(paste0("rm ",out.dir,eth[i],"/prs/prs_eursnp_tarcoef_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,"_GA_",i1,".nosex"))
+    system(paste0("rm ",out.dir,eth[i],"/prs/prs_eursnp_tarcoef_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,"_GA_",i1,".nopred"))
     system(paste0("rm /lscratch/",sid,"/",eth[i],"/prs_eursnp_tarcoef_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
     gc()
   }
