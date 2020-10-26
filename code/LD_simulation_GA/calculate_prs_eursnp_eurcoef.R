@@ -14,7 +14,7 @@ eth <- c("EUR","AFR","AMR","EAS","SAS")
 pthres <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01,0.5)
 
 sid <- Sys.getenv("SLURM_JOB_ID")
-system(paste0("rm -rf /lscratch/",sid,"/",eth[i]))
+#system(paste0("rm -rf /lscratch/",sid,"/",eth[i]))
 dir.create(paste0("/lscratch/",sid,"/",eth[i],"/"),showWarnings = F)
 temp.dir <- paste0("/lscratch/",sid,"/",eth[i],"/")
 system(paste0("cp ",cur.dir,eth[i],"/chr",j,".tag.* ",temp.dir))
