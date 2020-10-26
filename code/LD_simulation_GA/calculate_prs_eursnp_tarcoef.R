@@ -13,8 +13,8 @@ eth <- c("EUR","AFR","AMR","EAS","SAS")
 pthres <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01,0.5)
 
 sid <- Sys.getenv("SLURM_JOB_ID")
-dir.create(paste0('/lscratch/',sid,'/',eth[i],"/"),showWarnings = F)
-temp.dir <- paste0('/lscratch/',sid,'/',eth[i],"/")
+dir.create(paste0("/lscratch/",sid,"/",eth[i],"/"),showWarnings = F)
+temp.dir <- paste0("/lscratch/",sid,"/",eth[i],"/")
 system(paste0("cp ",cur.dir,eth[i],"/chr",j,".tag.* ",temp.dir,"."))
 system(paste0("ls ",temp.dir))
 library(dplyr)
@@ -23,31 +23,27 @@ for(l in 1:3){
   for(m in 1:4){
     #n.snp.mat <- matrix(0,length(pthres),4)
     #load EUR r2 result
-    load(paste0(cur.dir,"LD.clump.result.rdata"))
-    setwd("/data/zhangh24/multi_ethnic/")
-    cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
-    load(paste0(cur.dir,"LD.clump.result.rdata"))
+    load(paste0(out.dir,"LD.clump.result.GA_",i1,".rdata"))
     #keep the EUR results with sample size at 100,000 (m = 4)
-    r2.mat <- as.data.frame(LD.result.list[[3]]) %>% 
+    r2.mat <- as.data.frame(LD.result.list[[2]]) %>% 
       filter(eth.vec=="EUR"&
                m_vec==4&
-               l_vec==l&
-               rep.vec == i_rep)
+               l_vec==l)
     
     #use target population regresssion coefficients
     #get the number of SNPs in different population
     #load EUR SNP
     k = which.max(r2.mat$r2.vec)
-    LD <- as.data.frame(fread(paste0(cur.dir,eth[1],"/LD_clump_rho_",l,"_size_",4,"_rep_",i_rep,".clumped")))
+    LD <- as.data.frame(fread(paste0(out.dir,eth[1],"/LD_clump_rho_",l,"_size_",4,"_rep_",i_rep,"_GA_",i1,".clumped")))
     clump.snp <- LD[,3,drop=F]  
     #select the EUR snp
-    sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_new/",eth[1],"/summary_out_rho_",l,"_size_",4,"_rep_",i_rep)))  
+    sum.data <- as.data.frame(fread(paste0(out.dir,eth[1],"/summary_out_rho_",l,"_size_",4,"_rep_",i_rep,"_GA_",i1)))  
     colnames(sum.data)[2] <- "SNP"
     prs.all <- left_join(clump.snp,sum.data,by="SNP") 
     
     prs.file <- prs.all %>% filter(P<=pthres[k]) %>% 
       select(SNP)
-    sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_new/",eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep)))  
+    sum.data <- as.data.frame(fread(paste0(out.dir,eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))  
     #combine the prs with the target population coefficients
     #idx <- which(prs.file$SNP%in%sum.data$SNP==F)
     #length(idx)
@@ -55,11 +51,15 @@ for(l in 1:3){
     prs.file <- prs.file.com %>% select(SNP,A1,BETA)
     #prs.file[14,]
     prs.file <- prs.file[complete.cases(prs.file),]
-    write.table(prs.file,file = paste0(cur.dir,eth[i],"/prs/prs_eursnp_tarcoef_rho_",l,"_size_",m,"_rep_",i_rep),col.names = T,row.names = F,quote=F)
-    system(paste0("/data/zhangh24/software/plink2 --threads 2 --score ",cur.dir,eth[i],"/prs/prs_eursnp_tarcoef_rho_",l,"_size_",m,"_rep_",i_rep," no-sum no-mean-imputation --bfile ",cur.dir,eth[i],"/chr",j,".tag --exclude /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/duplicated.id  --out ",cur.dir,eth[i],"/prs/prs_eursnp_tarcoef_rho_",l,"_size_",m,"_",j,"_rep_",i_rep))
-    system(paste0("rm ",cur.dir,eth[i],"/prs/prs_eursnp_tarcoef_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,".log"))
-    system(paste0("rm ",cur.dir,eth[i],"/prs/prs_eursnp_tarcoef_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,".nosex"))
-    system(paste0("rm ",cur.dir,eth[i],"/prs/prs_eursnp_tarcoef_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,".nopred"))
+    write.table(prs.file,file = paste0("/lscratch/",sid,"/",eth[i],"/prs_eursnp_tarcoef_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,),col.names = T,row.names = F,quote=F)
+    res = system(paste0("/data/zhangh24/software/plink2 --threads 2 --score /lscratch/",sid,'/',eth[i],"/prs_eursnp_tarcoef_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1, " no-sum no-mean-imputation --bfile ",temp.dir,"/chr",j,".tag --exclude ",out.dir,eth[i],"/duplicated.id  --out ",out.dir,eth[i],"/prs/prs_eursnp_tarcoef_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,"_GA_",i1))
+    if(res==2){
+      stop()
+    }
+    system(paste0("rm ",cur.dir,eth[i],"/prs/prs_eursnp_tarcoef_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,"_GA_",i1,".log"))
+    system(paste0("rm ",cur.dir,eth[i],"/prs/prs_eursnp_tarcoef_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,"_GA_",i1,".nosex"))
+    system(paste0("rm ",cur.dir,eth[i],"/prs/prs_eursnp_tarcoef_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,"_GA_",i1,".nopred"))
+    system(paste0("rm /lscratch/",sid,"/",eth[i],"/prs_eursnp_tarcoef_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
     gc()
   }
 }
