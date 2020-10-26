@@ -3,12 +3,12 @@
 #l for different causal proportion
 #m for different traning sample size
 args = commandArgs(trailingOnly = T)
-i = as.numeric(args[[1]])
-l = as.numeric(args[[2]])
-m = as.numeric(args[[4]])
+i = 2
+l = 2
+m = as.numeric(args[[1]])
 #i_rep = 2
-i1 = as.numeric(args[[5]])
-i_rep = as.numeric(args[[6]])
+i1 = 1
+i_rep = as.numeric(args[[2]])
 
 library(dplyr)
 library(data.table)
