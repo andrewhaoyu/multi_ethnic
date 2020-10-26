@@ -115,7 +115,7 @@ for(l in 1:3){
       select(SNP,A1,BETA)
     prs.file = prs.file[complete.cases(prs.file),]
     write.table(prs.file,file = paste0("/lscratch/",sid,"/",eth[i],"/prs_eursnp_eb_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1),col.names = T,row.names = F,quote=F)
-    res = system(paste0("/data/zhangh24/software/plink2 --threads 2 --score /lscratch/",sid,'/',eth[i],"/prs_eursnp_eb_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1, " no-sum no-mean-imputation --bfile ",temp.dir,"/chr",j,".tag --exclude ",out.dir,eth[i],"/duplicated.id  --out ",out.dir,eth[i],"/prs/prs_eursnp_eb_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,"_GA_",i1))
+    res = system(paste0("/data/zhangh24/software/plink2 --threads 2 --score /lscratch/",sid,'/',eth[i],"/prs_eursnp_eb_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1, " no-sum no-mean-imputation --bfile ",temp.dir,"chr",j,".tag --exclude ",out.dir,eth[i],"/duplicated.id  --out ",out.dir,eth[i],"/prs/prs_eursnp_eb_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,"_GA_",i1))
     if(res==2){
       stop()
     }
