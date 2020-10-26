@@ -7,7 +7,7 @@ i = as.numeric(args[[1]])
 l = as.numeric(args[[2]])
 #m = as.numeric(args[[3]])
 #i_rep = 2
-i1 = 2
+i1 = as.numeric(args[[3]])
 
 library(dplyr)
 library(data.table)
@@ -19,7 +19,7 @@ for(m in 1:4){
 n.train <- n.train.vec[m]
 n.test <- (120000-n.train)/2
 n.vad <- n.test
-n.rep = 3
+n.rep = 10
 #r2 mat represent the r2 matrix for the testing dataset
 #column represent the ethnic groups
 #row represent different p-value threshold
