@@ -25,7 +25,7 @@ n.train.vec <- c(15000,45000,80000,100000)
 n.train <- n.train.vec[m]
 n.test <- (120000-n.train)/2
 n.vad <- n.test
-n.rep = 5
+n.rep = 10
 
 #r2 mat represent the r2 matrix for the testing dataset
 #column represent the ethnic groups
@@ -36,7 +36,7 @@ out.dir <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
 setwd("/data/zhangh24/multi_ethnic/")
 
 #load the phenotype file
-y <- as.data.frame(fread(paste0(cur.dir,eth[i],"/phenotypes_rho",l,"_",i1,".phen")))
+y <- as.data.frame(fread(paste0(out.dir,eth[i],"/phenotypes_rho",l,"_",i1,".phen")))
 y <- y[,2+(1:n.rep)]
 n <- nrow(y)
 y_test_mat <- y[(n.train+1):nrow(y),]
@@ -99,5 +99,5 @@ for(i_rep in 1:n.rep){
   
 }
 
-save(r2.vec,file = paste0(cur.dir,eth[i],"/r2_eursnp_",method[q],"_rho_",l,"_size_",m,"_GA_",i1))
+save(r2.vec,file = paste0(out.dir,eth[i],"/r2_eursnp_",method[q],"_rho_",l,"_size_",m,"_GA_",i1))
 #write.csv(r2.mat,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/ld.clump.auc.csv")
