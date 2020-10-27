@@ -69,9 +69,9 @@ pthres <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01,0.
           if(res ==2){
             stop()
           }
-          system(paste0("rm ",out.dir,"/prs/prs_eursnp_eurcoef_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,"_GA_",i1,".nosex"))
-          system(paste0("rm ",out.dir,"/prs/prs_eursnp_eurcoef_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,"_GA_",i1,".log"))
-          system(paste0("rm ",out.dir,"/prs/prs_eursnp_eurcoef_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,"_GA_",i1,".nopred"))
+          system(paste0("rm ",out.dir,"/prs/prs_pvalue_two_dim_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,"_GA_",i1,".nosex"))
+          system(paste0("rm ",out.dir,"/prs/prs_pvalue_two_dim_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,"_GA_",i1,".log"))
+          system(paste0("rm ",out.dir,"/prs/prs_pvalue_two_dim_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,"_GA_",i1,".nopred"))
           system(paste0("rm ",temp.dir,"/prs_pvalue_two_dim_",k1,"_",k2,"_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
           gc()
           #system(paste0("/data/zhangh24/software/plink2 --score ",cur.dir,eth[i],"/prs/prs_file_pvalue_",k,"_rho_",l,"_size_",m,,"_rep_",i_rep," no-sum no-mean-imputation --bfile ",cur.dir,eth[i],"/all_chr.tag --exclude /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/duplicated.id  --out ",cur.dir,eth[i],"/prs/prs_",k,"_rho_",l,"_size_",m))
