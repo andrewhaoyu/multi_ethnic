@@ -82,6 +82,65 @@ for(i1 in 1:2){
       width = 15, height = 10, res = 300,units = "in")
   print(p)
   dev.off()
+  #load LD clump results
+  load(paste0("LD.clump.result.GA_",i1,".rdata"))
+  LD.clump.result <- LD.result.list[[1]]
+  LD.clump.result <- LD.clump.result[LD.clump.result$eth.vec!="EUR",]
+  method_vec <- rep("P+T",nrow(LD.clump.result))
+  LD.clump.result$method_vec = method_vec
+  LD.clump.result.PT <- LD.clump.result
+  #Best EUR result
+  load(paste0("best_eur_snp_result_GA_",i1,".rdata"))
+  method <- c("eurcoef","tarcoef","eb")
+  method_nameupdate <- c("Best EUR PRS","Best EUR SNP + target coefficients","Best EUR SNP + EB")
+  for(q in 1:length(method)){
+    idx <- which(LD.clump.result$method_vec==method[q])
+    LD.clump.result$method_vec[idx] <-   method_nameupdate[q]
+  }
+  LD.clump.result.EUR <- LD.clump.result
+  LD.clump.result <- rbind(LD.clump.result.EUR,LD.clump.result.PT)
+  
+  
+  
+  LD.clump.result$method_vec <- factor(LD.clump.result$method_vec,
+                                       levels = c("P+T",
+                                                  "Best EUR PRS",
+                                                  "Best EUR SNP + target coefficients",
+                                                  "Best EUR SNP + EB"))
+                                                  #"2DLD","2DLD-EB"))
+  sample_size =  as.character(LD.clump.result$method_vec)
+  ssp = factor(c("15000","45000","80000","100000"),
+               levels = c("15000","45000","80000","100000"))
+  cau_vec <- as.character(LD.clump.result$l_vec)
+  csp <- c(0.01,0.001,0.0005)
+  for(l in 1:3){
+    idx <- which(LD.clump.result$l_vec==l)
+    cau_vec[idx] <- paste0("Causal SNPs Proportion = ",csp[l])
+  }
+  for(m in 1:4){
+    idx <- which(LD.clump.result$m_vec==m)
+    sample_size[idx] <- ssp[m]
+  }
+  LD.clump.result <- cbind(LD.clump.result,cau_vec,sample_size)
+  p <- ggplot(LD.clump.result,aes(x= sample_size,y=r2.vec,group=method_vec))+
+    geom_bar(aes(fill=method_vec),
+             stat="identity",
+             position = position_dodge())+
+    #geom_point(aes(color=method_vec))+
+    theme_Publication()+
+    ylab("R2")+
+    xlab("Sample Size")+
+    labs(fill = "Method")+
+    facet_grid(vars(cau_vec),vars(eth.vec))+
+    scale_fill_nejm()+
+    theme(axis.text = element_text(size = rel(0.9)),
+          legend.text = element_text(size = rel(0.9)))+
+    ggtitle("Prediction performance comparasion (Sample Size for EUR = 100k)")
+  p
+  png(file = paste0("./method_compare_result_summary_GA_",i1,".png"),
+      width = 13, height = 8, res = 300,units = "in")
+  print(p)
+  dev.off()
   
 }
 
@@ -133,7 +192,7 @@ dev.off()
 
 
 
-#Best EUR result
+#load LD clump results
 load("LD.clump.result.rdata")
 LD.clump.result <- LD.result.list[[1]]
 
@@ -146,6 +205,7 @@ LD.clump.result <- LD.clump.result[LD.clump.result$eth.vec!="EUR",]
 method_vec <- rep("P+T",nrow(LD.clump.result))
 LD.clump.result$method_vec = method_vec
 LD.clump.result.PT <- LD.clump.result
+#Best EUR result
 load("best_eur_snp_result.rdata")
 method <- c("eurcoef","tarcoef","eb")
 method_nameupdate <- c("Best EUR PRS","Best EUR SNP + target coefficients","Best EUR SNP + EB")
