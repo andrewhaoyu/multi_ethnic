@@ -8,22 +8,21 @@
 args = commandArgs(trailingOnly = T)
 i_rep = as.numeric(args[[1]])
 i = as.numeric(args[[2]])
-l = as.numeric(args[[3]])
-m = as.numeric(args[[4]])
-j = as.numeric(args[[5]])
+j = as.numeric(args[[3]])
+l = as.numeric(args[[4]])
+m = as.numeric(args[[5]])
 i1 = as.numeric(args[[6]])
-
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
 out.dir <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
 #j = as.numeric(args[[3]])
 sid <- Sys.getenv("SLURM_JOB_ID")
-dir.create(paste0('/lscratch/',sid,'/',eth[i],"/"),showWarnings = F)
-temp.dir <- paste0('/lscratch/',sid,'/',eth[i],"/")
+dir.create(paste0("/lscratch/",sid,"/",eth[i],"/"),showWarnings = F)
+temp.dir <- paste0("/lscratch/",sid,"/",eth[i],"/")
 
 system(paste0("cp ",cur.dir,eth[i],"/chr",j,".tag.* ",temp.dir,"."))
 system(paste0("ls ",temp.dir))
-print("step1 finished")
+
 library(dplyr)
 library(data.table)
 setwd("/data/zhangh24/multi_ethnic/")
@@ -44,10 +43,10 @@ pthres <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01,0.
       select(SNP,beta_eur,peur)
     
     #read LD clumped SNPs
-    LD <- as.data.frame(fread(paste0(out.dir,eth[i],"/LD_clump_two_dim_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1".clumped")))
+    LD <- as.data.frame(fread(paste0(out.dir,eth[i],"/LD_clump_two_dim_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".clumped")))
     clump.snp <- LD[,3,drop=F] 
     #read the target ethnic group summary level statistics
-    sum.data <- as.data.frame(fread(paste0(out.dir,eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))) 
+    sum.data <- as.data.frame(fread(paste0(out.dir,eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))  
     colnames(sum.data)[2] <- "SNP"
     #combine the target level summary stat with EUR
     summary.com <- left_join(sum.data,summary.eur.select,by="SNP")
@@ -64,14 +63,18 @@ pthres <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01,0.
         
         #}
         #for(j in 1:22){
-        print("step2 finished")
         if(nrow(prs.file)>0){
-          write.table(prs.file,file = paste0(temp.dir,"prs_pvalue_two_dim_",k1,"_",k2,"_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1),col.names = T,row.names = F,quote=F)
-          res <- system(paste0("/data/zhangh24/software/plink2 --threads 2 --score ",temp.dir,"prs_pvalue_two_dim_",k1,"_",k2,"_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1," no-sum no-mean-imputation --bfile ",temp.dir,"chr",j,".tag --exclude ",out.dir,eth[i],"/duplicated.id  --out ",out.dir,eth[i],"/prs/prs_two_dim_",k1,"_",k2,"_rho_",l,"_size_",m,"_chr_",j,"_rep_",i_rep,"_GA_",i1))
-          #system(paste0("/data/zhangh24/software/plink2 --score ",cur.dir,eth[i],"/prs/prs_file_pvalue_",k,"_rho_",l,"_size_",m,,"_rep_",i_rep," no-sum no-mean-imputation --bfile ",cur.dir,eth[i],"/all_chr.tag --exclude /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/duplicated.id  --out ",cur.dir,eth[i],"/prs/prs_",k,"_rho_",l,"_size_",m))
-          if(res==2){
+          write.table(prs.file,file = paste0(temp.dir,"/prs_pvalue_two_dim_",k1,"_",k2,"_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1),col.names = T,row.names = F,quote=F)
+          res = system(paste0("/data/zhangh24/software/plink2 --threads 2 --score ",temp.dir,"prs_pvalue_two_dim_",k1,"_",k2,"_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1," no-sum no-mean-imputation --bfile ",temp.dir,"chr",j,".tag --exclude ",out.dir,eth[i],"/duplicated.id  --out ",cur.dir,eth[i],"/prs/prs_two_dim_",k1,"_",k2,"_rho_",l,"_size_",m,"_chr_",j,"_rep_",i_rep,"_GA_",i1))
+          if(res ==2){
             stop()
           }
+          system(paste0("rm ",out.dir,"/prs/prs_eursnp_eurcoef_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,"_GA_",i1,".nosex"))
+          system(paste0("rm ",out.dir,"/prs/prs_eursnp_eurcoef_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,"_GA_",i1,".log"))
+          system(paste0("rm ",out.dir,"/prs/prs_eursnp_eurcoef_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,"_GA_",i1,".nopred"))
+          system(paste0("rm ",temp.dir,"/prs_pvalue_two_dim_",k1,"_",k2,"_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
+          gc()
+          #system(paste0("/data/zhangh24/software/plink2 --score ",cur.dir,eth[i],"/prs/prs_file_pvalue_",k,"_rho_",l,"_size_",m,,"_rep_",i_rep," no-sum no-mean-imputation --bfile ",cur.dir,eth[i],"/all_chr.tag --exclude /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/duplicated.id  --out ",cur.dir,eth[i],"/prs/prs_",k,"_rho_",l,"_size_",m))
         }
         
       }
@@ -79,13 +82,12 @@ pthres <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01,0.
     }
     
     
-  }
-  
-}
+  #}
+#}
 
 #pthres <- c(1E-10,1E-09,5E-08,1E-07,2.5E-07,5E-07,7.5E-07,1E-06,2.5E-06,5E-06,7.5E-06,1E-05,2.5e-05,5E-05,7.5e-05,1E-04,2.5E-04,5E-04,7.5E-04,1E-03)
-print("step3 finished")
-system(paste0('rm -r /lscratch/',sid,'/',eth[i],'/'))
+
+system(paste0("rm -rf ", temp.dir))
 
 #}
 
