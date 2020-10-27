@@ -10,8 +10,8 @@ args = commandArgs(trailingOnly = T)
 i = as.numeric(args[[1]])
 l = as.numeric(args[[2]])
 m = as.numeric(args[[3]])
-q = 1
-i1 = as.numeric(args[[4]])
+q = as.numeric(args[[4]])
+i1 = as.numeric(args[[5]])
 #i_rep = as.numeric(args[[5]])
 
 method <- c("eurcoef","tarcoef","eb")
