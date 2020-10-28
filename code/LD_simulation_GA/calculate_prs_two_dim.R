@@ -20,7 +20,7 @@ sid <- Sys.getenv("SLURM_JOB_ID")
 dir.create(paste0("/lscratch/",sid,"/",eth[i],"/"),showWarnings = F)
 temp.dir <- paste0("/lscratch/",sid,"/",eth[i],"/")
 
-system(paste0("cp ",cur.dir,eth[i],"/chr",j,".tag.* ",temp.dir,"."))
+system(paste0("cp ",cur.dir,eth[i],"/chr",j,".tag.* ",temp.dir))
 system(paste0("ls ",temp.dir))
 
 library(dplyr)
