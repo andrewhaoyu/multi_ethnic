@@ -43,7 +43,7 @@ snp.infor.select = snp.infor %>%
   LD <- as.data.frame(fread(paste0(out.dir,eth[i],"/LD_clump_two_dim_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".clumped")))
     clump.snp <- LD[,3,drop=F] 
     
-    summary.data <- as.data.frame(fread(paste0(out.dir,eth[1],"/summary_out_rho_",l,"_size_",4,"_rep_",i_rep,"_GA_",i1)))  
+    sum.data <- as.data.frame(fread(paste0(out.dir,eth[1],"/summary_out_rho_",l,"_size_",4,"_rep_",i_rep,"_GA_",i1)))  
     colnames(sum.data)[2] <- "SNP"
     prs.all <- left_join(clump.snp,sum.data,by="SNP") 
     prs.file <- prs.all %>% filter(CHR==j) %>% 
