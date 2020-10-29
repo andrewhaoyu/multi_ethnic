@@ -65,7 +65,7 @@ pthres <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01,0.
         #for(j in 1:22){
         if(nrow(prs.file)>0){
           write.table(prs.file,file = paste0(temp.dir,"/prs_pvalue_two_dim_",k1,"_",k2,"_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1),col.names = T,row.names = F,quote=F)
-          res = system(paste0("/data/zhangh24/software/plink2 --threads 2 --score ",temp.dir,"prs_pvalue_two_dim_",k1,"_",k2,"_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1," no-sum no-mean-imputation --bfile ",temp.dir,"chr",j,".tag --exclude ",out.dir,eth[i],"/duplicated.id  --out ",cur.dir,eth[i],"/prs/prs_two_dim_",k1,"_",k2,"_rho_",l,"_size_",m,"_chr_",j,"_rep_",i_rep,"_GA_",i1))
+          res = system(paste0("/data/zhangh24/software/plink2 --threads 2 --score ",temp.dir,"prs_pvalue_two_dim_",k1,"_",k2,"_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1," no-sum no-mean-imputation --bfile ",temp.dir,"chr",j,".tag --exclude ",out.dir,eth[i],"/duplicated.id  --out ",out.dir,eth[i],"/prs/prs_two_dim_",k1,"_",k2,"_rho_",l,"_size_",m,"_chr_",j,"_rep_",i_rep,"_GA_",i1))
           if(res ==2){
             stop()
           }
