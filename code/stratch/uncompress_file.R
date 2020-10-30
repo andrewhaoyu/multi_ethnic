@@ -12,6 +12,7 @@ cur.dir <- paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic/LD_simulation_new/"
 #system(paste0("mkdir ",cur.dir,"pheno_summary_out_GA"))
 #system(paste0("cd ",cur.dir," ;mv pheno_GA/* pheno_summary_out_GA/"))
 #system(paste0("cd ",cur.dir," ;mv summary_out_GA/* pheno_summary_out_GA/"))
+
 res = system(paste0("cd ",cur.dir," ; tar -xzvf pheno_summary_out_GA.tar.gz "))
 if(res==2){
   stop()
