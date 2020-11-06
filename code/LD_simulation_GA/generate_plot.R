@@ -1,6 +1,7 @@
 setwd("/Users/zhangh24/GoogleDrive/multi_ethnic/result/LD_simulation_GA")
 library(ggplot2)
 library(ggsci)
+library(dplyr)
 for(i1 in 1:2){
   #standard LD clumping results
   load(paste0("LD.clump.result.GA_",i1,".rdata"))
@@ -98,29 +99,44 @@ for(i1 in 1:2){
     LD.clump.result$method_vec[idx] <-   method_nameupdate[q]
   }
   LD.clump.result.EUR <- LD.clump.result
-  LD.clump.result <- rbind(LD.clump.result.EUR,LD.clump.result.PT)
-  
-  
-  
+  #
+  #2DLD
+  load(paste0("LD.clump.result.two.dim_GA_",i1,".rdata"))
+  LD.clump.result <- LD.result.list[[1]]
+  method_vec <- rep("2DLD",nrow(LD.clump.result))
+  LD.clump.result$method_vec = method_vec
+  LD.clump.result.2DLD = LD.clump.result
+  #2DLD + EB
+  load(paste0("LD.clump.result.eb_GA_",i1,".rdata"))
+  LD.clump.result <- LD.result.list[[1]]
+  method_vec <- rep("2DLD + EB coefficients",nrow(LD.clump.result))
+  LD.clump.result$method_vec = method_vec
+  LD.clump.result.EB = LD.clump.result
+  LD.clump.result <- rbind(LD.clump.result.EUR,LD.clump.result.PT,
+                           LD.clump.result.2DLD,LD.clump.result.EB)
   LD.clump.result$method_vec <- factor(LD.clump.result$method_vec,
                                        levels = c("P+T",
                                                   "Best EUR PRS",
                                                   "Best EUR SNP + target coefficients",
-                                                  "Best EUR SNP + EB"))
+                                                  "Best EUR SNP + EB",
+                                                  "2DLD",
+                                                  "2DLD + EB coefficients"))
                                                   #"2DLD","2DLD-EB"))
   sample_size =  as.character(LD.clump.result$method_vec)
-  ssp = factor(c("15000","45000","80000","100000"),
-               levels = c("15000","45000","80000","100000"))
+  ssp = as.character(c("15000","45000","80000","100000"))
   cau_vec <- as.character(LD.clump.result$l_vec)
   csp <- c(0.01,0.001,0.0005)
   for(l in 1:3){
     idx <- which(LD.clump.result$l_vec==l)
     cau_vec[idx] <- paste0("Causal SNPs Proportion = ",csp[l])
   }
+  cau_vec = factor(cau_vec,levels = paste0("Causal SNPs Proportion = ",csp))
   for(m in 1:4){
     idx <- which(LD.clump.result$m_vec==m)
     sample_size[idx] <- ssp[m]
   }
+  sample_size = factor(sample_size,
+                       levels = c("15000","45000","80000","100000"))
   LD.clump.result <- cbind(LD.clump.result,cau_vec,sample_size)
   p <- ggplot(LD.clump.result,aes(x= sample_size,y=r2.vec,group=method_vec))+
     geom_bar(aes(fill=method_vec),
@@ -138,6 +154,26 @@ for(i1 in 1:2){
     ggtitle("Prediction performance comparasion (Sample Size for EUR = 100k)")
   p
   png(file = paste0("./method_compare_result_summary_GA_",i1,".png"),
+      width = 13, height = 8, res = 300,units = "in")
+  print(p)
+  dev.off()
+  LD.clump.result.15k <- LD.clump.result %>% filter(m_vec==1)
+  p <- ggplot(LD.clump.result.15k,aes(x= sample_size,y=r2.vec,group=method_vec))+
+    geom_bar(aes(fill=method_vec),
+             stat="identity",
+             position = position_dodge())+
+    #geom_point(aes(color=method_vec))+
+    theme_Publication()+
+    ylab("R2")+
+    xlab("Sample Size")+
+    labs(fill = "Method")+
+    facet_grid(vars(cau_vec),vars(eth.vec))+
+    scale_fill_nejm()+
+    theme(axis.text = element_text(size = rel(0.9)),
+          legend.text = element_text(size = rel(0.9)))+
+    ggtitle("Prediction performance comparasion (Sample Size for EUR = 100k)")
+  p
+  png(file = paste0("./method_compare_result_15k_summary_GA_",i1,".png"),
       width = 13, height = 8, res = 300,units = "in")
   print(p)
   dev.off()

@@ -55,6 +55,10 @@ pthres <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01,0.
     for(k1 in 1:length(pthres)){
       for(k2 in 1:length(pthres)){
         
+        # prs.file <- prs.all %>% filter((P<=pthres[k1]|
+        #                                   peur<=pthres[k2])) %>% 
+        #   select(SNP,A1,BETA)
+        
         prs.file <- prs.all %>% filter((P<=pthres[k1]|
                                           peur<=pthres[k2])&
                                          CHR==j) %>% 

@@ -77,9 +77,6 @@ snp.infor.select = snp.infor %>%
              beta_st=BETA*sqrt(2*MAF*(1-MAF)),
              sd_st = sd_tar*sqrt(2*MAF*(1-MAF))) %>%
       select(SNP,beta_st,sd_st,A1,MAF)
-    #read the target ethnic group summary level statistics
-    prior.sigma = cov(cbind(summary.tar.select$beta_st,
-                            summary.eur.select$beta_st),use="complete.obs")
     #load("/data/zhangh24/multi_ethnic/result/LD_simulation_new/causal_Sigma.rdata")
     #prior.sigma = Sigma
     #prior.sigma = (Sigma[c(i,1),c(i,1)])
@@ -116,6 +113,11 @@ snp.infor.select = snp.infor %>%
     prs.all = summary.tar.select
     for(k1 in 1:length(pthres)){
       for(k2 in 1:length(pthres)){
+        
+        #read the target ethnic group summary level statistics
+        prior.sigma = cov(cbind(summary.tar.select$beta_st,
+                                summary.eur.select$beta_st),use="complete.obs")
+        
         
         prs.file <- prs.all %>% filter((P<=pthres[k1]|
                                           peur<=pthres[k2])) %>%
