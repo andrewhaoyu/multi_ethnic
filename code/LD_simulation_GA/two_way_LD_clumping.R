@@ -9,6 +9,8 @@ i_rep = as.numeric(args[[4]])
 i1 = as.numeric(args[[5]])
 library(data.table)
 library(dplyr)
+sid<-Sys.getenv('SLURM_JOB_ID')
+dir.create(paste0('/lscratch/',sid,'/test'),showWarnings = FALSE)
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
 out.dir <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
@@ -33,9 +35,6 @@ assoc = summary.com.EUR %>%
   rename(P=peur)
 write.table(assoc,paste0("/lscratch/",sid,"/test/",eth[1],"_assoc.out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1),col.names = T,row.names = F,quote=F)
 
-sid<-Sys.getenv('SLURM_JOB_ID')
-dir.create(paste0('/lscratch/',sid,'/test'),showWarnings = FALSE)
-eth <- c("EUR","AFR","AMR","EAS","SAS")
 system(paste0("cp /data/zhangh24/KG.plink/",eth[1],"/chr_all.bed /lscratch/",sid,"/test/",eth[1],"_chr_all.bed"))
 system(paste0("cp /data/zhangh24/KG.plink/",eth[1],"/chr_all.bim /lscratch/",sid,"/test/",eth[1],"_chr_all.bim"))
 system(paste0("cp /data/zhangh24/KG.plink/",eth[1],"/chr_all.fam /lscratch/",sid,"/test/",eth[1],"_chr_all.fam"))
