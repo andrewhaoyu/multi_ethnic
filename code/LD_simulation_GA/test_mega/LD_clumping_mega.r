@@ -13,6 +13,7 @@ l = as.numeric(args[[2]])
 m = as.numeric(args[[3]])
 i_rep = as.numeric(args[[4]])
 i1 = as.numeric(args[[5]])
+q = as.numeric(args[[6]])
 library(data.table)
 library(dplyr)
 sid<-Sys.getenv('SLURM_JOB_ID')
@@ -34,7 +35,8 @@ system(paste0("cp /data/zhangh24/KG.plink/",eth[i],"/chr_all.fam /lscratch/",sid
 # 
 # }
 #only keep the SNPs with MAF > 0.05 in each ethnic group
-
+snplist_vec = c("mega","hm")
+snplist <- snplist_vec[q]
 setwd("/data/zhangh24/multi_ethnic/")
 #load 1kg snp list
 load("./result/LD_simulation_new/snp.infor.rdata")
@@ -42,17 +44,34 @@ idx <- which(snp.infor$position==752566)
 #load mega snp list
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
 library(data.table)
-mega.list <- as.data.frame(fread(paste0(cur.dir,"mega-hm3-rsid.txt"),header  =F))
-mega.infor <- as.data.frame(fread(paste0(cur.dir,"snpBatch_ILLUMINA_1062317")))
-colnames(mega.infor)[5] <- "rsid"
-idx <- which(mega.infor$rsid=="rs3094315")
 MAF = snp.infor[,..eth]
 MAF = cbind(snp.infor$id,MAF)
 colnames(MAF)[1] <- "SNP"
 MAF_var = list('EUR','AFR','AMR','EAS',"SAS")
 sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_GA/",eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))  
 var_name = colnames(sum.data)
-sum.data.com = left_join(sum.data,MAF,bY="SNP")
+library(tidyr)
+sum.data = sum.data %>% 
+  separate(col=SNP,into=c("rs_id","position_new","allele1","allele2"),sep=":",remove=F)
+if(q==1){
+  mega.list <- as.data.frame(fread(paste0(cur.dir,"mega-hm3-rsid.txt"),header  =F))
+  #mega.infor <- as.data.frame(fread(paste0(cur.dir,"snpBatch_ILLUMINA_1062317")))
+  #colnames(mega.infor)[5] <- "rsid"
+  colnames(mega.list) = "rs_id"
+  sum.data.match <- inner_join(mega.list,sum.data,by="rs_id")
+  
+}else if(q==2){
+  hm.list <- as.data.frame(fread(paste0(cur.dir,"hm3rsid.txt")))
+  colnames(hm.list)[1] = "rs_id"
+  hm.list = hm.list[,1,drop=F]
+  sum.data.match <- inner_join(hm.list,sum.data,by="rs_id")
+}
+
+
+library(tidyr)
+sum.data.com = left_join(sum.data.match,MAF,bY="SNP") 
+  
+
 # idx <- which(sum.data.com$EAS>=0.05&sum.data.com$EAS<=0.95)
 # idx2 <- which(sum.data.com$P<=5e-08)
 # sum.data.com.temp <- sum.data.com[idx2,]
@@ -60,7 +79,7 @@ sum.data.MAF = sum.data.com %>% filter(get(eth[i])>=0.01&get(eth[i])<=0.99) %>%
   select(all_of(var_name))
 #idx.order <- order(sum.data.MAF$P)
 #sum.data.MAF.new <- sum.data.MAF[idx.order,]
-write.table(sum.data.MAF,file = paste0("/lscratch/",sid,"/test/",eth[i],"_summary_out_MAF_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".out")
+write.table(sum.data.MAF,file = paste0("/lscratch/",sid,"/test/",eth[i],"_summary_out_MAF_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_",snplist,".out")
             ,col.names = T,row.names = F,quote=F) 
 
 # dim(summary)
@@ -72,11 +91,11 @@ eth <- c("EUR","AFR","AMR","EAS","SAS")
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
 #code <- rep("c",5*3*3)
 #system(paste0("/data/zhangh24/software/plink2 --bfile /data/zhangh24/KG.plink/",eth[i],"/chr_all --clump ",cur.dir,eth[i],"/summary_out_MAF_rho_",l,"_size_",m,"_rep_",i_rep,".out --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out ",cur.dir,eth[i],"/LD_clump_rho_",l,"_size_",m,"_rep_",i_rep))
-res = system(paste0("/data/zhangh24/software/plink2 --threads 2 --bfile /lscratch/",sid,"/test/",eth[i],"_chr_all --clump /lscratch/",sid,"/test/",eth[i],"_summary_out_MAF_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".out --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out ",cur.dir,eth[i],"/LD_clump_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
+res = system(paste0("/data/zhangh24/software/plink2 --threads 2 --bfile /lscratch/",sid,"/test/",eth[i],"_chr_all --clump /lscratch/",sid,"/test/",eth[i],"_summary_out_MAF_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_",snplist,".out --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out ",cur.dir,eth[i],"/LD_clump_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_",snplist))
 if(res==2){
   stop()
 }
-system(paste0("rm ",cur.dir,eth[i],"/LD_clump_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".log"))
+system(paste0("rm ",cur.dir,eth[i],"/LD_clump_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_",snplist,".log"))
 #       temp = temp +1 
 #     }
 #   }
