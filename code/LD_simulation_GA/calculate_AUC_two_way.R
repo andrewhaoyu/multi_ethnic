@@ -47,7 +47,7 @@ summary.eur.select = summary.eur %>%
   select(SNP,beta_eur,peur)
 
 #read LD clumped SNPs
-LD <- as.data.frame(fread(paste0(out.dir,eth[i],"/LD_clump_two_dim_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".clumped")))
+LD <- as.data.frame(fread(paste0(out.dir,eth[i],"/LD_clump_two_way_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".clumped")))
 clump.snp <- LD[,3,drop=F] 
 #idx <- which(clump.snp%in%sum.data$SNP==F)
 #read the target ethnic group summary level statistics
@@ -79,7 +79,7 @@ for(k1 in 1:length(pthres)){
         if(length(idx)>0){
           
           
-          filename <- paste0(out.dir,eth[i],"/prs/prs_two_dim_",k1,"_",k2,"_rho_",l,"_size_",m,"_chr_",j,"_rep_",i_rep,"_GA_",i1,".profile")
+          filename <- paste0(out.dir,eth[i],"/prs/prs_two_way_",k1,"_",k2,"_rho_",l,"_size_",m,"_chr_",j,"_rep_",i_rep,"_GA_",i1,".profile")
           
           prs.temp <- fread(filename)  
           prs.score <- prs.temp$SCORE*2*length(idx)+prs.score
@@ -127,5 +127,5 @@ for(k1 in 1:length(pthres)){
 idx <- which.max(r2.vec.test)
 r2 <- r2.vec.vad[idx]
 r2.list <- list(r2,r2.vec.test,r2.vec.vad)
-save(r2.list,file = paste0(out.dir,eth[i],"/r2.list_two_dim_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
+save(r2.list,file = paste0(out.dir,eth[i],"/r2.list_two_way_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
 #write.csv(r2.mat,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/ld.clump.auc.csv")
