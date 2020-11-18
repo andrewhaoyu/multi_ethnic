@@ -7,6 +7,91 @@ library(RColorBrewer)
 library(grid)
 library(gridExtra)
 
+#
+for(i1 in 1:2){
+
+  #standard LD clumping results
+  load(paste0("LD.clump.result.GA_",i1,".rdata"))
+  LD.clump.result.1kg <- LD.result.list[[1]]
+  chips = rep("1kg",nrow(LD.clump.result.1kg))
+  LD.clump.result.1kg$chips = chips
+  load(paste0("LD.clump.result.GA_",i1,"_mega.rdata"))
+  LD.clump.result.mega <- LD.result.list[[1]]
+  chips = rep("mega",nrow(LD.clump.result.mega))
+  LD.clump.result.mega$chips = chips
+  load(paste0("LD.clump.result.GA_",i1,"_hm.rdata"))
+  LD.clump.result.hm <- LD.result.list[[1]]
+  chips = rep("hm",nrow(LD.clump.result.mega))
+  LD.clump.result.hm$chips = chips
+  
+  LD.clump.result = rbind(LD.clump.result.1kg,LD.clump.result.mega,LD.clump.result.hm)
+  
+  #save(LD.clump.result,file = "LD.clump.result_090420_P+T.rdata")
+  #load("LD.clump.result_090420_P+T.rdata")
+  sample_size =  as.character(LD.clump.result$method_vec)
+  ssp = as.character(c("15000","45000","80000","100000"))
+  cau_vec <- as.character(LD.clump.result$l_vec)
+  csp <- c(0.01,0.001,0.0005)
+  for(l in 1:3){
+    idx <- which(LD.clump.result$l_vec==l)
+    cau_vec[idx] <- paste0("Causal SNPs Proportion = ",csp[l])
+  }
+  cau_vec = factor(cau_vec,levels = paste0("Causal SNPs Proportion = ",csp))
+  for(m in 1:4){
+    idx <- which(LD.clump.result$m_vec==m)
+    sample_size[idx] <- ssp[m]
+  }
+  sample_size = factor(sample_size,
+                       levels = c("15000","45000","80000","100000"))
+  LD.clump.result <- cbind(LD.clump.result,cau_vec,sample_size)
+  
+  
+  LD.clump.result$eth.vec <- factor(LD.clump.result$eth.vec,
+                                    #levels =c("EUR","AFR","AMR","EAS","SAS"))
+                                    levels =c("EUR","AFR","AMR","EAS","SAS"))
+  for(m in 1:4){
+    idx <- which(LD.clump.result$m_vec ==m)
+    LD.clump.result.sub = LD.clump.result[idx,]
+    p <- ggplot(LD.clump.result.sub,aes(x= sample_size,y=r2.vec,group=chips))+
+      geom_bar(aes(fill=chips),
+               stat="identity",
+               position = position_dodge())+
+      #geom_point(aes(color=method_vec))+
+      theme_Publication()+
+      ylab("R2")+
+      xlab("Sample Size")+
+      labs(fill = "Method")+
+      facet_grid(vars(cau_vec),vars(eth.vec))+
+      scale_fill_nejm()+
+      theme(axis.text = element_text(size = rel(0.9)),
+            legend.text = element_text(size = rel(0.9)))+
+      ggtitle("Prediction performance comparasion (P+T)")
+    p
+    
+    png(file = paste0("./LD_clumping_compare_GA_",i1,"_size_",m,".png"),
+        width = 10, height = 8, res = 300,units = "in")
+    print(p)
+    dev.off()
+    
+  }
+  
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 for(i1 in 1:2){
   #standard LD clumping results
   load(paste0("LD.clump.result.GA_",i1,".rdata"))
@@ -74,6 +159,7 @@ for(i1 in 1:2){
                                     levels =c("EUR","AFR","AMR","EAS","SAS"))
   
   
+  
   p <- ggplot(LD.clump.result,aes(x= log10(pthres.vec),y=r2.vec,group=eth.vec))+
     geom_line(aes(color=eth.vec))+
     geom_point(aes(color=eth.vec))+
@@ -83,6 +169,7 @@ for(i1 in 1:2){
     labs(color = "Ethnic group")+
     facet_grid(vars(cau_vec),vars(sample_size))+
     scale_color_nejm()
+  
   p
   png(file = paste0("./LD_clumping_result_p_thres_GA_",i1,".png"),
       width = 15, height = 10, res = 300,units = "in")
@@ -172,11 +259,78 @@ for(i1 in 1:2){
       width = 13, height = 8, res = 300,units = "in")
   print(p)
   dev.off()
+  load("R2.simulation.hapmap3.RData")
+  res$cau_vec = as.character(res$cau_vec)
+  idx <- which(res$cau_vec=="Causal SNPs Proportion = 5e-4")
+  res$cau_vec[idx] = "Causal SNPs Proportion = 5e-04"
+  
+  res$sample_size = as.character(res$sample_size)
+ 
+   idx <- which(res$sample_size=="1e+05")
+  res$sample_size[idx] = "100000"
+  res = res %>% 
+    mutate(m_vec = case_when(sample_size%in%"15000"~1,
+                             sample_size%in%"45000"~2,
+                             sample_size%in%"80000"~3,
+                             sample_size%in%"100000"~4))
+  
+  res$sample_size = factor(res$sample_size,
+                           levels = c("15000","45000","80000","100000"))
+  
+  
+  LD.result.LDpred <- res %>%
+    rename(eth.vec = race,
+           r2.vec = R2,
+           method_vec = Method) %>% 
+    filter(GA==i1) %>% 
+    select(eth.vec,r2.vec,cau_vec,sample_size,method_vec,m_vec)
+  LD.clump.result = LD.clump.result %>% 
+    select(colnames(LD.result.LDpred))
+  LD.clump.result.plot = rbind(LD.clump.result,LD.result.LDpred)
+  
+  for(m in 1:4){
+    LD.clump.result.sub <- LD.clump.result.plot %>% filter(m_vec==m) %>% 
+      select(eth.vec,r2.vec,cau_vec,sample_size,method_vec) %>% 
+      mutate(method_vec = as.character(method_vec))
+    method_vec = as.character(LD.clump.result.sub$method_vec)
+    method_vec = factor(method_vec,
+                        levels = c("P+T","LDpred2",
+                                   "Best EUR PRS",
+                                   "Best EUR SNP + target coefficients",
+                                   "Best EUR SNP + EB",
+                                   "EUR LDpred2",
+                                   "2DLD",
+                                   "2WLD",
+                                   "MEBayes"))
+    LD.clump.result.sub$method_vec = method_vec
+    p <- ggplot(LD.clump.result.sub,aes(x= sample_size,y=r2.vec,group=method_vec))+
+      geom_bar(aes(fill=method_vec),
+               stat="identity",
+               position = position_dodge())+
+      #geom_point(aes(color=method_vec))+
+      theme_Publication()+
+      ylab("R2")+
+      xlab("Sample Size")+
+      labs(fill = "Method")+
+      facet_grid(vars(cau_vec),vars(eth.vec))+
+      #scale_fill_nejm()+
+      scale_fill_manual(values = getPalette(colourCount)) +
+      theme(axis.text = element_text(size = rel(0.9)),
+            legend.text = element_text(size = rel(0.9)))+
+      ggtitle("Prediction performance comparasion (Sample Size for EUR = 100k)")
+    p
+    png(file = paste0("./method_compare_result_size_",m,"_summary_GA_",i1,".png"),
+        width = 13, height = 8, res = 300,units = "in")
+    print(p)
+    dev.off()
+    
+  }
   LD.clump.result.15k <- LD.clump.result %>% filter(m_vec==1) %>% 
     select(eth.vec,r2.vec,cau_vec,sample_size,method_vec) %>% 
     mutate(method_vec = as.character(method_vec))
   method_vec = as.character(LD.clump.result.15k$method_vec)
   method_vec = factor(method_vec,
+                      
                       levels = c("P+T",
                                  "Best EUR PRS",
                                  "Best EUR SNP + target coefficients",
@@ -184,22 +338,6 @@ for(i1 in 1:2){
                                  "2DLD",
                                  "2WLD"))
   LD.clump.result.15k$method_vec = method_vec
-  p <- ggplot(LD.clump.result.15k,aes(x= sample_size,y=r2.vec,group=method_vec))+
-    geom_bar(aes(fill=method_vec),
-             stat="identity",
-             position = position_dodge())+
-    #geom_point(aes(color=method_vec))+
-    theme_Publication()+
-    ylab("R2")+
-    xlab("Sample Size")+
-    labs(fill = "Method")+
-    facet_grid(vars(cau_vec),vars(eth.vec))+
-    #scale_fill_nejm()+
-    scale_fill_manual(values = getPalette(colourCount)) +
-    theme(axis.text = element_text(size = rel(0.9)),
-          legend.text = element_text(size = rel(0.9)))+
-    ggtitle("Prediction performance comparasion (Sample Size for EUR = 100k)")
-  p
   
   load("R2.simulation.hapmap3.RData")
   res$cau_vec = as.character(res$cau_vec)
@@ -223,7 +361,7 @@ for(i1 in 1:2){
                                     "2WLD",
                                     "MEBayes"))
   LD.clump.result.15k$method_vec = method_vec
-  colourCount = length(uvals)
+  colourCount = 9
   getPalette = colorRampPalette(brewer.pal(9, "Paired"))
   
   p <- ggplot(LD.clump.result.15k,aes(x= sample_size,y=r2.vec,group=method_vec))+
@@ -242,7 +380,7 @@ for(i1 in 1:2){
           legend.text = element_text(size = rel(0.9)))+
     ggtitle("Prediction performance comparasion (Sample Size for EUR = 100k)")
   p
-  png(file = paste0("./method_compare_result_15k_summary_GA_",i1,".png"),
+  png(file = paste0("./all_method_compare_result_size_",1,"_summary_GA_",i1,".png"),
       width = 13, height = 8, res = 300,units = "in")
   print(p)
   dev.off()

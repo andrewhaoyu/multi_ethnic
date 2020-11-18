@@ -1,0 +1,1 @@
+setwd("/data/zhangh24/multi_ethnic/data/AABC_data")
