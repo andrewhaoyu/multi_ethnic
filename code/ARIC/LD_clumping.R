@@ -10,7 +10,6 @@ args = commandArgs(trailingOnly = T)
 
 i = as.numeric(args[[1]])
 l = as.numeric(args[[2]])
-j = as.numeric(args[[3]])
 m = as.numeric(args[[3]])
 i_rep = as.numeric(args[[4]])
 i1 = as.numeric(args[[5]])
@@ -31,6 +30,7 @@ sum.data.assoc = sum.data %>%
          P = PVAL) %>% 
   filter(CHR==j) %>% 
   select(CHR,SNP,BP,A1,BETA,P)
+idx <- which(sum.data.assoc$SNP=="rs4970836")
 write.table(sum.data.assoc,file = paste0(out.dir,eth[i],"/",trait[l],"_chr_",j,"_assoc.txt"),col.names = T,row.names = F,quote=F)
 
 # dim(summary)
@@ -50,6 +50,46 @@ system(paste0("rm ",cur.dir,eth[i],"/LD_clump_rho_",l,"_size_",m,"_rep_",i_rep,"
 
 data = as.data.frame(fread(paste0(data.dir,trait[l],"/",eth[i],"/geno/mega/ref_chr",j,".bim")))
 idx <- which(data$V2=="rs78444298")
+
+
+
+
+#quality check
+
+
+all.bim.list = list()
+
+for(j in 1:22){
+  file = paste0(data.dir,trait[l],"/",eth[i],"/geno/mega/ref_chr",j,".bim")
+  temp.bim <- as.data.frame(fread(file))
+  all.bim.list[[j]] = temp.bim
+}
+
+all.bim = rbindlist(all.bim.list)
+
+
+sum.data = as.data.frame(fread(paste0(data.dir,trait[l],"/",eth[i],"/sumdata/training-GWAS-formatted.txt")))
+sum.data.all = as.data.frame(fread(paste0(data.dir,trait[l],"/",eth[i],"/sumdata/training-GWAS-all.txt")))
+
+head(sum.data.all)
+
+sum.data.all = sum.data.all %>% 
+  mutate(SNP_ID = MARKER) %>% 
+  select(SNP_ID,EFFECTALLELE,OTHERALLELE,BETA,EAF)
+
+sum.data.com = left_join(sum.data,sum.data.all,by="SNP_ID")
+head(sum.data.com)
+
+sum.data.com.sig = sum.data.com %>% 
+  filter(PVAL<5E-08)
+
+idx <- which(sum.data.com.sig$SNP_ID%in%all.bim$V2==F)
+save(sum.data.com.sig[idx,],file=
+
+       
+       range(ifelse(sum.data.com.sig[idx,]$EAF>0.5,1-sum.data.com.sig[idx,]$EAF,sum.data.com.sig[idx,]$EAF))
+       
+hist(sum.data.com.sig[idx,]$EAF)
 #       temp = temp +1 
 #     }
 #   }
@@ -66,7 +106,8 @@ idx <- which(data$V2=="rs78444298")
 # sum.data = sum.data %>% 
 #   mutate(chr.pos = paste0(CHR,":",POS))
 #load snp information file
-# load("/dcl01/chatterj/data/hzhang1/multi_ethnic/LD_simulation_new/snp.infor.rdata")
+ load("/dcl01/chatterj/data/hzhang1/multi_ethnic/LD_simulation_new/snp.infor.rdata")
+ idx <- which(snp.infor$position==)
 # snp.infor  = snp.infor %>% 
 #   mutate(chr.pos = paste0(CHR,":",position)) %>% 
 #   select(id,a0,a1,AFR,EUR,chr.pos)

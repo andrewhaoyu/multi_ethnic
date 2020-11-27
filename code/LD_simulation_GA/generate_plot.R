@@ -6,6 +6,9 @@ library(dplyr)
 library(RColorBrewer)
 library(grid)
 library(gridExtra)
+#library(RColorBrewer)
+colourCount = 9
+getPalette = colorRampPalette(brewer.pal(9, "Set1"))
 
 #
 for(i1 in 1:2){
@@ -287,7 +290,7 @@ for(i1 in 1:2){
   LD.clump.result = LD.clump.result %>% 
     select(colnames(LD.result.LDpred))
   LD.clump.result.plot = rbind(LD.clump.result,LD.result.LDpred)
-  
+  save(LD.clump.result.plot,file = paste0("LD.clump.pred.result_GA_",i1,".rdata"))
   for(m in 1:4){
     LD.clump.result.sub <- LD.clump.result.plot %>% filter(m_vec==m) %>% 
       select(eth.vec,r2.vec,cau_vec,sample_size,method_vec) %>% 
