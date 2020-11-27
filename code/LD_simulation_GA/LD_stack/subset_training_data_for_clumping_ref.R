@@ -42,7 +42,7 @@ system(paste0("mv ",temp.dir,"/clump_ref_all_chr.bed ",cur.dir,eth[i],"/"))
 
 
 
-data <- fread2("/gpfs/gsfs11/users/zhangh24/multi_ethnic/result/LD_simulation_new/EUR/temp/chr_13.txt",header=T)
+#data <- fread2("/gpfs/gsfs11/users/zhangh24/multi_ethnic/result/LD_simulation_new/EUR/temp/chr_13.txt",header=T)
 
 
 

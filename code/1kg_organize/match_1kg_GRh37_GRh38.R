@@ -25,6 +25,7 @@ snp.infor.match = left_join(snp.infor.update,
                             snp.infor.38,by="rs_id") %>% 
   mutate(position_GRCh37=position) 
 
+idx <- which(snp.infor.match$position_GRCh37!=snp.infor.match$position_GRCh38)
 
 snp.infor.match = snp.infor.match %>% 
   select(id,position,a0,a1,TYPE,AFR,AMR,EAS,EUR,SAS,ALL,CHR,rs_id,position_GRCh38,position_GRCh37)
