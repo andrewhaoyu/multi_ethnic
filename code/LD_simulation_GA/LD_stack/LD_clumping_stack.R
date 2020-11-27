@@ -84,7 +84,7 @@ for(r_ind in 1:length(r2_vec)){
     print(c(r_ind,w_ind))
     pthr = 0.5
     r2thr = r2_vec[r_ind]
-    kbpthr = wc_vec[wc_ind]
+    kbpthr = wc_vec[w_ind]
     eth <- c("EUR","AFR","AMR","EAS","SAS")
     out.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/LD_stack/"
     #code <- rep("c",5*3*3)
