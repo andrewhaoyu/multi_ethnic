@@ -18,7 +18,7 @@ ref_fam = fam[1:3000,]
 write.table(ref_fam,file = paste0(temp.dir,"/ref_fam.fam"),row.names=F,col.names=F,quote=F)
 
 
-temp.fam <- fread("/lscratch/3258129/test/ref_fam.fam")
+
 res = system(paste0("/data/zhangh24/software/plink2 --threads 2 --bfile ",cur.dir,eth[i],"/all_chr.tag --keep ",temp.dir,"/ref_fam.fam --out ",temp.dir,"/clump_ref_all_chr --make-bed"))
 if(res==2){
   stop()
