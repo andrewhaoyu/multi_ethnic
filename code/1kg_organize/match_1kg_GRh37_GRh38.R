@@ -18,4 +18,4 @@ snp.infor.new = snp.infor %>%
   mutate(chr.pos = paste0(CHR,":",position))
 snp.infor.update = left_join(snp.infor.new,vcf.infor,by="chr.pos")
 
-save(snp.infor.update,file = "/result/LD_simulation_new/snp.infor.update.rdata")
+save(snp.infor.update,file = "./result/LD_simulation_new/snp.infor.update.rdata")
