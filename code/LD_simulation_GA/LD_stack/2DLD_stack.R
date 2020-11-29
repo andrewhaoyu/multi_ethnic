@@ -31,9 +31,26 @@ summary.com <- left_join(summary,summary.eur.select,by="SNP")
 idx <- which(summary.com$peur<summary.com$P)
 summary.com.EUR <- summary.com[idx,]
 
-assoc = summary.com.EUR %>%
+#load 1kg snp list
+setwd("/data/zhangh24/multi_ethnic/")
+load("./result/LD_simulation_new/snp.infor.match37_38.rdata")
+snp.infor = snp.infor.match %>% 
+  rename(SNP=id) %>% 
+  select(SNP,rs_id)
+summary.com.EUR = left_join(summary.com.EUR,snp.infor,by="SNP")
+mega.list <- as.data.frame(fread(paste0(cur.dir,"mega-hm3-rsid.txt"),header  =F))
+#mega.infor <- as.data.frame(fread(paste0(cur.dir,"snpBatch_ILLUMINA_1062317")))
+#colnames(mega.infor)[5] <- "rsid"
+colnames(mega.list) = "rs_id"
+
+#subset SNPs to mega SNPs
+summary.match.EUR = inner_join(summary.com.EUR,mega.list,by="rs_id")
+assoc = summary.match.EUR %>%
   select(CHR,SNP,BP,A1,TEST,BETA,STAT,peur) %>% 
   rename(P=peur)
+
+
+
 write.table(assoc,paste0("/lscratch/",sid,"/test/",eth[1],"_assoc.out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1),col.names = T,row.names = F,quote=F)
 
 system(paste0("cp ",cur.dir,eth[1],"/clump_ref_all_chr.bed ",temp.dir,eth[1],"clump_ref_all_chr.bed"))
@@ -67,8 +84,13 @@ system(paste0("rm ",temp.dir,"*.fam"))
 
 idx <- which((summary.com$P<summary.com$peur)|is.na(summary.com$peur))
 summary.com.tar <- summary.com[idx,]
+summary.com.tar = left_join(summary.com.tar,snp.infor,by="SNP")
 
-assoc = summary.com.tar %>%
+#subset SNPs to mega SNPs
+summary.match.tar = inner_join(summary.com.tar,mega.list,by="rs_id")
+
+
+assoc = summary.match.tar %>%
   select(CHR,SNP,BP,A1,TEST,BETA,STAT,P) 
 #%>% 
 #rename(P=peur)
