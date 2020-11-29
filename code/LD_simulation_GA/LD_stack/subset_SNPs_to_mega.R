@@ -1,10 +1,7 @@
 #goal subset the SNPs data to mega list
 args = commandArgs(trailingOnly = T)
 i = as.numeric(args[[1]])
-l = as.numeric(args[[2]])
-m = as.numeric(args[[3]])
-i_rep = as.numeric(args[[4]])
-i1 = as.numeric(args[[5]])
+j = as.numeric(args[[2]])
 library(data.table)
 library(dplyr)
 
