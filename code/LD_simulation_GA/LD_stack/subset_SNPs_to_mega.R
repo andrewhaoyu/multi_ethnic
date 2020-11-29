@@ -19,6 +19,7 @@ if(i==1){
   MAF.cutoff = 0.01
 }
 library(rlang)
+setwd("/data/zhangh24/multi_ethnic/")
 load("./result/LD_simulation_new/snp.infor.match37_38.rdata")
 snp.infor = snp.infor.match %>% 
   filter(!!sym(eth[i])>=MAF.cutoff&
