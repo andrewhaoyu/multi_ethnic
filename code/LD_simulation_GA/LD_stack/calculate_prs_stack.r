@@ -33,7 +33,7 @@ print("step1 finished")
 #for(l in 1:3){
 r2_vec = c(0.01,0.05,0.1,0.2,0.5)
 wc_base_vec = c(50,100,200,500)
-    
+setwd("/data/zhangh24/multi_ethnic/")  
 for(m in 1:4){
   sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_GA/",eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))  
   for(r_ind in 1:length(r2_vec)){
@@ -41,7 +41,7 @@ for(m in 1:4){
     for(w_ind in 1:length(wc_vec)){
       print(c(r_ind,w_ind))
       
-  setwd("/data/zhangh24/multi_ethnic/")
+  
   
   LD <- as.data.frame(fread(paste0(out.dir,eth[i],"/LD_clump_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped")))
   clump.snp <- LD[,3,drop=F] 
