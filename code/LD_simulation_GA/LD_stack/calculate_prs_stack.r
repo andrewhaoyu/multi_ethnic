@@ -25,8 +25,10 @@ pthres <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01,0.
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
 out.dir <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/LD_stack/"
 sid <- Sys.getenv("SLURM_JOB_ID")
-dir.create(paste0('/lscratch/',sid,'/',eth[i],"/"),showWarnings = F)
-temp.dir <- paste0('/lscratch/',sid,'/',eth[i],"/")
+dir.create(paste0('/lscratch/',sid,'/test/'),showWarnings = FALSE)
+temp.dir = paste0('/lscratch/',sid,'/test/')
+dir.create(paste0('/lscratch/',sid,'/test/prs/'),showWarnings = FALSE)
+temp.dir.prs = paste0('/lscratch/',sid,'/test/prs/')
 system(paste0("cp ",cur.dir,eth[i],"/chr",j,".mega.* ",temp.dir,"."))
 system(paste0("ls ",temp.dir))
 print("step1 finished")
@@ -55,22 +57,25 @@ for(m in 1:4){
     prs.file <- prs.all %>% filter(P<=pthres[k]&CHR==j) %>% 
       select(SNP,A1,BETA)
     #setwd(temp.dir)
-    write.table(prs.file,file = paste0(temp.dir,"prs_chr_",j,"_pvalue_",k,"_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind),col.names = T,row.names = F,quote=F)
+    
     #}
     #for(j in 1:22){
     print("step2 finished")
     if(nrow(prs.file)>0){
-      res <- system(paste0("/data/zhangh24/software/plink2 --threads 2 --score ",temp.dir,"prs_chr_",j,"_pvalue_",k,"_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind," no-sum no-mean-imputation --bfile ",temp.dir,"chr",j,".mega --exclude /data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/duplicated.id  --out ",temp.dir,"prs_chr_",j,"_pvalue_",k,"_rho_",l,"_size_",m,"_chr_",j,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind))
+      write.table(prs.file,file = paste0(temp.dir.prs,"prs_chr_",j,"_pvalue_",k,"_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind),col.names = T,row.names = F,quote=F)
+      res <- system(paste0("/data/zhangh24/software/plink2 --threads 2 --score ",temp.dir,"prs_chr_",j,"_pvalue_",k,"_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind," no-sum no-mean-imputation --bfile ",temp.dir,"chr",j,".mega --exclude /data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/duplicated.id  --out ",temp.dir.prs,"prs_chr_",j,"_pvalue_",k,"_rho_",l,"_size_",m,"_chr_",j,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind))
       #system(paste0("/data/zhangh24/software/plink2 --score ",cur.dir,eth[i],"/prs/prs_file_pvalue_",k,"_rho_",l,"_size_",m,,"_rep_",i_rep," no-sum no-mean-imputation --bfile ",cur.dir,eth[i],"/all_chr.tag --exclude /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/duplicated.id  --out ",cur.dir,eth[i],"/prs/prs_",k,"_rho_",l,"_size_",m))
       if(res==2){
         stop()
       }
-      system(paste0("mv ",temp.dir,"prs_chr_",j,"_pvalue_",k,"_rho_",l,"_size_",m,"_chr_",j,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".profile ",out.dir,eth[i],"/prs/"))
+      system(paste0("mv ",temp.dir.prs,"prs_chr_",j,"_pvalue_",k,"_rho_",l,"_size_",m,"_chr_",j,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".profile ",out.dir,eth[i],"/prs/"))
+      system(paste0("rm -rf ",temp.dir.prs))
+      dir.create(paste0(temp.dir.prs),showWarnings = FALSE)
     }
     
     
   }
-  system(paste0("rm ",temp.dir,"prs_chr_*"))
+  
   
 }
   }
