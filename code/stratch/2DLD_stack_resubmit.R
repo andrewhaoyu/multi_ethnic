@@ -7,6 +7,8 @@ l = as.numeric(args[[2]])
 m = as.numeric(args[[3]])
 i_rep = as.numeric(args[[4]])
 i1 = as.numeric(args[[5]])
+r_ind = as.numeric(args[[6]])
+w_ind = as.numeric(args[[7]])
 library(data.table)
 library(dplyr)
 sid<-Sys.getenv('SLURM_JOB_ID')
@@ -61,9 +63,9 @@ system(paste0("cp ",cur.dir,eth[1],"/clump_ref_all_chr.fam ",temp.dir,eth[1],"cl
 setwd("/data/zhangh24/multi_ethnic/")
 r2_vec = c(0.01,0.05,0.1,0.2,0.5)
 wc_base_vec = c(50,100,200,500)
-for(r_ind in 1:length(r2_vec)){
-  wc_vec = wc_base_vec/r2_vec[r_ind]
-  for(w_ind in 1:length(wc_vec)){
+# for(r_ind in 1:length(r2_vec)){
+#   wc_vec = wc_base_vec/r2_vec[r_ind]
+#   for(w_ind in 1:length(wc_vec)){
     print(c(r_ind,w_ind))
     pthr = 0.5
     r2thr = r2_vec[r_ind]
@@ -77,8 +79,8 @@ for(r_ind in 1:length(r2_vec)){
       stop()
     }
     #system(paste0("mv ",temp.dir,"LD_clump_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped ",out.dir,eth[i],"/"))
-    }
-}
+#   }
+# }
 
 system(paste0("rm ",temp.dir,"*.bim"))
 system(paste0("rm ",temp.dir,"*.bed"))
@@ -102,9 +104,9 @@ system(paste0("cp ",cur.dir,eth[i],"/clump_ref_all_chr.bim ",temp.dir,eth[i],"cl
 system(paste0("cp ",cur.dir,eth[i],"/clump_ref_all_chr.fam ",temp.dir,eth[i],"clump_ref_all_chr.fam"))
 
 
-for(r_ind in 1:length(r2_vec)){
-  wc_vec = wc_base_vec/r2_vec[r_ind]
-  for(w_ind in 1:length(wc_vec)){
+# for(r_ind in 1:length(r2_vec)){
+#   wc_vec = wc_base_vec/r2_vec[r_ind]
+#   for(w_ind in 1:length(wc_vec)){
     print(c(r_ind,w_ind))
     pthr = 0.5
     r2thr = r2_vec[r_ind]
@@ -116,20 +118,20 @@ for(r_ind in 1:length(r2_vec)){
       stop()
     }
     
-     }
-}
+#   }
+# }
 
-for(r_ind in 1:length(r2_vec)){
-  wc_vec = wc_base_vec/r2_vec[r_ind]
-  for(w_ind in 1:length(wc_vec)){
+# for(r_ind in 1:length(r2_vec)){
+#   wc_vec = wc_base_vec/r2_vec[r_ind]
+#   for(w_ind in 1:length(wc_vec)){
     print(c(r_ind,w_ind))
-LD.EUR <- as.data.frame(fread(paste0(temp.dir,eth[1],"_LD_clump_two_dim_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped")))
-LD.tar <- as.data.frame(fread(paste0(temp.dir,eth[i],"_LD_clump_two_dim_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped")))
-
-LD <- rbind(LD.EUR,LD.tar)
-write.table(LD,file = paste0(out.dir,eth[i],"/LD_clump_two_way_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped"),row.names = F,quote=F)
-  }
-  }
+    LD.EUR <- as.data.frame(fread(paste0(temp.dir,eth[1],"_LD_clump_two_dim_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped")))
+    LD.tar <- as.data.frame(fread(paste0(temp.dir,eth[i],"_LD_clump_two_dim_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped")))
+    
+    LD <- rbind(LD.EUR,LD.tar)
+    write.table(LD,file = paste0(out.dir,eth[i],"/LD_clump_two_way_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped"),row.names = F,quote=F)
+#   }
+# }
 #LD.test <- as.data.frame(fread(paste0(out.dir,eth[i],"/LD_clump_two_dim_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".clumped")))
 # summary.com = summary.com %>% 
 #   mutate(p_update=pmin(P,peur,na.rm = T))
