@@ -5,9 +5,10 @@
 args = commandArgs(trailingOnly = T)
 i = as.numeric(args[[1]])
 l = as.numeric(args[[2]])
-#m = as.numeric(args[[3]])
+m = as.numeric(args[[3]])
+i_rep = as.numeric(args[[4]])
 #i_rep = 2
-i1 = as.numeric(args[[3]])
+i1 = as.numeric(args[[5]])
 
 library(dplyr)
 library(data.table)
@@ -15,7 +16,7 @@ eth <- c("EUR","AFR","AMR","EAS","SAS")
 pthres <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01,0.5)
 #n <- 120000
 
-for(m in 1:4){
+#for(m in 1:4){
 
   n.test <- 10000
   n.vad <- n.test
@@ -27,7 +28,7 @@ for(m in 1:4){
   setwd("/data/zhangh24/multi_ethnic/")
   out.dir <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/LD_stack/"
 
-  for(i_rep in 1:n.rep){
+  #for(i_rep in 1:n.rep){
     sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_GA/",eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))  
     r2_vec = c(0.01,0.05,0.1,0.2,0.5)
     wc_base_vec = c(50,100,200,500)
@@ -71,6 +72,6 @@ for(m in 1:4){
     }
   }
     }
-  }
-}
+  #}
+#}
 #write.csv(r2.mat,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/ld.clump.auc.csv")
