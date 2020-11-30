@@ -68,7 +68,11 @@ for(m in 1:4){
       if(res==2){
         stop()
       }
-      system(paste0("mv ",temp.dir.prs,"prs_chr_",j,"_pvalue_",k,"_rho_",l,"_size_",m,"_chr_",j,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".profile ",out.dir,eth[i],"/prs/"))
+      
+      res = system(paste0("mv ",temp.dir.prs,"prs_chr_",j,"_pvalue_",k,"_rho_",l,"_size_",m,"_chr_",j,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".profile ",out.dir,eth[i],"/prs/"))
+      if(res==2){
+        stop()
+      }
       system(paste0("rm -rf ",temp.dir.prs))
       dir.create(paste0(temp.dir.prs),showWarnings = FALSE)
     }
