@@ -1,33 +1,110 @@
-library(bigsnpr)
-setwd("/data/zhangh24/multi_ethnic/result")
-snp_readBed("tmp-data/public-data.bed")
-obj.bigSNP <- snp_attach("tmp-data/public-data.rds")
-str(obj.bigSNP, max.level = 2, strict.width = "cut")
-G   <- obj.bigSNP$genotypes
-CHR <- obj.bigSNP$map$chromosome
-POS <- obj.bigSNP$map$physical.pos
-y   <- obj.bigSNP$fam$affection - 1
-NCORES <- nb_cores()
-# Check some counts for the 10 first variants
-big_counts(G, ind.col = 1:10)
-
-sumstats <- bigreadr::fread2("tmp-data/public-data-sumstats.txt",
-                             select = c(1:6, 10))
-str(sumstats)
-
+#test pcakge
+install.packages("SuperLearner")
+install.packages(c("caret", "glmnet", "randomForest", "ggplot2", "RhpcBLASctl"))
+install.packages("xgboost", repos=c("http://dmlc.ml/drat/", getOption("repos")), type="source")
+data(Boston, package = "MASS")
+library(ranger)
+colSums(is.na(Boston))
+outcome = Boston$medv
+data = subset(Boston, select = -medv)
+str(data)
+dim(data)
 set.seed(1)
-ind.train <- sample(nrow(G), 400)
-ind.test <- setdiff(rows_along(G), ind.train)
+train_obs = sample(nrow(data), 150)
+x_train = data[train_obs, ]
+x_holdout = data[-train_obs, ]
+outcome_bin = as.numeric(outcome > 22)
+y_train = outcome_bin[train_obs]
+y_holdout = outcome_bin[-train_obs]
+table(y_train, useNA = "ifany")
+library(SuperLearner)
+listWrappers()
+sl_lasso = SuperLearner(Y = y_train, X = x_train, family = binomial(),
+                        SL.library = "SL.glmnet")
+sl_lasso
+sl_lasso$cvRisk[which.min(sl_lasso$cvRisk)]
+sl_rf = SuperLearner(Y = y_train, X = x_train, family = binomial(),
+                     SL.library = "SL.ranger")
+sl = SuperLearner(Y = y_train, X = x_train, family = binomial(),
+                  SL.library = c("SL.mean", "SL.glmnet", "SL.ranger"))
+pred = predict(sl, x_holdout, onlySL = TRUE)
+set.seed(1)
 
-names(sumstats) <- c("chr", "rsid", "pos", "a0", "a1", "beta", "p")
-map <- obj.bigSNP$map[,-(2:3)]
-names(map) <- c("chr", "pos", "a0", "a1")
-info_snp <- snp_match(sumstats, map)
+# Don't have timing info for the CV.SuperLearner unfortunately.
+# So we need to time it manually.
 
-beta <- info_snp$beta
-lpval <- -log10(info_snp$p)
+system.time({
+  # This will take about 2x as long as the previous SuperLearner.
+  cv_sl = CV.SuperLearner(Y = y_train, X = x_train, family = binomial(),
+                          # For a real analysis we would use V = 10.
+                          V = 3,
+                          SL.library = c("SL.mean", "SL.glmnet", "SL.ranger"))
+})
+summary(cv_sl)
 
-NCORES = 2
-all_keep <- snp_grid_clumping(G, CHR, POS, ind.row = ind.train,
-                              lpS = lpval)
-attr(all_keep, "grid")
+
+
+
+
+
+
+
+
+
+
+#install.packages("rJava")
+#install.packages("bartMachine")
+#install.packages("KernelKnn")
+#library(rJava)
+library(kernlab)
+library(KernelKnn)
+#library(bartMachine)
+data(Boston, package = "MASS")
+set.seed(1)
+sl_lib = c("SL.xgboost", 
+           "SL.randomForest", 
+           "SL.glmnet", 
+           "SL.nnet", 
+           "SL.ksvm",
+          "SL.kernelKnn",
+          "SL.rpartPrune",
+          "SL.lm", 
+          "SL.mean")
+
+# Fit XGBoost, RF, Lasso, Neural Net, SVM, BART, K-nearest neighbors, Decision Tree, 
+# OLS, and simple mean; create automatic ensemble.
+#result = SuperLearner(Y = Boston$medv, X = Boston[, -14], SL.library = sl_lib)
+
+train_obs = sample(nrow(data), 150)
+x_train = data[train_obs, ]
+x_holdout = data[-train_obs, ]
+outcome_bin = outcome
+y_train = outcome_bin[train_obs]
+y_holdout = outcome_bin[-train_obs]
+table(y_train, useNA = "ifany")
+library(SuperLearner)
+listWrappers()
+sl_lasso = SuperLearner(Y = y_train, X = x_train, family = gaussian(),
+                        SL.library = sl_lib)
+sl_lasso
+sl_lasso$cvRisk[which.min(sl_lasso$cvRisk)]
+sl_rf = SuperLearner(Y = y_train, X = x_train, family = gaussian(),
+                     SL.library = "SL.ranger")
+sl = SuperLearner(Y = y_train, X = x_train, family = gaussian(),
+                  SL.library = c("SL.glmnet", "SL.ranger"))
+
+pred = predict(sl, x_holdout, onlySL = TRUE)
+set.seed(1)
+model1 <- lm(y_holdout~pred$pred)
+summary(model1)
+# Don't have timing info for the CV.SuperLearner unfortunately.
+# So we need to time it manually.
+
+system.time({
+  # This will take about 2x as long as the previous SuperLearner.
+  cv_sl = CV.SuperLearner(Y = y_train, X = x_train, family = binomial(),
+                          # For a real analysis we would use V = 10.
+                          V = 3,
+                          SL.library = c("SL.mean", "SL.glmnet", "SL.ranger"))
+})
+summary(cv_sl)
