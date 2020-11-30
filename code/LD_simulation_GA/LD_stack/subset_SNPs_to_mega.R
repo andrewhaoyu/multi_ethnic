@@ -37,7 +37,11 @@ snp.infor.subset = inner_join(snp.infor,mega.list,by="rs_id") %>%
   select(SNP)
 write.table(snp.infor.subset,file = paste0(temp.dir,"extract_snp_list.txt"),row.names = F,col.names = F,quote=F)
 
-res = system(paste0("/data/zhangh24/software/plink2 --bfile ",temp.dir,eth[i],"chr",j,".tag --extract ",temp.dir,"extract_snp_list.txt --out ",temp.dir,"chr",j,".mega --make-bed"))
+
+all.fam <- as.data.frame(fread(paste0(temp.dir,eth[i],"chr",j,".tag.fam")))
+sub.fam <- all.fam[100001:120000,]
+write.table(sub.fam,file = paste0(temp.dir,"sub_fam.txt"),row.names = F,col.names = F,quote=F)
+res = system(paste0("/data/zhangh24/software/plink2 --bfile ",temp.dir,eth[i],"chr",j,".tag --extract ",temp.dir,"extract_snp_list.txt --out ",temp.dir,"chr",j,".mega --make-bed --keep ",temp.dir,"sub_fam.txt"))
 
 if(res==2){
   stop()
