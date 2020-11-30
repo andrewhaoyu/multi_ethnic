@@ -57,10 +57,10 @@ for(m in 1:1){
       if(nrow(prs.all)>0){
             
             
-            filename <- paste0(out.dir,eth[i],"/prs/prs_",j,"_pvalue_",k,"_rho_",l,"_size_",m,"_chr_",j,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".profile")
+            filename <- paste0(out.dir,eth[i],"/prs/prs_pvalue_",k,"_rho_",l,"_size_",m,"_chr_",j,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".profile")
             
             prs.temp <- fread(filename)  
-            prs.score <- prs.temp$SCORE*2*length(idx)+prs.score
+            #prs.score <- prs.temp$SCORE*2*length(idx)+prs.score
           }
         }
         #prs.score.mat[,k] = prs.score
