@@ -5,10 +5,10 @@
 args = commandArgs(trailingOnly = T)
 i = as.numeric(args[[1]])
 l = as.numeric(args[[2]])
-m = as.numeric(args[[3]])
-i_rep = as.numeric(args[[4]])
+#m = as.numeric(args[[3]])
+i_rep = as.numeric(args[[3]])
 #i_rep = 2
-i1 = as.numeric(args[[5]])
+i1 = as.numeric(args[[4]])
 
 library(dplyr)
 library(data.table)
@@ -16,7 +16,7 @@ eth <- c("EUR","AFR","AMR","EAS","SAS")
 pthres <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01,0.5)
 #n <- 120000
 
-#for(m in 1:4){
+for(m in 1:4){
 
   n.test <- 10000
   n.vad <- n.test
@@ -60,7 +60,7 @@ pthres <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01,0.
           if(length(idx)>0){
             
             
-            filename <- paste0(out.dir,eth[i],"/prs/prs_chr_",j,"_pvalue_",k,"_rho_",l,"_size_",m,"_chr_",j,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".profile")
+            filename <- paste0(out.dir,eth[i],"/prs/prs_chr_",j,"_rho_",l,"_size_",m,"_chr_",j,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".p_value_",k,".profile")
             
             prs.temp <- fread(filename)  
             prs.score <- prs.temp$SCORE*2*length(idx)+prs.score
@@ -72,6 +72,6 @@ pthres <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01,0.
     }
   }
     }
-  #}
+  }
 #}
 #write.csv(r2.mat,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/ld.clump.auc.csv")
