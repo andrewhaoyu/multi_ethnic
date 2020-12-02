@@ -111,6 +111,22 @@ pthres <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01,0.
      
 }
   }
+  result.data <- data.frame(r2.vec.test,r2.vec.vad,
+                            pthres_vec1,pthres_vec2,
+                            r2_ind_vec,
+                            wc_ind_vec)
+  #standard C+T
+  result.data.CT = result.data %>% 
+    filter(r2_ind_vec==3&wc_ind_vec==1)
+  idx <- which.max(result.data.CT$r2.vec.test)
+  r2.max.ct <- result.data.CT$r2.vec.vad[idx]
+  idx <- which.max(r2.vec.test)
+  r2.max <- r2.vec.vad[idx]
+  r2.list.temp <- list(
+                  r2.max,
+                  r2.max.ct,
+                  result.data[idx,])
+  save(r2.list.temp,file = paste0(out.dir,eth[i],"/r2.list_rho_two_way_temp",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
   prs.sum = colSums(prs.mat)
   idx <- which(prs.sum!=0)
   #drop the prs with all 0
@@ -127,6 +143,7 @@ pthres <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01,0.
   library(ranger)
   x.test = as.data.frame(prs.mat.new[1:n.test,])
   x.vad= as.data.frame(prs.mat.new[(1+n.test):(n.test+n.vad),])
+  
   SL.libray <- c(
     #"SL.xgboost"
     #"SL.randomForest"
