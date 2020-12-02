@@ -71,13 +71,13 @@ for(m in 1:1){
             if(length(idx)>0){
               
               
-              filename <- paste0(out.dir,eth[i],"/prs/prs_chr_",j,"_rho_",l,"_size_",m,"_chr_",j,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".p_value_",k,".profile")
+              filename <- paste0(out.dir,eth[i],"/prs/prs_two_way_rho_",l,"_size_",m,"_chr_",j,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1,".p_value_",k2,".profile")
               
               prs.temp <- fread(filename)  
               prs.score <- prs.temp$SCORE*2*length(idx)+prs.score
             }
           }
-          write.table(prs.score,file = paste0(out.dir,eth[i],"/prs/prs_pvalue_",k,"_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1,"p_value,",k2,".profile"),row.names = F,col.names = F,quote=F)
+          write.table(prs.score,file = paste0(out.dir,eth[i],"/prs/prs_two_way_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1,"p_value,",k2,".profile"),row.names = F,col.names = F,quote=F)
         }
         }
       }

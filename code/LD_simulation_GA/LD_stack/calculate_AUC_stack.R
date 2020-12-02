@@ -120,7 +120,8 @@ n.train.vec <- c(15000,45000,80000,100000)
     library(ranger)
     x.test = as.data.frame(prs.mat[1:n.test,])
     x.vad= as.data.frame(prs.mat[(1+n.test):(n.test+n.vad),])
-    SL.libray <- c(#"SL.xgboost", 
+    SL.libray <- c(
+                  #"SL.xgboost"
                    #"SL.randomForest"
                   "SL.glmnet",
                   "SL.ridge",
