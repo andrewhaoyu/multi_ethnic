@@ -44,7 +44,7 @@ summary.eur <- as.data.frame(fread(paste0("./result/LD_simulation_GA/",eth[1],"/
 colnames(summary.eur)[9] = "peur"
 colnames(summary.eur)[7] = "beta_eur"
 summary.eur.select = summary.eur %>% 
-  mutate(sd_eur=beta_eur/STAT)
+  mutate(sd_eur=beta_eur/STAT) %>% 
   select(SNP,A1,beta_eur,sd_eur,peur) %>% 
   rename(A1.EUR = A1)
 r2_vec = c(0.01,0.05,0.1,0.2,0.5)
