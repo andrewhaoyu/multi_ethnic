@@ -3,12 +3,13 @@ for(i1 in 1:2){
   eth <- c("EUR","AFR","AMR","EAS","SAS")
   pthres <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01,0.5)
   
-  total <- 4*3*4
-  out.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
+  total <- 4*3*1*3
+  out.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/LD_stack/"
   eth.vec <- rep(0,total)
   r2.vec <- rep(0,total)
   l_vec <- rep(0,total)
   m_vec <- rep(0,total)
+  method_vec <- rep("c",total)
   n.rep = 3
   #r2.mat <- matrix(0,length(pthres),total)
   temp = 1
@@ -17,7 +18,8 @@ for(i1 in 1:2){
       for(m in 1:4){
         r2.temp <- rep(0,n.rep)
         for(i_rep in 1:n.rep){
-          load(paste0(out.dir,eth[i],"/r2.list_two_way_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
+          load(paste0(out.dir,eth[i],"/r2.list_rho_two_way_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
+          #load("/gpfs/gsfs11/users/zhangh24/multi_ethnic/result/LD_simulation_GA/LD_stack/AFR/r2.list_rho_two_way_1_size_1_rep_1_GA_1")
           r2.temp[i_rep] = r2.list[[1]]
         }
         eth.vec[temp] = eth[i]
