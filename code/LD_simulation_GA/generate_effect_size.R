@@ -163,6 +163,12 @@ print(herit)
 
 
 
+
+
+
+
+
+#all SNPs causal, genetic correlation 0.8
 i1 = 2
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
 for(l in 1:3){
@@ -233,4 +239,353 @@ for(l in 1:3){
   
 }
 
+
+
+
+
+
+
+
+
+#genetic correlation 0.6, all SNPs causal
+i1 = 3
+cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
+for(l in 1:3){
+  eth <- c("EUR","AFR","AMR","EAS","SAS")
+  cau.snp.infor <- cau.snp.infor.list[[l]]
+  library(data.table)
+  #generate the effect-size for all the SNPs
+  #even if the SNPs have 0 MAF in a particular population the effectsize will aslo be generated
+  #it's okay since only the extracted genotype are those only existing in a particular population
+  
+  #get the number of causal SNPs in EUR
+  
+  n.total.snp <- nrow(cau.snp.infor)
+  
+  
+  sigma = 0.4
+  gr12 = 0.6
+  gr13 = 0.6
+  gr14 = 0.6
+  gr15 = 0.6
+  gr23 = 0.6
+  gr24 = 0.6
+  gr25 = 0.6
+  gr34 = 0.6
+  gr35 = 0.6
+  gr45 = 0.6
+  n = as.numeric(n.total.snp)
+  n1 = n
+  n2 = n
+  n3 = n
+  n4 = n
+  n5 = n
+  Sigma <- GenSigma(sigma,n1,n2,n3,n4,n5,
+                    gr12,gr13,gr14,gr15,
+                    gr23,gr24,gr25,
+                    gr34,gr35,
+                    gr45)
+  save(Sigma,file = paste0(cur.dir,"/causal_Sigma_",i1,".rdata"))
+  library(mvtnorm)
+  #beta represent standarize scale effect-size
+  set.seed(666)
+  beta =  rmvnorm(n.total.snp,c(0,0,0,0,0),
+                  sigma=Sigma)
+  colnames(beta) <- paste0("beta_",c("EUR","AFR","AMR","EAS","SAS"))
+  #since this is the effect-size under standardized scale
+  #to use GCTA, we need the original scale effect size
+  EUR.bi <- cau.snp.infor$EUR>=0.01&
+    cau.snp.infor$EUR<=0.99
+  AFR.bi <-  cau.snp.infor$AFR>=0.01&
+    cau.snp.infor$AFR<=0.99
+  AMR.bi <-  cau.snp.infor$AMR>=0.01&
+    cau.snp.infor$AMR<=0.99
+  EAS.bi <-  cau.snp.infor$EAS>=0.01&
+    cau.snp.infor$EAS<=0.99
+  SAS.bi <-  cau.snp.infor$SAS>=0.01&
+    cau.snp.infor$SAS<=0.99
+  eth.bi <- cbind(EUR.bi,AFR.bi,AMR.bi,EAS.bi,SAS.bi)
+  library(dplyr)
+  MAF <- cau.snp.infor %>% select(EUR,AFR,AMR,EAS,SAS)
+  MAF <- as.data.frame(MAF)
+  for(i in 1:5){
+    idx <- which(eth.bi[,i]==1)
+    #beta.ori <- beta[idx,i]/sqrt(2*MAF[idx,i]*(1-MAF[idx,i]))
+    select.cau <- cbind(cau.snp.infor[idx,1],
+                        beta[idx,i])
+    write.table(select.cau,file = paste0(cur.dir,eth[i],"/select.cau_rho",l,"_",i1),row.names = F,col.names = F,quote=F)
+  }
+  
+}
+
+
+
+
+
+
+
+
+#all SNPs causal, genetic correlation 0.8, alpha = 0
+i1 = 4
+cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
+for(l in 1:3){
+  eth <- c("EUR","AFR","AMR","EAS","SAS")
+  cau.snp.infor <- cau.snp.infor.list[[l]]
+  library(data.table)
+  #generate the effect-size for all the SNPs
+  #even if the SNPs have 0 MAF in a particular population the effectsize will aslo be generated
+  #it's okay since only the extracted genotype are those only existing in a particular population
+  
+  #get the number of causal SNPs in EUR
+  
+  n.total.snp <- nrow(cau.snp.infor)
+  
+  
+  sigma = 0.4
+  gr12 = 0.8
+  gr13 = 0.8
+  gr14 = 0.8
+  gr15 = 0.8
+  gr23 = 0.8
+  gr24 = 0.8
+  gr25 = 0.8
+  gr34 = 0.8
+  gr35 = 0.8
+  gr45 = 0.8
+  n = as.numeric(n.total.snp)
+  n1 = n
+  n2 = n
+  n3 = n
+  n4 = n
+  n5 = n
+  Sigma <- GenSigma(sigma,n1,n2,n3,n4,n5,
+                    gr12,gr13,gr14,gr15,
+                    gr23,gr24,gr25,
+                    gr34,gr35,
+                    gr45)
+  save(Sigma,file = paste0(cur.dir,"/causal_Sigma_",i1,".rdata"))
+  library(mvtnorm)
+  #gamma represent generate scale
+  #u represent standarized scale effect-size
+  #GCTA needs u
+  set.seed(666)
+  gamma =  rmvnorm(n.total.snp,c(0,0,0,0,0),
+                  sigma=Sigma)
+  colnames(gamma) <- paste0("gamma_",c("EUR","AFR","AMR","EAS","SAS"))
+  #since this is the effect-size under standardized scale
+  #to use GCTA, we need the original scale effect size
+  EUR.bi <- cau.snp.infor$EUR>=0.01&
+    cau.snp.infor$EUR<=0.99
+  AFR.bi <-  cau.snp.infor$AFR>=0.01&
+    cau.snp.infor$AFR<=0.99
+  AMR.bi <-  cau.snp.infor$AMR>=0.01&
+    cau.snp.infor$AMR<=0.99
+  EAS.bi <-  cau.snp.infor$EAS>=0.01&
+    cau.snp.infor$EAS<=0.99
+  SAS.bi <-  cau.snp.infor$SAS>=0.01&
+    cau.snp.infor$SAS<=0.99
+  eth.bi <- cbind(EUR.bi,AFR.bi,AMR.bi,EAS.bi,SAS.bi)
+  library(dplyr)
+  MAF <- cau.snp.infor %>% select(EUR,AFR,AMR,EAS,SAS)
+  MAF <- as.data.frame(MAF)
+  for(i in 1:5){
+    idx <- which(eth.bi[,i]==1)
+    
+    u = gamma[,i]*sqrt(2*MAF[,i]*(1-MAF[,i]))    
+    #scale factor for heritability
+    total.heritabillity = sum(u^2)
+    
+    u = u*sqrt(0.4/total.heritabillity)
+    
+    #beta.ori <- beta[idx,i]/sqrt(2*MAF[idx,i]*(1-MAF[idx,i]))
+    #scale beta back to standarized scale
+    # u =  beta_scale[idx]*sqrt(2*MAF[idx,i]*(1-MAF[idx,i]))
+        
+    
+    select.cau <- cbind(cau.snp.infor[idx,1],
+                        u[idx])
+    write.table(select.cau,file = paste0(cur.dir,eth[i],"/select.cau_rho",l,"_",i1),row.names = F,col.names = F,quote=F)
+  }
+  
+}
+
+
+#all SNPs causal, genetic correlation 0.8, alpha = -0.25
+i1 = 5
+cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
+for(l in 1:3){
+  eth <- c("EUR","AFR","AMR","EAS","SAS")
+  cau.snp.infor <- cau.snp.infor.list[[l]]
+  library(data.table)
+  #generate the effect-size for all the SNPs
+  #even if the SNPs have 0 MAF in a particular population the effectsize will aslo be generated
+  #it's okay since only the extracted genotype are those only existing in a particular population
+  
+  #get the number of causal SNPs in EUR
+  
+  n.total.snp <- nrow(cau.snp.infor)
+  
+  
+  sigma = 0.4
+  gr12 = 0.8
+  gr13 = 0.8
+  gr14 = 0.8
+  gr15 = 0.8
+  gr23 = 0.8
+  gr24 = 0.8
+  gr25 = 0.8
+  gr34 = 0.8
+  gr35 = 0.8
+  gr45 = 0.8
+  n = as.numeric(n.total.snp)
+  n1 = n
+  n2 = n
+  n3 = n
+  n4 = n
+  n5 = n
+  Sigma <- GenSigma(sigma,n1,n2,n3,n4,n5,
+                    gr12,gr13,gr14,gr15,
+                    gr23,gr24,gr25,
+                    gr34,gr35,
+                    gr45)
+  save(Sigma,file = paste0(cur.dir,"/causal_Sigma_",i1,".rdata"))
+  library(mvtnorm)
+  #beta represent effect under alpha = -0.25 scale
+  #u represent standarized scale effect-size
+  #GCTA needs u
+  set.seed(666)
+  gamma =  rmvnorm(n.total.snp,c(0,0,0,0,0),
+                  sigma=Sigma)
+  colnames(gamma) <- paste0("gamma_",c("EUR","AFR","AMR","EAS","SAS"))
+  #since this is the effect-size under standardized scale
+  #to use GCTA, we need the original scale effect size
+  EUR.bi <- cau.snp.infor$EUR>=0.01&
+    cau.snp.infor$EUR<=0.99
+  AFR.bi <-  cau.snp.infor$AFR>=0.01&
+    cau.snp.infor$AFR<=0.99
+  AMR.bi <-  cau.snp.infor$AMR>=0.01&
+    cau.snp.infor$AMR<=0.99
+  EAS.bi <-  cau.snp.infor$EAS>=0.01&
+    cau.snp.infor$EAS<=0.99
+  SAS.bi <-  cau.snp.infor$SAS>=0.01&
+    cau.snp.infor$SAS<=0.99
+  eth.bi <- cbind(EUR.bi,AFR.bi,AMR.bi,EAS.bi,SAS.bi)
+  library(dplyr)
+  MAF <- cau.snp.infor %>% select(EUR,AFR,AMR,EAS,SAS)
+  MAF <- as.data.frame(MAF)
+  for(i in 1:5){
+    idx <- which(eth.bi[,i]==1)
+    
+    #scale factor for heritability
+    u = gamma[,i]*(2*MAF[,i]*(1-MAF[,i]))^0.375
+    #scale factor for heritability
+    total.heritabillity = sum(u^2)
+    
+    u = u*sqrt(0.4/total.heritabillity)
+    
+    #beta.ori <- beta[idx,i]/sqrt(2*MAF[idx,i]*(1-MAF[idx,i]))
+    #scale beta back to standarized scale
+    # u =  beta_scale[idx]*sqrt(2*MAF[idx,i]*(1-MAF[idx,i]))
+    
+    
+    select.cau <- cbind(cau.snp.infor[idx,1],
+                        u[idx])
+    
+    write.table(select.cau,file = paste0(cur.dir,eth[i],"/select.cau_rho",l,"_",i1),row.names = F,col.names = F,quote=F)
+  }
+  
+}
+
+
+
+
+
+
+
+
+
+
+
+#all SNPs causal, genetic correlation 0.8, alpha = -0.25
+i1 = 5
+cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
+for(l in 1:3){
+  eth <- c("EUR","AFR","AMR","EAS","SAS")
+  cau.snp.infor <- cau.snp.infor.list[[l]]
+  library(data.table)
+  #generate the effect-size for all the SNPs
+  #even if the SNPs have 0 MAF in a particular population the effectsize will aslo be generated
+  #it's okay since only the extracted genotype are those only existing in a particular population
+  
+  #get the number of causal SNPs in EUR
+  
+  n.total.snp <- nrow(cau.snp.infor)
+  
+  
+  sigma = 0.4
+  gr12 = 0.8
+  gr13 = 0.8
+  gr14 = 0.8
+  gr15 = 0.8
+  gr23 = 0.8
+  gr24 = 0.8
+  gr25 = 0.8
+  gr34 = 0.8
+  gr35 = 0.8
+  gr45 = 0.8
+  n = as.numeric(n.total.snp)
+  n1 = n
+  n2 = n
+  n3 = n
+  n4 = n
+  n5 = n
+  Sigma <- GenSigma(sigma,n1,n2,n3,n4,n5,
+                    gr12,gr13,gr14,gr15,
+                    gr23,gr24,gr25,
+                    gr34,gr35,
+                    gr45)
+  save(Sigma,file = paste0(cur.dir,"/causal_Sigma_",i1,".rdata"))
+  library(mvtnorm)
+  #gamma represent original scale effect-size
+  #u represent standarized scale effect-size
+  #GCTA needs u
+  set.seed(666)
+  gamma =  rmvnorm(n.total.snp,c(0,0,0,0,0),
+                  sigma=Sigma)
+  colnames(gamma) <- paste0("gamma_",c("EUR","AFR","AMR","EAS","SAS"))
+  #since this is the effect-size under standardized scale
+  #to use GCTA, we need the original scale effect size
+  EUR.bi <- cau.snp.infor$EUR>=0.01&
+    cau.snp.infor$EUR<=0.99
+  AFR.bi <-  cau.snp.infor$AFR>=0.01&
+    cau.snp.infor$AFR<=0.99
+  AMR.bi <-  cau.snp.infor$AMR>=0.01&
+    cau.snp.infor$AMR<=0.99
+  EAS.bi <-  cau.snp.infor$EAS>=0.01&
+    cau.snp.infor$EAS<=0.99
+  SAS.bi <-  cau.snp.infor$SAS>=0.01&
+    cau.snp.infor$SAS<=0.99
+  eth.bi <- cbind(EUR.bi,AFR.bi,AMR.bi,EAS.bi,SAS.bi)
+  library(dplyr)
+  MAF <- cau.snp.infor %>% select(EUR,AFR,AMR,EAS,SAS)
+  MAF <- as.data.frame(MAF)
+  for(i in 1:5){
+    idx <- which(eth.bi[,i]==1)
+    #beta.ori <- beta[idx,i]/sqrt(2*MAF[idx,i]*(1-MAF[idx,i]))
+    #scale beta back to standarized scale
+    beta = gamma*(MAF[,i]*(1-MAF[,i]))^(-0.125)
+    #scale factor for heritability
+    total.heritabillity = sum(beta[,i]^2*2*MAF[,i]*(1-MAF[,i]))
+    
+    beta_scale = beta[,i]*sqrt(0.4/total.heritabillity)
+    
+    u =  beta[idx,i]/sqrt(2*MAF[idx,i]*(1-MAF[idx,i]))
+    
+    
+    select.cau <- cbind(cau.snp.infor[idx,1],
+                        u)
+    write.table(select.cau,file = paste0(cur.dir,eth[i],"/select.cau_rho",l,"_",i1),row.names = F,col.names = F,quote=F)
+  }
+  
+}
 
