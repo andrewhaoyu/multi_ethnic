@@ -23,11 +23,11 @@ out.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
 sid<-Sys.getenv('SLURM_JOB_ID')
 dir.create(paste0('/lscratch/',sid,'/test'),showWarnings = FALSE)
 eth <- c("EUR","AFR","AMR","EAS","SAS")
-system(paste0("cp ", cur.dir,eth[i],"/chr",j,".tag.bed /lscratch/",sid,"/test/",eth[i],"_chr",j,".tag.bed"))
-system(paste0("cp ", cur.dir,eth[i],"/chr",j,".tag.bim /lscratch/",sid,"/test/",eth[i],"_chr",j,".tag.bim"))
-system(paste0("cp ", cur.dir,eth[i],"/chr",j,".tag.fam /lscratch/",sid,"/test/",eth[i],"_chr",j,".tag.fam"))
+system(paste0("cp ", cur.dir,eth[i],"/chr",j,"train.mega.bed /lscratch/",sid,"/test/",eth[i],"_chr",j,".train.mega.bed"))
+system(paste0("cp ", cur.dir,eth[i],"/chr",j,"train.mega.bim /lscratch/",sid,"/test/",eth[i],"_chr",j,".train.mega.bim"))
+system(paste0("cp ", cur.dir,eth[i],"/chr",j,"train.mega.fam /lscratch/",sid,"/test/",eth[i],"_chr",j,".train.mega.fam"))
 
-res <- system(paste0("/data/zhangh24/software/plink2 --threads 2 --bfile /lscratch/",sid,"/test/",eth[i],"_chr",j,".tag --out ",out.dir,eth[i],"/summary_chr_",j,"_rho_",l,"_rep_",i_rep,"_GA_",i1,".out --linear --all-pheno --allow-no-sex --pheno ",out.dir,eth[i],"/pheno_plink_rho_",l,"_rep_",i_rep,"_GA_",i1))
+res <- system(paste0("/data/zhangh24/software/plink2 --threads 2 --bfile /lscratch/",sid,"/test/",eth[i],"_chr",j,".train.mega --out ",out.dir,eth[i],"/summary_chr_",j,"_rho_",l,"_rep_",i_rep,"_GA_",i1,".out --linear --all-pheno --allow-no-sex --pheno ",out.dir,eth[i],"/pheno_plink_rho_",l,"_rep_",i_rep,"_GA_",i1))
 if(res==2){
   stop()
 }
