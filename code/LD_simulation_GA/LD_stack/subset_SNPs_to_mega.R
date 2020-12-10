@@ -39,14 +39,14 @@ write.table(snp.infor.subset,file = paste0(temp.dir,"extract_snp_list.txt"),row.
 
 
 all.fam <- as.data.frame(fread(paste0(temp.dir,eth[i],"chr",j,".tag.fam")))
-sub.fam <- all.fam[100001:120000,]
+sub.fam <- all.fam[1:100000,]
 write.table(sub.fam,file = paste0(temp.dir,"sub_fam.txt"),row.names = F,col.names = F,quote=F)
-res = system(paste0("/data/zhangh24/software/plink2 --bfile ",temp.dir,eth[i],"chr",j,".tag --extract ",temp.dir,"extract_snp_list.txt --out ",temp.dir,"chr",j,".mega --make-bed --keep ",temp.dir,"sub_fam.txt"))
+res = system(paste0("/data/zhangh24/software/plink2 --bfile ",temp.dir,eth[i],"chr",j,".tag --extract ",temp.dir,"extract_snp_list.txt --out ",temp.dir,"chr",j,"train.mega --make-bed --keep ",temp.dir,"sub_fam.txt"))
 
 if(res==2){
   stop()
 }
 
-system(paste0("mv ",temp.dir,"/chr",j,".mega.bed ",cur.dir,eth[i],"/chr",j,".mega.bed"))
-system(paste0("mv ",temp.dir,"/chr",j,".mega.bim ",cur.dir,eth[i],"/chr",j,".mega.bim"))
-system(paste0("mv ",temp.dir,"/chr",j,".mega.fam ",cur.dir,eth[i],"/chr",j,".mega.fam"))
+system(paste0("mv ",temp.dir,"/chr",j,"train.mega.bed ",cur.dir,eth[i],"/chr",j,"train.mega.bed"))
+system(paste0("mv ",temp.dir,"/chr",j,"train.mega.bim ",cur.dir,eth[i],"/chr",j,"train.mega.bim"))
+system(paste0("mv ",temp.dir,"/chr",j,"train.mega.fam ",cur.dir,eth[i],"/chr",j,"train.mega.fam"))
