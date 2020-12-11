@@ -3,7 +3,7 @@
 args = commandArgs(trailingOnly = T)
 i1 = as.numeric(args[[1]])
 i = as.numeric(args[[2]])
-l = as.numeric(args[[3]])
+
 
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
 
@@ -16,7 +16,7 @@ code <- c("c",3*5*3*10*4)
 temp = 1
 # for(i1 in 3:5){
 #   for(i in 1:5){
-#     for(l in 1:3){
+     for(l in 1:3){
       for(i_rep in 1:10){
         for(m in 1:4){
           
@@ -33,7 +33,7 @@ temp = 1
           #temp <- temp+1
         }
       }
-  #   }  
+     }  
   # }
   # }
 
