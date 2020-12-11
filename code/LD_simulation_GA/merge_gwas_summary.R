@@ -26,8 +26,11 @@ temp = 1
           }
           temp.code <- paste0(temp.code," >> ",cur.dir,eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)
           print(i_rep)
-          code[temp] <- system(paste0(temp.code))
-          temp <- temp+1
+          res = system(paste0(temp.code))
+          if(res==2){
+            stop()
+          }
+          #temp <- temp+1
         }
       }
   #   }  
