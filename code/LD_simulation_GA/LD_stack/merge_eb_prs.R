@@ -9,6 +9,7 @@ l = as.numeric(args[[2]])
 i_rep = as.numeric(args[[3]])
 #i_rep = 2
 i1 = as.numeric(args[[4]])
+r_ind = as.numeric(args[[5]])
 
 library(dplyr)
 library(data.table)
@@ -41,7 +42,7 @@ for(m in 1:1){
   
   r2_vec = c(0.01,0.05,0.1,0.2,0.5)
   wc_base_vec = c(50,100,200,500)
-  for(r_ind in 1:length(r2_vec)){
+  #for(r_ind in 1:length(r2_vec)){
     wc_vec = wc_base_vec/r2_vec[r_ind]
     for(w_ind in 1:length(wc_vec)){
       print(c(r_ind,w_ind))
@@ -83,6 +84,6 @@ for(m in 1:1){
       }
     }
   }
-}
+#}
 #}
 #write.csv(r2.mat,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/ld.clump.auc.csv")

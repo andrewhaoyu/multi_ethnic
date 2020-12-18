@@ -108,6 +108,7 @@ PostBeta <- function(beta,Sigma,Sigma0,MAF.train,
 }
 
 
+
 for(m_i in 1:nrow(summary.com.match)){
   #if(m_i%%1000)print(m_i)
   Sigma = diag(c(var_st[m_i],
@@ -129,6 +130,12 @@ for(m_i in 1:nrow(summary.com.match)){
 
 summary.com.match$BETA = post_beta_tar
 summary.com  = summary.com.match
+
+#remove duplicated snp
+idx <- which(duplicated(summary.com$SNP))
+if(length(idx)!=0){
+  summary.com = summary.com[-idx,]
+}
 for(r_ind in 1:length(r2_vec)){
   wc_vec = wc_base_vec/r2_vec[r_ind]
   for(w_ind in 1:length(wc_vec)){
@@ -141,6 +148,7 @@ for(r_ind in 1:length(r2_vec)){
     #read the target ethnic group summary level statistics
     #combine the statistics with SNPs after clumping
     prs.all <- left_join(clump.snp,summary.com,by="SNP") 
+    #idx <- which(summary.com$SNP=="rs201335322:154415264:C:T")
     colSums(is.na(prs.all))
     for(k1 in 1:length(pthres)){
       #keep al the SNPs with peur pass the threshold
@@ -151,6 +159,8 @@ for(r_ind in 1:length(r2_vec)){
         select(SNP,A1,BETA,P)
       colSums(is.na(prs.file))
       write.table(prs.file,file = paste0(temp.dir.prs,"prs_file"),col.names = T,row.names = F,quote=F)
+      
+      #idx <- which(prs.file$SNP=="rs4806716:54639868:G:A")
       
       p.value.file <- prs.all.temp %>% filter(CHR==j) %>% 
         select(SNP,P)
@@ -174,7 +184,7 @@ for(r_ind in 1:length(r2_vec)){
       res = system(paste0("/data/zhangh24/software/plink2 --q-score-range ",temp.dir.prs,"q_range_file ",temp.dir.prs,"p_value_file header --threads 2 --score ",temp.dir.prs,"prs_file header no-sum no-mean-imputation --bfile ",temp.dir,"chr",j,".mega --exclude ",old.out.dir,eth[i],"/duplicated.id  --out ",temp.dir.prs,"prs_eb_rho_",l,"_size_",m,"_chr_",j,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1))
       print("step2 finished")
       #system(paste0("ls ",temp.dir.prs))
-      if(res==2){
+      if(res==3){
         stop()
       }
       res = system(paste0("mv ",temp.dir.prs,"*.profile ",out.dir,eth[i],"/prs/"))
