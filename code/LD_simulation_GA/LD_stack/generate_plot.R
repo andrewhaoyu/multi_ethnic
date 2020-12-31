@@ -91,10 +91,13 @@ for(i1 in 1:2){
   LD.result.2D.stack = LD.result.list[[1]]
   load(paste0("./LD_stack/LD.clump.result.eb_GA_",i1,".rdata"))
   LD.result.eb.stack = LD.result.list[[1]]
+  load(paste0("./LD_stack/LD.clump.result.eb_test_GA_",i1,".rdata"))
+  LD.result.eb.stack.test = LD.result.list[[1]]
   
   
   LD.result.stack.com <- rbind(LD.result.stack,LD.result.2D.stack,
-                               LD.result.eb.stack) %>% 
+                               LD.result.eb.stack,
+                               LD.result.eb.stack.test) %>% 
     filter(eth.vec!="EUR")
   
   sample_size =  as.character(LD.result.stack.com$method_vec)
@@ -138,6 +141,7 @@ for(i1 in 1:2){
                                    "2DLD-eb",
                                    "2DLD-max-eb",
                                    "2DLD-SL-eb",
+                                   "2DLD-SL-eb-test",
                                    "MEBayes"))
   
     LD.clump.result.plot.sub$method_vec = method_vec
@@ -184,6 +188,7 @@ for(i1 in 1:2){
                               "2DLD-eb",
                               "2DLD-max-eb",
                               "2DLD-SL-eb",
+                              "2DLD-SL-eb-test",
                               "MEBayes"))
     
     p <- ggplot(LD.clump.result.plot.sub.2,aes(x= sample_size,y=r2.vec,group=method_vec))+
