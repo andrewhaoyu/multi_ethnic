@@ -7,8 +7,8 @@ library(RColorBrewer)
 library(grid)
 library(gridExtra)
 #library(RColorBrewer)
-colourCount = 9
-getPalette = colorRampPalette(brewer.pal(9, "Set1"))
+colourCount = 12
+getPalette = colorRampPalette(brewer.pal(9, "Paired"))
 
 
 
@@ -89,8 +89,12 @@ for(i1 in 1:2){
   LD.result.stack = LD.result.list[[1]]
   load(paste0("./LD_stack/LD.clump.result.two_way_GA_",i1,".rdata"))
   LD.result.2D.stack = LD.result.list[[1]]
+  load(paste0("./LD_stack/LD.clump.result.eb_GA_",i1,".rdata"))
+  LD.result.eb.stack = LD.result.list[[1]]
   
-  LD.result.stack.com <- rbind(LD.result.stack,LD.result.2D.stack) %>% 
+  
+  LD.result.stack.com <- rbind(LD.result.stack,LD.result.2D.stack,
+                               LD.result.eb.stack) %>% 
     filter(eth.vec!="EUR")
   
   sample_size =  as.character(LD.result.stack.com$method_vec)
@@ -131,10 +135,26 @@ for(i1 in 1:2){
                                    "2DLD",
                                    "2DLD-max",
                                    "2DLD-SL",
+                                   "2DLD-eb",
+                                   "2DLD-max-eb",
+                                   "2DLD-SL-eb",
                                    "MEBayes"))
   
     LD.clump.result.plot.sub$method_vec = method_vec
-    p <- ggplot(LD.clump.result.plot.sub,aes(x= sample_size,y=r2.vec,group=method_vec))+
+    
+    
+    LD.clump.result.plot.sub.1 = LD.clump.result.plot.sub %>% 
+      filter(method_vec %in%c("C+T","C+T max","C+T SL",
+                          "LDpred2",
+                          
+                          "Best EUR PRS (C+T)",
+                          "Best EUR SNP + target coefficients (C+T)",
+                          "Best EUR SNP + EB(C+T)",
+                          "EUR LDpred2"))
+    
+    
+    
+    p <- ggplot(LD.clump.result.plot.sub.1,aes(x= sample_size,y=r2.vec,group=method_vec))+
       geom_bar(aes(fill=method_vec),
                stat="identity",
                position = position_dodge())+
@@ -150,10 +170,46 @@ for(i1 in 1:2){
             legend.text = element_text(size = rel(0.9)))+
       ggtitle("Prediction performance comparasion (Sample Size for EUR = 100k)")
     p
-    png(file = paste0("./LD_stack/method_compare_result_size_",m,"_summary_GA_",i1,".png"),
+    png(file = paste0("./LD_stack/sub1_method_compare_result_size_",m,"_summary_GA_",i1,".png"),
         width = 13, height = 8, res = 300,units = "in")
     print(p)
     dev.off()
+    
+    LD.clump.result.plot.sub.2 = LD.clump.result.plot.sub %>% 
+      filter(method_vec %in%c("Best EUR SNP + EB(C+T)",
+                              "EUR LDpred2",
+                              "2DLD",
+                              "2DLD-max",
+                              "2DLD-SL",
+                              "2DLD-eb",
+                              "2DLD-max-eb",
+                              "2DLD-SL-eb",
+                              "MEBayes"))
+    
+    p <- ggplot(LD.clump.result.plot.sub.2,aes(x= sample_size,y=r2.vec,group=method_vec))+
+      geom_bar(aes(fill=method_vec),
+               stat="identity",
+               position = position_dodge())+
+      #geom_point(aes(color=method_vec))+
+      theme_Publication()+
+      ylab("R2")+
+      xlab("Sample Size")+
+      labs(fill = "Method")+
+      facet_grid(vars(cau_vec),vars(eth.vec))+
+      #scale_fill_nejm()+
+      scale_fill_manual(values = getPalette(colourCount)) +
+      theme(axis.text = element_text(size = rel(0.9)),
+            legend.text = element_text(size = rel(0.9)))+
+      ggtitle("Prediction performance comparasion (Sample Size for EUR = 100k)")
+    p
+    png(file = paste0("./LD_stack/sub2_method_compare_result_size_",m,"_summary_GA_",i1,".png"),
+        width = 13, height = 8, res = 300,units = "in")
+    print(p)
+    dev.off()
+    
+    
+    
+    
     
   }
   LD.clump.result.15k <- LD.clump.result %>% filter(m_vec==1) %>% 
