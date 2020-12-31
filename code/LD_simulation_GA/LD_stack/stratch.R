@@ -43,10 +43,10 @@ colnames(sum.data)[2] <- "SNP"
 #combine the target level summary stat with EUR
 summary.com <- left_join(sum.data,summary.eur.select,by="SNP")
 
-# r2_vec = c(0.01,0.1,0.5)
-# wc_base_vec = c(50,100,500)
-r2_vec = c(0.01,0.05,0.1,0.2,0.5)
-wc_base_vec = c(50,100,200,500)
+r2_vec = c(0.01,0.1,0.5)
+wc_base_vec = c(50,100,500)
+# r2_vec = c(0.01,0.05,0.1,0.2,0.5)
+# wc_base_vec = c(50,100,200,500)
 
 r2.vec.test <- rep(0,length(pthres)^2*length(r2_vec)*length(wc_base_vec))
 r2.vec.vad <- rep(0,length(pthres)^2*length(r2_vec)*length(wc_base_vec))
@@ -187,5 +187,5 @@ r2.list <- list(r2.stack,
                 r2.max,
                 r2.max.ct,
                 result.data[idx,])
-save(r2.list,file = paste0(out.dir,eth[i],"/r2.list_rho_eb_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
+save(r2.list,file = paste0(out.dir,eth[i],"/r2.list_rho_eb_test_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
 #write.csv(r2.mat,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/ld.clump.auc.csv")
