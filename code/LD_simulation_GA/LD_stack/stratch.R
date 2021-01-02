@@ -150,6 +150,14 @@ library(SuperLearner)
 library(ranger)
 x.test = as.data.frame(prs.mat.new[1:n.test,])
 x.vad= as.data.frame(prs.mat.new[(1+n.test):(n.test+n.vad),])
+tune = list(ntrees = c(10, 20, 50),
+            max_depth = 1:3,
+            shrinkage = c(0.001, 0.01, 0.1))
+
+# Set detailed names = T so we can see the configuration for each function.
+# Also shorten the name prefix.
+learners = create.Learner("SL.xgboost", tune = tune, detailed_names = TRUE, name_prefix = "xgb")
+
 SL.libray <- c(
   #"SL.xgboost"
   #"SL.randomForest"
@@ -158,8 +166,8 @@ SL.libray <- c(
   #"SL.bayesglm"
   #"SL.stepAIC"
   "SL.nnet"
-  
-  ,
+  #learners$names
+  #,
   #"SL.svm"
   "SL.xgboost"
   #"SL.kernelKnn",
@@ -167,7 +175,7 @@ SL.libray <- c(
   #"SL.lm"
   #"SL.mean"
 )
-options(mc.cores = 8)
+options(mc.cores = 2)
 getOption("mc.cores")
 
 time1= proc.time()
