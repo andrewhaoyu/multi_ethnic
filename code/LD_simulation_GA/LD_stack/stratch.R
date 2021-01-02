@@ -43,7 +43,7 @@ colnames(sum.data)[2] <- "SNP"
 #combine the target level summary stat with EUR
 summary.com <- left_join(sum.data,summary.eur.select,by="SNP")
 
-r2_vec = c(0.01,0.1,0.5)
+r2_vec = c(0.05,0.1,0.2)
 wc_base_vec = c(50,100,200,500)
 # r2_vec = c(0.01,0.05,0.1,0.2,0.5)
  #wc_base_vec = c(50,100,200,500)
