@@ -150,7 +150,6 @@ library(SuperLearner)
 library(ranger)
 x.test = as.data.frame(prs.mat.new[1:n.test,])
 x.vad= as.data.frame(prs.mat.new[(1+n.test):(n.test+n.vad),])
-
 SL.libray <- c(
   #"SL.xgboost"
   #"SL.randomForest"
@@ -162,14 +161,17 @@ SL.libray <- c(
   
   ,
   #"SL.svm"
-  "SL.loess"
+  "SL.xgboost"
   #"SL.kernelKnn",
   #"SL.rpartPrune", 
   #"SL.lm"
   #"SL.mean"
 )
+options(mc.cores = 2)
+getOption("mc.cores")
+
 time1= proc.time()
-sl = SuperLearner(Y = y.test, X = x.test, family = gaussian(),
+sl = mcSuperLearner(Y = y.test, X = x.test, family = gaussian(),
                   # For a real analysis we would use V = 10.
                   # V = 3,
                   SL.library = SL.libray)

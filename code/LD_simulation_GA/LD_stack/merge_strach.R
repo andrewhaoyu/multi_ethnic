@@ -1,4 +1,5 @@
 #merge the r2 results of AUC
+library(dplyr)
 for(i1 in 1:2){
   eth <- c("EUR","AFR","AMR","EAS","SAS")
   pthres <- c(5E-08,5E-07,5E-06,5E-05,1E-04,1E-03,1E-02,0.5)
