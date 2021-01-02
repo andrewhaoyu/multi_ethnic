@@ -207,6 +207,8 @@ for(i1 in 1:2){
             legend.text = element_text(size = rel(0.9)))+
       ggtitle("Prediction performance comparasion (Sample Size for EUR = 100k)")
     p
+    LD.clump.result.plot.sub.2 %>% 
+      filter(method_vec%in%c("2DLD-SL-eb-test","2DLD-SL-eb"))
     png(file = paste0("./LD_stack/sub2_method_compare_result_size_",m,"_summary_GA_",i1,".png"),
         width = 13, height = 8, res = 300,units = "in")
     print(p)
