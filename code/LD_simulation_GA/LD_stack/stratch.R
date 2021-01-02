@@ -160,13 +160,14 @@ learners = create.Learner("SL.xgboost", tune = tune, detailed_names = TRUE, name
 
 SL.libray <- c(
   #"SL.xgboost"
-  #"SL.randomForest"
+  
   "SL.glmnet",
   "SL.ridge",
   #"SL.bayesglm"
   #"SL.stepAIC"
-  "SL.nnet"
-  #learners$names
+  "SL.nnet",
+  #learners$names,
+  #"SL.ranger",
   #,
   #"SL.svm"
   "SL.xgboost"
