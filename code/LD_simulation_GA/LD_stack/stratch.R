@@ -166,11 +166,11 @@ SL.libray <- c(
   #"SL.bayesglm"
   #"SL.stepAIC"
   "SL.nnet",
-  #learners$names,
-  #"SL.ranger",
+  learners$names,
+  "SL.ranger"
   #,
   #"SL.svm"
-  "SL.xgboost"
+  #"SL.xgboost"
   #"SL.kernelKnn",
   #"SL.rpartPrune", 
   #"SL.lm"
