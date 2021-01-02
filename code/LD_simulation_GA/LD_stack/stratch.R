@@ -45,7 +45,7 @@ summary.com <- left_join(sum.data,summary.eur.select,by="SNP")
 
 # r2_vec = c(0.05,0.1,0.2)
 # wc_base_vec = c(50,100,200,500)
-r2_vec = c(0.01,0.05,0.1,0.2)
+r2_vec = c(0.05,0.1,0.2,0.5)
 wc_base_vec = c(50,100,200,500)
 
 r2.vec.test <- rep(0,length(pthres)^2*length(r2_vec)*length(wc_base_vec))
