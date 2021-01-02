@@ -159,18 +159,22 @@ SL.libray <- c(
   #"SL.bayesglm"
   #"SL.stepAIC"
   "SL.nnet"
-  #"SL.ksvm",
-  #"SL.bartMachine", 
+  
+  ,
+  #"SL.svm"
+  "SL.loess"
   #"SL.kernelKnn",
   #"SL.rpartPrune", 
   #"SL.lm"
   #"SL.mean"
 )
+time1= proc.time()
 sl = SuperLearner(Y = y.test, X = x.test, family = gaussian(),
                   # For a real analysis we would use V = 10.
                   # V = 3,
                   SL.library = SL.libray)
-sl
+time2 = proc.time()-time1
+print(time2)
 y.pred <- predict(sl, x.vad, onlySL = TRUE)
 #names(r2.vec.test) <- names(r2.vec.vad) <- pthres
 
