@@ -167,7 +167,7 @@ SL.libray <- c(
   #"SL.lm"
   #"SL.mean"
 )
-options(mc.cores = 2)
+options(mc.cores = 8)
 getOption("mc.cores")
 
 time1= proc.time()
