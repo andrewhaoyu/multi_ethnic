@@ -95,7 +95,7 @@ z_stat_tar = summary.com.match$z_stat_tar
 z_stat_eur = summary.com.match$z_stat_eur
 z_mat = cbind(z_stat_tar,z_stat_eur)
 
-z_post = z_mat%*%post_sigma
+z_post = z_mat%*%post.sigma
 
 post_beta_tar = summary.com.match$beta_tar
 post_beta_tar[idx] = z_post[idx,1]*summary.com.match$sd_tar[idx]
