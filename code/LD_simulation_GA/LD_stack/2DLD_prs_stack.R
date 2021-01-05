@@ -8,7 +8,7 @@
 args = commandArgs(trailingOnly = T)
 i_rep = as.numeric(args[[1]])
 i = as.numeric(args[[2]])
-j = as.numeric(args[[3]])
+#j = as.numeric(args[[3]])
 l = as.numeric(args[[4]])
 m = as.numeric(args[[5]])
 i1 = as.numeric(args[[6]])
@@ -23,14 +23,14 @@ temp.dir = paste0('/lscratch/',sid,'/test/')
 dir.create(paste0('/lscratch/',sid,'/test/prs/'),showWarnings = FALSE)
 temp.dir.prs = paste0('/lscratch/',sid,'/test/prs/')
 
-system(paste0("cp ",cur.dir,eth[i],"/chr",j,".mega.* ",temp.dir))
+system(paste0("cp ",cur.dir,eth[i],"/all_chr_test.mega.* ",temp.dir))
 system(paste0("ls ",temp.dir))
 
 library(dplyr)
 library(data.table)
 setwd("/data/zhangh24/multi_ethnic/")
 
-pthres <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01,0.5)
+pthres <- c(5E-08,5E-07,5E-06,5E-05,5E-04,5E-03,5E-02,5E-01)
 #n.snp.mat <- matrix(0,length(pthres),4)
 
 
@@ -44,8 +44,8 @@ colnames(summary.eur)[9] = "peur"
 colnames(summary.eur)[7] = "beta_eur"
 summary.eur.select = summary.eur %>% 
   select(SNP,beta_eur,peur)
-r2_vec = c(0.01,0.05,0.1,0.2,0.5)
-wc_base_vec = c(50,100,200,500)
+r2_vec = c(0.01,0.05,0.1,0.2,0.5,0.8)
+wc_base_vec = c(50,100)
 sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_GA/",eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))  
 colnames(sum.data)[2] <- "SNP"
 #combine the target level summary stat with EUR
@@ -69,12 +69,12 @@ for(k1 in 1:length(pthres)){
   prs.all.temp = prs.all
   idx <- which(prs.all.temp$peur<=pthres[k1])
   prs.all.temp$P[idx] = 1E-20
-  prs.file <- prs.all.temp %>% filter(CHR==j) %>% 
+  prs.file <- prs.all.temp %>%
     select(SNP,A1,BETA,P)
   colSums(is.na(prs.file))
   write.table(prs.file,file = paste0(temp.dir.prs,"prs_file"),col.names = T,row.names = F,quote=F)
   
-  p.value.file <- prs.all.temp %>% filter(CHR==j) %>% 
+  p.value.file <- prs.all.temp %>% 
     select(SNP,P)
   write.table(p.value.file,file = paste0(temp.dir.prs,"p_value_file"),col.names = T,row.names = F,quote=F)
   n_pthres = length(pthres)
@@ -93,7 +93,7 @@ for(k1 in 1:length(pthres)){
   }
    q_range = q_range[1:(temp-1),]
    write.table(q_range,file = paste0(temp.dir.prs,"q_range_file"),row.names = F,col.names = F,quote=F)
-   res = system(paste0("/data/zhangh24/software/plink2 --q-score-range ",temp.dir.prs,"q_range_file ",temp.dir.prs,"p_value_file header --threads 2 --score ",temp.dir.prs,"prs_file header no-sum no-mean-imputation --bfile ",temp.dir,"chr",j,".mega --exclude ",old.out.dir,eth[i],"/duplicated.id  --out ",temp.dir.prs,"prs_two_way_rho_",l,"_size_",m,"_chr_",j,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1))
+   res = system(paste0("/data/zhangh24/software/plink2 --q-score-range ",temp.dir.prs,"q_range_file ",temp.dir.prs,"p_value_file header --threads 2 --score ",temp.dir.prs,"prs_file header no-sum no-mean-imputation --bfile ",temp.dir,"all_chr_test.mega --exclude ",old.out.dir,eth[i],"/duplicated.id  --out ",temp.dir.prs,"prs_two_way_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1))
    print("step2 finished")
    #system(paste0("ls ",temp.dir.prs))
    if(res==2){
