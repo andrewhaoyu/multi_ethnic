@@ -14,7 +14,7 @@ library(dplyr)
 library(data.table)
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 pthres <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01,0.5)
-pthres <- c(5E-08,5E-07,5E-06,5E-05,5E-04,5E-03,5E-02,5E-01)
+
 #n <- 120000
 
 #for(m in 1:1){
@@ -47,7 +47,7 @@ summary.com <- left_join(sum.data,summary.eur.select,by="SNP")
 # r2_vec = c(0.01,0.05,0.1,0.2,0.5)
 # wc_base_vec = c(50,100,200,500)
 r2_vec = c(0.01,0.05,0.1,0.2,0.5)
-wc_base_vec = c(50)
+wc_base_vec = c(50,100)
 
 r2.vec.test <- rep(0,length(pthres)^2*length(r2_vec)*length(wc_base_vec))
 r2.vec.vad <- rep(0,length(pthres)^2*length(r2_vec)*length(wc_base_vec))
@@ -78,10 +78,11 @@ for(r_ind in 1:length(r2_vec)){
           filter(peur<=pthres[k1]|
                    P<=pthres[k2])
         if(nrow(prs.all)>0){
-          filename <- paste0(out.dir,eth[i],"/prs/prs_eb_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1,"p_value,",k2,".profile")
+          
+          filename <- paste0(out.dir,eth[i],"/prs/prs_eb_test_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1,".p_value_",k2,".profile")
           
           prs.temp <- fread(filename)  
-          prs.score <- prs.temp$V1
+          prs.score <- prs.temp$SCORE
           prs.test <- prs.score[(1):(n.test)]
           prs.vad <- prs.score[(n.test+1):(n.test+n.vad)]
           #model = lm(y~prs.score)
@@ -119,7 +120,7 @@ result.data <- data.frame(r2.vec.test,r2.vec.vad,
                           r2_ind_vec,
                           wc_ind_vec)
 
-pthres_new <- c(5E-08,5E-07,5E-06,5E-05,1E-04,1E-03,1E-02,0.5)
+pthres_new <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01,0.5)
 result.data = result.data %>% 
   filter(pthres_vec1%in%pthres_new&
            pthres_vec2%in%pthres_new)
@@ -151,13 +152,13 @@ library(SuperLearner)
 library(ranger)
 x.test = as.data.frame(prs.mat.new[1:n.test,])
 x.vad= as.data.frame(prs.mat.new[(1+n.test):(n.test+n.vad),])
-tune = list(ntrees = c(10, 20, 50),
-            max_depth = 1:3,
-            shrinkage = c(0.001, 0.01, 0.1))
-
-# Set detailed names = T so we can see the configuration for each function.
-# Also shorten the name prefix.
-learners = create.Learner("SL.xgboost", tune = tune, detailed_names = TRUE, name_prefix = "xgb")
+# tune = list(ntrees = c(10, 20, 50),
+#             max_depth = 1:3,
+#             shrinkage = c(0.001, 0.01, 0.1))
+# 
+# # Set detailed names = T so we can see the configuration for each function.
+# # Also shorten the name prefix.
+# learners = create.Learner("SL.xgboost", tune = tune, detailed_names = TRUE, name_prefix = "xgb")
 
 SL.libray <- c(
   #"SL.xgboost"
@@ -166,9 +167,9 @@ SL.libray <- c(
   "SL.ridge",
   #"SL.bayesglm"
   #"SL.stepAIC"
-  "SL.nnet",
-  learners$names,
-  "SL.ranger"
+  "SL.nnet"
+ # learners$names,
+#  "SL.ranger"
   #,
   #"SL.svm"
   #"SL.xgboost"
