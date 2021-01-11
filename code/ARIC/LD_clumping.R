@@ -10,10 +10,13 @@ args = commandArgs(trailingOnly = T)
 
 i = as.numeric(args[[1]])
 l = as.numeric(args[[2]])
-m = as.numeric(args[[3]])
-i_rep = as.numeric(args[[4]])
-i1 = as.numeric(args[[5]])
+j = as.numeric(args[[3]])
+#m = as.numeric(args[[3]])
+#i_rep = as.numeric(args[[4]])
+#i1 = as.numeric(args[[5]])
 library(data.table)
+#install.packages("dplyr")
+#install.packages("vctrs")
 library(dplyr)
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 trait = c("eGFRcr","ACR","urate")
@@ -28,10 +31,11 @@ sum.data = as.data.frame(fread(paste0(data.dir,trait[l],"/",eth[i],"/sumdata/tra
 sum.data.assoc = sum.data %>% 
   mutate(BP=POS,SNP = SNP_ID,A1 = REF,
          P = PVAL) %>% 
-  filter(CHR==j) %>% 
-  select(CHR,SNP,BP,A1,BETA,P)
+  filter(CHR==j) 
+
+sum.data.assoc = sum.data.assoc[,c("CHR","SNP","BP","A1","BETA","P")]
 idx <- which(sum.data.assoc$SNP=="rs4970836")
-write.table(sum.data.assoc,file = paste0(out.dir,eth[i],"/",trait[l],"_chr_",j,"_assoc.txt"),col.names = T,row.names = F,quote=F)
+#write.table(sum.data.assoc,file = paste0(out.dir,eth[i],"/",trait[l],"_chr_",j,"_assoc.txt"),col.names = T,row.names = F,quote=F)
 
 # dim(summary)
 # head(summary)
@@ -39,17 +43,17 @@ pthr = 0.5
 r2thr = 0.1
 kbpthr = 500
 eth <- c("EUR","AFR","AMR","EAS","SAS")
-cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
+#cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
 #code <- rep("c",5*3*3)
 #system(paste0("/data/zhangh24/software/plink2 --bfile /data/zhangh24/KG.plink/",eth[i],"/chr_all --clump ",cur.dir,eth[i],"/summary_out_MAF_rho_",l,"_size_",m,"_rep_",i_rep,".out --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out ",cur.dir,eth[i],"/LD_clump_rho_",l,"_size_",m,"_rep_",i_rep))
 res = system(paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/plink --bfile ",data.dir,trait[l],"/",eth[i],"/geno/mega/ref_chr",j," --clump ",out.dir,eth[i],"/",trait[l],"_chr_",j,"_assoc.txt --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out ",out.dir,eth[i],"/",trait[l],"_LD_clump"))
 if(res==2){
   stop()
 }
-system(paste0("rm ",cur.dir,eth[i],"/LD_clump_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".log"))
+#system(paste0("rm ",cur.dir,eth[i],"/LD_clump_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".log"))
 
-data = as.data.frame(fread(paste0(data.dir,trait[l],"/",eth[i],"/geno/mega/ref_chr",j,".bim")))
-idx <- which(data$V2=="rs78444298")
+# data = as.data.frame(fread(paste0(data.dir,trait[l],"/",eth[i],"/geno/mega/ref_chr",j,".bim")))
+# idx <- which(data$V2=="rs78444298")
 
 
 
