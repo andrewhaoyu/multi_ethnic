@@ -50,7 +50,7 @@ for(i in 1:2){
     #cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
     #code <- rep("c",5*3*3)
     #system(paste0("/data/zhangh24/software/plink2 --bfile /data/zhangh24/KG.plink/",eth[i],"/chr_all --clump ",cur.dir,eth[i],"/summary_out_MAF_rho_",l,"_size_",m,"_rep_",i_rep,".out --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out ",cur.dir,eth[i],"/LD_clump_rho_",l,"_size_",m,"_rep_",i_rep))
-    res = system(paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/plink --bfile ",data.dir,trait[l],"/",eth[i],"/geno/mega/ref_chr",j," --clump ",temp.dir,"chr_",j,"_assoc.txt --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out ",temp.dir,"LD_clump_chr_",j))
+    res = system(paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/plink --bfile ",data.dir,trait[1],"/",eth[i],"/geno/mega/ref_chr",j," --clump ",temp.dir,"chr_",j,"_assoc.txt --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out ",temp.dir,"LD_clump_chr_",j))
     system(paste0("mv ",temp.dir,"LD_clump_chr_",j,".clumped ",out.dir))
     if(res==2){
       stop()
