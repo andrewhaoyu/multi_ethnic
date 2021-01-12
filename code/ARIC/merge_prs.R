@@ -5,14 +5,30 @@ library(data.table)
 pthres <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01,0.5)
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 trait = c("eGFRcr","ACR","urate")
+#merge clump data
+
 for(i in 1:2){
   for(l in 1:3){
-    setwd("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic")
     temp.dir = paste0("/fastscratch/myscratch/hzhang1/ARIC/",trait[l],"/",eth[i],"/")
     data.dir = "/dcl01/chatterj/data/jin/prs/realdata/ARIC/"
     out.dir = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/",trait[l],"/",eth[i],"/")
-    LD <- as.data.frame(fread(paste0(out.dir,"/LD_clump_chr_",j,".clumped")))
-    clump.snp <- LD[,3,drop=F] 
+    
+    LD.list = list()
+    for(j in 1:22){
+      
+      LD <- as.data.frame(fread(paste0(out.dir,"/LD_clump_chr_",j,".clumped")))
+      clump.snp <- LD[,3,drop=F]  
+      LD.list[[j]] = clump.snp
+    }
+    LD = rbindlist(LD.list)
+    write.table(LD,file = paste0(out.dir,"/LD_clump.clumped"),row.names = F,col.names = T)
+  }}
+
+for(i in 1:2){
+  for(l in 1:3){
+    temp.dir = paste0("/fastscratch/myscratch/hzhang1/ARIC/",trait[l],"/",eth[i],"/")
+    data.dir = "/dcl01/chatterj/data/jin/prs/realdata/ARIC/"
+    out.dir = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/",trait[l],"/",eth[i],"/")
     
     sum.data = as.data.frame(fread(paste0(data.dir,trait[l],"/",eth[i],"/sumdata/training-GWAS-formatted.txt")))
     sum.data = sum.data %>% 
@@ -21,6 +37,7 @@ for(i in 1:2){
     # write.table(sum.data.MAF,file = paste0("/lscratch/",sid,"/test/",eth[i],"_summary_out_MAF_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".out")
     #             ,col.names = T,row.names = F,quote=F) 
     #prepare association file for plink
+    clump.snp <- as.data.frame(fread(paste0(out.dir,"/LD_clump.clumped")))
     prs.clump <- left_join(clump.snp,sum.data,by="SNP")
     
     for(k in 1:length(pthres)){
@@ -28,7 +45,8 @@ for(i in 1:2){
         filter(P<=pthres[k])
       if(nrow(prs.all)>0){
         n.snp.total <- 0
-        prs.score <- rep(0,n.test+n.vad)
+        fam.file <- as.data.frame(fread(paste0(data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc1.fam")))
+        prs.score <- rep(0,nrow(fam.file))
         for(j in 1:22){
           
           #get the number of
@@ -43,7 +61,7 @@ for(i in 1:2){
             prs.score <- prs.temp$SCORE*2*length(idx)+prs.score
           }
         }
-        write.table(prs.score,file = paste0(out.dir,eth[i],"/prs/prs_pvalue_",k,"_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".profile"),row.names = F,col.names = F,quote=F)
+        write.table(prs.score,file = paste0(out.dir,"/prs_pvalue_",k,".profile"),row.names = F,col.names = F,quote=F)
         
       
     }

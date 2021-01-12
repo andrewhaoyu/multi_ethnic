@@ -44,7 +44,7 @@ for(i in 1:2){
     #setwd(temp.dir)
     write.table(prs.file,file = paste0(temp.dir,"prs_coeff_chr_",j),col.names = T,row.names = F,quote=F)
     p.value.file <- prs.all %>% filter(CHR==j) 
-      p.value.file = p.value.file[,c("SNP","P")]
+    p.value.file = p.value.file[,c("SNP","P")]
       
     write.table(p.value.file,file = paste0(temp.dir,"p_value_chr_",j),col.names = T,row.names = F,quote=F)
       
