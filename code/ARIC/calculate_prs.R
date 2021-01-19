@@ -1,9 +1,7 @@
 #use plink2 to calculate prs
 #load LD_clump_file
 #i is the ethnic
-#l is the causal proportion
-#m is the training sample size
-#k is the p value thres
+#l is trait
 #j is the number of chromsome
 args = commandArgs(trailingOnly = T)
 
