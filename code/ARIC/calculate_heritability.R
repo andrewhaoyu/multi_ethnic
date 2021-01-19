@@ -2,7 +2,7 @@ args = commandArgs(trailingOnly = T)
 
 i = as.numeric(args[[1]])
 l = as.numeric(args[[2]])
-
+library(data.table)
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 trait = c("eGFRcr","ACR","urate")
 setwd("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic")
