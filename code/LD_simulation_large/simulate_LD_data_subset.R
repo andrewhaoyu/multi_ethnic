@@ -51,5 +51,11 @@ system(paste0("/data/zhangh24/software/plink2 --gen /lscratch/",sid,"/test/",eth
 system(paste0("rm -r /lscratch/",sid,"/test"))
 #we will need to combine tag info file with tag gen file for each ethnic groups
 
-
-
+n.snps = rep(0,5)
+MAF = snp.infor %>% 
+  select(EUR,AFR,AMR,EAS,SAS)
+for(l in 1:5){
+  idx <- which(MAF[,l]>=0.01&MAF[,l]<=0.99)
+  n.snps[l] = length(idx)
+  
+}

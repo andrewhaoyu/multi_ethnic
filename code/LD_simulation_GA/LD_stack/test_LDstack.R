@@ -30,15 +30,73 @@ dir.create(paste0('/lscratch/',sid,'/test/'),showWarnings = FALSE)
 temp.dir = paste0('/lscratch/',sid,'/test/')
 dir.create(paste0('/lscratch/',sid,'/test/prs/'),showWarnings = FALSE)
 temp.dir.prs = paste0('/lscratch/',sid,'/test/prs/')
-system(paste0("cp ",cur.dir,eth[i],"/chr",j,".mega.* ",temp.dir,"."))
+system(paste0("cp ",cur.dir,eth[i],"/all_chr_test.mega.* ",temp.dir,"."))
 system(paste0("ls ",temp.dir))
+bim <- as.data.frame(fread(paste0(temp.dir,"all_chr_test.mega.bim")))
+colnames(bim)[2] <- "SNP"
 print("step1 finished")
+snp_readBed(paste0(temp.dir,"all_chr_test.mega.bed"))
+obj.bigSNP <- snp_attach(paste0(temp.dir,"all_chr_test.mega.rds"))
+str(obj.bigSNP, max.level = 2, strict.width = "cut")
+# See how the file looks like
+str(obj.bigSNP, max.level = 2, strict.width = "cut")
+G   <- obj.bigSNP$genotypes
+CHR <- obj.bigSNP$map$chromosome
+POS <- obj.bigSNP$map$physical.pos
+y   <- obj.bigSNP$fam$affection - 1
+big_counts(G, ind.col = 1:10)
+NCORES <- 2
 #for(l in 1:3){
 r2_vec = c(0.01,0.05,0.1,0.2,0.5)
 wc_base_vec = c(50,100,200,500)
-setwd("/data/zhangh24/multi_ethnic/")  
+setwd("/data/zhangh24/multi_ethnic/")
+library(tidyverse)
 for(m in 1:4){
-  sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_GA/",eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))  
+  sumstats <- as.data.frame(fread(paste0("./result/LD_simulation_GA/",eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))  
+  sumstats = left_join(bim,sumstats,by="SNP")
+  #snp.id = sumstats %>%  select(SNP)
+  #get the reference allele and effect allele
+  #sum data used A1 to code effect allele
+  #bim data used original plink coding
+  #bigsnpr required both reference and effect
+  #transform sum data to orginal plink coding
+  eff_allele = sumstats$A1
+  noneff_allele = sumstats$V6
+  coding_allele = sumstats$V5
+  noncoding_allele = sumstats$V6
+  BETA = sumstats$BETA
+  idx <- which(eff_allele!=coding_allele)
+  eff_allele[idx] = coding_allele[idx]
+  BETA[idx] = -BETA[idx]
+  noneff_allele[idx] = noncoding_allele[idx]
+  all.equal(eff_allele,coding_allele)
+  sumstats$a0 = eff_allele
+  sumstats$a1 = noneff_allele
+  sumstats$BETA = BETA
+  
+  sumstats = sumstats %>% 
+    rename(chr=CHR,
+           rsid = SNP,
+           pos = BP,
+           beta = BETA,
+           p = P) %>% 
+    select(chr,rsid,pos,a0,a1,beta,p)
+  ind.train <- c(1:10000)
+  ind.test <- setdiff(rows_along(G), ind.train)
+  
+  
+  map <- obj.bigSNP$map[,-(2:3)]
+  names(map) <- c("chr", "pos", "a0", "a1")
+  info_snp <- snp_match(sumstats, map, strand_flip = FALSE)
+  info.snp.id = info_snp$rsid
+  info.snp.chr = info_snp$chr
+  info.snp.pos = info_snp$pos
+  beta <- info_snp$beta
+  lpval <- -log10(info_snp$p)
+  all_keep <- snp_grid_clumping(G, info.snp.chr, info.snp.pos, ind.row = ind.train,
+                                lpS = lpval, ncores = NCORES)
+  
+  
   for(r_ind in 1:length(r2_vec)){
     wc_vec = wc_base_vec/r2_vec[r_ind]
     for(w_ind in 1:length(wc_vec)){

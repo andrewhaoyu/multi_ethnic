@@ -1,4 +1,4 @@
-setwd("/Users/zhangh24/GoogleDrive/multi_ethnic/resulT/ARIC")
+setwd("/Users/zhangh24/GoogleDrive/multi_ethnic/result/ARIC")
 source("../../code/LD_simulation_large/theme_Publication.R")
 library(ggplot2)
 library(ggsci)
@@ -12,14 +12,10 @@ getPalette = colorRampPalette(brewer.pal(9, "Paired"))
 
 library(tidyr)
 library(tidyverse)
-load(paste0("ARIC.result.CT.rdata"))
-result.pthres.all = ARIC.result.CT[[2]]
-result.pthres.all$eth = factor(result.pthres.all$eth,levels=c("EUR","AFR"))
-result.pthres.all$triat = factor(result.pthres.all$triat,levels=c("eGFRcr","ACR","urate"))
-colnames(result.pthres.all)[7] = "trait"
+load(paste0("ARIC.result.CT.rep.rdata"))
 ARIC.result.CT.long= ARIC.result.CT[[1]]
-ARIC.result.CT.long$eth = factor(ARIC.result.CT.long$eth,levels=c("EUR","AFR"))
-ARIC.result.CT.long$trait = factor(ARIC.result.CT.long$trait,levels=c("eGFRcr","ACR","urate"))
+ARIC.result.CT.long$eth = factor(ARIC.result.CT.long$eth,levels = c("EUR","AFR"))
+ARIC.result.CT.long$trait = factor(ARIC.result.CT.long$trait,levels = c("eGFRcr","ACR","urate"))
 
 ARIC.result.CT.prs = spread(ARIC.result.CT.long[,c("eth","trait","r2_prs")],trait,r2_prs)
 ARIC.result.CT.prs.pc = spread(ARIC.result.CT.long[,c("eth","trait","r2_prs_pc")],trait,r2_prs_pc)
@@ -27,11 +23,25 @@ ARIC.result.CT.wide = rbind(ARIC.result.CT.prs,ARIC.result.CT.prs.pc)
 
 write.csv(ARIC.result.CT.wide,file = "ARIC.result.CT.csv")
 
+result.pthres.all = ARIC.result.CT[[2]]
+result.pthres.all$eth = factor(result.pthres.all$eth,levels = c("EUR","AFR"))
+result.pthres.all$triat = factor(result.pthres.all$triat,levels = c("eGFRcr","ACR","urate"))
+colnames(result.pthres.all)[7] = "trait"
 
-result.pthres.sub = result.pthres.all %>% filter(eth == "EUR"&trait=="eGFRcr")
-ggplot(result.pthres.sub,aes(-log10(pthres_vec),r2.vec.test.prs)) + geom_point()+geom_line()+
-  theme_Publication()+
-  ggtitle("eGFR PRS R2 in test data")
+
+eth <- c("EUR","AFR","AMR","EAS","SAS")
+trait = c("eGFRcr","ACR","urate")
+
+
+    #result.pthres.sub = result.pthres.all %>% filter(eth == "EUR"&trait=="eGFRcr")
+    p= ggplot(result.pthres.all,aes(log10(pthres_vec),r2.vec.test.prs)) + geom_point()+geom_line()+
+      theme_Publication()+
+      ggtitle(paste0("R2 of PRS"))+
+      xlab("log10(p-value)")+
+      ylab("R2")+
+      facet_grid(rows = vars(eth),cols = vars(trait))
+  print(p)    
+  
 ggplot(result.pthres.sub,aes(-log10(pthres_vec),r2.vec.vad.prs)) + geom_point()+geom_line()+
   theme_Publication()+
   ggtitle("eGFR PRS R2 in vad data")
