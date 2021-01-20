@@ -12,6 +12,7 @@ getPalette = colorRampPalette(brewer.pal(9, "Paired"))
 
 library(tidyr)
 library(tidyverse)
+#load(paste0("ARIC.result.CT.rep.rdata"))
 load(paste0("ARIC.result.CT.rep.rdata"))
 ARIC.result.CT.long= ARIC.result.CT[[1]]
 ARIC.result.CT.long$eth = factor(ARIC.result.CT.long$eth,levels = c("EUR","AFR"))
@@ -27,14 +28,14 @@ result.pthres.all = ARIC.result.CT[[2]]
 result.pthres.all$eth = factor(result.pthres.all$eth,levels = c("EUR","AFR"))
 result.pthres.all$triat = factor(result.pthres.all$triat,levels = c("eGFRcr","ACR","urate"))
 colnames(result.pthres.all)[7] = "trait"
-
+result.pthres.all$r2 = (result.pthres.all$r2.vec.test.prs+result.pthres.all$r2.vec.vad.prs)/2
 
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 trait = c("eGFRcr","ACR","urate")
 
 
     #result.pthres.sub = result.pthres.all %>% filter(eth == "EUR"&trait=="eGFRcr")
-    p= ggplot(result.pthres.all,aes(log10(pthres_vec),r2.vec.test.prs)) + geom_point()+geom_line()+
+    p= ggplot(result.pthres.all,aes(log10(pthres_vec),r2)) + geom_point()+geom_line()+
       theme_Publication()+
       ggtitle(paste0("R2 of PRS"))+
       xlab("log10(p-value)")+

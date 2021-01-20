@@ -19,3 +19,4 @@ pheno = left_join(fam,y,by="ID") %>%
   select(V1,ID,y)
 write.table(pheno,file =paste0(temp.dir,"pheno.txt"),row.names = F,col.names = F,quote=F)
 res <- system(paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/gcta/gcta64 --grm ",grm.dir,"merged_chr_qc --pheno ",temp.dir,"pheno.txt --reml --out ",out.dir,"heritability"))  
+res <- system(paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/gcta/gcta64 --grm ",grm.dir,"merged_chr_qc --pheno ",temp.dir,"pheno.txt --HEreg --out ",out.dir,"heritability"))  

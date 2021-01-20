@@ -25,12 +25,13 @@ for(i in 1:2){
     
     y <- as.data.frame(fread(paste0(data.dir,trait[l],"/",eth[i],"/pheno/pheno.txt")))
     colnames(y)[2] = "ID"
-    test.id = as.data.frame(fread(paste0(data.dir,trait[l],"/",eth[i],"/pheno/IDs.tuning.txt"),header=F))
-    colnames(test.id)[2] = "ID"
-    vad.id = as.data.frame(fread(paste0(data.dir,trait[l],"/",eth[i],"/pheno/IDs.validation.txt"),header=F))
-    colnames(vad.id)[2] = "ID"
-    test.data = left_join(test.id,y,by="ID")
-    vad.data = left_join(vad.id,y,by="ID")
+    # test.id = as.data.frame(fread(paste0(data.dir,trait[l],"/",eth[i],"/pheno/IDs.tuning.txt"),header=F))
+    # colnames(test.id)[2] = "ID"
+    # vad.id = as.data.frame(fread(paste0(data.dir,trait[l],"/",eth[i],"/pheno/IDs.validation.txt"),header=F))
+    # colnames(vad.id)[2] = "ID"
+    # test.id = sample(c(1:nrow(y)),nrow(y)/2,replace = F)
+    # test.data = left_join(test.id,y,by="ID")
+    # vad.data = left_join(vad.id,y,by="ID")
     sum.data = as.data.frame(fread(paste0(data.dir,trait[l],"/",eth[i],"/sumdata/training-GWAS-formatted.txt")))
     
     sum.data = sum.data %>% 
@@ -44,6 +45,15 @@ for(i in 1:2){
     r2.vec.vad.prs = rep(0,length(pthres))
     r2.vec.vad.prs.pc = rep(0,length(pthres))
     pthres_vec = rep(0,length(pthres))
+    n.rep = 100
+    
+    
+    
+    r2.vec.test.prs.rep = rep(0,n.rep)
+    r2.vec.test.prs.pc.rep = rep(0,n.rep)
+    r2.vec.vad.prs.rep = rep(0,n.rep)
+    r2.vec.vad.prs.pc.rep = rep(0,n.rep)
+    
     temp =1
     for(k in 1:length(pthres)){
       prs.all <- prs.clump %>% 
@@ -60,39 +70,61 @@ for(i in 1:2){
         prs.data = data.frame(ID = genotype.fam$V2,prs= prs.score,stringsAsFactors = F)
         #prs.score <- prs.temp$SCORE*2*length(idx)+prs.score
         #prs.score.mat[,k] = prs.score
-        prs.test <- left_join(test.data,prs.data,by="ID")
-        prs.vad <- left_join(vad.data,prs.data,by="ID")
-        #model = lm(y~prs.score)
-        
-        model1.full <- lm(y~prs+pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.test)
-        model1.prs <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.test)
-        model1.null <- lm(y~age+sex,data=prs.test)
-        #r2.test.rep[i_rep] <- summary(model1)$r.square
-        model2.full <- lm(y~prs+pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.vad)
-        model2.prs <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex+age+sex,data=prs.vad)
-        model2.null <- lm(y~age+sex,data=prs.vad)
-        # r2.vec.test.prs[temp] = summary(model1.prs)$r.square-summary(model1.null)$r.square
-        # r2.vec.vad.prs[temp] = summary(model2.prs)$r.square-summary(model2.null)$r.square
-        # r2.vec.test.prs.pc[temp] = summary(model1.full)$r.square-summary(model1.null)$r.square
-        # r2.vec.vad.prs.pc[temp] = summary(model2.full)$r.square-summary(model2.null)$r.square
-        # 
-        r2.vec.test.prs[temp] = summary(model1.prs)$r.square
-        r2.vec.vad.prs[temp] = summary(model2.prs)$r.square
-        r2.vec.test.prs.pc[temp] = summary(model1.full)$r.square
-        r2.vec.vad.prs.pc[temp] = summary(model2.full)$r.square
-        
+        for(i_rep in 1:n.rep){
+          test.id = sample(c(1:nrow(y)),nrow(y)/2,replace = F)
+          vad.id = setdiff(c(1:nrow(y)),test.id)
+          test.data <- y[test.id,]
+          vad.data <- y[vad.id,]
+          
+          prs.test <- left_join(test.data,prs.data,by="ID")
+          prs.vad <- left_join(vad.data,prs.data,by="ID")
+          #model = lm(y~prs.score)
+          
+          model1.full <- lm(y~prs+pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.test)
+          model1.prs <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.test)
+          model1.null <- lm(y~age+sex,data=prs.test)
+          #r2.test.rep[i_rep] <- summary(model1)$r.square
+          model2.full <- lm(y~prs+pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.vad)
+          model2.prs <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex+age+sex,data=prs.vad)
+          model2.null <- lm(y~age+sex,data=prs.vad)
+          r2.vec.test.prs.rep[i_rep] = summary(model1.full)$r.square-summary(model1.prs)$r.square
+          r2.vec.vad.prs.rep[i_rep] = summary(model2.full)$r.square-summary(model2.prs)$r.square
+          r2.vec.test.prs.pc.rep[i_rep] = summary(model1.full)$r.square-summary(model1.null)$r.square
+          r2.vec.vad.prs.pc.rep[i_rep] = summary(model2.full)$r.square-summary(model2.null)$r.square
+          
+          #coefficients(model1.full)['scale(prs)']^2/var(prs.test$y)
+          
+          idx <- which(is.na(prs.test$y))
+          length(idx)            
+          
+          # r2.vec.test.prs[temp] = summary(model1.prs)$r.square
+          # r2.vec.vad.prs[temp] = summary(model2.prs)$r.square
+          # r2.vec.test.prs.pc[temp] = summary(model1.full)$r.square
+          # r2.vec.vad.prs.pc[temp] = summary(model2.full)$r.square
+          # 
+        }
         pthres_vec[temp] = pthres[k]
-        temp = temp+1
-      }else{
+        r2.vec.test.prs[temp] = mean(r2.vec.test.prs.rep)
+        r2.vec.vad.prs[temp] = mean(r2.vec.vad.prs.rep)
+        r2.vec.test.prs.pc[temp] = mean(r2.vec.test.prs.pc.rep)
+        r2.vec.vad.prs.pc[temp] = mean(r2.vec.vad.prs.pc.rep)
+        temp = temp+1 
+      }
+      else{
+        pthres_vec[temp] = pthres[k]
         r2.vec.test.prs[temp] = 0
-        r2.vec.vad.prs[temp] = 0  
+        r2.vec.vad.prs[temp] = 0
         r2.vec.test.prs.pc[temp] = 0
         r2.vec.vad.prs.pc[temp] = 0
-        pthres_vec[temp] = pthres[k]
-        temp = temp+1
+        temp = temp+1 
       }
       
+      
+      
     }
+    
+    
+    
     eth_vec[step] = eth[i]
     trait_vec[step] = trait[l]
     result.data <- data.frame(r2.vec.test.prs,r2.vec.vad.prs,
@@ -100,10 +132,9 @@ for(i in 1:2){
                               pthres_vec,
                               eth = rep(eth[i],length(pthres)),
                               triat = rep(trait[l],length(pthres)))
-    #two fold cross validation
+    
     idx <- which.max(r2.vec.test.prs)
     r2.prs = r2.vec.vad.prs[idx]
-    
     idx <- which.max(r2.vec.test.prs.pc)
     r2.prs.pc = r2.vec.vad.prs.pc[idx]
     
@@ -121,8 +152,8 @@ r2.result = data.frame(eth = eth_vec,
                        r2_prs_pc = r2_prs_pc_vec)
 result.data = rbindlist(result.data.list)  
 ARIC.result.CT = list(r2.result,result.data)
-save(ARIC.result.CT,file = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/ARIC.result.CT.rdata"))    
-
+#save(ARIC.result.CT,file = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/ARIC.result.CT.rdata"))    
+save(ARIC.result.CT,file = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/ARIC.result.CT.rep.rdata"))    
 #}
 #     prs.sum = colSums(prs.mat)
 #     idx <- which(prs.sum!=0)
