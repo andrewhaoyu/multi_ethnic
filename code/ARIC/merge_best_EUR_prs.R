@@ -14,6 +14,7 @@ i = 2
     out.dir = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/",trait[l],"/",eth[i],"/")
     fam.file <- as.data.frame(fread(paste0(data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc1.fam")))
     prs.score <- matrix(0,nrow(fam.file),3)
+    colnames(prs.score) <- c("eurcoef","tarcoef","ebcoef")
         for(j in 1:22){
   
             
@@ -21,9 +22,9 @@ i = 2
             filename <- paste0(temp.dir,"best_eur_prs_chr_",j,".sscore")
             
             prs.temp <- fread(filename)  
-            prs.score <- prs.temp$SCORE+prs.score
+            prs.score <- prs.temp[,5:7]* as.numeric(prs.temp[1,3]/2)+prs.score
         }
-    write.table(prs.score,file = paste0(out.dir,"/prs_pvalue_",k,".profile"),row.names = F,col.names = F,quote=F)
+    write.table(prs.score,file = paste0(out.dir,"/prs_best_eur_prs.profile"),row.names = F,col.names = F,quote=F)
         }
         
         

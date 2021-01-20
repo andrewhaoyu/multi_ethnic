@@ -31,13 +31,16 @@ for(l in 1:3){
     load(paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/ARIC.result.CT.rdata"))
     CT.result = ARIC.result.CT[[2]] %>% 
       filter(triat==all_of(trait[l])&
-               eth==all_of(eth[i]))
+               eth=="EUR")
     idx.pcut <- which.max(CT.result$r2.vec.test.prs)
     prs.file = prs.clump %>% filter(P<=pthres[idx.pcut]) %>% 
       select(SNP,A1,BETA)
     #best eur SNP with EUR coefficients
     #write.table(prs.file,file = paste0(temp.dir,"best_eur_prs_coeff_chr_",j),col.names = T,row.names = F,quote=F)
     prs.eur = prs.file  
+    
+    
+    
     
     #best EUR SNP with target coefficients
     sum.tar = as.data.frame(fread(paste0(data.dir,trait[l],"/",eth[i],"/sumdata/training-GWAS-formatted.txt")))
@@ -49,6 +52,12 @@ for(l in 1:3){
     prs.file = left_join(best.snp.id,sum.tar,by="SNP") %>% 
       select(SNP,A1,BETA)
     prs.tar = prs.file
+    
+    idx <- which(prs.tar$A1!=prs.eur$A1)
+    if(length(idx)>0){
+      prs.eur$A1[idx] = prs.tar$A1[idx]
+      prs.eur$BETA[idx] = -prs.eur$BETA[idx]
+    }
     #write.table(prs.file,file = paste0(temp.dir,"best_eur_tarcoef_prs_coeff_chr_",j),col.names = T,row.names = F,quote=F)
     #res <- system(paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/plink --threads 2 --score ",temp.dir,"best_eur_tarcoef_prs_coeff_chr_",j," header no-sum no-mean-imputation --bfile ",data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc",j," --out ",temp.dir,"best_eur_tarcoef_prs_chr_",j))
     
@@ -105,6 +114,8 @@ for(l in 1:3){
       select(SNP,A1,BETA)
     prs.eb= prs.file
     
+    
+  
     BETA_eur = prs.eur$BETA
     BETA_tar = prs.tar$BETA
     BETA_tar[is.na(BETA_tar)] = 0
@@ -112,11 +123,13 @@ for(l in 1:3){
     BETA_eb[is.na(BETA_eb)] = 0
     prs.file = cbind(prs.eur,BETA_tar,BETA_eb)
     
+    #idx <- which(prs.tar$A1!=prs.eur$A1)
     
     write.table(prs.file,file = paste0(temp.dir,"best_eur_coeff_chr_",j),col.names = T,row.names = F,quote=F)
     
     
     res <- system(paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/plink2 --score-col-nums 3,4,5 --threads 2 --score ",temp.dir,"best_eur_coeff_chr_",j," header no-mean-imputation --bfile ",data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc",j," --out ",temp.dir,"best_eur_prs_chr_",j))
+    
     
   #}
 
