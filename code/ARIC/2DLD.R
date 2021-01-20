@@ -71,6 +71,7 @@ trait = c("eGFRcr","ACR","urate")
     
       }
     }
+  }
 #}
 #system(paste0("rm ",cur.dir,eth[i],"/LD_clump_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".log"))
 
