@@ -21,6 +21,7 @@ library(dplyr)
 
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 trait = c("eGFRcr","ACR","urate")
+i = 2
 #for(i in 1:2){
   for(l in 1:3){
     setwd("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic")
