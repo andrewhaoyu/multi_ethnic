@@ -8,13 +8,16 @@ eth <- c("EUR","AFR","AMR","EAS","SAS")
 trait = c("eGFRcr","ACR","urate")
 
 setwd("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic")
-  for(l in 1:3){
+  
+for(l in 1:3){
     #load best EUR SNPs
+    
     i = 2
     temp.dir = paste0("/fastscratch/myscratch/hzhang1/ARIC/",trait[l],"/",eth[i],"/")
     data.dir = "/dcl01/chatterj/data/jin/prs/realdata/ARIC/"
     out.dir = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/",trait[l],"/",eth[i],"/")
     out.dir.eur = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/",trait[l],"/",eth[1],"/")
+    #for(j in 1:22){
     LD <- as.data.frame(fread(paste0(out.dir.eur,"/LD_clump_chr_",j,".clumped")))
     clump.snp <- LD[,3,drop=F] 
     
@@ -32,10 +35,9 @@ setwd("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic")
     idx.pcut <- which.max(CT.result$r2.vec.test.prs)
     prs.file = prs.clump %>% filter(P<=pthres[idx.pcut]) %>% 
       select(SNP,A1,BETA)
-    write.table(prs.file,file = paste0(temp.dir,"best_eur_prs_coeff_chr_",j),col.names = T,row.names = F,quote=F)
     #best eur SNP with EUR coefficients
-    res <- system(paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/plink --threads 2 --score ",temp.dir,"best_eur_prs_coeff_chr_",j," header no-sum no-mean-imputation --bfile ",data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc",j," --out ",temp.dir,"best_eur_prs_chr_",j))
-    
+    #write.table(prs.file,file = paste0(temp.dir,"best_eur_prs_coeff_chr_",j),col.names = T,row.names = F,quote=F)
+    prs.eur = prs.file  
     
     #best EUR SNP with target coefficients
     sum.tar = as.data.frame(fread(paste0(data.dir,trait[l],"/",eth[i],"/sumdata/training-GWAS-formatted.txt")))
@@ -46,8 +48,9 @@ setwd("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic")
     best.snp.id = prs.file %>% select(SNP)
     prs.file = left_join(best.snp.id,sum.tar,by="SNP") %>% 
       select(SNP,A1,BETA)
-    write.table(prs.file,file = paste0(temp.dir,"best_eur_tarcoef_prs_coeff_chr_",j),col.names = T,row.names = F,quote=F)
-    res <- system(paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/plink --threads 2 --score ",temp.dir,"best_eur_tarcoef_prs_coeff_chr_",j," header no-sum no-mean-imputation --bfile ",data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc",j," --out ",temp.dir,"best_eur_tarcoef_prs_chr_",j))
+    prs.tar = prs.file
+    #write.table(prs.file,file = paste0(temp.dir,"best_eur_tarcoef_prs_coeff_chr_",j),col.names = T,row.names = F,quote=F)
+    #res <- system(paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/plink --threads 2 --score ",temp.dir,"best_eur_tarcoef_prs_coeff_chr_",j," header no-sum no-mean-imputation --bfile ",data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc",j," --out ",temp.dir,"best_eur_tarcoef_prs_chr_",j))
     
     #best EUR SNP with EB coefficients
     #align EUR and tar
@@ -100,12 +103,24 @@ setwd("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic")
       filter(CHR==j) %>% 
       rename(A1 = A1_tar) %>% 
       select(SNP,A1,BETA)
-    write.table(prs.file,file = paste0(temp.dir,"best_eur_eb_prs_coeff_chr_",j),col.names = T,row.names = F,quote=F)
-    res <- system(paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/plink --threads 2 --score ",temp.dir,"best_eur_eb_prs_coeff_chr_",j," header no-sum no-mean-imputation --bfile ",data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc",j," --out ",temp.dir,"best_eur_eb_prs_chr_",j))
+    prs.eb= prs.file
     
-  }
+    BETA_eur = prs.eur$BETA
+    BETA_tar = prs.tar$BETA
+    BETA_tar[is.na(BETA_tar)] = 0
+    BETA_eb = prs.eb$BETA
+    BETA_eb[is.na(BETA_eb)] = 0
+    prs.file = cbind(prs.eur,BETA_tar,BETA_eb)
+    
+    
+    write.table(prs.file,file = paste0(temp.dir,"best_eur_coeff_chr_",j),col.names = T,row.names = F,quote=F)
+    
+    
+    res <- system(paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/plink2 --score-col-nums 3,4,5 --threads 2 --score ",temp.dir,"best_eur_coeff_chr_",j," header no-mean-imputation --bfile ",data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc",j," --out ",temp.dir,"best_eur_prs_chr_",j))
+    
+  #}
 
-
+}
 
 
 
