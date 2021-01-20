@@ -10,45 +10,101 @@ trait = c("eGFRcr","ACR","urate")
 setwd("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic")
   for(l in 1:3){
     #load best EUR SNPs
-    i = 1
+    i = 2
     temp.dir = paste0("/fastscratch/myscratch/hzhang1/ARIC/",trait[l],"/",eth[i],"/")
     data.dir = "/dcl01/chatterj/data/jin/prs/realdata/ARIC/"
     out.dir = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/",trait[l],"/",eth[i],"/")
-    LD <- as.data.frame(fread(paste0(out.dir,"/LD_clump_chr_",j,".clumped")))
+    out.dir.eur = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/",trait[l],"/",eth[1],"/")
+    LD <- as.data.frame(fread(paste0(out.dir.eur,"/LD_clump_chr_",j,".clumped")))
     clump.snp <- LD[,3,drop=F] 
     
-    sum.data = as.data.frame(fread(paste0(data.dir,trait[l],"/",eth[i],"/sumdata/training-GWAS-formatted.txt")))
-    sum.data = sum.data %>% 
+    sum.eur = as.data.frame(fread(paste0(data.dir,trait[l],"/",eth[1],"/sumdata/training-GWAS-formatted.txt")))
+    sum.data = sum.eur %>% 
       mutate(BP=POS,SNP = SNP_ID,A1 = REF,
-             P = PVAL) 
-    # write.table(sum.data.MAF,file = paste0("/lscratch/",sid,"/test/",eth[i],"_summary_out_MAF_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".out")
-    #             ,col.names = T,row.names = F,quote=F) 
-    #prepare association file for plink
-    prs.all <- left_join(clump.snp,sum.data,by="SNP")
-    n_pthres <- length(pthres)
-    q_range = data.frame(rep("p_value",n_pthres),rep(0,n_pthres),rep(0.5,n_pthres),stringsAsFactors = F)
-    prs.file <- prs.all %>% filter(CHR==j) 
-    prs.file = prs.file[,c("SNP","A1","BETA")]
-    #setwd(temp.dir)
-    write.table(prs.file,file = paste0(temp.dir,"prs_coeff_chr_",j),col.names = T,row.names = F,quote=F)
-    p.value.file <- prs.all %>% filter(CHR==j) 
-    p.value.file = p.value.file[,c("SNP","P")]
+             P = PVAL)
+    prs.clump <- left_join(clump.snp,sum.data,by="SNP")
     
-    write.table(p.value.file,file = paste0(temp.dir,"p_value_chr_",j),col.names = T,row.names = F,quote=F)
+    #load LD clumping results
+    load(paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/ARIC.result.CT.rdata"))
+    CT.result = ARIC.result.CT[[2]] %>% 
+      filter(triat==all_of(trait[l])&
+               eth==all_of(eth[i]))
+    idx.pcut <- which.max(CT.result$r2.vec.test.prs)
+    prs.file = prs.clump %>% filter(P<=pthres[idx.pcut]) %>% 
+      select(SNP,A1,BETA)
+    write.table(prs.file,file = paste0(temp.dir,"best_eur_prs_coeff_chr_",j),col.names = T,row.names = F,quote=F)
+    #best eur SNP with EUR coefficients
+    res <- system(paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/plink --threads 2 --score ",temp.dir,"best_eur_prs_coeff_chr_",j," header no-sum no-mean-imputation --bfile ",data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc",j," --out ",temp.dir,"best_eur_prs_chr_",j))
     
-    if(nrow(prs.file)>0){
-      res <- system(paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/plink --q-score-range ",temp.dir,"q_range_file ",temp.dir,"p_value_chr_",j," header --threads 2 --score ",temp.dir,"prs_coeff_chr_",j," header no-sum no-mean-imputation --bfile ",data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc",j," --out ",temp.dir,"prs_chr_",j))
-      
-      print("step2 finished")
-      #system(paste0("/data/zhangh24/software/plink2 --score ",cur.dir,eth[i],"/prs/prs_file_pvalue_",k,"_rho_",l,"_size_",m,,"_rep_",i_rep," no-sum no-mean-imputation --bfile ",cur.dir,eth[i],"/all_chr.tag --exclude /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/duplicated.id  --out ",cur.dir,eth[i],"/prs/prs_",k,"_rho_",l,"_size_",m))
-      if(res==2){
-        stop()
-      }
-      
-      
+    
+    #best EUR SNP with target coefficients
+    sum.tar = as.data.frame(fread(paste0(data.dir,trait[l],"/",eth[i],"/sumdata/training-GWAS-formatted.txt")))
+    sum.tar = sum.tar %>% 
+      mutate(BP=POS,SNP = SNP_ID,A1 = REF,
+             P = PVAL)
+    
+    best.snp.id = prs.file %>% select(SNP)
+    prs.file = left_join(best.snp.id,sum.tar,by="SNP") %>% 
+      select(SNP,A1,BETA)
+    write.table(prs.file,file = paste0(temp.dir,"best_eur_tarcoef_prs_coeff_chr_",j),col.names = T,row.names = F,quote=F)
+    res <- system(paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/plink --threads 2 --score ",temp.dir,"best_eur_tarcoef_prs_coeff_chr_",j," header no-sum no-mean-imputation --bfile ",data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc",j," --out ",temp.dir,"best_eur_tarcoef_prs_chr_",j))
+    
+    #best EUR SNP with EB coefficients
+    #align EUR and tar
+    #use all best EUR SNPs to estimate prior
+    clump.snp <- as.data.frame(fread(paste0(out.dir.eur,"/LD_clump.clumped")))
+    sum.eur = as.data.frame(fread(paste0(data.dir,trait[l],"/",eth[1],"/sumdata/training-GWAS-formatted.txt")))
+    sum.eur = sum.eur %>% 
+      mutate(BP=POS,SNP = SNP_ID,A1 = REF,
+             P = PVAL)
+    prs.clump <- left_join(clump.snp,sum.eur,by="SNP")
+    best.snp = prs.clump %>% filter(P<=pthres[idx.pcut]) %>% 
+      rename(A1_EUR=A1,BETA_EUR= BETA,
+                 SE_EUR = SE) %>% 
+      select(SNP,A1_EUR,BETA_EUR,SE_EUR,CHR)
+    
+    
+    
+    sum.tar = as.data.frame(fread(paste0(data.dir,trait[l],"/",eth[i],"/sumdata/training-GWAS-formatted.txt")))
+    sum.tar = sum.tar %>% 
+      mutate(BP=POS,SNP = SNP_ID,
+             P = PVAL,
+             BETA_tar = BETA,
+             SE_tar = SE,
+             A1_tar = REF) %>% 
+      select(SNP,A1_tar,BETA_tar,SE_tar)
+    
+    sum.match <- left_join(best.snp,sum.tar,by="SNP")
+    
+    idx <- which(sum.match$A1_tar!=
+                   sum.match$A1_EUR)
+    if(length(idx)>0){
+      sum.match$BETA_EUR[idx]=-sum.match$BETA_EUR[idx]
     }
+    sum.match = sum.match %>% 
+      mutate(z_stat_eur = BETA_EUR/SE_EUR,
+             z_stat_tar = BETA_tar/SE_tar)
+    prior.sigma = cov(cbind(sum.match$z_stat_tar,
+                            sum.match$z_stat_eur),use="complete.obs")-diag(2)
+    post.sigma = solve(solve(prior.sigma)+diag(2))
+    z_stat_tar = sum.match$z_stat_tar
+    z_stat_eur = sum.match$z_stat_eur
+    z_mat = cbind(z_stat_tar,z_stat_eur)
+    
+    z_post = z_mat%*%post.sigma
+    post_beta_tar = sum.match$BETA_tar
+    idx <- which(!is.na(sum.match$z_stat_tar))
+    post_beta_tar[idx] = z_post[idx,1]*sum.match$SE_tar[idx]
+    sum.match$BETA = post_beta_tar
+    prs.file = sum.match %>% 
+      filter(CHR==j) %>% 
+      rename(A1 = A1_tar) %>% 
+      select(SNP,A1,BETA)
+    write.table(prs.file,file = paste0(temp.dir,"best_eur_eb_prs_coeff_chr_",j),col.names = T,row.names = F,quote=F)
+    res <- system(paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/plink --threads 2 --score ",temp.dir,"best_eur_eb_prs_coeff_chr_",j," header no-sum no-mean-imputation --bfile ",data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc",j," --out ",temp.dir,"best_eur_eb_prs_chr_",j))
+    
   }
-}
+
 
 
 
