@@ -24,7 +24,7 @@ r2_vec = c(0.01,0.05,0.1,0.2,0.5)
 wc_base_vec = c(50,100)
 
 
-#generate q_range file is a one time job
+# generate q_range file is a one time job
 # for(l in 1:3){
 #   temp.dir = paste0("/fastscratch/myscratch/hzhang1/ARIC/",trait[l],"/",eth[i],"/")
 #   q_range = data.frame(
@@ -32,13 +32,13 @@ wc_base_vec = c(50,100)
 #     rep(0,n_pthres),
 #     pthres,stringsAsFactors = F)
 #   write.table(q_range,file = paste0(temp.dir,"2Dq_range_file"),row.names = F,col.names = F,quote=F)
-#   
+# 
 # }
 
 
   for(l in 1:3){
     setwd("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic")
-    
+    temp.dir = paste0("/fastscratch/myscratch/hzhang1/ARIC/",trait[l],"/",eth[i],"/")
     data.dir = "/dcl01/chatterj/data/jin/prs/realdata/ARIC/"
     out.dir = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/",trait[l],"/",eth[i],"/")
     out.dir.eur = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/",trait[l],"/",eth[1],"/")
