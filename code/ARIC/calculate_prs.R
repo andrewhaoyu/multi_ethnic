@@ -50,7 +50,7 @@ for(i in 1:2){
     #in summary data and ARIC data
     bim <- as.data.frame(fread(paste0(data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc",j,".bim")))
     colnames(bim)[2] <- "SNP"
-    sum.com.match <- left_join(bim,sum.com,by="SNP")
+    sum.com.match <- left_join(bim,sum.data,by="SNP")
     #A1 is in summary data
     #V5 and V6 is from genotype data
     #if A1 is not either V5 or V6, flip strand
