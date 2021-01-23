@@ -23,9 +23,22 @@ i = 2
 r2_vec = c(0.01,0.05,0.1,0.2,0.5)
 wc_base_vec = c(50,100)
 
+
+#generate q_range file is a one time job
+# for(l in 1:3){
+#   temp.dir = paste0("/fastscratch/myscratch/hzhang1/ARIC/",trait[l],"/",eth[i],"/")
+#   q_range = data.frame(
+#     paste0("p_value_",c(1:n_pthres)),
+#     rep(0,n_pthres),
+#     pthres,stringsAsFactors = F)
+#   write.table(q_range,file = paste0(temp.dir,"2Dq_range_file"),row.names = F,col.names = F,quote=F)
+#   
+# }
+
+
   for(l in 1:3){
     setwd("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic")
-    temp.dir = paste0("/fastscratch/myscratch/hzhang1/ARIC/",trait[l],"/",eth[i],"/")
+    
     data.dir = "/dcl01/chatterj/data/jin/prs/realdata/ARIC/"
     out.dir = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/",trait[l],"/",eth[i],"/")
     out.dir.eur = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/",trait[l],"/",eth[1],"/")
@@ -80,11 +93,6 @@ wc_base_vec = c(50,100)
     prs.all <- left_join(clump.snp,sum.com.match,by="SNP")
     colSums(is.na(prs.all))
     
-    q_range = data.frame(
-      paste0("p_value_",c(1:n_pthres)),
-      rep(0,n_pthres),
-      pthres,stringsAsFactors = F)
-    write.table(q_range,file = paste0(temp.dir,"q_range_file"),row.names = F,col.names = F,quote=F)
       
     
     
@@ -111,7 +119,7 @@ wc_base_vec = c(50,100)
    # idx <- which(bim$V2=="rs1967017")
    # bim[idx,]
    if(nrow(prs.file)>0){
-      res <- system(paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/plink --q-score-range ",temp.dir,"q_range_file ",temp.dir,"2Dp_value_chr_",j," header --threads 2 --score ",temp.dir,"2Dprs_coeff_chr_",j," header no-sum no-mean-imputation --bfile ",data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc",j," --out ",temp.dir,"prs_chr_",j,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1))
+      res <- system(paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/plink --q-score-range ",temp.dir,"2Dq_range_file ",temp.dir,"2Dp_value_chr_",j," header --threads 2 --score ",temp.dir,"2Dprs_coeff_chr_",j," header no-sum no-mean-imputation --bfile ",data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc",j," --out ",temp.dir,"prs_chr_",j,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1))
       #res <- system(paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/plink2 --q-score-range ",temp.dir,"q_range_file ",temp.dir,"p_value_chr_",j," header --threads 2 --score ",temp.dir,"prs_coeff_chr_",j," header no-mean-imputation --bfile ",data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc",j," --out ",temp.dir,"prs_chr_",j))
       print("step2 finished")
       #system(paste0("/data/zhangh24/software/plink2 --score ",cur.dir,eth[i],"/prs/prs_file_pvalue_",k,"_rho_",l,"_size_",m,,"_rep_",i_rep," no-sum no-mean-imputation --bfile ",cur.dir,eth[i],"/all_chr.tag --exclude /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/duplicated.id  --out ",cur.dir,eth[i],"/prs/prs_",k,"_rho_",l,"_size_",m))
