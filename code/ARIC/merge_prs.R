@@ -56,7 +56,7 @@ for(i in 1:2){
             
             
             filename <- paste0(temp.dir,"prs_chr_",j,".p_value_",k,".profile")
-            
+            filename <- paste0(temp.dir,"prs_chr_",j,".p_value_",k,".sscore")
             prs.temp <- fread(filename)  
             prs.score <- prs.temp$SCORE*2*length(idx)+prs.score
           }

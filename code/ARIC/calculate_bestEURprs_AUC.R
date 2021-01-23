@@ -12,7 +12,7 @@ method_vec = rep("c",qw)
 eth_vec = rep("c",qw)
 trait_vec = rep("c",qw)
 r2_prs_vec = rep(0,qw)
-r2_prs_pc_vec = rep(0,qw)
+rer2_prs_pc_vec = rep(0,qw)
 result.data.list = list()
 method_op <- c("Best EUR SNP (C+T)",
                "Best EUR SNP + target coefficients (C+T)",
@@ -29,12 +29,6 @@ i= 2
     
     y <- as.data.frame(fread(paste0(data.dir,trait[l],"/",eth[i],"/pheno/pheno.txt")))
     colnames(y)[2] = "ID"
-    test.id = as.data.frame(fread(paste0(data.dir,trait[l],"/",eth[i],"/pheno/IDs.tuning.txt"),header=F))
-    colnames(test.id)[2] = "ID"
-    vad.id = as.data.frame(fread(paste0(data.dir,trait[l],"/",eth[i],"/pheno/IDs.validation.txt"),header=F))
-    colnames(vad.id)[2] = "ID"
-    test.data = left_join(test.id,y,by="ID")
-    vad.data = left_join(vad.id,y,by="ID")
     sum.data = as.data.frame(fread(paste0(data.dir,trait[l],"/",eth[i],"/sumdata/training-GWAS-formatted.txt")))
     
     sum.data = sum.data %>% 
@@ -43,7 +37,7 @@ i= 2
         
         filename <- paste0(out.dir,"prs_best_eur_prs.profile")
         
-        prs.temp <- as.data.frame(fread(filename))
+        prs.temp <- as.data.frame(fread(filename,header=T))
         for(i_method in 1:3){
           prs.score <-   prs.temp[,i_method]
           genotype.fam <- as.data.frame(fread(paste0(data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc1.fam")))
@@ -54,11 +48,14 @@ i= 2
           
           model1.full <- lm(y~prs+pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.test)
           model1.prs <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.test)
-          model1.null <- lm(y~age+sex,data=prs.test)
+          #model1.null <- lm(y~age+sex,data=prs.test)
           #r2.test.rep[i_rep] <- summary(model1)$r.square
           
+          
           r2_prs_vec[step] = summary(model1.full)$r.square-summary(model1.prs)$r.square
-          r2_prs_pc_vec[step] = summary(model1.full)$r.square-summary(model1.null)$r.square
+          model1.null <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.test)
+          model1.prs <- lm(model1.null$residual~prs,data=prs.test)
+          rer2_prs_pc_vec[step] = summary(model1.prs)$r.square
           method_vec[step] = method_op[i_method]
           eth_vec[step] = eth[i]
           trait_vec[step] = trait[l]
@@ -76,11 +73,12 @@ i= 2
 r2.result = data.frame(eth = eth_vec,
                        trait = trait_vec,
                        r2_prs = r2_prs_vec,
-                       r2_prs_pc = r2_prs_pc_vec,
+                       rer2_prs_pc = rer2_prs_pc_vec,
                        method_vec)
 
-ARIC.result.CT = list(r2.result,result.data)
-save(ARIC.result.CT,file = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/ARIC.result.CT.rdata"))    
+ARIC.result.bestEUR = r2.result
+save(ARIC.result.bestEUR,file = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/ARIC.result.bestEUR.rdata"))    
+write.csv(ARIC.result.bestEUR,file = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/ARIC.result.bestEUR.csv"))
 
 #}
 #     prs.sum = colSums(prs.mat)

@@ -1,5 +1,12 @@
-
-
+startend <- function(num,size,ind){
+  split.all <- split(1:num,cut(1:num,size))
+  temp <- split.all[[ind]]
+  start <- temp[1]
+  end <- temp[length(temp)]
+  return(c(start,end))
+}
+#library(devtools)
+#install.packages("devtools")
 library(dplyr)
 library(data.table)
 eth <- c("EUR","AFR","AMR","EAS","SAS")
@@ -11,8 +18,9 @@ qw = 2*3
 eth_vec = rep("c",qw)
 trait_vec = rep("c",qw)
 r2_prs_vec = rep(0,qw)
-r2_prs_pc_vec = rep(0,qw)
+rer2_prs_vec = rep(0,qw)
 result.data.list = list()
+reresult.data.list = list()
 
 step = 1
 
@@ -45,14 +53,20 @@ for(i in 1:2){
     r2.vec.vad.prs = rep(0,length(pthres))
     r2.vec.vad.prs.pc = rep(0,length(pthres))
     pthres_vec = rep(0,length(pthres))
-    n.rep = 100
+    n.rep = 5
     
     
     
-    r2.vec.test.prs.rep = rep(0,n.rep)
-    r2.vec.test.prs.pc.rep = rep(0,n.rep)
-    r2.vec.vad.prs.rep = rep(0,n.rep)
-    r2.vec.vad.prs.pc.rep = rep(0,n.rep)
+    r2.vec.test.prs.rep = matrix(0,length(pthres),n.rep)
+    r2.vec.vad.prs.rep = matrix(0,length(pthres),n.rep)
+    
+    
+    
+    rer2.vec.test.prs.rep = matrix(0,length(pthres),n.rep)
+    rer2.vec.vad.prs.rep = matrix(0,length(pthres),n.rep)
+    
+    
+    
     
     temp =1
     for(k in 1:length(pthres)){
@@ -71,8 +85,10 @@ for(i in 1:2){
         #prs.score <- prs.temp$SCORE*2*length(idx)+prs.score
         #prs.score.mat[,k] = prs.score
         for(i_rep in 1:n.rep){
-          test.id = sample(c(1:nrow(y)),nrow(y)/2,replace = F)
-          vad.id = setdiff(c(1:nrow(y)),test.id)
+          #n.sub.fold = nrow(y)/n.rep
+          start.end <- startend(nrow(y),n.rep,i_rep)
+          vad.id = c(start.end[1]:start.end[2])
+          test.id = setdiff(c(1:nrow(y)),vad.id)
           test.data <- y[test.id,]
           vad.data <- y[vad.id,]
           
@@ -82,64 +98,76 @@ for(i in 1:2){
           
           model1.full <- lm(y~prs+pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.test)
           model1.prs <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.test)
-          model1.null <- lm(y~age+sex,data=prs.test)
+          #model1.null <- lm(y~age+sex,data=prs.test)
           #r2.test.rep[i_rep] <- summary(model1)$r.square
           model2.full <- lm(y~prs+pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.vad)
-          model2.prs <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex+age+sex,data=prs.vad)
-          model2.null <- lm(y~age+sex,data=prs.vad)
-          r2.vec.test.prs.rep[i_rep] = summary(model1.full)$r.square-summary(model1.prs)$r.square
-          r2.vec.vad.prs.rep[i_rep] = summary(model2.full)$r.square-summary(model2.prs)$r.square
-          r2.vec.test.prs.pc.rep[i_rep] = summary(model1.full)$r.square-summary(model1.null)$r.square
-          r2.vec.vad.prs.pc.rep[i_rep] = summary(model2.full)$r.square-summary(model2.null)$r.square
+          model2.prs <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.vad)
+          #model2.null <- lm(y~age+sex,data=prs.vad)
+          r2.vec.test.prs.rep[k,i_rep] = summary(model1.full)$r.square-summary(model1.prs)$r.square
+          r2.vec.vad.prs.rep[k,i_rep] = summary(model2.full)$r.square-summary(model2.prs)$r.square
           
-          #coefficients(model1.full)['scale(prs)']^2/var(prs.test$y)
+          #residual r2
+          model1.null <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.test)
+          model1.prs <- lm(model1.null$residual~prs,data=prs.test)
+          #model1.null <- lm(y~age+sex,data=prs.test)
+          #r2.test.rep[i_rep] <- summary(model1)$r.square
+          model2.null <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.vad)
+          model2.prs <- lm(model2.null$residual~prs,data=prs.vad)
+          #model2.null <- lm(y~age+sex,data=prs.vad)
+          rer2.vec.test.prs.rep[k,i_rep] = summary(model1.prs)$r.square
+          rer2.vec.vad.prs.rep[k,i_rep] = summary(model2.prs)$r.square
+          #pthres_vec[temp] = pthres[k]
           
-          idx <- which(is.na(prs.test$y))
-          length(idx)            
           
-          # r2.vec.test.prs[temp] = summary(model1.prs)$r.square
-          # r2.vec.vad.prs[temp] = summary(model2.prs)$r.square
-          # r2.vec.test.prs.pc[temp] = summary(model1.full)$r.square
-          # r2.vec.vad.prs.pc[temp] = summary(model2.full)$r.square
-          # 
         }
-        pthres_vec[temp] = pthres[k]
-        r2.vec.test.prs[temp] = mean(r2.vec.test.prs.rep)
-        r2.vec.vad.prs[temp] = mean(r2.vec.vad.prs.rep)
-        r2.vec.test.prs.pc[temp] = mean(r2.vec.test.prs.pc.rep)
-        r2.vec.vad.prs.pc[temp] = mean(r2.vec.vad.prs.pc.rep)
-        temp = temp+1 
-      }
-      else{
-        pthres_vec[temp] = pthres[k]
-        r2.vec.test.prs[temp] = 0
-        r2.vec.vad.prs[temp] = 0
-        r2.vec.test.prs.pc[temp] = 0
-        r2.vec.vad.prs.pc[temp] = 0
-        temp = temp+1 
+        
+      }else{
+        #pthres_vec[temp] = pthres[k]
+        r2.vec.test.prs.rep[k,] = 0
+        r2.vec.vad.prs.rep[k,] = 0
+        rer2.vec.test.prs.rep[k,] = 0
+        rer2.vec.vad.prs.rep[k,] = 0
+        
       }
       
-      
-      
+     
     }
     
     
     
     eth_vec[step] = eth[i]
     trait_vec[step] = trait[l]
+    
+    r2.vec.test.prs = rowMeans(r2.vec.test.prs.rep)
+    r2.vec.vad.prs = rowMeans(r2.vec.vad.prs.rep)
+    rer2.vec.test.prs = rowMeans(rer2.vec.test.prs.rep)
+    rer2.vec.vad.prs = rowMeans(rer2.vec.vad.prs.rep)
     result.data <- data.frame(r2.vec.test.prs,r2.vec.vad.prs,
-                              r2.vec.test.prs.pc,r2.vec.vad.prs.pc,
-                              pthres_vec,
+                              rer2.vec.test.prs,rer2.vec.vad.prs,
+                              pthres,
                               eth = rep(eth[i],length(pthres)),
                               triat = rep(trait[l],length(pthres)))
+    #find the best prs cutoff under each rep
+    # r2.prs.temp = rep(0,n.rep) 
+    # rer2.prs.temp = rep(0,n.rep)
+    # for(i_rep in 1:n.rep){
+    #   idx <- which.max(r2.vec.test.prs.rep[,i_rep]) 
+    #   r2.prs.temp[i_rep] = r2.vec.vad.prs.rep[idx,i_rep]
+    #   idx <- which.max(rer2.vec.test.prs.rep[,i_rep]) 
+    #   rer2.prs.temp[i_rep] = rer2.vec.vad.prs.rep[idx,i_rep]
+    # }
+    # 
+    # r2.prs = mean(r2.prs.temp)
+    # 
+    # rer2.prs = mean(rer2.prs.temp)
     
-    idx <- which.max(r2.vec.test.prs)
-    r2.prs = r2.vec.vad.prs[idx]
-    idx <- which.max(r2.vec.test.prs.pc)
-    r2.prs.pc = r2.vec.vad.prs.pc[idx]
+    idx <- which.max(result.data$r2.vec.test.prs)
+    r2.prs = result.data$r2.vec.vad.prs[idx]
+    idx <- which.max(result.data$rer2.vec.test.prs)
+    rer2.prs = result.data$rer2.vec.vad.prs[idx]
     
     r2_prs_vec[step] = r2.prs
-    r2_prs_pc_vec[step] = r2.prs.pc
+    rer2_prs_vec[step] = rer2.prs
     result.data.list[[step]] = result.data
     step = step+1
   }
@@ -149,7 +177,8 @@ for(i in 1:2){
 r2.result = data.frame(eth = eth_vec,
                        trait = trait_vec,
                        r2_prs = r2_prs_vec,
-                       r2_prs_pc = r2_prs_pc_vec)
+                       rer2_prs = rer2_prs_vec
+                       )
 result.data = rbindlist(result.data.list)  
 ARIC.result.CT = list(r2.result,result.data)
 #save(ARIC.result.CT,file = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/ARIC.result.CT.rdata"))    

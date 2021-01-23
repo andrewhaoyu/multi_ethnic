@@ -6,6 +6,7 @@ library(dplyr)
 library(RColorBrewer)
 library(grid)
 library(gridExtra)
+
 #library(RColorBrewer)
 colourCount = 12
 getPalette = colorRampPalette(brewer.pal(9, "Paired"))
@@ -15,11 +16,16 @@ library(tidyverse)
 #load(paste0("ARIC.result.CT.rep.rdata"))
 load(paste0("ARIC.result.CT.rep.rdata"))
 ARIC.result.CT.long= ARIC.result.CT[[1]]
+pla = 3
+ARIC.result.CT.long = ARIC.result.CT.long %>% 
+  mutate(r2_prs =round(r2_prs,pla),
+         rer2_prs =round(rer2_prs,pla))
 ARIC.result.CT.long$eth = factor(ARIC.result.CT.long$eth,levels = c("EUR","AFR"))
 ARIC.result.CT.long$trait = factor(ARIC.result.CT.long$trait,levels = c("eGFRcr","ACR","urate"))
 
-ARIC.result.CT.prs = spread(ARIC.result.CT.long[,c("eth","trait","r2_prs")],trait,r2_prs)
-ARIC.result.CT.prs.pc = spread(ARIC.result.CT.long[,c("eth","trait","r2_prs_pc")],trait,r2_prs_pc)
+
+ARIC.result.CT.prs = spread(ARIC.result.CT.long[,c("eth","trait","r2_prs")],trait,r2_prs,pla)
+ARIC.result.CT.prs.pc = spread(ARIC.result.CT.long[,c("eth","trait","rer2_prs")],trait,rer2_prs)
 ARIC.result.CT.wide = rbind(ARIC.result.CT.prs,ARIC.result.CT.prs.pc)
 
 write.csv(ARIC.result.CT.wide,file = "ARIC.result.CT.csv")
@@ -28,14 +34,14 @@ result.pthres.all = ARIC.result.CT[[2]]
 result.pthres.all$eth = factor(result.pthres.all$eth,levels = c("EUR","AFR"))
 result.pthres.all$triat = factor(result.pthres.all$triat,levels = c("eGFRcr","ACR","urate"))
 colnames(result.pthres.all)[7] = "trait"
-result.pthres.all$r2 = (result.pthres.all$r2.vec.test.prs+result.pthres.all$r2.vec.vad.prs)/2
+#result.pthres.all$r2 = (result.pthres.all$r2.vec.test.prs+result.pthres.all$r2.vec.vad.prs)/2
 
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 trait = c("eGFRcr","ACR","urate")
 
 
     #result.pthres.sub = result.pthres.all %>% filter(eth == "EUR"&trait=="eGFRcr")
-    p= ggplot(result.pthres.all,aes(log10(pthres_vec),r2)) + geom_point()+geom_line()+
+    p= ggplot(result.pthres.all,aes(log10(pthres),r2.vec.test.prs)) + geom_point()+geom_line()+
       theme_Publication()+
       ggtitle(paste0("R2 of PRS"))+
       xlab("log10(p-value)")+
@@ -43,9 +49,18 @@ trait = c("eGFRcr","ACR","urate")
       facet_grid(rows = vars(eth),cols = vars(trait))
   print(p)    
   
-ggplot(result.pthres.sub,aes(-log10(pthres_vec),r2.vec.vad.prs)) + geom_point()+geom_line()+
-  theme_Publication()+
-  ggtitle("eGFR PRS R2 in vad data")
+  
+  p= ggplot(result.pthres.all,aes(log10(pthres),rer2.vec.test.prs)) + geom_point()+geom_line()+
+    theme_Publication()+
+    ggtitle(paste0("R2 of PRS"))+
+    xlab("log10(p-value)")+
+    ylab("R2")+
+    facet_grid(rows = vars(eth),cols = vars(trait))
+  print(p)    
+  
+# ggplot(result.pthres.sub,aes(-log10(pthres_vec),r2.vec.vad.prs)) + geom_point()+geom_line()+
+#   theme_Publication()+
+#   ggtitle("eGFR PRS R2 in vad data")
 
 for(i1 in 1:2){
   load(paste0("LD.clump.result.GA_",i1,".rdata"))
