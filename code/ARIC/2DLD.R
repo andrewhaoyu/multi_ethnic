@@ -65,7 +65,7 @@ i = 2
     #code <- rep("c",5*3*3)
     #system(paste0("/data/zhangh24/software/plink2 --bfile /data/zhangh24/KG.plink/",eth[i],"/chr_all --clump ",cur.dir,eth[i],"/summary_out_MAF_rho_",l,"_size_",m,"_rep_",i_rep,".out --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out ",cur.dir,eth[i],"/LD_clump_rho_",l,"_size_",m,"_rep_",i_rep))
     res = system(paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/plink --bfile ",data.dir,trait[1],"/",eth[i],"/geno/mega/ref_chr",j," --clump ",temp.dir,"2DLD_chr_",j,"_assoc.txt --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out ",temp.dir,"2DLD_clump_chr_",j,"_",r_ind,"_",w_ind))
-    system(paste0("mv ",temp.dir,"LD_clump_chr_",j,".clumped ",out.dir))
+    #system(paste0("mv ",temp.dir,"2DLD_clump_chr_",j,".clumped ",out.dir))
     if(res==2){
       stop()
     }

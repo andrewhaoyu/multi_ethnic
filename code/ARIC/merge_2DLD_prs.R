@@ -6,23 +6,31 @@ pthres <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01,0.
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 trait = c("eGFRcr","ACR","urate")
 #merge clump data
+i = 2
+r2_vec = c(0.01,0.05,0.1,0.2,0.5)
+wc_base_vec = c(50,100)
 
-for(i in 1:2){
+#for(i in 1:2){
   for(l in 1:3){
     temp.dir = paste0("/fastscratch/myscratch/hzhang1/ARIC/",trait[l],"/",eth[i],"/")
     data.dir = "/dcl01/chatterj/data/jin/prs/realdata/ARIC/"
     out.dir = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/",trait[l],"/",eth[i],"/")
-    
+    for(r_ind in 1:length(r2_vec)){
+      wc_vec = wc_base_vec/r2_vec[r_ind]
+      for(w_ind in 1:length(wc_vec)){
+        
     LD.list = list()
     for(j in 1:22){
       
-      LD <- as.data.frame(fread(paste0(out.dir,"/LD_clump_chr_",j,".clumped")))
+      LD <- as.data.frame(fread(paste0(temp.dir,"2DLD_clump_chr_",j,"_",r_ind,"_",w_ind,".clumped")))
       clump.snp <- LD[,3,drop=F]  
       LD.list[[j]] = clump.snp
     }
     LD = rbindlist(LD.list)
     write.table(LD,file = paste0(out.dir,"/LD_clump.clumped"),row.names = F,col.names = T)
-  }}
+      }
+    }
+  }
 
 for(i in 1:2){
   for(l in 1:3){
@@ -64,9 +72,9 @@ for(i in 1:2){
         }
         write.table(prs.score,file = paste0(out.dir,"/prs_pvalue_",k,".profile"),row.names = F,col.names = F,quote=F)
         
-      
+        
+      }
     }
-  }
   }
 }
 
