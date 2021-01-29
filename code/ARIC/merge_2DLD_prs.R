@@ -23,7 +23,7 @@ wc_base_vec = c(50,100)
     for(j in 1:22){
       print(j)
       LD <- as.data.frame(fread(paste0(temp.dir,"2DLD_clump_chr_",j,"_",r_ind,"_",w_ind,".clumped")))
-      clump.snp <- LD[,3,drop=F]  
+      clump.snp <- LD[,2,drop=F]  
       LD.list[[j]] = clump.snp
     }
     LD = rbindlist(LD.list)

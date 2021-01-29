@@ -19,8 +19,8 @@ trait = c("eGFRcr","ACR","urate")
 qw = 1*3
 eth_vec = rep("c",qw)
 trait_vec = rep("c",qw)
-r2_prs_vec = rep(0,qw)
 rer2_prs_vec = rep(0,qw)
+rer2_prs_sl<- rep(0,qw)
 result.data.list = list()
 reresult.data.list = list()
 
@@ -57,6 +57,7 @@ i = 2
     prs.mat = data.frame(ID = genotype.fam$V2,matrix(0,n.sub,n.col))
     #files = dir(path = temp.dir,pattern=paste0(".profile"),full.names = T)
     #temp for loop in rbind,w_ind,k1,k2
+    #evaluate 2DLD-method result
     temp =1
     for(r_ind in 1:length(r2_vec)){
       wc_vec = wc_base_vec/r2_vec[r_ind]
@@ -91,15 +92,15 @@ i = 2
           prs.vad <- left_join(vad.data,prs.data,by="ID")
           #model = lm(y~prs.score)
           
-          model1.full <- lm(y~prs+pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.test)
-          model1.prs <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.test)
-          #model1.null <- lm(y~age+sex,data=prs.test)
-          #r2.test.rep[i_rep] <- summary(model1)$r.square
-          model2.full <- lm(y~prs+pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.vad)
-          model2.prs <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.vad)
-          #model2.null <- lm(y~age+sex,data=prs.vad)
-          r2.vec.test.prs.rep[temp,i_rep] = summary(model1.full)$r.square-summary(model1.prs)$r.square
-          r2.vec.vad.prs.rep[temp,i_rep] = summary(model2.full)$r.square-summary(model2.prs)$r.square
+          # model1.full <- lm(y~prs+pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.test)
+          # model1.prs <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.test)
+          # #model1.null <- lm(y~age+sex,data=prs.test)
+          # #r2.test.rep[i_rep] <- summary(model1)$r.square
+          # model2.full <- lm(y~prs+pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.vad)
+          # model2.prs <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.vad)
+          # #model2.null <- lm(y~age+sex,data=prs.vad)
+          # r2.vec.test.prs.rep[temp,i_rep] = summary(model1.full)$r.square-summary(model1.prs)$r.square
+          # r2.vec.vad.prs.rep[temp,i_rep] = summary(model2.full)$r.square-summary(model2.prs)$r.square
           
           #residual r2
           model1.null <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.test)
@@ -128,12 +129,11 @@ i = 2
     eth_vec[step] = eth[i]
     trait_vec[step] = trait[l]
     
-    r2.vec.test.prs = rowMeans(r2.vec.test.prs.rep)
-    r2.vec.vad.prs = rowMeans(r2.vec.vad.prs.rep)
+    # r2.vec.test.prs = rowMeans(r2.vec.test.prs.rep)
+    # r2.vec.vad.prs = rowMeans(r2.vec.vad.prs.rep)
     rer2.vec.test.prs = rowMeans(rer2.vec.test.prs.rep)
     rer2.vec.vad.prs = rowMeans(rer2.vec.vad.prs.rep)
-    result.data <- data.frame(r2.vec.test.prs,r2.vec.vad.prs,
-                              rer2.vec.test.prs,rer2.vec.vad.prs,
+    result.data <- data.frame(rer2.vec.test.prs,rer2.vec.vad.prs,
                               expand.grid(pthres,pthres)[,c(2,1)],
                               eth = rep(eth[i],length(pthres)^2),
                               triat = rep(trait[l],length(pthres)^2))
@@ -147,28 +147,70 @@ i = 2
     r2_prs_vec[step] = r2.prs
     rer2_prs_vec[step] = rer2.prs
     result.data.list[[step]] = result.data
+    
+    #evaluate 2DLD-super-learning method
+    
+    #r2_prs_sl <- rep(0,qw)
+    
+    #r2.prs.sl.rep <- rep(0,n.rep)
+    rer2.prs.sl.rep <- rep(0,n.rep)
+    SL.libray <- c(
+      "SL.glmnet",
+      "SL.ridge"
+      #"SL.nnet"
+    )
+    library(caret)
+    library(SuperLearner)
+    library(ranger)
+    library(glmnet)
+    for(i_rep in 1:n.rep){
+      #n.sub.fold = nrow(y)/n.rep
+      start.end <- startend(nrow(y),n.rep,i_rep)
+      vad.id = c(start.end[1]:start.end[2])
+      test.id = setdiff(c(1:nrow(y)),vad.id)
+      test.data <- y[test.id,]
+      vad.data <- y[vad.id,]
+      
+      prs.test <- left_join(test.data,prs.mat,by="ID")
+      prs.vad <- left_join(vad.data,prs.mat,by="ID")
+      #model = lm(y~prs.score)
+      
+      #residual r2
+      model1.null <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.test)
+      y.test <- model1.null$residual
+      x.test = prs.test[,16:ncol(prs.test)]
+      sl = SuperLearner(Y = y.test, X = x.test, family = gaussian(),
+                        # For a real analysis we would use V = 10.
+                        # V = 3,
+                        SL.library = SL.libray)
+      x.vad = prs.vad[,16:ncol(prs.vad)]
+      y.pred <- predict(sl,x.vad,onlySL = TRUE)
+      
+      model2.null <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.vad)
+      y.vad <- model2.null$residual
+      
+      model2.prs <- lm(y.vad~y.pred[[1]])
+      #model2.null <- lm(y~age+sex,data=prs.vad)
+      rer2.prs.sl.rep[i_rep] = summary(model2.prs)$r.square
+      #pthres_vec[temp] = pthres[k]
+      
+      
+    }
+   
+    rer2_prs_sl = mean(rer2_prs_sl)
     step = step+1
     
-    
-    
-    
-    }
-    
-    
-    
-  }
-  
-}
+  }  
 
 r2.result = data.frame(eth = eth_vec,
                        trait = trait_vec,
-                       r2_prs = r2_prs_vec,
-                       rer2_prs = rer2_prs_vec
+                       rer2_prs = rer2_prs_vec,
+                       rer2_prs_sl = rer2_prs_sl
 )
 result.data = rbindlist(result.data.list)  
-ARIC.result.CT = list(r2.result,result.data)
+ARIC.result.2DLD = list(r2.result,result.data)
 #save(ARIC.result.CT,file = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/ARIC.result.CT.rdata"))    
-save(ARIC.result.CT,file = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/ARIC.result.CT.rep.rdata"))    
+save(ARIC.result.2DLD,file = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/ARIC.result.2DLD.rdata"))    
 #}
 #     prs.sum = colSums(prs.mat)
 #     idx <- which(prs.sum!=0)
