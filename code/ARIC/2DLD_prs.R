@@ -87,7 +87,7 @@ wc_base_vec = c(50,100)
       for(w_ind in 1:length(wc_vec)){
         
     LD <- as.data.frame(fread(paste0(temp.dir,"2DLD_clump_chr_",j,"_",r_ind,"_",w_ind,".clumped")))
-    clump.snp <- LD[,3,drop=F]
+    clump.snp <- LD[,2,drop=F]
     
     prs.all <- left_join(clump.snp,sum.com.match,by="SNP")
     colSums(is.na(prs.all))
