@@ -73,7 +73,7 @@ i= 2
 r2.result = data.frame(eth = eth_vec,
                        trait = trait_vec,
                        r2_prs = r2_prs_vec,
-                       rer2_prs_pc = rer2_prs_pc_vec,
+                       rer2_prs = rer2_prs_pc_vec,
                        method_vec)
 
 ARIC.result.bestEUR = r2.result

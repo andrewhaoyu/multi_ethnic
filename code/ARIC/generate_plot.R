@@ -25,8 +25,8 @@ ARIC.result.CT.long$trait = factor(ARIC.result.CT.long$trait,levels = c("eGFRcr"
 
 
 ARIC.result.CT.prs = spread(ARIC.result.CT.long[,c("eth","trait","r2_prs")],trait,r2_prs,pla)
-ARIC.result.CT.prs.pc = spread(ARIC.result.CT.long[,c("eth","trait","rer2_prs")],trait,rer2_prs)
-ARIC.result.CT.wide = rbind(ARIC.result.CT.prs,ARIC.result.CT.prs.pc)
+ARIC.result.CT.reprs = spread(ARIC.result.CT.long[,c("eth","trait","rer2_prs")],trait,rer2_prs)
+ARIC.result.CT.wide = rbind(ARIC.result.CT.prs,ARIC.result.CT.reprs)
 
 write.csv(ARIC.result.CT.wide,file = "ARIC.result.CT.csv")
 
@@ -57,6 +57,22 @@ trait = c("eGFRcr","ACR","urate")
     ylab("R2")+
     facet_grid(rows = vars(eth),cols = vars(trait))
   print(p)    
+  
+  
+  
+  ARIC.result.bestEUR <- read.csv(paste0("ARIC.result.bestEUR.csv"))  
+  ARIC.result.bestEUR.long = ARIC.result.bestEUR %>% 
+    mutate(r2_prs =round(r2_prs,pla),
+           rer2_prs =round(rer2_prs,pla))
+  ARIC.result.bestEUR.long$eth = factor(ARIC.result.bestEUR.long$method_vec,levels = c("Best EUR SNP (C+T)","Best EUR SNP + target coefficients (C+T)","Best EUR SNP + EB coefficients (C+T)"))
+  ARIC.result.bestEUR.long$trait = factor(ARIC.result.bestEUR.long$trait,levels = c("eGFRcr","ACR","urate"))
+  
+  #ARIC.result.bestEUR.prs = spread(ARIC.result.bestEUR.long[,c("eth","trait","r2_prs")],trait,r2_prs,pla)
+  ARIC.result.bestEUR.reprs = spread(ARIC.result.bestEUR.long[,c("method_vec","trait","rer2_prs")],trait,rer2_prs)
+  ARIC.result.bestEUR.wide = rbind(ARIC.result.bestEUR.prs,ARIC.result.CT.reprs)
+  
+  write.csv(ARIC.result.bestEUR.reprs,file = "ARIC.result.bestEUR.reprs.csv")
+  
   
 # ggplot(result.pthres.sub,aes(-log10(pthres_vec),r2.vec.vad.prs)) + geom_point()+geom_line()+
 #   theme_Publication()+

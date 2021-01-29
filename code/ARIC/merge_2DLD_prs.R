@@ -2,7 +2,7 @@
 library(dplyr)
 library(data.table)
 
-pthres <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01,0.5)
+pthres <- c(5E-08,5E-07,5E-06,5E-05,5E-04,5E-03,5E-02,5E-01)
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 trait = c("eGFRcr","ACR","urate")
 #merge clump data
@@ -21,63 +21,52 @@ wc_base_vec = c(50,100)
         
     LD.list = list()
     for(j in 1:22){
-      
+      print(j)
       LD <- as.data.frame(fread(paste0(temp.dir,"2DLD_clump_chr_",j,"_",r_ind,"_",w_ind,".clumped")))
       clump.snp <- LD[,3,drop=F]  
       LD.list[[j]] = clump.snp
     }
     LD = rbindlist(LD.list)
-    write.table(LD,file = paste0(out.dir,"/LD_clump.clumped"),row.names = F,col.names = T)
+    save(LD,file = paste0(temp.dir,"/2DLD_LD_clump.rdata"),row.names = F,col.names = T)
       }
     }
   }
 
-for(i in 1:2){
+i = 2
   for(l in 1:3){
     temp.dir = paste0("/fastscratch/myscratch/hzhang1/ARIC/",trait[l],"/",eth[i],"/")
     data.dir = "/dcl01/chatterj/data/jin/prs/realdata/ARIC/"
     out.dir = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/",trait[l],"/",eth[i],"/")
-    
-    sum.data = as.data.frame(fread(paste0(data.dir,trait[l],"/",eth[i],"/sumdata/training-GWAS-formatted.txt")))
-    sum.data = sum.data %>% 
-      mutate(BP=POS,SNP = SNP_ID,A1 = REF,
-             P = PVAL) 
-    # write.table(sum.data.MAF,file = paste0("/lscratch/",sid,"/test/",eth[i],"_summary_out_MAF_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".out")
-    #             ,col.names = T,row.names = F,quote=F) 
-    #prepare association file for plink
-    clump.snp <- as.data.frame(fread(paste0(out.dir,"/LD_clump.clumped")))
-    prs.clump <- left_join(clump.snp,sum.data,by="SNP")
-    
-    for(k in 1:length(pthres)){
-      prs.all <- prs.clump %>% 
-        filter(P<=pthres[k])
-      if(nrow(prs.all)>0){
-        n.snp.total <- 0
+    files = dir(path = temp.dir,pattern=paste0(".profile"),full.names = T)
+    for(r_ind in 1:length(r2_vec)){
+      for(w_ind in 1:length(wc_base_vec)){
+    for(k1 in 1:length(pthres)){
+     for(k2 in 1:length(pthres)){
+       print(c(k1,k2))
+
         fam.file <- as.data.frame(fread(paste0(data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc1.fam")))
         prs.score <- rep(0,nrow(fam.file))
+        
         for(j in 1:22){
           
-          #get the number of
-          idx <- which(prs.all$CHR==j)
-          
-          if(length(idx)>0){
-            
-            
-            filename <- paste0(temp.dir,"prs_chr_",j,".p_value_",k,".profile")
+            filename <- paste0(temp.dir,"/prs_chr_",j,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1,".p_value_",k2,".profile")
             #filename <- paste0(temp.dir,"prs_chr_",j,".p_value_",k,".sscore")
-            prs.temp <- fread(filename)  
-            prs.score <- prs.temp$SCORE*prs.temp$CNT+prs.score
-            n.snp.total = n.snp.total+prs.temp$CNT/2
-          }
+            if(filename%in%files){
+              prs.temp <- fread(filename)  
+              prs.score <- prs.temp$SCORE*prs.temp$CNT+prs.score
+              
+            }
+            #n.snp.total = n.snp.total+prs.temp$CNT/2
+          
         }
-        write.table(prs.score,file = paste0(out.dir,"/prs_pvalue_",k,".profile"),row.names = F,col.names = F,quote=F)
+        write.table(prs.score,file = paste0(temp.dir,"/2Dprs_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1,"_",k2,".profile"),row.names = F,col.names = F,quote=F)
         
         
       }
     }
   }
 }
-
+}
 
 
 

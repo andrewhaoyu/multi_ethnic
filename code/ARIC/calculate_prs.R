@@ -77,7 +77,11 @@ for(i in 1:2){
     p.value.file <- prs.all %>% filter(CHR==j) 
     p.value.file = p.value.file[,c("SNP","P")]
       
-    write.table(p.value.file,file = paste0(temp.dir,"p_value_chr_",j),col.names = T,row.names = F,quote=F)
+    # com.prs = left_join(prs.file,p.value.file,by="SNP")
+    # com.prs.filter = com.prs %>%
+    # filter(P<=pthres[9])
+
+     write.table(p.value.file,file = paste0(temp.dir,"p_value_chr_",j),col.names = T,row.names = F,quote=F)
       
       if(nrow(prs.file)>0){
         res <- system(paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/plink --q-score-range ",temp.dir,"q_range_file ",temp.dir,"p_value_chr_",j," header --threads 2 --score ",temp.dir,"prs_coeff_chr_",j," header no-sum no-mean-imputation --bfile ",data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc",j," --out ",temp.dir,"prs_chr_",j))

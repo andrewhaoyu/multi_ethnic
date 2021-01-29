@@ -38,7 +38,6 @@ wc_base_vec = c(50,100)
 
   for(l in 1:3){
     setwd("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic")
-    temp.dir = paste0("/fastscratch/myscratch/hzhang1/ARIC/",trait[l],"/",eth[i],"/")
     data.dir = "/dcl01/chatterj/data/jin/prs/realdata/ARIC/"
     out.dir = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/",trait[l],"/",eth[i],"/")
     out.dir.eur = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/",trait[l],"/",eth[1],"/")
@@ -114,8 +113,10 @@ wc_base_vec = c(50,100)
     p.value.file = p.value.file[,c("SNP","P")]
     
     write.table(p.value.file,file = paste0(temp.dir,"2Dp_value_chr_",j),col.names = T,row.names = F,quote=F)
-    
-   # bim <- fread(paste0(data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc",j,".bim"))
+   com.prs = left_join(prs.file,p.value.file,by="SNP")
+   com.prs.filter = com.prs %>%
+     filter(P<=pthres[9])
+   #bim <- fread(paste0(data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc",j,".bim"))
    # idx <- which(bim$V2=="rs1967017")
    # bim[idx,]
    if(nrow(prs.file)>0){
