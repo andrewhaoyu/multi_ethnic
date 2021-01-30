@@ -44,10 +44,12 @@ for(l in 1:3){
   out.dir.eur = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/",trait[l],"/",eth[1],"/")
   summary.eur = as.data.frame(fread(paste0(data.dir,trait[l],"/",eth[1],"/sumdata/training-GWAS-formatted.txt")))
   summary.eur.select = summary.eur %>% 
-    mutate(peur = PVAL,
+    mutate(p_eur = PVAL,
            beta_eur = BETA,
-           SNP = SNP_ID) %>% 
-    select(SNP,beta_eur,peur)
+           SNP = SNP_ID,
+           se_eur = SE,
+           A1_eur = REF) %>% 
+    select(SNP,beta_eur,se_eur,A1_eur,p_eur)
   # colnames(summary.eur)[9] = "peur"
   # colnames(summary.eur)[7] = "beta_eur"
   # summary.eur.select = summary.eur %>% 
@@ -56,19 +58,67 @@ for(l in 1:3){
   #load target gwas summary statistics
   sum.data = as.data.frame(fread(paste0(data.dir,trait[l],"/",eth[i],"/sumdata/training-GWAS-formatted.txt")))
   sum.data = sum.data %>% 
-    mutate(BP=POS,SNP = SNP_ID,A1 = REF,
-           P = PVAL) 
+    mutate(BP=POS,
+           SNP = SNP_ID,
+           beta_tar = BETA,
+           A1_tar = REF,
+           p_tar = PVAL,
+           se_tar = SE) %>% 
+    select(SNP,beta_tar,se_tar,A1_tar,p_tar)
   
   # filter.data <- sum.data %>% 
   #   filter(SNP_ID=="rs1967017")
   # 
   sum.com <- left_join(sum.data,summary.eur.select,by="SNP")
   
+  #align alleles
+  sum.com = sum.com %>% 
+    mutate(beta_eur=ifelse(A1_tar==A1_eur,
+                           beta_eur,
+                           -beta_eur),
+           A1_eur =ifelse(A1_eur==A1_tar,A1_eur,A1_tar)) %>% 
+    mutate(z_stat_eur = beta_eur/se_eur,
+           z_stat_tar = beta_tar/se_tar)
+  
+  #load the best 2DLD cutoff to estimate prior
+  load(paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/ARIC.result.2DLD.rdata"))
+  r2.result <- ARIC.result.2DLD[[2]]
+  
+  r2.result.filter <- r2.result %>% 
+    filter(trait.vec==trait[l]) %>% 
+    filter(rer2.vec.test.prs==max(rer2.vec.test.prs))
+  p.k1 =   r2.result.filter$p.eur.vec
+  p.k2 = r2.result.filter$p.tar.vec
+  r_ind = r2.result.filter$r2.vec
+  w_ind = r2.result.filter$wc.vec
+  load(paste0(temp.dir,"/2DLD_LD_clump_rind_",r_ind,"_wcind_",w_ind,".rdata"))
+  summary.com.prior = left_join(LD,sum.com,by="SNP") %>% 
+    filter(p_eur<p.k1|
+             p_tar<p.k2) %>% 
+    mutate(z_stat_eur = beta_eur/se_eur,
+           z_stat_tar = beta_tar/se_tar)
+  prior.sigma = cov(cbind(summary.com.prior$z_stat_tar,
+                          summary.com.prior$z_stat_eur),use="complete.obs")-diag(2)
+  
+  post.sigma = solve(solve(prior.sigma)+diag(2))
+  z_stat_tar = sum.com$z_stat_tar
+  z_stat_eur = sum.com$z_stat_eur
+  z_mat = cbind(z_stat_tar,z_stat_eur)
+  z_post = z_mat%*%post.sigma
+  
+  sum.com = sum.com %>% 
+    mutate(z_post_tar = z_post[,1]) %>% 
+    mutate(post_beta_tar = ifelse(is.na(z_post_tar),beta_tar,z_post_tar*se_tar))
+    
+  
   #load bim file to match all the SNPs with different strand
   #in summary data and ARIC data
   bim <- as.data.frame(fread(paste0(data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc",j,".bim")))
   colnames(bim)[2] <- "SNP"
-  sum.com.match <- left_join(bim,sum.com,by="SNP")
+  sum.com.match <- left_join(bim,sum.com,by="SNP") %>% 
+    mutate(A1 = A1_tar,
+           BETA = post_beta_tar,
+           P = p_tar)
   #A1 is in summary data
   #V5 and V6 is from genotype data
   #if A1 is not either V5 or V6, flip strand
@@ -80,13 +130,7 @@ for(l in 1:3){
       (A1!=V5&A1!=V6)&A1=="G" ~"C",
       TRUE ~ A1
     ))
-  #load the best 2DLD cutoff to estimate prior
-  load(paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/ARIC.result.2DLD.rdata"))
-  r2.result <- ARIC.result.2DLD[[2]]
-  colnames(r2.result)[3:6] <- c("p_eur","p_tar","eth","trait")
-  r2.result.filter <- r2.result %>% 
-    group_by(trait) %>% 
-    filter(rer2.vec.test.prs==max(rer2.vec.test.prs))
+  
   # idx <- which((sum.com.match$A1_new!=sum.com.match$V5)&
   #                (sum.com.match$A1_new!=sum.com.match$V6))
   
@@ -113,20 +157,10 @@ for(l in 1:3){
           select(SNP,A1,BETA,P)
         write.table(prs.file,file = paste0(temp.dir,"prs_coeff_chr_",j),col.names = T,row.names = F,quote=F)
         
-        prs.file <- prs.all %>% filter(CHR==j) 
-        prs.file = prs.file[,c("SNP","A1","BETA")]
-        #setwd(temp.dir)
-        write.table(prs.file,file = paste0(temp.dir,"2Dprs_coeff_chr_",j),col.names = T,row.names = F,quote=F)
-        p.value.file <- prs.all %>% filter(CHR==j) 
-        p.value.file = p.value.file[,c("SNP","P")]
+        p.value.file = prs.file %>% 
+          select(SNP,P)
         
         write.table(p.value.file,file = paste0(temp.dir,"2Dp_value_chr_",j),col.names = T,row.names = F,quote=F)
-        com.prs = left_join(prs.file,p.value.file,by="SNP")
-        com.prs.filter = com.prs %>%
-          filter(P<=pthres[9])
-        #bim <- fread(paste0(data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc",j,".bim"))
-        # idx <- which(bim$V2=="rs1967017")
-        # bim[idx,]
         if(nrow(prs.file)>0){
           res <- system(paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/plink --q-score-range ",temp.dir,"2Dq_range_file ",temp.dir,"2Dp_value_chr_",j," header --threads 2 --score ",temp.dir,"2Dprs_coeff_chr_",j," header no-sum no-mean-imputation --bfile ",data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc",j," --out ",temp.dir,"prs_chr_",j,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1))
           #res <- system(paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/plink2 --q-score-range ",temp.dir,"q_range_file ",temp.dir,"p_value_chr_",j," header --threads 2 --score ",temp.dir,"prs_coeff_chr_",j," header no-mean-imputation --bfile ",data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc",j," --out ",temp.dir,"prs_chr_",j))

@@ -100,7 +100,7 @@ wc_base_vec = c(50,100)
     prs.file <- prs.all %>% 
         mutate(P = replace(P,peur<=pthres[k1],1E-20))%>%
         select(SNP,A1,BETA,P)
-    write.table(prs.file,file = paste0(temp.dir,"prs_coeff_chr_",j),col.names = T,row.names = F,quote=F)
+    write.table(prs.file,file = paste0(temp.dir,"2Dprs_coeff_chr_",j),col.names = T,row.names = F,quote=F)
     
     p.value.file = prs.file %>% 
       select(SNP,P)

@@ -27,7 +27,7 @@ wc_base_vec = c(50,100)
       LD.list[[j]] = clump.snp
     }
     LD = rbindlist(LD.list)
-    save(LD,file = paste0(temp.dir,"/2DLD_LD_clump.rdata"),row.names = F,col.names = T)
+    save(LD,file = paste0(temp.dir,"/2DLD_LD_clump_rind_",r_ind,"_wcind_",w_ind,".rdata"))
       }
     }
   }
