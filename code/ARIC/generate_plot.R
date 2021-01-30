@@ -24,7 +24,7 @@ ARIC.result.CT.long$eth = factor(ARIC.result.CT.long$eth,levels = c("EUR","AFR")
 ARIC.result.CT.long$trait = factor(ARIC.result.CT.long$trait,levels = c("eGFRcr","ACR","urate"))
 
 
-ARIC.result.CT.prs = spread(ARIC.result.CT.long[,c("eth","trait","r2_prs")],trait,r2_prs,pla)
+ARIC.result.CT.prs = spread(ARIC.result.CT.long[,c("eth","trait","r2_prs")],trait,r2_prs)
 ARIC.result.CT.reprs = spread(ARIC.result.CT.long[,c("eth","trait","rer2_prs")],trait,rer2_prs)
 ARIC.result.CT.wide = rbind(ARIC.result.CT.prs,ARIC.result.CT.reprs)
 
@@ -73,6 +73,21 @@ trait = c("eGFRcr","ACR","urate")
   
   write.csv(ARIC.result.bestEUR.reprs,file = "ARIC.result.bestEUR.reprs.csv")
   
+  
+  #2DLD result
+  load("ARIC.result.2DLD.rdata")
+  ARIC.result.2DLD.wide <- ARIC.result.2DLD[[1]]
+  colnames(ARIC.result.2DLD.wide)[3:4] <- c("TDLD","TDLD-SL")
+  library(reshape2)
+  ARIC.result.2DLD.long = melt(ARIC.result.2DLD.wide,id.vars=c("eth","trait"),
+                               variable.name = "method",
+                               value.name = "rer2") %>% 
+    mutate(rer2 = round(rer2,pla)) %>% 
+    select(trait,method,rer2) %>% 
+    mutate(trait = factor(trait,levels = c("eGFRcr","ACR","urate")))
+  ARIC.result.2DLD.wide = spread(ARIC.result.2DLD.long,
+                                 trait,rer2)
+  write.csv(ARIC.result.2DLD.wide,file = "ARIC.result.2DLD.reprs.csv")
   
 # ggplot(result.pthres.sub,aes(-log10(pthres_vec),r2.vec.vad.prs)) + geom_point()+geom_line()+
 #   theme_Publication()+

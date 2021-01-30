@@ -9,6 +9,11 @@ startend <- function(num,size,ind){
 #install.packages("devtools")
 library(dplyr)
 library(data.table)
+library(caret)
+library(SuperLearner)
+library(ranger)
+library(glmnet)
+
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 pthres <- c(5E-08,5E-07,5E-06,5E-05,5E-04,5E-03,5E-02,5E-01)
 eth <- c("EUR","AFR","AMR","EAS","SAS")
@@ -44,7 +49,13 @@ i = 2
     r2.vec.test.prs.pc = rep(0,n.col)
     r2.vec.vad.prs = rep(0,n.col)
     r2.vec.vad.prs.pc = rep(0,n.col)
-    prs.mat = matrix(0,)
+    p.eur.vec = rep(0,n.col)
+    p.tar.vec = rep(0,n.col)
+    r2.vec = rep(0,n.col)
+    wc.vec = rep(0,n.col)
+    eth.vec = rep(0,n.col)
+    trait.vec = rep(0,n.col)
+    prs.mat = matrix(0,nrow(y),n.col)
     n.rep = 5
     
     genotype.fam <- as.data.frame(fread(paste0(data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc1.fam")))
@@ -54,7 +65,7 @@ i = 2
     r2.vec.vad.prs.rep = matrix(0,n.col,n.rep)
     rer2.vec.test.prs.rep = matrix(0,n.col,n.rep)
     rer2.vec.vad.prs.rep = matrix(0,n.col,n.rep)
-    prs.mat = data.frame(ID = genotype.fam$V2,matrix(0,n.sub,n.col))
+    prs.mat = data.frame(matrix(0,n.sub,n.col))
     #files = dir(path = temp.dir,pattern=paste0(".profile"),full.names = T)
     #temp for loop in rbind,w_ind,k1,k2
     #evaluate 2DLD-method result
@@ -76,7 +87,7 @@ i = 2
         
         
         prs.data = data.frame(ID = genotype.fam$V2,prs= prs.score,stringsAsFactors = F)
-        prs.mat[,temp+1] = prs.data$prs
+        prs.mat[,temp] = prs.data$prs
         
         #prs.score <- prs.temp$SCORE*2*length(idx)+prs.score
         #prs.score.mat[,k] = prs.score
@@ -90,17 +101,6 @@ i = 2
           
           prs.test <- left_join(test.data,prs.data,by="ID")
           prs.vad <- left_join(vad.data,prs.data,by="ID")
-          #model = lm(y~prs.score)
-          
-          # model1.full <- lm(y~prs+pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.test)
-          # model1.prs <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.test)
-          # #model1.null <- lm(y~age+sex,data=prs.test)
-          # #r2.test.rep[i_rep] <- summary(model1)$r.square
-          # model2.full <- lm(y~prs+pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.vad)
-          # model2.prs <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.vad)
-          # #model2.null <- lm(y~age+sex,data=prs.vad)
-          # r2.vec.test.prs.rep[temp,i_rep] = summary(model1.full)$r.square-summary(model1.prs)$r.square
-          # r2.vec.vad.prs.rep[temp,i_rep] = summary(model2.full)$r.square-summary(model2.prs)$r.square
           
           #residual r2
           model1.null <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.test)
@@ -116,6 +116,12 @@ i = 2
           
           
         }
+        p.eur.vec[temp] = pthres[k1]
+        p.tar.vec[temp] = pthres[k2]
+        r2.vec[temp] = r_ind
+        wc.vec[temp] = w_ind
+        eth.vec[temp] = eth[i]
+        trait.vec[temp] = trait[l]
         temp = temp+1
       }
       } 
@@ -134,17 +140,19 @@ i = 2
     rer2.vec.test.prs = rowMeans(rer2.vec.test.prs.rep)
     rer2.vec.vad.prs = rowMeans(rer2.vec.vad.prs.rep)
     result.data <- data.frame(rer2.vec.test.prs,rer2.vec.vad.prs,
-                              expand.grid(pthres,pthres)[,c(2,1)],
-                              eth = rep(eth[i],length(pthres)^2),
-                              triat = rep(trait[l],length(pthres)^2))
+                              p.eur.vec,
+                              p.tar.vec,
+                              r2.vec,
+                              wc.vec,
+                              eth.vec = eth.vec,
+                              trait.vec = trait.vec)
+    result.data.filter = result.data %>% 
+      filter(rer2.vec.test.prs==max(rer2.vec.test.prs))
     
-    
-    idx <- which.max(result.data$r2.vec.test.prs)
-    r2.prs = result.data$r2.vec.vad.prs[idx]
     idx <- which.max(result.data$rer2.vec.test.prs)
     rer2.prs = result.data$rer2.vec.vad.prs[idx]
     
-    r2_prs_vec[step] = r2.prs
+    
     rer2_prs_vec[step] = rer2.prs
     result.data.list[[step]] = result.data
     
@@ -156,13 +164,20 @@ i = 2
     rer2.prs.sl.rep <- rep(0,n.rep)
     SL.libray <- c(
       "SL.glmnet",
-      "SL.ridge"
-      #"SL.nnet"
+      "SL.ridge",
+      "SL.nnet"
     )
-    library(caret)
-    library(SuperLearner)
-    library(ranger)
-    library(glmnet)
+    #clean prs.mat
+    #drop prs with all 0
+    prs.mat = prs.mat %>% 
+      select(which(!colSums(prs.mat)%in% 0))
+    mtx = cor(prs.mat)
+    #drop the columns with perfect correlation
+    drop = findCorrelation(mtx,cutoff=0.98)
+    drop = names(prs.mat)[drop]
+    prs.mat.new = prs.mat %>% 
+      select(-all_of(drop))
+    prs.mat <- data.frame(ID = genotype.fam$V2,prs.mat.new)
     for(i_rep in 1:n.rep){
       #n.sub.fold = nrow(y)/n.rep
       start.end <- startend(nrow(y),n.rep,i_rep)
@@ -183,7 +198,9 @@ i = 2
                         # For a real analysis we would use V = 10.
                         # V = 3,
                         SL.library = SL.libray)
+      
       x.vad = prs.vad[,16:ncol(prs.vad)]
+      
       y.pred <- predict(sl,x.vad,onlySL = TRUE)
       
       model2.null <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.vad)
@@ -197,7 +214,7 @@ i = 2
       
     }
    
-    rer2_prs_sl = mean(rer2_prs_sl)
+    rer2_prs_sl[step] = mean(rer2.prs.sl.rep)
     step = step+1
     
   }  

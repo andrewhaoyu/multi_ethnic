@@ -93,10 +93,6 @@ wc_base_vec = c(50,100)
     prs.all <- left_join(clump.snp,sum.com.match,by="SNP")
     colSums(is.na(prs.all))
     
-      
-    
-    
-    
     
     for(k1 in 1:length(pthres)){
       
@@ -106,17 +102,13 @@ wc_base_vec = c(50,100)
         select(SNP,A1,BETA,P)
     write.table(prs.file,file = paste0(temp.dir,"prs_coeff_chr_",j),col.names = T,row.names = F,quote=F)
     
-    prs.file <- prs.all %>% filter(CHR==j) 
-    prs.file = prs.file[,c("SNP","A1","BETA")]
-    #setwd(temp.dir)
-    write.table(prs.file,file = paste0(temp.dir,"2Dprs_coeff_chr_",j),col.names = T,row.names = F,quote=F)
-    p.value.file <- prs.all %>% filter(CHR==j) 
-    p.value.file = p.value.file[,c("SNP","P")]
-    
+    p.value.file = prs.file %>% 
+      select(SNP,P)
+   
     write.table(p.value.file,file = paste0(temp.dir,"2Dp_value_chr_",j),col.names = T,row.names = F,quote=F)
-   com.prs = left_join(prs.file,p.value.file,by="SNP")
-   com.prs.filter = com.prs %>%
-     filter(P<=pthres[9])
+   # # com.prs = left_join(prs.file,p.value.file,by="SNP")
+   # com.prs.filter = com.prs %>%
+   #   filter(P<=pthres[9])
    #bim <- fread(paste0(data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc",j,".bim"))
    # idx <- which(bim$V2=="rs1967017")
    # bim[idx,]
@@ -128,7 +120,6 @@ wc_base_vec = c(50,100)
       if(res==2){
         stop()
       }
-      
       
     }
   }
