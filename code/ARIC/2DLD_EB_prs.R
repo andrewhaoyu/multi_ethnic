@@ -153,16 +153,16 @@ for(l in 1:3){
         
         #keep al the SNPs with peur pass the threshold
         prs.file <- prs.all %>% 
-          mutate(P = replace(P,peur<=pthres[k1],1E-20))%>%
+          mutate(P = replace(P,p_eur<=pthres[k1],1E-20))%>%
           select(SNP,A1,BETA,P)
-        write.table(prs.file,file = paste0(temp.dir,"prs_coeff_chr_",j),col.names = T,row.names = F,quote=F)
+        write.table(prs.file,file = paste0(temp.dir,"EBprs_coeff_chr_",j),col.names = T,row.names = F,quote=F)
         
         p.value.file = prs.file %>% 
           select(SNP,P)
         
-        write.table(p.value.file,file = paste0(temp.dir,"2Dp_value_chr_",j),col.names = T,row.names = F,quote=F)
+        write.table(p.value.file,file = paste0(temp.dir,"EBp_value_chr_",j),col.names = T,row.names = F,quote=F)
         if(nrow(prs.file)>0){
-          res <- system(paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/plink --q-score-range ",temp.dir,"2Dq_range_file ",temp.dir,"2Dp_value_chr_",j," header --threads 2 --score ",temp.dir,"2Dprs_coeff_chr_",j," header no-sum no-mean-imputation --bfile ",data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc",j," --out ",temp.dir,"prs_chr_",j,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1))
+          res <- system(paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/plink --q-score-range ",temp.dir,"2Dq_range_file ",temp.dir,"EBp_value_chr_",j," header --threads 2 --score ",temp.dir,"EBprs_coeff_chr_",j," header no-sum no-mean-imputation --bfile ",data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc",j," --out ",temp.dir,"EBprs_chr_",j,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1))
           #res <- system(paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/plink2 --q-score-range ",temp.dir,"q_range_file ",temp.dir,"p_value_chr_",j," header --threads 2 --score ",temp.dir,"prs_coeff_chr_",j," header no-mean-imputation --bfile ",data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc",j," --out ",temp.dir,"prs_chr_",j))
           print("step2 finished")
           #system(paste0("/data/zhangh24/software/plink2 --score ",cur.dir,eth[i],"/prs/prs_file_pvalue_",k,"_rho_",l,"_size_",m,,"_rep_",i_rep," no-sum no-mean-imputation --bfile ",cur.dir,eth[i],"/all_chr.tag --exclude /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/duplicated.id  --out ",cur.dir,eth[i],"/prs/prs_",k,"_rho_",l,"_size_",m))
