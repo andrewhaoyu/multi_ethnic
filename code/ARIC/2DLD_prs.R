@@ -104,6 +104,8 @@ wc_base_vec = c(50,100)
     
     p.value.file = prs.file %>% 
       select(SNP,P)
+    p.value.file[3271,]
+    which(is.na(p.value.file$P))
    
     write.table(p.value.file,file = paste0(temp.dir,"2Dp_value_chr_",j),col.names = T,row.names = F,quote=F)
    # # com.prs = left_join(prs.file,p.value.file,by="SNP")
