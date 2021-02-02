@@ -76,8 +76,9 @@ write.table(sum.data.MAF,file = paste0(temp.dir,eth[i],"_summary_out_MAF_rho_",l
 
 # dim(summary)
 # head(summary)
-r2_vec = c(0.01,0.05,0.1,0.2,0.5)
-wc_base_vec = c(50,100,200,500)
+r2_vec = c(0.1)
+wc_base_vec = c(50)
+
 for(r_ind in 1:length(r2_vec)){
   wc_vec = wc_base_vec/r2_vec[r_ind]
   for(w_ind in 1:length(wc_vec)){
