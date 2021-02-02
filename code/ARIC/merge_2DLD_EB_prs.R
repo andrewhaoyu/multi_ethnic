@@ -10,34 +10,13 @@ i = 2
 r2_vec = c(0.01,0.05,0.1,0.2,0.5)
 wc_base_vec = c(50,100)
 
-#for(i in 1:2){
-for(l in 1:3){
-  temp.dir = paste0("/fastscratch/myscratch/hzhang1/ARIC/",trait[l],"/",eth[i],"/")
-  data.dir = "/dcl01/chatterj/data/jin/prs/realdata/ARIC/"
-  out.dir = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/",trait[l],"/",eth[i],"/")
-  for(r_ind in 1:length(r2_vec)){
-    wc_vec = wc_base_vec/r2_vec[r_ind]
-    for(w_ind in 1:length(wc_vec)){
-      
-      LD.list = list()
-      for(j in 1:22){
-        print(j)
-        LD <- as.data.frame(fread(paste0(temp.dir,"2DLD_clump_chr_",j,"_",r_ind,"_",w_ind,".clumped")))
-        clump.snp <- LD[,2,drop=F]  
-        LD.list[[j]] = clump.snp
-      }
-      LD = rbindlist(LD.list)
-      save(LD,file = paste0(temp.dir,"/2DLD_LD_clump_rind_",r_ind,"_wcind_",w_ind,".rdata"))
-    }
-  }
-}
 
 i = 2
 for(l in 1:3){
   temp.dir = paste0("/fastscratch/myscratch/hzhang1/ARIC/",trait[l],"/",eth[i],"/")
   data.dir = "/dcl01/chatterj/data/jin/prs/realdata/ARIC/"
   out.dir = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/",trait[l],"/",eth[i],"/")
-  files = dir(path = temp.dir,pattern=paste0("EBprs_chr_*.profile"),full.names = T)
+  files = dir(path = temp.dir,pattern=paste0("EBprs_chr_(.*).profile"),full.names = T)
   for(r_ind in 1:length(r2_vec)){
     for(w_ind in 1:length(wc_base_vec)){
       for(k1 in 1:length(pthres)){

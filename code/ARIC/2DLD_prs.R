@@ -24,7 +24,7 @@ r2_vec = c(0.01,0.05,0.1,0.2,0.5)
 wc_base_vec = c(50,100)
 
 
-# generate q_range file is a one time job
+#generate q_range file is a one time job
 # for(l in 1:3){
 #   temp.dir = paste0("/fastscratch/myscratch/hzhang1/ARIC/",trait[l],"/",eth[i],"/")
 #   q_range = data.frame(
@@ -104,8 +104,7 @@ wc_base_vec = c(50,100)
     
     p.value.file = prs.file %>% 
       select(SNP,P)
-    p.value.file[3271,]
-    which(is.na(p.value.file$P))
+   
    
     write.table(p.value.file,file = paste0(temp.dir,"2Dp_value_chr_",j),col.names = T,row.names = F,quote=F)
    # # com.prs = left_join(prs.file,p.value.file,by="SNP")

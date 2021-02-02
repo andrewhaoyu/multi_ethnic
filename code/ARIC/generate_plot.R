@@ -89,6 +89,22 @@ trait = c("eGFRcr","ACR","urate")
                                  trait,rer2)
   write.csv(ARIC.result.2DLD.wide,file = "ARIC.result.2DLD.reprs.csv")
   
+  #2DLD-EB result
+  load("ARIC.result.EB.rdata")
+  ARIC.result.EB.wide <- ARIC.result.EB[[1]]
+  colnames(ARIC.result.EB.wide)[3:4] <- c("TDLD-EB","TDLD-SLEB")
+  library(reshape2)
+  ARIC.result.EB.long = melt(ARIC.result.EB.wide,id.vars=c("eth","trait"),
+                               variable.name = "method",
+                               value.name = "rer2") %>% 
+    mutate(rer2 = round(rer2,pla)) %>% 
+    select(trait,method,rer2) %>% 
+    mutate(trait = factor(trait,levels = c("eGFRcr","ACR","urate")))
+  ARIC.result.EB.wide = spread(ARIC.result.EB.long,
+                                 trait,rer2)
+  write.csv(ARIC.result.2DLD.wide,file = "ARIC.result.2DLD.reprs.csv")
+  
+  
 # ggplot(result.pthres.sub,aes(-log10(pthres_vec),r2.vec.vad.prs)) + geom_point()+geom_line()+
 #   theme_Publication()+
 #   ggtitle("eGFR PRS R2 in vad data")

@@ -37,7 +37,7 @@ i = 2
     temp.dir = paste0("/fastscratch/myscratch/hzhang1/ARIC/",trait[l],"/",eth[i],"/")
     data.dir = "/dcl01/chatterj/data/jin/prs/realdata/ARIC/"
     out.dir = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/",trait[l],"/",eth[i],"/")
-    files = dir(path = temp.dir,pattern=paste0(".profile"),full.names = T)
+    files = dir(path = temp.dir,pattern=paste0("prs_chr_(.*).profile"),full.names = T)
     for(r_ind in 1:length(r2_vec)){
       for(w_ind in 1:length(wc_base_vec)){
     for(k1 in 1:length(pthres)){
