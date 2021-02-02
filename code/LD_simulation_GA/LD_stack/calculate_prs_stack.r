@@ -10,10 +10,10 @@ args = commandArgs(trailingOnly = T)
 i = as.numeric(args[[1]])
 l = as.numeric(args[[2]])
 i_rep = as.numeric(args[[3]])
-j = as.numeric(args[[4]])
+#j = as.numeric(args[[4]])
 #l = as.numeric(args[[3]])
 #m = as.numeric(args[[4]])
-i1 = as.numeric(args[[5]])
+i1 = as.numeric(args[[4]])
 #i_rep = 1
 
 #j = as.numeric(args[[3]])
@@ -29,12 +29,12 @@ dir.create(paste0('/lscratch/',sid,'/test/'),showWarnings = FALSE)
 temp.dir = paste0('/lscratch/',sid,'/test/')
 dir.create(paste0('/lscratch/',sid,'/test/prs/'),showWarnings = FALSE)
 temp.dir.prs = paste0('/lscratch/',sid,'/test/prs/')
-system(paste0("cp ",cur.dir,eth[i],"/chr",j,".mega.* ",temp.dir,"."))
+system(paste0("cp ",cur.dir,eth[i],"/all_chr_test.mega.* ",temp.dir,"."))
 system(paste0("ls ",temp.dir))
 print("step1 finished")
 #for(l in 1:3){
-r2_vec = c(0.01,0.05,0.1,0.2,0.5)
-wc_base_vec = c(50,100,200,500)
+r2_vec = c(0.1)
+wc_base_vec = c(50)
 setwd("/data/zhangh24/multi_ethnic/")  
 for(m in 1:4){
   sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_GA/",eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))  
@@ -56,16 +56,16 @@ for(m in 1:4){
   n_pthres <- length(pthres)
   q_range = data.frame(rep("p_value",n_pthres),rep(0,n_pthres),rep(0.5,n_pthres))
   
-  prs.file <- prs.all %>% filter(CHR==j) %>% 
+  prs.file <- prs.all %>% 
     select(SNP,A1,BETA)
   write.table(prs.file,file = paste0(temp.dir.prs,"prs_file"),col.names = T,row.names = F,quote=F)
-  p.value.file <- prs.all %>% filter(CHR==j) %>% 
+  p.value.file <- prs.all %>% 
     select(SNP,P)
   write.table(p.value.file,file = paste0(temp.dir.prs,"p_value_file"),col.names = T,row.names = F,quote=F)
   
   temp = 1
   for(k in 1:length(pthres)){
-    prs.file <- prs.all %>% filter(P<=pthres[k]&CHR==j) 
+    prs.file <- prs.all %>% filter(P<=pthres[k]) 
     #  select(SNP,A1,BETA)
   
     
@@ -79,7 +79,7 @@ for(m in 1:4){
   }
   q_range = q_range[1:(temp-1),]
   write.table(q_range,file = paste0(temp.dir.prs,"q_range_file"),row.names = F,col.names = F,quote=F)
-  res <- system(paste0("/data/zhangh24/software/plink2 --q-score-range ",temp.dir.prs,"q_range_file ",temp.dir.prs,"p_value_file header --threads 2 --score ",temp.dir.prs,"prs_file header no-sum no-mean-imputation --bfile ",temp.dir,"chr",j,".mega --exclude /data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/duplicated.id  --out ",temp.dir.prs,"prs_chr_",j,"_rho_",l,"_size_",m,"_chr_",j,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind))
+  res <- system(paste0("/data/zhangh24/software/plink2 --q-score-range ",temp.dir.prs,"q_range_file ",temp.dir.prs,"p_value_file header --threads 2 --score ",temp.dir.prs,"prs_file header no-sum no-mean-imputation --bfile ",temp.dir,"all_chr_test.mega --exclude /data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/duplicated.id  --out ",temp.dir.prs,"prs_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind))
   #system(paste0("ls ",temp.dir.prs))
   #system(paste0("/data/zhangh24/software/plink2 --score ",cur.dir,eth[i],"/prs/prs_file_pvalue_",k,"_rho_",l,"_size_",m,,"_rep_",i_rep," no-sum no-mean-imputation --bfile ",cur.dir,eth[i],"/all_chr.tag --exclude /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/duplicated.id  --out ",cur.dir,eth[i],"/prs/prs_",k,"_rho_",l,"_size_",m))
   print("step2 finished")
