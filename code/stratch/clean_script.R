@@ -6,8 +6,10 @@ eth <- c("EUR","AFR","AMR","EAS","SAS")
 # cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
 # system(paste0("rm ",cur.dir,eth[i],"/*mega*"))
  cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/LD_stack/"
-
-       system(paste0("find ",cur.dir,eth[i],"/prs/ -name '*chr*' -type f -delete"))
+ system(paste0("rm ",cur.dir,eth[i],"/ *.clumped"))
+ system(paste0("rm -rf ",cur.dir,eth[i],"/prs"))
+ system(paste0("mkdir ",cur.dir,eth[i],"/prs"))
+#system(paste0("find ",cur.dir,eth[i],"/prs/ -name '*chr*' -type f -delete"))
    #system(paste0("rm ",cur.dir,eth[i],"/prs/*chr_",j,"*_rind_",r_ind,"_wcind_",w_ind,"*"))
    
  #system(paste0("mkdir ",cur.dir,eth[i],"/prs"))
