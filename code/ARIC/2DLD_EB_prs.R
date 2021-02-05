@@ -20,7 +20,7 @@ n_pthres  = length(pthres)
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 trait = c("eGFRcr","ACR","urate")
 i = 2
-r2_vec = c(0.01,0.05,0.1,0.2,0.5)
+r2_vec = c(0.01,0.05,0.1,0.2,0.5,0.8)
 wc_base_vec = c(50,100)
 
 
