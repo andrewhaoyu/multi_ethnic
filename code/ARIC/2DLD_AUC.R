@@ -33,6 +33,8 @@ reresult.data.list = list()
 step = 1
 
 i = 2
+r2_vec = c(0.01,0.05,0.1,0.2,0.5,0.8)
+wc_base_vec = c(50,100)
   for(l in 1:3){
     
     temp.dir = paste0("/fastscratch/myscratch/hzhang1/ARIC/",trait[l],"/",eth[i],"/")

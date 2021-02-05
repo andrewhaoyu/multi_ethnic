@@ -49,15 +49,17 @@ for(l in 1:3){
     colnames(sum.data)[2] <- "SNP"
     prs.all <- left_join(clump.snp,sum.data,by="SNP") 
     prs.file <- prs.all %>% filter(P<=p.cut) %>% 
-      select(SNP,A1,BETA)
+      mutate(SE_eur = BETA/STAT) %>% 
+      select(SNP,A1,BETA,SE_eur)
     prs.eur = prs.file
     
     #load the target ethnic coefficients
     sum.tar <- as.data.frame(fread(paste0(out.dir.sum,eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))  
     sum.tar = sum.tar %>% 
       mutate(A1_tar = A1,
-             BETA_tar = BETA) %>% 
-      select(SNP,A1_tar,BETA_tar)
+             BETA_tar = BETA,
+             SE_tar = BETA/STAT) %>% 
+      select(SNP,A1_tar,BETA_tar,SE_tar)
     prs.eur = prs.eur %>% 
       mutate(A1_eur = A1,
              BETA_eur = BETA)
@@ -70,28 +72,30 @@ for(l in 1:3){
     all.equal(prs.file[,"A1_tar"],
               prs.file[,"A1_eur"])
     
+    #load EB coefficients
+    prs.file = prs.file %>% 
+      mutate(z_stat_tar = BETA_tar/SE_tar,
+             z_stat_eur = BETA_eur/SE_eur)
+    z.mat = prs.file %>% 
+      select(z_stat_tar,z_stat_eur)
+    prior.sigma = cov(z.mat,use="complete.obs")-diag(2)
+    post.sigma = solve(solve(prior.sigma)+diag(2))
+    z.post = as.matrix(z.mat)%*%post.sigma
+    post_beta_tar = z.post[,"z_stat_tar"]*prs.file$SE_tar
     
-    #align the two different ethnic groups
-    idx <- which(prs.tar$A1!=prs.eur$A1)
-    if(length(idx)>0){
-      prs.eur$A1[idx] = prs.tar$A1[idx]
-      prs.eur$BETA[idx] = -prs.eur$BETA[idx]
-    }
+    prs.file = prs.file %>% 
+      mutate(post_beta_tar=ifelse(is.na(post_beta_tar),BETA_tar,post_beta_tar))
     
+    prs.coef = prs.file %>% 
+      select(SNP,A1,BETA_eur,BETA_tar,post_beta_tar)
     
-    
-    
-    
-    
-    write.table(prs.file,file = paste0("/lscratch/",sid,"/",eth[i],"/prs_eursnp_eurcoef_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1),col.names = T,row.names = F,quote=F)
-    res = system(paste0("/data/zhangh24/software/plink2 --threads 2 --score /lscratch/",sid,'/',eth[i],"/prs_eursnp_eurcoef_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1, " no-sum no-mean-imputation --bfile ",temp.dir,"/chr",j,".tag --exclude ",out.dir,eth[i],"/duplicated.id  --out ",out.dir,eth[i],"/prs/prs_eursnp_eurcoef_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,"_GA_",i1))
+    write.table(prs.coef,file = paste0("/lscratch/",sid,"/",eth[i],"/prs_besteur_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1),col.names = T,row.names = F,quote=F)
+    res = system(paste0("/data/zhangh24/software/plink2_alpha --score-col-nums 3,4,5 --threads 2 --score /lscratch/",sid,'/',eth[i],"/prs_besteur_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1, " header no-mean-imputation --bfile ",temp.dir,"/all_chr_test.mega --exclude ",out.dir.sum,eth[i],"/duplicated.id  --out /lscratch/",sid,'/',eth[i],"/prs_besteur_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
+    system(paste0("mv /lscratch/",sid,'/',eth[i],"/prs_besteur_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".sscore ",out.dir,eth[i],"/prs/"))
     if(res==2){
       stop()
     }
-    system(paste0("rm ",out.dir,eth[i],"/prs/prs_eursnp_eurcoef_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,"_GA_",i1,".nosex"))
-    system(paste0("rm ",out.dir,eth[i],"/prs/prs_eursnp_eurcoef_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,"_GA_",i1,".log"))
-    system(paste0("rm ",out.dir,eth[i],"/prs/prs_eursnp_eurcoef_rho_",l,"_size_",m,"_",j,"_rep_",i_rep,"_GA_",i1,".nopred"))
-    system(paste0("rm /lscratch/",sid,"/",eth[i],"/prs_eursnp_eurcoef_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
+    
     gc()
     #system(paste0('ls/lscratch/',sid,"/"))
   }
