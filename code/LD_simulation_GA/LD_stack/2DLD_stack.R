@@ -16,16 +16,18 @@ dir.create(paste0('/lscratch/',sid,'/test/LD/'),showWarnings = FALSE)
 temp.dir.LD <- paste0('/lscratch/',sid,'/test/LD/')
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
-out.dir <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
-#clumping for EUR SNPs
-summary.eur <- as.data.frame(fread(paste0(out.dir,eth[1],"/summary_out_rho_",l,"_size_",4,"_rep_",i_rep,"_GA_",i1)))  
+out.dir.sum <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
+out.dir <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/LD_stack"
+#load EUR clumping summary data
+summary.eur <- as.data.frame(fread(paste0(out.dir.sum,eth[1],"/summary_out_rho_",l,"_size_",4,"_rep_",i_rep,"_GA_",i1)))  
 colnames(summary.eur)[9] = "peur"
 #only keep snpid and p-value for future combination
 summary.eur.select = summary.eur %>% 
   select(SNP,peur)
 #for(i in 2:4){
 #summary <- as.data.frame(fread(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/summary.out"),header=T))
-summary <- as.data.frame(fread(paste0(out.dir,eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))  
+#load target snps summary stat
+summary <- as.data.frame(fread(paste0(out.dir.sum,eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))  
 #find the shared SNPs between target ethnic group and EUR
 #get the min p-value for between the target ethnic group and EUR for shared snp
 summary.com <- left_join(summary,summary.eur.select,by="SNP")
@@ -59,7 +61,7 @@ system(paste0("cp ",cur.dir,eth[1],"/clump_ref_all_chr.bed ",temp.dir,eth[1],"cl
 system(paste0("cp ",cur.dir,eth[1],"/clump_ref_all_chr.bim ",temp.dir,eth[1],"clump_ref_all_chr.bim"))
 system(paste0("cp ",cur.dir,eth[1],"/clump_ref_all_chr.fam ",temp.dir,eth[1],"clump_ref_all_chr.fam"))
 setwd("/data/zhangh24/multi_ethnic/")
-r2_vec = c(0.01,0.05,0.1,0.2,0.5)
+r2_vec = c(0.01,0.05,0.1,0.2,0.5,0.8)
 wc_base_vec = c(50,100)
 for(r_ind in 1:length(r2_vec)){
   wc_vec = wc_base_vec/r2_vec[r_ind]
@@ -69,7 +71,7 @@ for(r_ind in 1:length(r2_vec)){
     r2thr = r2_vec[r_ind]
     kbpthr = wc_vec[w_ind]
     eth <- c("EUR","AFR","AMR","EAS","SAS")
-    out.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/LD_stack/"
+    
     #code <- rep("c",5*3*3)
     #system(paste0("/data/zhangh24/software/plink2 --bfile /data/zhangh24/KG.plink/",eth[i],"/chr_all --clump ",cur.dir,eth[i],"/summary_out_MAF_rho_",l,"_size_",m,"_rep_",i_rep,".out --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out ",cur.dir,eth[i],"/LD_clump_rho_",l,"_size_",m,"_rep_",i_rep))
     res = system(paste0("/data/zhangh24/software/plink2 --threads 2 --bfile ",temp.dir,eth[1],"clump_ref_all_chr --clump ",temp.dir,eth[1],"_assoc.out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1," --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out ", temp.dir,eth[1],"_LD_clump_two_dim_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind))
@@ -118,6 +120,10 @@ for(r_ind in 1:length(r2_vec)){
     
      }
 }
+system(paste0("rm ",temp.dir,"*.bim"))
+system(paste0("rm ",temp.dir,"*.bed"))
+system(paste0("rm ",temp.dir,"*.fam"))
+
 
 for(r_ind in 1:length(r2_vec)){
   wc_vec = wc_base_vec/r2_vec[r_ind]
@@ -126,6 +132,8 @@ for(r_ind in 1:length(r2_vec)){
 LD.EUR <- as.data.frame(fread(paste0(temp.dir,eth[1],"_LD_clump_two_dim_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped")))
 LD.tar <- as.data.frame(fread(paste0(temp.dir,eth[i],"_LD_clump_two_dim_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped")))
 
+LD.EUR <- LD.EUR[,3,drop=F]
+LD.tar <- LD.tar[,3,drop=F]
 LD <- rbind(LD.EUR,LD.tar)
 write.table(LD,file = paste0(out.dir,eth[i],"/LD_clump_two_way_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped"),row.names = F,quote=F)
   }
