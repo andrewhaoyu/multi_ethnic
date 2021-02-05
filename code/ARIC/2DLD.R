@@ -60,7 +60,7 @@ i = 2
       
     #idx <- which(sum.data.assoc$SNP=="rs4970836")
     write.table(sum.data.assoc.EUR,file = paste0(temp.dir,"2DLD_chr_",j,"_assoc_EUR.txt"),col.names = T,row.names = F,quote=F)
-    r2_vec = c(0.01,0.05,0.1,0.2,0.5)
+    r2_vec = c(0.01,0.05,0.1,0.2,0.5,0.8)
     wc_base_vec = c(50,100)
     for(r_ind in 1:length(r2_vec)){
       wc_vec = wc_base_vec/r2_vec[r_ind]
