@@ -70,7 +70,7 @@ for(l in 1:3){
   #   filter(SNP_ID=="rs1967017")
   # 
   sum.com <- left_join(sum.data,summary.eur.select,by="SNP")
-  
+  colSums(is.na(sum.com))
   #align alleles
   sum.com = sum.com %>% 
     mutate(beta_eur=ifelse(A1_tar==A1_eur,
@@ -79,6 +79,7 @@ for(l in 1:3){
            A1_eur =ifelse(A1_eur==A1_tar,A1_eur,A1_tar)) %>% 
     mutate(z_stat_eur = beta_eur/se_eur,
            z_stat_tar = beta_tar/se_tar)
+  
   
   #load the best 2DLD cutoff to estimate prior
   load(paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/ARIC.result.2DLD.rdata"))
