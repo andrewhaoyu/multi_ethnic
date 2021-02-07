@@ -9,9 +9,9 @@ args = commandArgs(trailingOnly = T)
 i_rep = as.numeric(args[[1]])
 i = as.numeric(args[[2]])
 #j = as.numeric(args[[3]])
-l = as.numeric(args[[4]])
-m = as.numeric(args[[5]])
-i1 = as.numeric(args[[6]])
+l = as.numeric(args[[3]])
+m = as.numeric(args[[4]])
+i1 = as.numeric(args[[5]])
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
 old.out.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
