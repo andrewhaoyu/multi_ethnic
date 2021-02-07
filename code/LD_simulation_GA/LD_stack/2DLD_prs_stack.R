@@ -59,22 +59,21 @@ for(r_ind in 1:length(r2_vec)){
     
 #read LD clumped SNPs
 LD <- as.data.frame(fread(paste0(out.dir,eth[i],"/LD_clump_two_way_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped")))
-clump.snp <- LD[,3,drop=F] 
+clump.snp <- LD
 #read the target ethnic group summary level statistics
 #combine the statistics with SNPs after clumping
 prs.all <- left_join(clump.snp,summary.com,by="SNP") 
 colSums(is.na(prs.all))
 for(k1 in 1:length(pthres)){
   #keep al the SNPs with peur pass the threshold
-  prs.all.temp = prs.all
-  idx <- which(prs.all.temp$peur<=pthres[k1])
-  prs.all.temp$P[idx] = 1E-20
-  prs.file <- prs.all.temp %>%
-    select(SNP,A1,BETA,P)
-  colSums(is.na(prs.file))
-  write.table(prs.file,file = paste0(temp.dir.prs,"prs_file"),col.names = T,row.names = F,quote=F)
+ 
   
-  p.value.file <- prs.all.temp %>% 
+  prs.file = prs.all %>% 
+    mutate(P = replace(P,peur<=pthres[k1],1E-20)) %>% 
+    select(SNP,A1,BETA,P)
+   write.table(prs.file,file = paste0(temp.dir.prs,"prs_file"),col.names = T,row.names = F,quote=F)
+  
+  p.value.file <- prs.file %>% 
     select(SNP,P)
   write.table(p.value.file,file = paste0(temp.dir.prs,"p_value_file"),col.names = T,row.names = F,quote=F)
   n_pthres = length(pthres)

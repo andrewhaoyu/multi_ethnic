@@ -17,7 +17,7 @@ temp.dir.LD <- paste0('/lscratch/',sid,'/test/LD/')
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
 out.dir.sum <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
-out.dir <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/LD_stack"
+out.dir <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/LD_stack/"
 #load EUR clumping summary data
 summary.eur <- as.data.frame(fread(paste0(out.dir.sum,eth[1],"/summary_out_rho_",l,"_size_",4,"_rep_",i_rep,"_GA_",i1)))  
 colnames(summary.eur)[9] = "peur"

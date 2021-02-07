@@ -1,4 +1,4 @@
-setwd("/Users/zhangh24/GoogleDrive/multi_ethnic/result/LD_simulation_GA")
+setwd("/Users/zhangh24/GoogleDrive/multi_ethnic/result/LD_simulation_GA/LD_stack/")
 source("../../code/LD_simulation_large/theme_Publication.R")
 library(ggplot2)
 library(ggsci)
@@ -12,12 +12,74 @@ getPalette = colorRampPalette(brewer.pal(9, "Paired"))
 
 
 
+load(paste0("LD.clump.result.CT.rdata"))
+load(paste0("eur.snp.reult.rdata"))
+i1 = 3
+LD.clump.result <- LD.result.list[[1]] %>% 
+  mutate(method_vec = rep("C + T"))
+
+
+
+prediction.result <- rbind(LD.clump.result,
+                           eursnp.result)
+
+
+prediction.result = prediction.result %>% 
+  mutate(cau_vec = case_when(
+    l_vec== 1 ~ paste0("Causal SNPs Proportion = 0.01"),
+    l_vec== 2 ~ paste0("Causal SNPs Proportion = 0.001"),
+    l_vec== 3 ~ paste0("Causal SNPs Proportion = 5E-04")
+  ),
+  sample_size = case_when(
+    m_vec == 1~ "15000",
+    m_vec == 2~ "45000",
+    m_vec == 3~ "80000",
+    m_vec == 4~ "100000"
+  )) %>% 
+  mutate(cau_vec = factor(cau_vec,
+                          levels = c("Causal SNPs Proportion = 0.01",
+                                     "Causal SNPs Proportion = 0.001",
+                                     "Causal SNPs Proportion = 5E-04")),
+        sample_size = factor(sample_size,
+                              levels = c("15000","45000","80000","100000")),
+        method_vec = factor(method_vec,
+                            levels = c("C + T",
+                                       "Best EUR SNP (C+T)",
+                                       "Best EUR SNP + target coefficients (C+T)",
+                                       "Best EUR SNP + EB coefficients (C+T)")))
+prediction.result.sub <- prediction.result %>% 
+  filter(ga_vec==i1&
+           eth.vec!="EUR"&
+           m_vec ==1)
+
+p <- ggplot(prediction.result.sub,aes(x= sample_size,y=r2.vec,group=method_vec))+
+  geom_bar(aes(fill=method_vec),
+           stat="identity",
+           position = position_dodge())+
+  #geom_point(aes(color=method_vec))+
+  theme_Publication()+
+  ylab("R2")+
+  xlab("Sample Size")+
+  labs(fill = "Method")+
+  facet_grid(vars(cau_vec),vars(eth.vec))+
+  #scale_fill_nejm()+
+  scale_fill_manual(values = getPalette(colourCount)) +
+  theme(axis.text = element_text(size = rel(0.9)),
+        legend.text = element_text(size = rel(0.9)))+
+  ggtitle("Prediction performance comparasion (Sample Size for EUR = 100k)")
+print(p)
 
 
 
 
-for(i1 in 1:2){
-  load(paste0("LD.clump.result.GA_",i1,".rdata"))
+
+
+
+
+
+
+for(i1 in 1:5){
+  load(paste0("LD.clump.result.CT.rdata"))
   LD.clump.result <- LD.result.list[[1]]
   LD.clump.result <- LD.clump.result[LD.clump.result$eth.vec!="EUR",]
   method_vec <- rep("P+T",nrow(LD.clump.result))
