@@ -12,6 +12,7 @@ l = as.numeric(args[[3]])
 m = as.numeric(args[[4]])
 i1 = as.numeric(args[[5]])
 
+
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
 old.out.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
