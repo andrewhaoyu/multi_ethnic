@@ -25,7 +25,6 @@ temp.dir.prs = paste0('/lscratch/',sid,'/test/prs/')
 
 system(paste0("cp ",cur.dir,eth[i],"/all_chr_test.mega.* ",temp.dir))
 system(paste0("ls ",temp.dir))
-
 library(dplyr)
 library(data.table)
 setwd("/data/zhangh24/multi_ethnic/")
@@ -73,14 +72,14 @@ summary.com.match = summary.com.match %>%
          z_stat_tar = STAT,
          z_stat_eur = beta_eur/sd_eur)
 #estimate the prior
-load(paste0(out.dir,eth[i],"/r2.list_rho_two_way_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
+load(paste0(out.dir,eth[i],"/r2.list_rho_2DLD_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
 
-p.k1 =r2.list[[4]][[3]]
-p.k2 = r2.list[[4]][[4]]
-r_ind = r2.list[[4]][[5]]
-w_ind = r2.list[[4]][[6]]
+p.k1 =r2.list[[3]][[3]]
+p.k2 = r2.list[[3]][[4]]
+r_ind = r2.list[[3]][[5]]
+w_ind = r2.list[[3]][[6]]
 LD <- as.data.frame(fread(paste0(out.dir,eth[i],"/LD_clump_two_way_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped")))
-clump.snp <- LD[,3,drop=F] 
+
 summary.com.prior = left_join(clump.snp,summary.com.match,by="SNP") %>% 
   filter(peur<p.k1|
            P<p.k2)
@@ -118,7 +117,7 @@ for(r_ind in 1:length(r2_vec)){
     
     #read LD clumped SNPs
     LD <- as.data.frame(fread(paste0(out.dir,eth[i],"/LD_clump_two_way_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped")))
-    clump.snp <- LD[,3,drop=F] 
+    
     #read the target ethnic group summary level statistics
     #combine the statistics with SNPs after clumping
     prs.all <- left_join(clump.snp,summary.com,by="SNP") 
@@ -134,7 +133,9 @@ for(r_ind in 1:length(r2_vec)){
       colSums(is.na(prs.file))
       write.table(prs.file,file = paste0(temp.dir.prs,"prs_file"),col.names = T,row.names = F,quote=F)
       
-      #idx <- which(prs.file$SNP=="rs4806716:54639868:G:A")
+      #pdx <- which(duplicated(prs.file$SNP))
+      
+      idx <- which(prs.file$SNP=="19:41363301:C:A")
       
       p.value.file <- prs.all.temp %>% 
         select(SNP,P)
@@ -155,8 +156,11 @@ for(r_ind in 1:length(r2_vec)){
       }
       q_range = q_range[1:(temp-1),]
       write.table(q_range,file = paste0(temp.dir.prs,"q_range_file"),row.names = F,col.names = F,quote=F)
-      res = system(paste0("/data/zhangh24/software/plink2 --q-score-range ",temp.dir.prs,"q_range_file ",temp.dir.prs,"p_value_file header --threads 2 --score ",temp.dir.prs,"prs_file header no-sum no-mean-imputation --bfile ",temp.dir,"all_chr_test.mega --exclude ",old.out.dir,eth[i],"/duplicated.id  --out ",temp.dir.prs,"prs_eb_test_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1))
+      res = system(paste0("/data/zhangh24/software/plink2 --q-score-range ",temp.dir.prs,"q_range_file ",temp.dir.prs,"p_value_file header --threads 2 --score ",temp.dir.prs,"prs_file header no-sum no-mean-imputation --bfile ",temp.dir,"all_chr_test.mega --exclude ",old.out.dir,eth[i],"/duplicated.id  --out ",temp.dir.prs,"prs_eb_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1))
       print("step2 finished")
+      #dup <- fread(paste0(old.out.dir,eth[i],"/duplicated.id"),header = F)
+      
+      
       #system(paste0("ls ",temp.dir.prs))
       if(res==3){
         stop()
