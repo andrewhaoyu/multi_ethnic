@@ -33,15 +33,15 @@ n <- nrow(y)
 y_test_mat <- y[(100000+1):nrow(y),,drop=F]
 
 #for(i_rep in 1:n.rep){
-# summary.eur <- as.data.frame(fread(paste0("./result/LD_simulation_GA/",eth[1],"/summary_out_rho_",l,"_size_",4,"_rep_",i_rep,"_GA_",i1)))  
-# colnames(summary.eur)[9] = "peur"
-# colnames(summary.eur)[7] = "beta_eur"
-# summary.eur.select = summary.eur %>% 
-#   select(SNP,beta_eur,peur)
-# sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_GA/",eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))  
-# colnames(sum.data)[2] <- "SNP"
-# #combine the target level summary stat with EUR
-# summary.com <- left_join(sum.data,summary.eur.select,by="SNP")
+summary.eur <- as.data.frame(fread(paste0("./result/LD_simulation_GA/",eth[1],"/summary_out_rho_",l,"_size_",4,"_rep_",i_rep,"_GA_",i1)))
+colnames(summary.eur)[9] = "peur"
+colnames(summary.eur)[7] = "beta_eur"
+summary.eur.select = summary.eur %>%
+  select(SNP,beta_eur,peur)
+sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_GA/",eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))
+colnames(sum.data)[2] <- "SNP"
+#combine the target level summary stat with EUR
+summary.com <- left_join(sum.data,summary.eur.select,by="SNP")
 
 r2_vec = c(0.01,0.05,0.1,0.2,0.5,0.8)
 wc_base_vec = c(50,100)
@@ -67,14 +67,14 @@ for(r_ind in 1:length(r2_vec)){
     
     #for(k in 1:length(pthres)){
     
-    #prs.clump = left_join(clump.snp,summary.com,by="SNP")
+    prs.clump = left_join(clump.snp,summary.com,by="SNP")
     
     for(k1 in 1:length(pthres)){
       for(k2 in 1:length(pthres)){
-        # prs.all <- prs.clump %>% 
-        #   filter(peur<=pthres[k1]|
-        #            P<=pthres[k2])
-        # if(nrow(prs.all)>0){
+        prs.all <- prs.clump %>%
+          filter(peur<=pthres[k1]|
+                   P<=pthres[k2])
+         if(nrow(prs.all)>0){
           filename <- paste0(out.dir,eth[i],"/prs/prs_eb_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1,".p_value_",k2,".profile")
           
           prs.temp <- fread(filename)  
@@ -95,17 +95,17 @@ for(r_ind in 1:length(r2_vec)){
           wc_ind_vec[temp] = w_ind
           prs.mat[,temp] = prs.score
           temp = temp+1
-      #   }else{
-      #     r2.vec.test[temp] = 0
-      #     r2.vec.vad[temp] = 0  
-      #     pthres_vec1[temp] = pthres[k1]
-      #     pthres_vec2[temp] = pthres[k2]
-      #     r2_ind_vec[temp] = r_ind
-      #     wc_ind_vec[temp] = w_ind
-      #     prs.mat[,temp] = 0
-      #     temp = temp+1
-      #   }
-      #   
+        }else{
+          r2.vec.test[temp] = 0
+          r2.vec.vad[temp] = 0
+          pthres_vec1[temp] = pthres[k1]
+          pthres_vec2[temp] = pthres[k2]
+          r2_ind_vec[temp] = r_ind
+          wc_ind_vec[temp] = w_ind
+          prs.mat[,temp] = 0
+          temp = temp+1
+        }
+
       }
     }
     
