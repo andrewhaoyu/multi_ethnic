@@ -51,17 +51,7 @@ wc_base_vec = c(50,100)
 sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_GA/",eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))
 colnames(sum.data)[2] <- "SNP"
 #combine the target level summary stat with EUR
-summary.com <- left_join(sum.data,summary.eur.select,by="SNP")
-load("./result/LD_simulation_new/snp.infor.match37_38.rdata")
-snp.infor = snp.infor.match %>% 
-  rename(SNP=id) %>% 
-  select(SNP,rs_id,all_of(eth))
-summary.com.update = left_join(summary.com,snp.infor,by="SNP")
-mega.list <- as.data.frame(fread(paste0(cur.dir,"mega-hm3-rsid.txt"),header  =F))
-#mega.infor <- as.data.frame(fread(paste0(cur.dir,"snpBatch_ILLUMINA_1062317")))
-#colnames(mega.infor)[5] <- "rsid"
-colnames(mega.list) = "rs_id"
-summary.com.match = inner_join(summary.com.update,mega.list,by="rs_id")
+summary.com.match <- left_join(sum.data,summary.eur.select,by="SNP")
 
 idx <- which(summary.com.match$A1!=summary.com.match$A1.EUR)
 summary.com.match$A1.EUR[idx] <- summary.com.match$A1[idx]
@@ -136,7 +126,7 @@ for(r_ind in 1:length(r2_vec)){
       
       #pdx <- which(duplicated(prs.file$SNP))
       
-      idx <- which(prs.file$SNP=="19:41363301:C:A")
+      
       
       p.value.file <- prs.all.temp %>% 
         select(SNP,P)
