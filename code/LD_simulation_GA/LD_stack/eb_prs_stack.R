@@ -80,7 +80,7 @@ p.k2 = r2.list[[3]][[4]]
 r_ind = r2.list[[3]][[5]]
 w_ind = r2.list[[3]][[6]]
 LD <- as.data.frame(fread(paste0(out.dir,eth[i],"/LD_clump_two_way_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped")))
-
+clump.snp <- LD
 summary.com.prior = left_join(clump.snp,summary.com.match,by="SNP") %>% 
   filter(peur<p.k1|
            P<p.k2)
