@@ -106,8 +106,8 @@ EBpost <- function(beta_tar,sd_tar,
   
   for(k in 1:nrow(beta_mat)){
     if(k%%10000==0){print(k," SNPs completed")}
-    beta_temp = beta_mat[i,]
-    var_mat_inverse_temp = var_mat_inverse[i,]
+    beta_temp = beta_mat[k,]
+    var_mat_inverse_temp = var_mat_inverse[k,]
     #find out nonmissing component
     
     idx <- which(!is.na(beta_temp))
