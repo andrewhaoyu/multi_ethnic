@@ -122,7 +122,6 @@ library(tidyverse)
 
 
 
-
 # result.matrix <- matrix(0,3,1)
 # for(l in 1:3){
 #   #for(i1 in 1:2){

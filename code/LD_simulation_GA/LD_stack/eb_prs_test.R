@@ -80,25 +80,73 @@ p.k2 = r2.list[[4]][[4]]
 r_ind = r2.list[[4]][[5]]
 w_ind = r2.list[[4]][[6]]
 LD <- as.data.frame(fread(paste0(out.dir,eth[i],"/LD_clump_two_way_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped")))
-clump.snp <- LD[,3,drop=F] 
+clump.snp <- LD[,1,drop=F] 
+
+EstimatePrior <- function(beta_tar,sd_tar,
+                          beta_eur,sd_eur){
+  beta_mat <-na.omit(cbind(beta_tar,beta_eur))
+  var_mat <- na.omit(cbind(sd_tar^2,sd_eur^2))
+  
+  prior.mat <- (crossprod(beta_mat)-diag(colSums(var_mat)))/(nrow(beta_mat)-1)
+  return(prior.mat)
+}
+
+
+EBpost <- function(beta_tar,sd_tar,
+                   beta_eur,sd_eur,EBprior){
+  
+ 
+  prior.mat.inverse = solve(EBprior)
+  beta_mat <-cbind(beta_tar,beta_eur)
+  var_mat_inverse <- cbind(1/sd_tar^2,1/sd_eur^2)
+  
+  beta_mat_post = beta_mat
+  
+  p <- ncol(beta_mat)
+  
+  for(k in 1:nrow(beta_mat)){
+    if(k%%10000==0){print(k," SNPs completed")}
+    beta_temp = beta_mat[i,]
+    var_mat_inverse_temp = var_mat_inverse[i,]
+    #find out nonmissing component
+    
+    idx <- which(!is.na(beta_temp))
+    if(length(idx)<p){
+      beta_temp <- beta_temp[idx]
+      var_mat_inverse_temp = var_mat_inverse_temp[idx,drop=F]
+      prior.mat.inverse_temp = prior.mat.inverse[idx,idx,drop=F]
+      beta_post = solve(var_mat_inverse_temp+prior.mat.inverse_temp)%*%beta_temp
+    }else{
+      beta_post = solve(var_mat_inverse_temp+prior.mat.inverse)%*%beta_temp
+    }   
+    beta_mat_post[k,idx] = beta_post
+    
+  }
+  return(beta_mat_post)
+}
+
+
+
 summary.com.prior = left_join(clump.snp,summary.com.match,by="SNP") %>% 
   filter(peur<p.k1|
            P<p.k2)
-prior.sigma = cov(cbind(summary.com.prior$z_stat_tar,
-                        summary.com.prior$z_stat_eur),use="complete.obs")-diag(2)
+beta_tar <- summary.com.prior$beta_tar
+sd_tar <- summary.com.prior$sd_tar
+beta_eur <- summary.com.prior$beta_eur
+sd_eur <- summary.com.prior$sd_eur
 
-post.sigma = solve(solve(prior.sigma)+diag(2))
+EBprior = EstimatePrior(beta_tar,sd_tar,
+                 beta_eur,sd_eur)
 
-idx <- which(!is.na(summary.com.match$z_stat_eur))
-length(idx)
-z_stat_tar = summary.com.match$z_stat_tar
-z_stat_eur = summary.com.match$z_stat_eur
-z_mat = cbind(z_stat_tar,z_stat_eur)
+beta_tar <- summary.com.match$beta_tar
+sd_tar <- summary.com.match$sd_tar
+beta_eur <- summary.com.match$beta_eur
+sd_eur <- summary.com.match$sd_eur
 
-z_post = z_mat%*%post.sigma
+post_beta_mat = EBpost(beta_tar,sd_tar,beta_eur,sd_eur,EBprior)
 
-post_beta_tar = summary.com.match$beta_tar
-post_beta_tar[idx] = z_post[idx,1]*summary.com.match$sd_tar[idx]
+post_beta_tar = post_beta_mat[,1,drop=F]
+
 
 
 summary.com.match$BETA = post_beta_tar
@@ -118,7 +166,7 @@ for(r_ind in 1:length(r2_vec)){
     
     #read LD clumped SNPs
     LD <- as.data.frame(fread(paste0(out.dir,eth[i],"/LD_clump_two_way_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped")))
-    clump.snp <- LD[,3,drop=F] 
+    clump.snp <- LD[,1,drop=F] 
     #read the target ethnic group summary level statistics
     #combine the statistics with SNPs after clumping
     prs.all <- left_join(clump.snp,summary.com,by="SNP") 
