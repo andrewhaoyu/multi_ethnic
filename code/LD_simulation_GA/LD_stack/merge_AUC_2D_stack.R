@@ -31,7 +31,7 @@
         l_vec[temp:(temp+1)] <- rep(l,2)
         m_vec[temp:(temp+1)] <- rep(m,2)
         ga_vec[temp:(temp+1)] <- rep(i1,2)
-        method_vec[temp:(temp+1)] <- c("2DLD","2DLD-SL")
+        method_vec[temp:(temp+1)] <- c("TDLD","TDLD-SL")
         temp = temp+2
       }
     }
@@ -41,8 +41,8 @@
  # LD.result.list = list(LD.clump.result)
   
   } 
-  LD.clump.result <- data.frame(eth.vec,r2.vec,l_vec,m_vec,method_vec,ga_vec)
-  save(LD.clump.result,file = paste0(out.dir,"LD.clump.result.2DLD.rdata"))
+  TDLD.result <- data.frame(eth.vec,r2.vec,l_vec,m_vec,method_vec,ga_vec)
+  save(TDLD.result,file = paste0(out.dir,"LD.clump.result.2DLD.rdata"))
   
   # #r2 result for different p-value threshold
   # r2.vec <- rep(0,length(pthres)^2*total)

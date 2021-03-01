@@ -1,5 +1,5 @@
-#run GWAS using plink2
-#use plink2 to run
+#run GWAS using plink1.9
+#use plink1.9 to run
 args  = commandArgs(trailingOnly = T)
 #i represent ethnic group
 #j represent chromosome
