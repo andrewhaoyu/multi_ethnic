@@ -46,8 +46,8 @@ summary.eur.select = summary.eur %>%
   mutate(sd_eur=beta_eur/STAT) %>% 
   select(SNP,A1,beta_eur,sd_eur,peur) %>% 
   rename(A1.EUR = A1)
-r2_vec = c(0.01,0.05,0.1,0.2,0.5)
-wc_base_vec = c(50,100,200,500)
+r2_vec = c(0.01,0.05,0.1,0.2,0.5,0.8)
+wc_base_vec = c(50,100)
 sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_GA/",eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))
 colnames(sum.data)[2] <- "SNP"
 #combine the target level summary stat with EUR
@@ -163,7 +163,7 @@ for(r_ind in 1:length(r2_vec)){
   for(w_ind in 1:length(wc_vec)){
     print(c(r_ind,w_ind))
     
-    
+    LD <- as.data.frame(fread(paste0(out.dir,eth[i],"/LD_clump_two_way_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped")))
     #read LD clumped SNPs
     LD <- as.data.frame(fread(paste0(out.dir,eth[i],"/LD_clump_two_way_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped")))
     clump.snp <- LD[,1,drop=F] 
