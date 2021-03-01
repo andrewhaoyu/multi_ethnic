@@ -105,7 +105,7 @@ EBpost <- function(beta_tar,sd_tar,
   p <- ncol(beta_mat)
   
   for(k in 1:nrow(beta_mat)){
-    if(k%%10000==0){print(k," SNPs completed")}
+    if(k%%10000==0){print(paste0(k," SNPs completed"))}
     beta_temp = beta_mat[k,]
     var_mat_inverse_temp = var_mat_inverse[k,]
     #find out nonmissing component
