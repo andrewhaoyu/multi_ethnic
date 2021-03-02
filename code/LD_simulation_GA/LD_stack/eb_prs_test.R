@@ -73,13 +73,14 @@ summary.com.match = summary.com.match %>%
          z_stat_tar = STAT,
          z_stat_eur = beta_eur/sd_eur)
 #estimate the prior
-load(paste0(out.dir,eth[i],"/r2.list_rho_two_way_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
+load(paste0(out.dir,eth[i],"/r2.list_rho_2DLD_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
 
-p.k1 =r2.list[[4]][[3]]
-p.k2 = r2.list[[4]][[4]]
-r_ind = r2.list[[4]][[5]]
-w_ind = r2.list[[4]][[6]]
+p.k1 =r2.list[[3]][[3]]
+p.k2 = r2.list[[3]][[4]]
+r_ind = r2.list[[3]][[5]]
+w_ind = r2.list[[3]][[6]]
 LD <- as.data.frame(fread(paste0(out.dir,eth[i],"/LD_clump_two_way_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped")))
+#LD <- as.data.frame(fread(paste0(out.dir,eth[i],"/LD_clump_two_way_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped")))
 clump.snp <- LD[,1,drop=F] 
 
 EstimatePrior <- function(beta_tar,sd_tar,
