@@ -50,6 +50,7 @@ r2_vec = c(0.01,0.05,0.1,0.2,0.5,0.8)
 wc_base_vec = c(50,100)
 sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_GA/",eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))
 colnames(sum.data)[2] <- "SNP"
+
 #combine the target level summary stat with EUR
 summary.com.match <- left_join(sum.data,summary.eur.select,by="SNP")
 

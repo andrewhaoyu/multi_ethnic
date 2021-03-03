@@ -102,7 +102,7 @@ EBpost <- function(beta_tar,sd_tar,
     #find out nonmissing component
     
     idx <- which(!is.na(beta_temp))
-    if(length(idx)<p){
+      if(length(idx)<p&length(idx)>0){
       beta_temp <- beta_temp[idx]
       var_mat_inverse_temp = var_mat_inverse_temp[idx,drop=F]
       prior.mat.inverse_temp = prior.mat.inverse[idx,idx,drop=F]

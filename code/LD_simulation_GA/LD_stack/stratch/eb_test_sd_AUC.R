@@ -20,7 +20,7 @@ pthres <- c(5E-08,5E-07,5E-06,5E-05,5E-04,5E-03,5E-02,5E-01,1.0)
 
 n.test <- 10000
 n.vad <- n.test
-n.rep = 3
+n.rep = 10
 #r2 mat represent the r2 matrix for the testing dataset
 #column represent the ethnic groups
 #row represent different p-value threshold
