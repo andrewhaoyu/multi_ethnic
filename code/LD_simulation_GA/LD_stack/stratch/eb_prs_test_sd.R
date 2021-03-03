@@ -51,17 +51,7 @@ wc_base_vec = c(50,100)
 sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_GA/",eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))
 colnames(sum.data)[2] <- "SNP"
 #combine the target level summary stat with EUR
-summary.com <- left_join(sum.data,summary.eur.select,by="SNP")
-load("./result/LD_simulation_new/snp.infor.match37_38.rdata")
-snp.infor = snp.infor.match %>% 
-  rename(SNP=id) %>% 
-  select(SNP,rs_id,all_of(eth))
-summary.com.update = left_join(summary.com,snp.infor,by="SNP")
-mega.list <- as.data.frame(fread(paste0(cur.dir,"mega-hm3-rsid.txt"),header  =F))
-#mega.infor <- as.data.frame(fread(paste0(cur.dir,"snpBatch_ILLUMINA_1062317")))
-#colnames(mega.infor)[5] <- "rsid"
-colnames(mega.list) = "rs_id"
-summary.com.match = inner_join(summary.com.update,mega.list,by="rs_id")
+summary.com.match <- left_join(sum.data,summary.eur.select,by="SNP")
 
 idx <- which(summary.com.match$A1!=summary.com.match$A1.EUR)
 summary.com.match$A1.EUR[idx] <- summary.com.match$A1[idx]
@@ -99,12 +89,12 @@ EBpost <- function(beta_tar,sd_tar,
                    beta_eur,sd_eur,EBprior){
   
   
-  prior.sigma = solve(EBprior)
+  prior.sigma = EBprior
   z_tar = beta_tar/sd_tar
   z_eur = beta_eur/sd_eur
   z_mat <-cbind(z_tar,z_eur)
   sd_mat =  cbind(sd_tar,sd_eur)
-  post.sigma.inverse = solve(solve(prior.sigma)+diag(2))
+  post.sigma = solve(solve(prior.sigma)+diag(2))
   
   z_mat_post = z_mat
   
@@ -120,10 +110,10 @@ EBpost <- function(beta_tar,sd_tar,
     if(length(idx)<p){
       z_temp <- z_temp[idx]
       
-      post.sigma.inverse_temp = post.sigma.inverse[idx,idx,drop=F]
-      z_post = post.sigma.inverse_temp%*%z_temp
+      post.sigma_temp = post.sigma[idx,idx,drop=F]
+      z_post = post.sigma_temp%*%z_temp
     }else{
-      z_post =post.sigma.inverse%*%z_temp
+      z_post =post.sigma%*%z_temp
     }   
     
     z_mat_post[k,idx] = z_post
