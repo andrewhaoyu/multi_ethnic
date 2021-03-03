@@ -173,12 +173,8 @@ for(r_ind in 1:length(r2_vec)){
     prs.all <- left_join(clump.snp,summary.com,by="SNP") 
     #idx <- which(summary.com$SNP=="rs201335322:154415264:C:T")
     colSums(is.na(prs.all))
-    idx <- which(prs.all$SNP=="rs77625376:73767270:A:C")
-    prs.all[idx,]
-    prs.temp = prs.all %>% 
-      filter(peur<=pthres[k1]|
-               P<=pthres[k2])
-    dim(prs.temp)
+  
+  
     for(k1 in 1:length(pthres)){
       #keep al the SNPs with peur pass the threshold
       prs.all.temp = prs.all
