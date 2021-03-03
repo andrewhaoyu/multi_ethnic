@@ -13,7 +13,7 @@ i1 = as.numeric(args[[5]])
 library(dplyr)
 library(data.table)
 eth <- c("EUR","AFR","AMR","EAS","SAS")
-pthres <- c(5E-08,5E-07,5E-06,5E-05,5E-04,5E-03,5E-02,5E-01)
+pthres <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01,0.5)
 #n <- 120000
 
 #for(m in 1:1){

@@ -30,7 +30,7 @@ library(dplyr)
 library(data.table)
 setwd("/data/zhangh24/multi_ethnic/")
 
-pthres <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01,0.5)
+pthres <- c(5E-08,5E-07,5E-06,5E-05,5E-04,5E-03,5E-02,5E-01)
 #n.snp.mat <- matrix(0,length(pthres),4)
 
 
@@ -164,7 +164,7 @@ for(r_ind in 1:length(r2_vec)){
   for(w_ind in 1:length(wc_vec)){
     print(c(r_ind,w_ind))
     
-    LD <- as.data.frame(fread(paste0(out.dir,eth[i],"/LD_clump_two_way_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped")))
+    
     #read LD clumped SNPs
     LD <- as.data.frame(fread(paste0(out.dir,eth[i],"/LD_clump_two_way_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped")))
     clump.snp <- LD[,1,drop=F] 
@@ -173,6 +173,12 @@ for(r_ind in 1:length(r2_vec)){
     prs.all <- left_join(clump.snp,summary.com,by="SNP") 
     #idx <- which(summary.com$SNP=="rs201335322:154415264:C:T")
     colSums(is.na(prs.all))
+    idx <- which(prs.all$SNP=="rs77625376:73767270:A:C")
+    prs.all[idx,]
+    prs.temp = prs.all %>% 
+      filter(peur<=pthres[k1]|
+               P<=pthres[k2])
+    dim(prs.temp)
     for(k1 in 1:length(pthres)){
       #keep al the SNPs with peur pass the threshold
       prs.all.temp = prs.all
