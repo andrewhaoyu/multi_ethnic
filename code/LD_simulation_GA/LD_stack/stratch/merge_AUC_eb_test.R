@@ -12,11 +12,11 @@ m_vec <- rep(0,total)
 method_vec <- rep("c",total)
 ga_vec <- rep(0,total)
 temp = 1
-n_rep = 10
+n.rep = n_rep = 10
 for(i in 2:5){
   filedir <- paste0(out.dir,eth[i])
   files <- dir(path = filedir,pattern=paste0("r2.list_rho_eb_test_*"),full.names = T)
-  for(i1 in 1:2){
+  for(i1 in c(1:2,4)){
     
     #r2.mat <- matrix(0,length(pthres),total)
     
@@ -85,7 +85,7 @@ n_rep = 10
 for(i in 2:5){
   filedir <- paste0(out.dir,eth[i])
  
-  for(i1 in 1:2){
+  for(i1 in c(1:2,4)){
     
     #r2.mat <- matrix(0,length(pthres),total)
     

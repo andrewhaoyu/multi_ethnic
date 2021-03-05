@@ -13,10 +13,12 @@ getPalette = colorRampPalette(brewer.pal(9, "Paired"))
 
 
 load(paste0("LD.clump.result.CT.rdata"))
+load(paste0("LD.clump.result.SCT.rdata"))
 load(paste0("eur.snp.reult.rdata"))
 load(paste0("weightedprs.result.rdata"))
 load(paste0("LD.clump.result.2DLD.rdata"))
 load(paste0("LD.clump.result.EB.rdata"))
+
 
 LD.clump.result <- LD.result.list[[1]] %>% 
   mutate(method_vec = rep("C + T"))
@@ -24,6 +26,7 @@ LD.clump.result <- LD.result.list[[1]] %>%
 
 
 prediction.result <- rbind(LD.clump.result,
+                           SCT.clump.result,
                            eursnp.result,
                            weightedprs.result,
                            TDLD.result,
@@ -50,6 +53,7 @@ prediction.result = prediction.result %>%
                               levels = c("15000","45000","80000","100000")),
         method_vec = factor(method_vec,
                             levels = c("C + T",
+                                       "SCT",
                                        "Best EUR SNP (C+T)",
                                        "Best EUR SNP + target coefficients (C+T)",
                                        "Best EUR SNP + EB coefficients (C+T)",
