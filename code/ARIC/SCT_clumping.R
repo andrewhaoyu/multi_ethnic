@@ -11,6 +11,8 @@ args = commandArgs(trailingOnly = T)
 #i = as.numeric(args[[1]])
 #l = as.numeric(args[[2]])
 j = as.numeric(args[[1]])
+i = as.numeric(args[[2]])
+l = as.numeric(args[[3]])
 library(data.table)
 #install.packages("dplyr")
 #install.packages("vctrs")
@@ -19,8 +21,8 @@ library(dplyr)
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 trait = c("eGFRcr","ACR","urate")
 library(bigsnpr)
-for(i in 1:2){
-  for(l in c(1,3)){
+# for(i in 1:2){
+#   for(l in c(1,3)){
     setwd("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic")
     temp.dir = paste0("/fastscratch/myscratch/hzhang1/ARIC/",trait[l],"/",eth[i],"/")
     data.dir = "/dcl01/chatterj/data/jin/prs/realdata/ARIC/"
@@ -84,8 +86,8 @@ for(i in 1:2){
     all_keep <- snp_grid_clumping(G, CHR, POS,ind.row = ind.train,
                                   lpS = lpval, exclude = which(is.na(lpval)),ncores = NCORES)
     save(all_keep,file = paste0(temp.dir,"all_keep_chr_",j,".rdata"))
-  }
-}
+#   }
+# }
     #idx <- which(sum.data.assoc$SNP=="rs4970836")
     #write.table(sum.data.assoc,file = paste0(temp.dir,"chr_",j,"_assoc.txt"),col.names = T,row.names = F,quote=F)
     
