@@ -81,7 +81,7 @@ library(bigsnpr)
     beta <- rep(NA, ncol(G))
     beta[info_snp$`_NUM_ID_`] <- info_snp$beta
     lpval <- rep(NA, ncol(G))
-    lpval[info_snp$`_NUM_ID_`] <- -log10(info_snp$p)
+    lpval[info_snp$`_NUM_ID_`] <- -log10(info_snp$P)
     ind.train = sample(nrow(G), 1000)
     all_keep <- snp_grid_clumping(G, CHR, POS,ind.row = ind.train,
                                   lpS = lpval, exclude = which(is.na(lpval)),ncores = NCORES)
@@ -108,4 +108,4 @@ library(bigsnpr)
   #   
   #   paste0(data.dir,trait[1],"/",eth[i],"/geno/mega/ref_chr",j)
   # }
-}
+#}
