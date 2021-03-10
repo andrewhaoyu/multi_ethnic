@@ -221,7 +221,7 @@ for(r_ind in 1:length(r2_vec)){
     
     #read LD clumped SNPs
     LD <- as.data.frame(fread(paste0(out.dir,eth[i],"/LD_clump_two_way_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped")))
-    
+    clump.snp = LD[,1,drop=F]
     #read the target ethnic group summary level statistics
     #combine the statistics with SNPs after clumping
     prs.all <- left_join(clump.snp,summary.com,by="SNP") 
