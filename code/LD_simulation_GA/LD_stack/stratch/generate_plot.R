@@ -17,7 +17,7 @@ load(paste0("LD.clump.result.CT.rdata"))
 #load(paste0("weightedprs.result.rdata"))
 #load(paste0("LD.clump.result.2DLD.rdata"))
 load(paste0("LD.clump.result.EB.rdata"))
-load(paste0("LD.clump.result.EB.test.rdata"))
+load(paste0("LD.clump.result.EB.Test.rdata"))
 load(paste0("LD.clump.result.EB.test.sd.rdata"))
 LD.clump.result <- LD.result.list[[1]] %>% 
   mutate(method_vec = rep("C + T"))
@@ -26,7 +26,7 @@ LD.clump.result <- LD.result.list[[1]] %>%
 
 prediction.result <- rbind(LD.clump.result,
                            EB.result,
-                           EB.result.Test,
+                           EB.result.test,
                            EB.result.Test.sd)
 
 
