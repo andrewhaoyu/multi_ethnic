@@ -30,7 +30,7 @@ library(dplyr)
 library(data.table)
 setwd("/data/zhangh24/multi_ethnic/")
 
-pthres <- c(5E-08,5E-07,5E-06,5E-05,5E-04,5E-03,5E-02,5E-01)
+pthres <- c(5E-08,5E-07,5E-06,5E-05,5E-04,5E-03,5E-02,5E-01,1.0)
 #n.snp.mat <- matrix(0,length(pthres),4)
 
 
@@ -61,28 +61,106 @@ summary.com.match = summary.com.match %>%
   mutate(beta_tar = BETA,
          sd_tar=BETA/STAT,
          z_stat_tar = STAT,
-         z_stat_eur = beta_eur/sd_eur)
+         z_stat_eur = beta_eur/sd_eur) %>% 
+  select(SNP,A1,beta_tar,sd_tar,beta_eur,sd_eur,P,peur)
 #load other ethnic group data
 i_can <- setdiff(c(2:5),i)
-z.mat.list <- list()
+beta.mat.list = list()
+sd.mat.list = list()
 temp = 1
+
+
 for(i_sub in i_can){
   sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_GA/",eth[i_sub],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))
   colnames(sum.data)[2] <- "SNP"
   sum.data = sum.data %>% 
     mutate(sd.sub = BETA/STAT) %>% 
     rename(A1.sub = A1,
-           BETA.sub = BETA,
-           z.sub = STAT)
+           BETA.sub = BETA) %>% 
+    select(SNP,A1.sub,BETA.sub,sd.sub)
   summary.com.temp <- left_join(summary.com.match,sum.data,by="SNP")
   #match allele
   summary.com.temp = summary.com.temp %>% 
-    mutate(z.sub.new = ifelse(A1==A1.sub,z.sub,-z.sub)) 
-  z.mat.list[[temp]] =  summary.com.temp %>% select(z.sub.new)
+    mutate(BETA.sub.new = ifelse(A1==A1.sub,BETA.sub,-BETA.sub)) 
+  beta.mat.list[[temp]] =  summary.com.temp %>% select(BETA.sub.new)
+  sd.mat.list[[temp]] = summary.com.temp %>% select(sd.sub)
   temp = temp+1
 }
+beta.mat = bind_cols(beta.mat.list)
+sd.mat = bind_cols(sd.mat.list)
+EstimatePriorMulti <- function(beta_tar,sd_tar,
+                          beta_eur,sd_eur,beta_other_mat,sd_other_mat){
+  beta_tar = as.numeric(beta_tar)
+  sd_tar = as.numeric(sd_tar)
+  beta_eur = as.numeric(beta_eur)
+  sd_eur = as.numeric(sd_eur)
+  beta_other_mat = as.matrix(beta_other_mat)
+  sd_other_mat = as.matrix(sd_other_mat)
+  z_tar = beta_tar/sd_tar
+  z_eur = beta_eur/sd_eur
+  z_other = beta_other_mat/sd_other_mat
+  z_mat <-na.omit(cbind(z_tar,z_eur,z_other))
+  p = ncol(z_mat)
+  
+  prior.mat <- cov(z_mat)-diag(p)
+  return(prior.mat)
+}
+EBpostMulti <- function(beta_tar,sd_tar,
+                   beta_eur,sd_eur,beta_other_mat,
+                   sd_other_mat,
+                   EBprior){
+  beta_tar = as.numeric(beta_tar)
+  sd_tar = as.numeric(sd_tar)
+  beta_eur = as.numeric(beta_eur)
+  sd_eur = as.numeric(sd_eur)
+  beta_other_mat = as.matrix(beta_other_mat)
+  sd_other_mat = as.matrix(sd_other_mat)
+  
+  prior.sigma = EBprior
+  z_tar = beta_tar/sd_tar
+  z_eur = beta_eur/sd_eur
+  z_other = beta_other_mat/sd_other_mat
+  z_mat <-as.matrix(cbind(z_tar,z_eur,z_other))
+  sd_other_mat = as.matrix(sd_other_mat)
+  sd_mat =  as.matrix(cbind(sd_tar,sd_eur,sd_other_mat))
+  z_mat_post = as.matrix(z_mat)
+  
+  p <- ncol(z_mat)
+  
+  post.sigma = solve(solve(prior.sigma)+diag(p))
+  
+  
+  for(k in 1:nrow(z_mat)){
+    if(k%%10000==0){print(paste0(k," SNPs completed"))}
+    z_temp =z_mat[k,]
+    
+    #find out nonmissing component
+    
+    idx <- which(!is.na(z_temp))
+    if(length(idx)<p){
+      z_temp <- z_temp[idx]
+      
+      post.sigma_temp = post.sigma[idx,idx,drop=F]
+      z_post = post.sigma_temp%*%z_temp
+    }else{
+      z_post =post.sigma%*%z_temp
+    }   
+    
+    z_mat_post[k,idx] = z_post
+  }
+  beta_mat_post = z_mat_post
+  beta_mat_post[,1] =z_mat_post[,1]*sd_tar
+  beta_mat_post[,2] =z_mat_post[,2]*sd_eur
+  beta_mat_post[,3:p] = z_mat_post[,3:p]*sd_other_mat
+  return(beta_mat_post)
+}
 
-z.mat = bind_cols(z.mat.list)
+
+
+
+
+
+
 
 #estimate the prior
 load(paste0(out.dir,eth[i],"/r2.list_rho_2DLD_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
@@ -93,37 +171,40 @@ r_ind = r2.list[[3]][[5]]
 w_ind = r2.list[[3]][[6]]
 LD <- as.data.frame(fread(paste0(out.dir,eth[i],"/LD_clump_two_way_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped")))
 clump.snp <- LD
-summary.com.match$z_stat_mat = z.mat
+summary.com.match$beta_mat = beta.mat
+summary.com.match$sd_mat = sd.mat
 summary.com.prior = left_join(clump.snp,summary.com.match,by="SNP") %>% 
   filter(peur<p.k1|
            P<p.k2)
-prior.sigma = cov(cbind(summary.com.prior$z_stat_tar,
-                        summary.com.prior$z_stat_eur,
-                        summary.com.prior$z_stat_mat),use="complete.obs")-diag(5)
+beta_tar = summary.com.prior$beta_tar
+sd_tar = summary.com.prior$sd_tar
+beta_eur = summary.com.prior$beta_eur
+sd_eur = summary.com.prior$sd_eur
+beta_other_mat = summary.com.prior$beta_mat
+sd_other_mat = summary.com.prior$sd_mat
 
-post.sigma = solve(solve(prior.sigma)+diag(5))
-
-idx <- which(!is.na(summary.com.match$z_stat_eur))
-length(idx)
-z_stat_tar = summary.com.match$z_stat_tar
-z_stat_eur = summary.com.match$z_stat_eur
-z_com = cbind(z_stat_tar,z_stat_eur,z.mat)
-z_post = z_com$z_stat_tar
-for(l in 1:nrow(z_com)){
-  temp = z_com[l,]
-  idx <- which(is.na(temp))
-  if(length(idx)!=4){
-    post.sigma.temp = post.sigma[-idx,-idx]
-  }
-}
-
-z_post = as.matrix(z_com)%*%as.matrix(post.sigma)
-
-post_beta_tar = summary.com.match$beta_tar
-post_beta_tar[idx] = z_post[idx,1]*summary.com.match$sd_tar[idx]
+prior.sigma = EstimatePriorMulti(beta_tar,sd_tar,
+                                 beta_eur,sd_eur,
+                                 beta_other_mat,
+                                 sd_other_mat)
 
 
+
+
+beta_tar <- summary.com.match$beta_tar
+sd_tar <- summary.com.match$sd_tar
+beta_eur <- summary.com.match$beta_eur
+sd_eur <- summary.com.match$sd_eur
+beta_other_mat <- summary.com.match$beta_mat
+sd_other_mat <- summary.com.match$sd_mat
+
+post_beta_mat = EBpostMulti(beta_tar,sd_tar,
+            beta_eur,sd_eur,beta_other_mat,
+            sd_other_mat,
+            prior.sigma)
+post_beta_tar = post_beta_mat[,1,drop=F]
 summary.com.match$BETA = post_beta_tar
+
 
 summary.com  = summary.com.match
 
@@ -179,7 +260,7 @@ for(r_ind in 1:length(r2_vec)){
       }
       q_range = q_range[1:(temp-1),]
       write.table(q_range,file = paste0(temp.dir.prs,"q_range_file"),row.names = F,col.names = F,quote=F)
-      res = system(paste0("/data/zhangh24/software/plink2 --q-score-range ",temp.dir.prs,"q_range_file ",temp.dir.prs,"p_value_file header --threads 2 --score ",temp.dir.prs,"prs_file header no-sum no-mean-imputation --bfile ",temp.dir,"all_chr_test.mega --exclude ",old.out.dir,eth[i],"/duplicated.id  --out ",temp.dir.prs,"prs_eb_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1))
+      res = system(paste0("/data/zhangh24/software/plink2 --q-score-range ",temp.dir.prs,"q_range_file ",temp.dir.prs,"p_value_file header --threads 2 --score ",temp.dir.prs,"prs_file header no-sum no-mean-imputation --bfile ",temp.dir,"all_chr_test.mega --exclude ",old.out.dir,eth[i],"/duplicated.id  --out ",temp.dir.prs,"prs_alleth_eb_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1))
       print("step2 finished")
       #dup <- fread(paste0(old.out.dir,eth[i],"/duplicated.id"),header = F)
       

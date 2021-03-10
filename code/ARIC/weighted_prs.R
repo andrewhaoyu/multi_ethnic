@@ -80,6 +80,6 @@ r2.result = data.frame(eth = eth_vec,
                        rer2_prs = rer2_prs_pc_vec,
                        method_vec)
 
-ARIC.result.bestEUR = r2.result
-save(ARIC.result.bestEUR,file = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/ARIC.result.bestEUR.rdata"))    
-write.csv(ARIC.result.bestEUR,file = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/ARIC.result.bestEUR.csv"))
+# ARIC.result.bestEUR = r2.result
+# save(ARIC.result.bestEUR,file = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/ARIC.result.bestEUR.rdata"))    
+# write.csv(ARIC.result.bestEUR,file = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/ARIC.result.bestEUR.csv"))

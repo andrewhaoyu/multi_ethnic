@@ -71,6 +71,10 @@ r_ind = r2.list[[3]][[5]]
 w_ind = r2.list[[3]][[6]]
 EstimatePrior <- function(beta_tar,sd_tar,
                           beta_eur,sd_eur){
+  beta_tar = as.numeric(beta_tar)
+  sd_tar = as.numeric(sd_tar)
+  beta_eur = as.numeric(beta_eur)
+  sd_eur = as.numeric(sd_eur)
   z_tar = beta_tar/sd_tar
   z_eur = beta_eur/sd_eur
   z_mat <-na.omit(cbind(z_tar,z_eur))
@@ -82,12 +86,15 @@ EstimatePrior <- function(beta_tar,sd_tar,
 EBpost <- function(beta_tar,sd_tar,
                    beta_eur,sd_eur,EBprior){
   
-  
+  beta_tar = as.numeric(beta_tar)
+  sd_tar = as.numeric(sd_tar)
+  beta_eur = as.numeric(beta_eur)
+  sd_eur = as.numeric(sd_eur)
   prior.sigma = EBprior
   z_tar = beta_tar/sd_tar
   z_eur = beta_eur/sd_eur
-  z_mat <-cbind(z_tar,z_eur)
-  sd_mat =  cbind(sd_tar,sd_eur)
+  z_mat <-as.matrix(cbind(z_tar,z_eur))
+  sd_mat =  as.matrix(cbind(sd_tar,sd_eur))
   post.sigma = solve(solve(prior.sigma)+diag(2))
   
   z_mat_post = z_mat
@@ -130,7 +137,6 @@ sd_eur <- summary.com.prior$sd_eur
 
 EBprior = EstimatePrior(beta_tar,sd_tar,
                         beta_eur,sd_eur)
-
 beta_tar <- summary.com.match$beta_tar
 sd_tar <- summary.com.match$sd_tar
 beta_eur <- summary.com.match$beta_eur

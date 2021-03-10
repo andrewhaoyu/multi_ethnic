@@ -44,7 +44,8 @@ for(i in 2:5){
       y <- as.data.frame(fread(paste0(out.dir.sum,eth[i],"/phenotypes_rho",l,"_",i1,".phen")))
       y <- y[,2+(1:n.rep)]
       n <- nrow(y)
-      y_test_mat <- y[(100000+1):nrow(y),]
+      y_test_mat <- y[(100000+1):110000,]
+      y_vad_mat <- y[(110001):120000,]
       for(m in 1:4){
         print(m)
           
@@ -59,12 +60,13 @@ for(i in 2:5){
             filename <- paste0(out.dir,eth[i],"/prs/prs_besteur_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".sscore")
             prs.temp <- as.data.frame(fread(filename))
             #load best EUR PRS
+            q = 1
             prs.score.eur<- prs.temp[,4+q]
             #load AUC performance for target
             load(paste0(out.dir,eth[i],"/r2.list_rho_",l,"_size_",m,"_GA_",i1))
             best.auc.result <- as.data.frame(r2.list[[2]]) %>% 
               filter(r2.vec.test==max(r2.vec.test))
-            r2_ind  = best.auc.result$r2_ind_vec
+            r_ind  = best.auc.result$r2_ind_vec
             w_ind = best.auc.result$wc_ind_vec
             k =which(pthres==best.auc.result$pthres_vec)
             filename <- paste0(out.dir,eth[i],"/prs/prs_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".p_value_",k,".profile")
@@ -72,9 +74,17 @@ for(i in 2:5){
             prs.score.tar <- prs.temp$SCORE
             
             y.test = y_test_mat[,i_rep]
+            y.vad = y_vad_mat[,i_rep]
+            prs.score = cbind(prs.score.eur,prs.score.tar)
+            prs.score.test = prs.score[1:10000,]
+            prs.score.vad = prs.score[10001:20000,]
             #y.vad = y_test_mat[(n.test+1):(nrow(y_test_mat)),i_rep]
-            model1 <- lm(y.test~prs.score.eur+prs.score.tar)
-            r2.test.rep[i_rep] <- summary(model1)$r.square
+            model1 <- lm(y.test~prs.score.test)
+            beta = coefficients(model1)[2:3]
+            model2 = lm(y.vad~prs.score.vad%*%beta)
+            
+            
+            r2.test.rep[i_rep] <- summary(model2)$r.square
             
             
             
