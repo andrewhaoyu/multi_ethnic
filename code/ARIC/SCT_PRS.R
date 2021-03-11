@@ -86,11 +86,19 @@ ind.train = sample(nrow(G), 1000)
 # all_keep <- snp_grid_clumping(G, CHR, POS,ind.row = ind.train,
 #                               lpS = lpval, exclude = which(is.na(lpval)),ncores = NCORES)
 load(paste0(temp.dir,"all_keep_chr_",j,".rdata"))
-attr(all_keep, "grid")
-str(all_keep, max.level = 2, strict.width = "cut")
 multi_PRS <- snp_grid_PRS(G, all_keep, beta, lpval,
                          # backingfile = paste0(data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc",j,".rds"), 
                           n_thr_lpS = 50, ncores = NCORES)
+n.row = nrow(multi_PRS)
+n.col = ncol(multi_PRS)
+
+multi_PRS_temp = matrix(0,n.row,n.col)
+
+
+
+
+#load(paste0(temp.dir,"multi_PRS_chr_",j,".rdata"))
+
 save(multi_PRS,file = paste0(temp.dir,"multi_PRS_chr_",j,".rdata"))
 #   }
 # }
