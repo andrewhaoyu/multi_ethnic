@@ -19,6 +19,7 @@ load(paste0("LD.clump.result.CT.rdata"))
 load(paste0("LD.clump.result.EB.rdata"))
 load(paste0("LD.clump.result.EB.Test.rdata"))
 load(paste0("LD.clump.result.EB.test.sd.rdata"))
+load(paste0("LD.clump.result.alleth.EB.rdata"))
 LD.clump.result <- LD.result.list[[1]] %>% 
   mutate(method_vec = rep("C + T"))
 
@@ -27,7 +28,8 @@ LD.clump.result <- LD.result.list[[1]] %>%
 prediction.result <- rbind(LD.clump.result,
                            EB.result,
                            EB.result.test,
-                           EB.result.Test.sd)
+                           EB.result.Test.sd,
+                           alleth.EB.result)
 
 
 prediction.result = prediction.result %>% 
@@ -55,7 +57,8 @@ prediction.result = prediction.result %>%
                                         "TDLD-EB-TEST",
                                         "TDLD-SLEB-TEST",
                                         "TDLD-EB-TEST-SD",
-                                        "TDLD-SLEB-TEST-SD"
+                                        "TDLD-SLEB-TEST-SD","TDLD-EB (all ethnics)",
+                                        "TDLD-SLEB (all ethnics)"
                              ))) %>% 
   mutate(ga_arc = case_when(ga_vec==1 ~"Fixed common SNP heritability",
                             ga_vec==2 ~"Strong negative selection",
@@ -93,7 +96,9 @@ for(m in 1:4){
       ggtitle(title)
     print(p)
   
-    
+    temp = prediction.result.sub %>%   
+      filter(method_vec%in%c("TDLD-EB",
+                         "TDLD-EB-TEST"))
     
   }
   
