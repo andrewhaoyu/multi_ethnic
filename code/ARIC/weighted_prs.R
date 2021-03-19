@@ -7,16 +7,16 @@ pthres <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01,0.
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 trait = c("eGFRcr","ACR","urate")
 
-qw = 3*3
+qw = 3
 method_vec = rep("c",qw)
 eth_vec = rep("c",qw)
 trait_vec = rep("c",qw)
 r2_prs_vec = rep(0,qw)
 rer2_prs_pc_vec = rep(0,qw)
 result.data.list = list()
-method_op <- c("Best EUR SNP (C+T)",
-               "Best EUR SNP + target coefficients (C+T)",
-               "Best EUR SNP + EB coefficients (C+T)")
+# method_op <- c("Best EUR SNP (C+T)",
+#                "Best EUR SNP + target coefficients (C+T)",
+#                "Best EUR SNP + EB coefficients (C+T)")
 
 step = 1
 i= 2
@@ -55,12 +55,40 @@ for(l in 1:3){
     prs.data = data.frame(ID = genotype.fam$V2, prs.score,stringsAsFactors = F)
     #prs.score <- prs.temp$SCORE*2*length(idx)+prs.score
     #prs.score.mat[,k] = prs.score
-    prs.test <- left_join(y,prs.data,by="ID")
-
-    model1.null <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.test)
-    model1.prs <- lm(model1.null$residual~prs.tar+prs.eur,data=prs.test)
-    rer2_prs_pc_vec[step] = summary(model1.prs)$r.square
-    method_vec[step] = method_op[i_method]
+    
+    prs.all <- left_join(y,prs.data,by="ID")
+    
+    #
+    startend <- function(num,size,ind){
+      split.all <- split(1:num,cut(1:num,size))
+      temp <- split.all[[ind]]
+      start <- temp[1]
+      end <- temp[length(temp)]
+      return(c(start,end))
+    }
+    n.rep = 5
+    rer2_prs_pc_rep =rep(0,n.rep)
+    #split the data into 5 fold
+    for(i_rep in 1:n.rep){
+      start.end <- startend(nrow(prs.all),n.rep,i_rep)
+      vad.id = c(start.end[1]:start.end[2])
+      test.id = setdiff(c(1:nrow(prs.all)),vad.id)
+      
+      prs.test = prs.all[test.id,]
+      prs.vad = prs.all[vad.id,]
+      
+      model1.null <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.test)
+      model1.prs <- lm(model1.null$residual~prs.tar+prs.eur,data=prs.test)
+      
+      beta = coefficients(model1.prs)
+      
+      prs.vad.score <- cbind(prs.vad$prs.tar,prs.vad$prs.eur)%*%beta[2:3]
+      model2.null <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.vad)
+      model2.prs <- lm(model2.null$residual~prs.vad.score)
+      rer2_prs_pc_rep[i_rep] = summary(model2.prs)$r.square
+    }
+    rer2_prs_pc_vec[step] = mean(rer2_prs_pc_rep)
+    method_vec[step] = "Weighted PRS"
     eth_vec[step] = eth[i]
     trait_vec[step] = trait[l]
     
@@ -74,11 +102,12 @@ for(l in 1:3){
 
 #}
 
-r2.result = data.frame(eth = eth_vec,
+weightedprs.result = data.frame(eth = eth_vec,
                        trait = trait_vec,
                        r2_prs = r2_prs_vec,
                        rer2_prs = rer2_prs_pc_vec,
                        method_vec)
+save(weightedprs.result,file = "/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/ARIC.weightedprs.result.rdata")
 
 # ARIC.result.bestEUR = r2.result
 # save(ARIC.result.bestEUR,file = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/ARIC.result.bestEUR.rdata"))    

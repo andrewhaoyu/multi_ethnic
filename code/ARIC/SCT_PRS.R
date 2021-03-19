@@ -92,8 +92,7 @@ multi_PRS <- snp_grid_PRS(G, all_keep, beta, lpval,
                           #backingfile = paste0(temp.dir,"multi_prs_chr",j), 
                           n_thr_lpS = 50, ncores = NCORES)
 multi_PRS = multi_PRS[1:nrow(multi_PRS),]
-save(multi_PRS, file = paste0(temp.dir,"multi_PRS_chr_",j,".rdata.gzip"),compress=
-      "gzip")
+save(multi_PRS, file = paste0(temp.dir,"multi_PRS_chr_",j,".rdata"))
 
 #load(paste0(temp.dir,"multi_PRS_chr_",j,".rdata.gzip"))
 # 
