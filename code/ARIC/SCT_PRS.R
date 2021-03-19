@@ -163,11 +163,6 @@ save(multi_PRS, file = paste0(temp.dir,"multi_PRS_chr_",j,".rdata"))
 
 
 
-apply(multi_PRS_temp[,1:100],2,var)
-
-#load(paste0(temp.dir,"multi_PRS_chr_",j,".rdata"))
-
-save(multi_PRS,file = paste0(temp.dir,"multi_PRS_chr_",j,".rdata"))
 #   }
 # }
 #idx <- which(sum.data.assoc$SNP=="rs4970836")
