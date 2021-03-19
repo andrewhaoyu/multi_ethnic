@@ -32,9 +32,6 @@ for(i in 1:2){
     out.dir = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/",trait[l],"/",eth[i],"/")
     
     
-    y <- as.data.frame(fread("/dcl01/chatterj/data/zyu/egfr_pc_AA_withgwasid.csv"))
-    egfrcr_v1 = y$egfrcr_v1
-    hist(egfrcr_v1)
     y <- as.data.frame(fread(paste0(data.dir,trait[l],"/",eth[i],"/pheno/pheno.txt")))
     colnames(y)[2] = "ID"
     # if(l==1){

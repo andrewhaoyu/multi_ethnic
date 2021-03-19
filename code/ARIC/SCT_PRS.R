@@ -51,6 +51,7 @@ big_counts(G, ind.col = 1:20)
 NCORES <- 2
 map <- obj.bigSNP$map
 colnames(map)[2] = "SNP"
+fam <- obj.bigSNP$fam
 #get the reference allele and effect allele
 #sum data used A1 to code effect allele
 #bim data used original plink coding
@@ -86,16 +87,84 @@ ind.train = sample(nrow(G), 1000)
 # all_keep <- snp_grid_clumping(G, CHR, POS,ind.row = ind.train,
 #                               lpS = lpval, exclude = which(is.na(lpval)),ncores = NCORES)
 load(paste0(temp.dir,"all_keep_chr_",j,".rdata"))
+
 multi_PRS <- snp_grid_PRS(G, all_keep, beta, lpval,
-                         # backingfile = paste0(data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc",j,".rds"), 
+                          #backingfile = paste0(temp.dir,"multi_prs_chr",j), 
                           n_thr_lpS = 50, ncores = NCORES)
-n.row = nrow(multi_PRS)
-n.col = ncol(multi_PRS)
+multi_PRS = multi_PRS[1:nrow(multi_PRS),]
+save(multi_PRS, file = paste0(temp.dir,"multi_PRS_chr_",j,".rdata.gzip"),compress=
+      "gzip")
 
-multi_PRS_temp = matrix(0,n.row,n.col)
+#load(paste0(temp.dir,"multi_PRS_chr_",j,".rdata.gzip"))
+# 
+# multi_PRS_new = multi_PRS[1:9345,]
+# 
+# multi_PRS_new = as_FBM(multi_PRS_new)
+# y = rnorm(9345)
+# temp = big_spLinReg(multi_PRS_new,y,alphas = c(1, 0.01, 1e-04))
+# 
+# pheno <- as.data.frame(fread(paste0(data.dir,trait[l],"/",eth[i],"/pheno/pheno.txt")))
+# colnames(pheno)[2] = "ID"
+# 
+# startend <- function(num,size,ind){
+#   split.all <- split(1:num,cut(1:num,size))
+#   temp <- split.all[[ind]]
+#   start <- temp[1]
+#   end <- temp[length(temp)]
+#   return(c(start,end))
+# }
+# #5 fold cross validation
+# #residual r2
+# prs.data = data.frame(ID = fam$sample.ID,stringsAsFactors = F)
+# prs.data.match = left_join(prs.data,pheno,by="ID")
+# 
+# model1.null <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.data.match)
+# idx <- which(!is.na(y))
+# y = prs.data.match$y
+# y[idx] = model1.null$residual
+# 
+# 
+# 
+# 
+# ind.train  = sample(idx,size = as.integer(length(idx)/2))
+# 
+# 
+# 
+# final_mod <- snp_grid_stacking(multi_PRS, y[ind.train], ncores = NCORES, K = 4)
+# 
+# 
+# 
+# 
+# #model1.null <- lm(y~age+sex,data=prs.test)
+# #r2.test.rep[i_rep] <- summary(model1)$r.square
+# model2.null <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=prs.vad)
+# model2.prs <- lm(model2.null$residual~prs,data=prs.vad)
 
 
 
+
+
+
+
+# new_beta = beta
+# lpS = lpval
+# n_thr_lpS = 50
+# seq_log(max(0.1, min(lpS, na.rm = TRUE)), max(lpS, na.rm = TRUE),
+#         n_thr_lpS)
+# clump.id = all_keep[[1]][[1]]
+# ind.sub = which(lpval[clump.id]>=0.1123652)
+# ind = clump.id[ind.sub]
+# pred <- 
+#   big_prodVec(G, new_beta[ind], ind.row = rows_along(G), ind.col = ind)
+# 
+
+
+
+
+
+
+
+apply(multi_PRS_temp[,1:100],2,var)
 
 #load(paste0(temp.dir,"multi_PRS_chr_",j,".rdata"))
 
@@ -123,3 +192,9 @@ save(multi_PRS,file = paste0(temp.dir,"multi_PRS_chr_",j,".rdata"))
 #   paste0(data.dir,trait[1],"/",eth[i],"/geno/mega/ref_chr",j)
 # }
 #}
+
+
+
+
+
+

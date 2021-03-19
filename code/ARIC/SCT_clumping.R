@@ -10,7 +10,7 @@ args = commandArgs(trailingOnly = T)
 
 #i = as.numeric(args[[1]])
 #l = as.numeric(args[[2]])
-j = as.numeric(args[[1]])
+#j = as.numeric(args[[1]])
 i = as.numeric(args[[2]])
 l = as.numeric(args[[3]])
 library(data.table)
@@ -26,6 +26,7 @@ library(bigsnpr)
     setwd("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic")
     temp.dir = paste0("/fastscratch/myscratch/hzhang1/ARIC/",trait[l],"/",eth[i],"/")
     data.dir = "/dcl01/chatterj/data/jin/prs/realdata/ARIC/"
+    geno.dir = "/dcl02/leased/chatterj/hzhang1/multi_ethnic/result/ARIC/"
     out.dir = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/",trait[l],"/",eth[i],"/")
     #load gwas summary statistics
     sum.data = as.data.frame(fread(paste0(data.dir,trait[l],"/",eth[i],"/sumdata/training-GWAS-formatted.txt")))
@@ -34,12 +35,13 @@ library(bigsnpr)
     #prepare association file for plink
     sum.data.assoc = sum.data %>% 
       mutate(BP=POS,SNP = SNP_ID,A1 = REF,
-             P = PVAL) %>% 
-      filter(CHR==j) 
-    
+             P = PVAL) 
     sum.data.assoc = sum.data.assoc[,c("CHR","SNP","BP","A1","BETA","P")]
-    #snp_readBed(paste0(data.dir,trait[1],"/",eth[i],"/geno/mega/ref_chr",j,".bed"))
-    obj.bigSNP <- snp_attach(paste0(data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc",j,".rds"))
+   
+     
+        
+    snp_readBed(paste0(geno.dir,trait[1],"/",eth[i],"/all_chr.bed"))
+    obj.bigSNP <- snp_attach(paste0(geno.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc",j,".rds"))
     str(obj.bigSNP, max.level = 2, strict.width = "cut")
     # See how the file looks like
     str(obj.bigSNP, max.level = 2, strict.width = "cut")

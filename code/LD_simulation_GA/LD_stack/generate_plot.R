@@ -7,7 +7,7 @@ library(RColorBrewer)
 library(grid)
 library(gridExtra)
 #library(RColorBrewer)
-colourCount = 12
+colourCount = 13
 getPalette = colorRampPalette(brewer.pal(9, "Paired"))
 
 
@@ -18,19 +18,28 @@ load(paste0("eur.snp.reult.rdata"))
 load(paste0("weightedprs.result.rdata"))
 load(paste0("LD.clump.result.2DLD.rdata"))
 load(paste0("LD.clump.result.EB.rdata"))
-
+load(paste0("LD.clump.result.alleth.EB.rdata"))
+load(paste0("LDpred2.result.rdata"))
+load(paste0("LDpredEUR.result.rdata"))
 
 LD.clump.result <- LD.result.list[[1]] %>% 
-  mutate(method_vec = rep("C + T"))
+  mutate(method_vec = rep("C+T"))
 
+TDLD.result = TDLD.result %>% 
+  filter(method_vec=="TDLD")
 
+alleth.EB.result = alleth.EB.result %>% 
+  filter(method_vec=="TDLD-SLEB (all ethnics)")
 
 prediction.result <- rbind(LD.clump.result,
                            SCT.clump.result,
                            eursnp.result,
                            weightedprs.result,
                            TDLD.result,
-                           EB.result)
+                           EB.result,
+                           alleth.EB.result,
+                           LDpred2.result,
+                           LDpredEUR.result)
 
 
 prediction.result = prediction.result %>% 
@@ -52,16 +61,18 @@ prediction.result = prediction.result %>%
         sample_size = factor(sample_size,
                               levels = c("15000","45000","80000","100000")),
         method_vec = factor(method_vec,
-                            levels = c("C + T",
+                            levels = c("C+T",
                                        "SCT",
+                                       "LDpred2",
                                        "Best EUR SNP (C+T)",
                                        "Best EUR SNP + target coefficients (C+T)",
                                        "Best EUR SNP + EB coefficients (C+T)",
+                                       "Best EUR PRS (LDpred2)",
                                        "Weighted-PRS",
                                        "TDLD",
-                                       "TDLD-SL",
                                        "TDLD-EB",
-                                       "TDLD-SLEB"
+                                       "TDLD-SLEB",
+                                       "TDLD-SLEB (all ethnics)"
                                        ))) %>% 
   mutate(ga_arc = case_when(ga_vec==1 ~"Fixed common SNP heritability",
                             ga_vec==2 ~"Strong negative selection",
