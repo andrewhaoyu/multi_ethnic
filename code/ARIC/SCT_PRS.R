@@ -83,6 +83,9 @@ beta <- rep(NA, ncol(G))
 beta[info_snp$`_NUM_ID_`] <- info_snp$beta
 lpval <- rep(NA, ncol(G))
 lpval[info_snp$`_NUM_ID_`] <- -log10(info_snp$P)
+idx <- which(lpval==Inf)
+lpval[idx] = 500
+#range(lpval[!c(1:length(lpval))%in%idx])
 ind.train = sample(nrow(G), 1000)
 # all_keep <- snp_grid_clumping(G, CHR, POS,ind.row = ind.train,
 #                               lpS = lpval, exclude = which(is.na(lpval)),ncores = NCORES)
