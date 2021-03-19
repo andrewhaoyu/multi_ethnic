@@ -13,10 +13,10 @@ for(l in c(1,3)){
     data.dir = "/dcl01/chatterj/data/jin/prs/realdata/ARIC/"
     out.dir = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/",trait[l],"/",eth[i],"/")
     j = 1
-    load(paste0(temp.dir,"multi_PRS_chr_",j,".rdata.gzip"))
+    load(paste0(temp.dir,"multi_PRS_chr_",j,".rdata"))
     multi_PRS_final = multi_PRS
     for(j in 2:22){
-      load(paste0(temp.dir,"multi_PRS_chr_",j,".rdata.gzip")) 
+      load(paste0(temp.dir,"multi_PRS_chr_",j,".rdata")) 
       multi_PRS_final = multi_PRS_final + multi_PRS
     }
     multi_PRS = multi_PRS_final
