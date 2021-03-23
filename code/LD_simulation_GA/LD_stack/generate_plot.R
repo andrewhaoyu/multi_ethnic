@@ -7,8 +7,6 @@ library(RColorBrewer)
 library(grid)
 library(gridExtra)
 #library(RColorBrewer)
-colourCount = 13
-getPalette = colorRampPalette(brewer.pal(9, "Paired"))
 
 
 
@@ -33,13 +31,13 @@ alleth.EB.result = alleth.EB.result %>%
 
 prediction.result <- rbind(LD.clump.result,
                            SCT.clump.result,
+                           LDpred2.result,
                            eursnp.result,
+                           LDpredEUR.result,
                            weightedprs.result,
                            TDLD.result,
                            EB.result,
-                           alleth.EB.result,
-                           LDpred2.result,
-                           LDpredEUR.result)
+                           alleth.EB.result)
 
 
 prediction.result = prediction.result %>% 
@@ -80,20 +78,99 @@ prediction.result = prediction.result %>%
                             ga_vec==4 ~"No negative selection",
                             ga_vec==5 ~"Mild negative selection",
                             ))
+uvals = unique(prediction.result$method_vec)
+
+n.single = 9
 
 
+single.color =  brewer.pal(n.single, "Blues")[c(4,5,7)]
+n.EUR = 9
 
 
+EUR.color = brewer.pal(n.EUR, "Greens")[c(4,5,6,7)]
+
+ 
+n.multi = 9
+multi.color = brewer.pal(n.multi, "Oranges")[c(3:7)]
+colour = c(single.color,EUR.color,multi.color)
+col_df = tibble(
+  colour = c(single.color,EUR.color,multi.color),
+  method_vec = uvals,
+  category = case_when(method_vec%in%c("C+T",
+                                       "SCT",
+                                       "LDpred2") ~ "Single ethnic method",
+                       method_vec%in%c("Best EUR SNP (C+T)",
+                                       "Best EUR SNP + target coefficients (C+T)",
+                                       "Best EUR SNP + EB coefficients (C+T)",
+                                       "Best EUR PRS (LDpred2)") ~ "EUR PRS based method",
+                       method_vec%in%c("Weighted-PRS",
+                                       "TDLD",
+                                       "TDLD-EB",
+                                       "TDLD-SLEB",
+                                       "TDLD-SLEB (all ethnics)") ~ "Multi ethnic method")
+) %>% 
+  mutate(category = factor(category,levels = c("Single ethnic method",
+                                                  "EUR PRS based method",
+                                                  "Multi ethnic method")))
+
+prediction.result = prediction.result %>% 
+  left_join(col_df)
+getLegend <- function(p) {
+  g <- ggplotGrob(p)
+  k <- which(g$layout$name=="guide-box")
+  g$grobs[[k]]
+}
+
+run_plot = function(filler, values) {
+  values = col_df %>% 
+    filter(category %in% filler)
+  labels = values %>% 
+    pull(method_vec)
+  values = values %>% pull(colour)
+  names(values) = labels
+  ggplot(
+    prediction.result.sub %>% 
+      filter(category %in% filler),
+    aes(x= sample_size,y=r2.vec,
+        group=method_vec))+
+    geom_bar(aes(fill = method_vec),
+             stat="identity",
+             position = position_dodge())+
+    #geom_point(aes(color=method_vec))+
+    theme_Publication()+
+    ylab("R2")+
+    xlab("Sample Size")+
+    labs(fill = filler)+
+    scale_fill_manual(values = values)
+}
+
+library(cowplot)
 m = 1
 for(m in 1:4){
   for(i1 in 1:5){
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     prediction.result.sub <- prediction.result %>% 
       filter(ga_vec==i1&
                eth.vec!="EUR"&
                m_vec ==m)
     title = prediction.result.sub$ga_arc[1]
-    p <- ggplot(prediction.result.sub,aes(x= sample_size,y=r2.vec,group=method_vec))+
+    legs = lapply(sort(unique(col_df$category)), run_plot)
+    
+    legs = lapply(legs, getLegend)
+    p.leg = plot_grid(NULL,NULL,legs[[1]],legs[[2]], legs[[3]],NULL,align="v",ncol=1,rel_heights=c(1,1,0.8,0.9,1.2,1.2))
+    print(p.leg)
+    p.null <- ggplot(prediction.result.sub,aes(x= sample_size,y=r2.vec,group=method_vec))+
       geom_bar(aes(fill=method_vec),
                stat="identity",
                position = position_dodge())+
@@ -104,10 +181,13 @@ for(m in 1:4){
       labs(fill = "Method")+
       facet_grid(vars(cau_vec),vars(eth.vec))+
       #scale_fill_nejm()+
-      scale_fill_manual(values = getPalette(colourCount)) +
+      scale_fill_manual(values = colour) +
       theme(axis.text = element_text(size = rel(0.9)),
             legend.text = element_text(size = rel(0.9)))+
-      ggtitle(title)
+      ggtitle(title)+
+      theme(legend.position = "none")
+    p = plot_grid(p.null,p.leg,nrow=1,rel_widths = c(3.5,1))
+    print(p)
     png(file = paste0("./method_compare_result_size_",m,"_summary_GA_",i1,".png"),
         width = 13, height = 8, res = 300,units = "in")
     print(p)
