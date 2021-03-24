@@ -28,6 +28,9 @@ sum.data.assoc = sum.data %>%
          P = PVAL) 
 
 sum.data.assoc = sum.data.assoc[,c("CHR","SNP","BP","A1","BETA","P")]
+# idx.order = order(sum.data.assoc$CHR,sum.data.assoc$BP)
+# sum.data.assoc = sum.data.assoc[idx.order,]
+# head(sum.data.assoc)
 #snp_readBed(paste0(data.dir,trait[1],"/",eth[i],"/geno/mega/ref_chr",j,".bed"))
 obj.bigSNP <- snp_attach(paste0(geno.dir,"all_chr.rds"))
 str(obj.bigSNP, max.level = 2, strict.width = "cut")
@@ -68,6 +71,9 @@ names(map) <- c("chr", "pos", "a0", "a1")
 
 
 
+idx <- which(info_snp$SNP=="rs3094315")
+
+
 info_snp <- snp_match(sum.data.match, map, strand_flip = FALSE)
 beta <- rep(NA, ncol(G))
 beta[info_snp$`_NUM_ID_`] <- info_snp$beta
@@ -95,12 +101,13 @@ n.rep = 5
 rer2_prs_pc_rep =rep(0,n.rep)
 pheno <- as.data.frame(fread(paste0(data.dir,trait[l],"/",eth[i],"/pheno/pheno.txt")))
 colnames(pheno)[2] = "ID"
-genotype.fam <- as.data.frame(fread(paste0(data.dir,trait[1],"/",eth[i],"/geno/mega/chr.qc1.fam")))
+genotype.fam <- fam[,1:2]
 colnames(genotype.fam)[2] = "ID"
 #match pheno to genotype data
 pheno.match = left_join(genotype.fam,pheno,by="ID")
 
 for(i_rep in 1:n.rep){
+  print(i_rep)
   start.end <- startend(nrow(G),n.rep,i_rep)
   vad.id = c(start.end[1]:start.end[2])
   test.id = setdiff(c(1:nrow(G)),vad.id)
@@ -110,12 +117,11 @@ for(i_rep in 1:n.rep){
   vad.id = setdiff(vad.id,idx)
   pheno.match.test = pheno.match[test.id,]
   pheno.match.vad = pheno.match[vad.id,]
-  
-  
-  
+
+
   model1.null <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=pheno.match.test)
   y = model1.null$residual
-
+  
   multi_PRS <- snp_grid_PRS(G, all_keep, beta, lpval,ind.row = test.id,
                             #backingfile = paste0(temp.dir,"multi_prs_chr",j), 
                             n_thr_lpS = 50, ncores = NCORES)

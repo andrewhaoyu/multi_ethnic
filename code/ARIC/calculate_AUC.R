@@ -50,9 +50,19 @@ for(i in 1:2){
     sum.data = sum.data %>% 
       mutate(BP=POS,SNP = SNP_ID,A1 = REF,
              P = PVAL) 
-    clump.snp <- as.data.frame(fread(paste0(out.dir,"/LD_clump.clumped")))
-    
+    # sum.data = sum.data %>%
+    #   mutate(BP=POS,SNP = SNP_ID,A1 = REF,
+    #          P = PVAL)
+    # idx.order = order(sum.data$CHR,sum.data$POS)
+    # sum.data = sum.data[idx.order,] %>%
+    #   mutate(index = c(1:nrow(sum.data)))
+        clump.snp <- as.data.frame(fread(paste0(out.dir,"/LD_clump.clumped")))
+
     prs.clump <- left_join(clump.snp,sum.data,by="SNP")
+    #prs.clump = prs.clump[order(prs.clump$index),]
+    head(prs.clump)
+    prs.filter = prs.clump %>% filter(CHR==1)
+    tail(prs.filter)
     r2.vec.test.prs = rep(0,length(pthres))
     r2.vec.test.prs.pc = rep(0,length(pthres))
     r2.vec.vad.prs = rep(0,length(pthres))
@@ -188,6 +198,9 @@ result.data = rbindlist(result.data.list)
 ARIC.result.CT = list(r2.result,result.data)
 #save(ARIC.result.CT,file = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/ARIC.result.CT.rdata"))    
 save(ARIC.result.CT,file = paste0("/dcl01/chatterj/data/hzhang1/multi_ethnic_data_analysis/multi_ethnic/result/ARIC/ARIC.result.CT.rep.rdata"))    
+
+idx <- which(ARIC.result.CT[[2]]$eth =="EUR"&ARIC.result.CT[[2]]$triat =="urate")
+ARIC.result.CT[[2]][idx,]
 #}
 #     prs.sum = colSums(prs.mat)
 #     idx <- which(prs.sum!=0)
