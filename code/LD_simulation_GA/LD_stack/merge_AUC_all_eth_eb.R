@@ -1,6 +1,6 @@
 #merge the r2 results of AUC
 #total <- 5*4*3*4
-total <- 5*4*3*1
+total <- 5*4*3*4
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 pthres <- c(5E-08,5E-07,5E-06,5E-05,5E-04,5E-03,5E-02,5E-01,1.0)
 
@@ -24,7 +24,7 @@ for(i in 2:5){
     
     
     for(l in 1:3){
-      for(m in 1:1){
+      for(m in 1:4){
         r2.temp <- rep(0,n_rep)
         r2.stack.temp = rep(0,n_rep)
         
