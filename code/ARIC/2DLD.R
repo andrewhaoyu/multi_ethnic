@@ -66,7 +66,7 @@ i = 2
       wc_vec = wc_base_vec/r2_vec[r_ind]
       for(w_ind in 1:length(wc_vec)){
         print(c(r_ind,w_ind))
-        pthr = 0.5
+        pthr = 1
         r2thr = r2_vec[r_ind]
         kbpthr = wc_vec[w_ind]
         

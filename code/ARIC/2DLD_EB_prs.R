@@ -147,7 +147,8 @@ for(l in 1:3){
   p.k2 = r2.result.filter$p.tar.vec
   r_ind = r2.result.filter$r2.vec
   w_ind = r2.result.filter$wc.vec
-  load(paste0(temp.dir,"/2DLD_LD_clump_rind_",r_ind,"_wcind_",w_ind,".rdata"))
+  
+  LD <- fread(paste0(temp.dir,"2DLD_clump_chr_",j,"_",r_ind,"_",w_ind,".clumped"))[,2]
   summary.com.prior = left_join(LD,sum.com,by="SNP") %>% 
     filter(p_eur<p.k1|
              p_tar<p.k2) %>% 
@@ -155,31 +156,38 @@ for(l in 1:3){
            z_stat_tar = beta_tar/se_tar)
   
   beta_tar <- summary.com.prior$beta_tar
-  sd_tar <- summary.com.prior$sd_tar
+  sd_tar <- summary.com.prior$se_tar
   beta_eur <- summary.com.prior$beta_eur
-  sd_eur <- summary.com.prior$sd_eur
+  sd_eur <- summary.com.prior$se_eur
   
   EBprior = EstimatePrior(beta_tar,sd_tar,
                           beta_eur,sd_eur)
+  beta_tar <- sum.com$beta_tar
+  sd_tar <- sum.com$se_tar
+  beta_eur <- sum.com$beta_eur
+  sd_eur <- sum.com$se_eur
   
   
   
+  post_beta_mat = EBpost(beta_tar,sd_tar,beta_eur,sd_eur,EBprior)
+  post_beta_tar = post_beta_mat[,1,drop=F]
+  sum.com$post_beta_tar = post_beta_tar
   
   
   
-  prior.sigma = cov(cbind(summary.com.prior$z_stat_tar,
-                          summary.com.prior$z_stat_eur),use="complete.obs")-diag(2)
-  
-  post.sigma = solve(solve(prior.sigma)+diag(2))
-  z_stat_tar = sum.com$z_stat_tar
-  z_stat_eur = sum.com$z_stat_eur
-  z_mat = cbind(z_stat_tar,z_stat_eur)
-  z_post = z_mat%*%post.sigma
-  
-  sum.com = sum.com %>% 
-    mutate(z_post_tar = z_post[,1]) %>% 
-    mutate(post_beta_tar = ifelse(is.na(z_post_tar),beta_tar,z_post_tar*se_tar))
-    
+  # prior.sigma = cov(cbind(summary.com.prior$z_stat_tar,
+  #                         summary.com.prior$z_stat_eur),use="complete.obs")-diag(2)
+  # 
+  # post.sigma = solve(solve(prior.sigma)+diag(2))
+  # z_stat_tar = sum.com$z_stat_tar
+  # z_stat_eur = sum.com$z_stat_eur
+  # z_mat = cbind(z_stat_tar,z_stat_eur)
+  # z_post = z_mat%*%post.sigma
+  # 
+  # sum.com = sum.com %>% 
+  #   mutate(z_post_tar = z_post[,1]) %>% 
+  #   mutate(post_beta_tar = ifelse(is.na(z_post_tar),beta_tar,z_post_tar*se_tar))
+  #   
   
   #load bim file to match all the SNPs with different strand
   #in summary data and ARIC data

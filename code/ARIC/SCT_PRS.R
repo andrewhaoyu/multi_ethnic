@@ -71,9 +71,6 @@ names(map) <- c("chr", "pos", "a0", "a1")
 
 
 
-idx <- which(info_snp$SNP=="rs3094315")
-
-
 info_snp <- snp_match(sum.data.match, map, strand_flip = FALSE)
 beta <- rep(NA, ncol(G))
 beta[info_snp$`_NUM_ID_`] <- info_snp$beta
