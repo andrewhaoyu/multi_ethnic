@@ -15,7 +15,7 @@ j = as.numeric(args[[1]])
 library(dplyr)
 library(data.table)
 
-pthres <- c(5E-08,5E-07,5E-06,5E-05,5E-04,5E-03,5E-02,5E-01,1.0)
+pthres <- c(5E-08,5E-07,5E-06,5E-05,5E-04,5E-03,5E-02,5E-01)
 n_pthres  = length(pthres)
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 trait = c("eGFRcr","ACR","urate")
@@ -24,7 +24,7 @@ r2_vec = c(0.01,0.05,0.1,0.2,0.5,0.8)
 wc_base_vec = c(50,100)
 
 
-#generate q_range file is a one time job
+# generate q_range file is a one time job
 # for(l in 1:3){
 #   temp.dir = paste0("/fastscratch/myscratch/hzhang1/ARIC/",trait[l],"/",eth[i],"/")
 #   q_range = data.frame(
@@ -79,61 +79,6 @@ for(l in 1:3){
            A1_eur =ifelse(A1_eur==A1_tar,A1_eur,A1_tar)) %>% 
     mutate(z_stat_eur = beta_eur/se_eur,
            z_stat_tar = beta_tar/se_tar)
-  EstimatePrior <- function(beta_tar,sd_tar,
-                            beta_eur,sd_eur){
-    beta_tar = as.numeric(beta_tar)
-    sd_tar = as.numeric(sd_tar)
-    beta_eur = as.numeric(beta_eur)
-    sd_eur = as.numeric(sd_eur)
-    z_tar = beta_tar/sd_tar
-    z_eur = beta_eur/sd_eur
-    z_mat <-na.omit(cbind(z_tar,z_eur))
-    
-    
-    prior.mat <- cov(z_mat)-diag(2)
-    return(prior.mat)
-  }
-  EBpost <- function(beta_tar,sd_tar,
-                     beta_eur,sd_eur,EBprior){
-    
-    beta_tar = as.numeric(beta_tar)
-    sd_tar = as.numeric(sd_tar)
-    beta_eur = as.numeric(beta_eur)
-    sd_eur = as.numeric(sd_eur)
-    prior.sigma = EBprior
-    z_tar = beta_tar/sd_tar
-    z_eur = beta_eur/sd_eur
-    z_mat <-as.matrix(cbind(z_tar,z_eur))
-    sd_mat =  as.matrix(cbind(sd_tar,sd_eur))
-    post.sigma = solve(solve(prior.sigma)+diag(2))
-    
-    z_mat_post = z_mat
-    
-    p <- ncol(z_mat)
-    
-    for(k in 1:nrow(z_mat)){
-      if(k%%10000==0){print(paste0(k," SNPs completed"))}
-      z_temp = z_mat[k,]
-      
-      #find out nonmissing component
-      
-      idx <- which(!is.na(z_temp))
-      if(length(idx)<p){
-        z_temp <- z_temp[idx]
-        
-        post.sigma_temp = post.sigma[idx,idx,drop=F]
-        z_post = post.sigma_temp%*%z_temp
-      }else{
-        z_post =post.sigma%*%z_temp
-      }   
-      
-      z_mat_post[k,idx] = z_post
-    }
-    beta_mat_post = z_mat_post
-    beta_mat_post[,1] =z_mat_post[,1]*sd_tar
-    beta_mat_post[,2] =z_mat_post[,2]*sd_eur
-    return(beta_mat_post)
-  }
   
   
   #load the best 2DLD cutoff to estimate prior
@@ -147,47 +92,25 @@ for(l in 1:3){
   p.k2 = r2.result.filter$p.tar.vec
   r_ind = r2.result.filter$r2.vec
   w_ind = r2.result.filter$wc.vec
-  
   load(paste0(temp.dir,"/2DLD_LD_clump_rind_",r_ind,"_wcind_",w_ind,".rdata"))
   summary.com.prior = left_join(LD,sum.com,by="SNP") %>% 
     filter(p_eur<p.k1|
              p_tar<p.k2) %>% 
     mutate(z_stat_eur = beta_eur/se_eur,
            z_stat_tar = beta_tar/se_tar)
+  prior.sigma = cov(cbind(summary.com.prior$z_stat_tar,
+                          summary.com.prior$z_stat_eur),use="complete.obs")-diag(2)
   
-  beta_tar <- summary.com.prior$beta_tar
-  sd_tar <- summary.com.prior$se_tar
-  beta_eur <- summary.com.prior$beta_eur
-  sd_eur <- summary.com.prior$se_eur
+  post.sigma = solve(solve(prior.sigma)+diag(2))
+  z_stat_tar = sum.com$z_stat_tar
+  z_stat_eur = sum.com$z_stat_eur
+  z_mat = cbind(z_stat_tar,z_stat_eur)
+  z_post = z_mat%*%post.sigma
   
-  EBprior = EstimatePrior(beta_tar,sd_tar,
-                          beta_eur,sd_eur)
-  beta_tar <- sum.com$beta_tar
-  sd_tar <- sum.com$se_tar
-  beta_eur <- sum.com$beta_eur
-  sd_eur <- sum.com$se_eur
+  sum.com = sum.com %>% 
+    mutate(z_post_tar = z_post[,1]) %>% 
+    mutate(post_beta_tar = ifelse(is.na(z_post_tar),beta_tar,z_post_tar*se_tar))
   
-  
-  
-  post_beta_mat = EBpost(beta_tar,sd_tar,beta_eur,sd_eur,EBprior)
-  post_beta_tar = post_beta_mat[,1,drop=F]
-  sum.com$post_beta_tar = post_beta_tar
-  
-  
-  
-  # prior.sigma = cov(cbind(summary.com.prior$z_stat_tar,
-  #                         summary.com.prior$z_stat_eur),use="complete.obs")-diag(2)
-  # 
-  # post.sigma = solve(solve(prior.sigma)+diag(2))
-  # z_stat_tar = sum.com$z_stat_tar
-  # z_stat_eur = sum.com$z_stat_eur
-  # z_mat = cbind(z_stat_tar,z_stat_eur)
-  # z_post = z_mat%*%post.sigma
-  # 
-  # sum.com = sum.com %>% 
-  #   mutate(z_post_tar = z_post[,1]) %>% 
-  #   mutate(post_beta_tar = ifelse(is.na(z_post_tar),beta_tar,z_post_tar*se_tar))
-  #   
   
   #load bim file to match all the SNPs with different strand
   #in summary data and ARIC data
