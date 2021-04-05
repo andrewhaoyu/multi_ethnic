@@ -28,7 +28,8 @@ TDLD.result = TDLD.result %>%
 
 alleth.EB.result = alleth.EB.result %>% 
   filter(method_vec=="TDLD-SLEB (all ethnics)")
-
+weightedprs.result = weightedprs.result %>% 
+  mutate(method_vec = "Weighted PRS")
 prediction.result <- rbind(LD.clump.result,
                            SCT.clump.result,
                            LDpred2.result,
@@ -66,7 +67,7 @@ prediction.result = prediction.result %>%
                                        "Best EUR SNP + target coefficients (C+T)",
                                        "Best EUR SNP + EB coefficients (C+T)",
                                        "Best EUR PRS (LDpred2)",
-                                       "Weighted-PRS",
+                                       "Weighted PRS",
                                        "TDLD",
                                        "TDLD-EB",
                                        "TDLD-SLEB",
@@ -102,8 +103,9 @@ col_df = tibble(
                        method_vec%in%c("Best EUR SNP (C+T)",
                                        "Best EUR SNP + target coefficients (C+T)",
                                        "Best EUR SNP + EB coefficients (C+T)",
-                                       "Best EUR PRS (LDpred2)") ~ "EUR PRS based method",
-                       method_vec%in%c("Weighted-PRS",
+                                       "Best EUR PRS (LDpred2)"
+                                       ) ~ "EUR PRS based method",
+                       method_vec%in%c("Weighted PRS",
                                        "TDLD",
                                        "TDLD-EB",
                                        "TDLD-SLEB",

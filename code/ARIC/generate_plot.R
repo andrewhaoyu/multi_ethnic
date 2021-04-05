@@ -9,12 +9,190 @@ library(gridExtra)
 
 #library(RColorBrewer)
 colourCount = 12
-getPalette = colorRampPalette(brewer.pal(9, "Paired"))
+#getPalette = colorRampPalette(brewer.pal(9, "Paired"))
 
 library(tidyr)
 library(tidyverse)
 #load(paste0("ARIC.result.CT.rep.rdata"))
 load(paste0("ARIC.result.CT.rep.rdata"))
+load(paste0("ARIC.result.SCT.rdata"))
+load(paste0("ARIC.result.bestEUR.rdata"))
+load(paste0("ARIC.weightedprs.result.rdata"))
+load(paste0("ARIC.result.2DLD.rdata"))
+load(paste0("ARIC.result.EB.rdata"))
+
+ARIC.result.CT = ARIC.result.CT[[1]][,c(1,2,4)]
+ARIC.result.CT$method = "C+T"
+ARIC.result.bestEUR = ARIC.result.bestEUR[,c(1,2,4,5)]
+ARIC.result.2DLD = ARIC.result.2DLD[[1]][,c(1,2,3)]
+ARIC.result.2DLD$method_vec = "TDLD"
+ARIC.result.TDLDEB = ARIC.result.EB[[1]][,c(1,2,3)]
+ARIC.result.TDLDEB$method_vec = "TDLD-EB"
+ARIC.result.TDLDSLEB = ARIC.result.EB[[1]][,c(1,2,4)]
+ARIC.result.TDLDSLEB$method_vec = "TDLD-SLEB"
+weightedprs.result = weightedprs.result[,c(1,2,4,5)]
+weightedprs.result$method_vec = "Weighted PRS"
+#plug in LD pred results from Jin
+ARIC.result.LDpred = data.frame(eth = c("EUR","EUR","AFR","AFR"),
+                                trait = c("eGFRcr","urate","eGFRcr","urate"),
+                                r2 = c(0.075,0.086,0.018,0.030),
+                                method_vec = "LDpred2")
+ARIC.result.EURLDpred = data.frame(eth = c("AFR","AFR"),
+                                trait = c("eGFRcr","urate"),
+                                r2 = c(0.005,0.043),
+                                method_vec = "Best EUR PRS (LDpred2)")
+colnames(ARIC.result.CT) = colnames(ARIC.result.SCT) = 
+  colnames(ARIC.result.LDpred) = colnames(ARIC.result.bestEUR) = 
+  colnames(ARIC.result.EURLDpred) = colnames(ARIC.result.2DLD) = 
+  colnames(ARIC.result.TDLDEB) = colnames(ARIC.result.TDLDSLEB) =
+  colnames(weightedprs.result) = 
+  c("eth_vec","trait_vec","r2_vec","method_vec")
+
+result.ARIC = rbind(ARIC.result.CT,
+                    ARIC.result.SCT,
+                    ARIC.result.LDpred,
+                    ARIC.result.bestEUR,
+                    ARIC.result.EURLDpred,
+                    weightedprs.result,
+                    ARIC.result.2DLD,
+                    ARIC.result.TDLDEB,
+                    ARIC.result.TDLDSLEB)
+result.ARIC = result.ARIC %>% 
+  mutate(method_vec = factor(method_vec,
+                             levels = c("C+T",
+                                        "SCT",
+                                        "LDpred2",
+                                        "Best EUR SNP (C+T)",
+                                        "Best EUR SNP + target coefficients (C+T)",
+                                        "Best EUR SNP + EB coefficients (C+T)",
+                                        "Best EUR PRS (LDpred2)",
+                                        "Weighted PRS",
+                                        "TDLD",
+                                        "TDLD-EB",
+                                        "TDLD-SLEB"
+                             )))
+
+uvals = unique(result.ARIC$method_vec)
+
+n.single = 9
+
+
+single.color =  brewer.pal(n.single, "Blues")[c(4,5,7)]
+n.EUR = 9
+
+
+EUR.color = brewer.pal(n.EUR, "Greens")[c(4,5,6,7)]
+
+
+n.multi = 9
+multi.color = brewer.pal(n.multi, "Oranges")[c(3:6)]
+colour = c(single.color,EUR.color,multi.color)
+col_df = tibble(
+  colour = c(single.color,EUR.color,multi.color),
+  method_vec = uvals,
+  category = case_when(method_vec%in%c("C+T",
+                                       "SCT",
+                                       "LDpred2") ~ "Single ethnic method",
+                       method_vec%in%c("Best EUR SNP (C+T)",
+                                       "Best EUR SNP + target coefficients (C+T)",
+                                       "Best EUR SNP + EB coefficients (C+T)",
+                                       "Best EUR PRS (LDpred2)"
+                       ) ~ "EUR PRS based method",
+                       method_vec%in%c("Weighted PRS",
+                                       "TDLD",
+                                       "TDLD-EB",
+                                       "TDLD-SLEB") ~ "Multi ethnic method")
+) %>% 
+  mutate(category = factor(category,levels = c("Single ethnic method",
+                                               "EUR PRS based method",
+                                               "Multi ethnic method")))
+
+result.ARIC = result.ARIC %>% 
+  left_join(col_df)
+
+
+result.ARIC.sub <- result.ARIC %>% 
+  filter(eth_vec=="AFR"&
+           trait_vec!="ACR") 
+
+
+prediction.result.sub = result.ARIC.sub %>% 
+  mutate(index = rep("1",nrow(result.ARIC.sub)))
+
+
+getLegend <- function(p) {
+  g <- ggplotGrob(p)
+  k <- which(g$layout$name=="guide-box")
+  g$grobs[[k]]
+}
+run_plot = function(filler, values) {
+  values = col_df %>% 
+    filter(category %in% filler)
+  labels = values %>% 
+    pull(method_vec)
+  values = values %>% pull(colour)
+  names(values) = labels
+  ggplot(
+    prediction.result.sub %>% 
+      filter(category %in% filler),
+    aes(x= index,y=r2_vec,
+        group=method_vec))+
+    geom_bar(aes(fill = method_vec),
+             stat="identity",
+             position = position_dodge())+
+    #geom_point(aes(color=method_vec))+
+    theme_Publication()+
+    ylab("R2")+
+    xlab("Sample Size")+
+    labs(fill = filler)+
+    scale_fill_manual(values = values)
+}
+
+
+
+p.null <- ggplot(prediction.result.sub,aes(x = index,y=r2_vec,group=method_vec))+
+  geom_bar(aes(fill=method_vec),
+           stat="identity",
+           position = position_dodge())+
+  #geom_point(aes(color=method_vec))+
+  theme_Publication()+
+  ylab("R2")+
+  xlab("Sample Size")+
+  labs(fill = "Method")+
+  facet_wrap(vars(trait_vec ))+
+  #scale_fill_nejm()+
+  scale_fill_manual(values = colour) +
+  theme(axis.text = element_text(size = rel(0.9)),
+        legend.text = element_text(size = rel(0.9)))+
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())+
+  theme(legend.position = "none")
+  
+#+
+  # ggtitle(title)+
+  # theme(legend.position = "none")
+
+
+
+#title = prediction.result.sub$ga_arc[1]
+legs = lapply(sort(unique(col_df$category)), run_plot)
+library(cowplot)
+legs = lapply(legs, getLegend)
+p.leg = plot_grid(NULL,NULL,legs[[1]],legs[[2]], legs[[3]],NULL,align="v",ncol=1,rel_heights=c(1,1,0.8,0.9,1.2,1.2))
+print(p.leg)
+p = plot_grid(p.null,p.leg,nrow=1,rel_widths = c(3.5,1))
+print(p)
+png(file = paste0("./ARIC_results_compare.png"),
+    width = 13, height = 8, res = 300,units = "in")
+print(p)
+dev.off()
+
+
+
+
+
+
 ARIC.result.CT.long= ARIC.result.CT[[1]]
 pla = 3
 ARIC.result.CT.long = ARIC.result.CT.long %>% 
