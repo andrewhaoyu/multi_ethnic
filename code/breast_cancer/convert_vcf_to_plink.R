@@ -1,0 +1,1 @@
+/data/zhangh24/software/plink2 --vcf /gpfs/gsfs10/users/BC_risk_prediction/ghana/GSA/VCFs_to_share/subtracted_chr22.dose.vcf.gz --recode --make-bed --out /data/zhangh24/multi_ethnic/data/GHBS_plink/chr22 --maf 0.005 --double-id

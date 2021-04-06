@@ -148,15 +148,14 @@ auc <- function(prs.model.file = "/data/songl5/Jianxin/AUC.SCZ/data/pruning_impu
 }
 
 
-res = auc(	prs.model.file = "/data/songl5/Jianxin/AUC.SCZ/data/pruning_imputation_withPCA/pruning_0.5_1.0/pruning_0.01/pv_5e-8/prs.model", 
-           gwas.summary.stats.file = "/data/songl5/Jianxin/AUC.SCZ/data/pruning_imputation_withPCA/pruning_0.5_1.0/MGS_0.5_1.0_CHR.SNP.A1.MAF.BETA.P.txt.gz",
-           N0 = 2653,
-           N1 = 2681,
-           soFile = '/data/songl5/Jianxin/AUC.SCZ/data/pruning_imputation_withPCA/pruning_0.5_1.0/scripts/getAdjCorrelation.so',
-           flag.correlation.adj.imputated.data = FALSE,
-           pos_thr = 5e8,
-           KG.plink.pre = '/data/songl5/1000G/KG.all.chr')
-
+res = auc(prs.model.file = "/data/zhangh24/multi_ethnic/result/breast_cancer/best_eur_prsmodelfile", 
+          gwas.summary.stats.file = "/data/zhangh24/multi_ethnic/result/breast_cancer/best_eur_gwas_summary_stat",
+          N0 = 3119,
+          N1 = 2702,
+          soFile = '/data/zhangh24/multi_ethnic/code/breast_cancer/getAdjCorrelation.so',
+          flag.correlation.adj.imputated.data = FALSE,
+          pos_thr = 5e8,
+          KG.plink.pre = '/data/zhangh24/KG.plink/AFR/chr_all')
 cat("\n#######################################\n\n")
 
 cat("Predicted AUC:\t", res[1], "\n", sep = "")
@@ -165,15 +164,3 @@ cat("Predicted AUC's variance:\t", res[2], "\n", sep = "")
 cat("\nHave a nice Day!\n")
 
 cat("\n#######################################\n")
-© 2021 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-Docs
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
