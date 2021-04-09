@@ -43,7 +43,25 @@ dat = data %>%
   mutate(MAF = ifelse(FREQ_A1<=0.5,FREQ_A1,1-FREQ_A1)) %>% 
   select(rsid,CHR,BP,P,MAF) %>% 
   rename(SNP = rsid)
+
+sample_size <- as.data.frame(fread("/data/zhangh24/multi_ethnic/data/23_sample_size.csv",header=T))
 library(readr)
+library(dplyr)
+x = dat$P
+z = qnorm(x / 2)
+lambda = round(median(z^2) / qchisq(0.5,1), 3)
+
+idx <- which(sample_size$eth==eth[i1]&
+               sample_size$Disease==trait[i2])
+N.effect  <- sample_size[idx,"N_effect"]
+#rescale lambda to 1000 subjects
+if(i2%in%c(1:2,5:7)){
+  lambda_1000 = round(1+500*(lambda-1)/N.effect ,3)
+}else{
+  lambda_1000 = round(1+1000*(lambda-1)/N.effect  ,3)
+}
+
+
 convert.qval.pval = function(qvalues) {
   # you need to know the estimate of pi0 used to create the q-value
   # that's the maximum q-value (or very, very close to it)
@@ -301,9 +319,14 @@ abline(h=ifelse(yLine<opt$break.top,
                 yLine,
                 rescale(yLine)),
        col=colLine,lwd=1.5,lty=2)
-legend("topleft",legend=legendtext,col=legendcol,pch=15,bty="n")
+text(5,1,expression(paste(lambda[1000]," = ")),cex = 1.5)
+text(5.9,1,paste(lambda_1000),cex = 1.5)
+
 title(paste0(trait_name[i2]," for ",eth[i1]))
 dev.off()
-# png(filename = paste0("man_",eth[i1],"_",trait[i2],".png"),width=8, height=4, units="in", res=300)
-# print(manhplot)
-# dev.off()
+
+# plot(1,1)
+# text(1,0.8,expression(paste(lambda[1000]," = ",buquote(.(lambda_1000)))),cex = 1.5)
+
+lambda_vec = c(lambda,lambda_1000)
+save(lambda_vec,file = paste0("/data/zhangh24/multi_ethnic/result/cleaned/lambda_value/lambda_vec_",i1,"_",i2,"_",i3,".rdata"))
