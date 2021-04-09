@@ -145,37 +145,37 @@ library("optparse")
 
 
 
-option_list <- list(
-  make_option("--input", type="character", default="",
-              help="Input file, tab delimited; required columns: 'MAF' and 'PVALUE'"),
-  make_option("--prefix", type="character", default="",
-              help="Prefix of output files"),
-  make_option("--top.size", type="numeric", default=0.125,
-              help="top size = proportion of total length y axis [default=0.125]"),
-  make_option("--break.top", type="numeric", default=15,
-              help="set axis break at -log10(P) [default=15]"),
-  make_option("--width", type="numeric", default=900,
-              help="Width QQ plot in pixel [default=900]"),
-  make_option("--height", type="numeric", default=900,
-              help="Height QQ plot in pixel [default=900]"),
-  make_option("--pointsize", type="numeric", default=16,
-              help="Point size of plots [default=16]"),
-  make_option("--maf", type="character", default="",
-              help="name of column with MAF [default='']"),
-  make_option("--af", type="character", default="",
-              help="name of column with AF [default='']"),
-  make_option("--pvalue", type="character", default="PVALUE",
-              help="name of column with p.value [default='PVALUE']"),
-  make_option("--log10p", type="logical", default=F,
-              help="Input p.value column with -log10(p.value) [default=F]"),
-  make_option("--maintitle", type="character", default="",
-              help="Plot title")
-)
-
-parser <- OptionParser(usage="%prog [options]", option_list=option_list)
+# option_list <- list(
+#   make_option("--input", type="character", default="",
+#               help="Input file, tab delimited; required columns: 'MAF' and 'PVALUE'"),
+#   make_option("--prefix", type="character", default="",
+#               help="Prefix of output files"),
+#   make_option("--top.size", type="numeric", default=0.125,
+#               help="top size = proportion of total length y axis [default=0.125]"),
+#   make_option("--break.top", type="numeric", default=15,
+#               help="set axis break at -log10(P) [default=15]"),
+#   make_option("--width", type="numeric", default=900,
+#               help="Width QQ plot in pixel [default=900]"),
+#   make_option("--height", type="numeric", default=900,
+#               help="Height QQ plot in pixel [default=900]"),
+#   make_option("--pointsize", type="numeric", default=16,
+#               help="Point size of plots [default=16]"),
+#   make_option("--maf", type="character", default="",
+#               help="name of column with MAF [default='']"),
+#   make_option("--af", type="character", default="",
+#               help="name of column with AF [default='']"),
+#   make_option("--pvalue", type="character", default="PVALUE",
+#               help="name of column with p.value [default='PVALUE']"),
+#   make_option("--log10p", type="logical", default=F,
+#               help="Input p.value column with -log10(p.value) [default=F]"),
+#   make_option("--maintitle", type="character", default="",
+#               help="Plot title")
+# )
 # 
-args <- parse_args(parser, positional_arguments = 0)
-opt <- args$options
+# parser <- OptionParser(usage="%prog [options]", option_list=option_list)
+# # 
+# args <- parse_args(parser, positional_arguments = 0)
+# opt <- args$options
 
 
 qqplotdata <- function(logpvector){
@@ -242,6 +242,9 @@ for(f in 1:length(freqtable)){
   legendcol <- c(legendcol,allcols[f])
 }
 legendtext <- paste0("MAF=",fbin,"; N SNPs=",format(fN,big.mark=",",scientific=FALSE))
+opt =  list(break.top = 15,
+            top.size = 0.125)
+
 
 png(filename = paste0(outpath,"/QQ_",eth[i1],"_",trait[i2],".png"), width = 8, height = 8, units = "in",res=300)
 xlim <- c(0,max(fx,na.rm=T))
