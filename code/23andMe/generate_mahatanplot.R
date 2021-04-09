@@ -4,7 +4,7 @@ com.args = commandArgs(trailingOnly = T)
 #i3 =1 means mega+hapmap i3 = 2 means all SNPs
 i1 = as.numeric(com.args[[1]])
 i2 = as.numeric(com.args[[2]])
-i3 = as.nunmeric(com.args[[3]])
+i3 = as.numeric(com.args[[3]])
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 trait <- c("any_cvd","depression",
            "heart_metabolic_disease_burden",
