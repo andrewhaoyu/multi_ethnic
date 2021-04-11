@@ -320,7 +320,7 @@ abline(h=ifelse(yLine<opt$break.top,
                 rescale(yLine)),
        col=colLine,lwd=1.5,lty=2)
 text(5,1,expression(paste(lambda[1000]," = ")),cex = 1.5)
-text(5.9,1,paste(lambda_1000),cex = 1.5)
+text(5.7,1,paste(lambda_1000),cex = 1.5)
 
 title(paste0(trait_name[i2]," for ",eth[i1]))
 dev.off()
