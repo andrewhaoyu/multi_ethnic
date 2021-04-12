@@ -30,9 +30,9 @@ sid<-Sys.getenv('SLURM_JOB_ID')
 dir.create(paste0('/lscratch/',sid,'/test'),showWarnings = FALSE)
 temp.dir = paste0('/lscratch/',sid,'/test/')
 kg.dir = "/data/zhangh24/KGref_MEGA/GRCh37/"
-system(paste0("cp ",kg.dir,eth[i],"/chr",j,".bed ",temp.dir,eth[i],"all_chr.bed"))
-system(paste0("cp ",kg.dir,eth[i],"/chr",j,".bim ",temp.dir,eth[i],"all_chr.bim"))
-system(paste0("cp ",kg.dir,eth[i],"/chr",j,".fam ",temp.dir,eth[i],"all_chr.fam"))
+system(paste0("cp ",kg.dir,eth[i],"/all_chr.bed ",temp.dir,eth[i],"all_chr.bed"))
+system(paste0("cp ",kg.dir,eth[i],"/all_chr.bim ",temp.dir,eth[i],"all_chr.bim"))
+system(paste0("cp ",kg.dir,eth[i],"/all_chr.fam ",temp.dir,eth[i],"all_chr.fam"))
 
 # for(i in 1:2){
 #   for(l in 1:3){
@@ -62,7 +62,7 @@ system(paste0("cp ",kg.dir,eth[i],"/chr",j,".fam ",temp.dir,eth[i],"all_chr.fam"
     #cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
     #code <- rep("c",5*3*3)
     #system(paste0("/data/zhangh24/software/plink2 --bfile /data/zhangh24/KG.plink/",eth[i],"/chr_all --clump ",cur.dir,eth[i],"/summary_out_MAF_rho_",l,"_size_",m,"_rep_",i_rep,".out --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out ",cur.dir,eth[i],"/LD_clump_rho_",l,"_size_",m,"_rep_",i_rep))
-    res = system(paste0("/data/zhangh24/software/plink2 --bfile ",temp.dir,eth[i],"all_chr--clump ",temp.dir,"all_chr_assoc.txt --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out ",temp.dir,"LD_clump"))
+    res = system(paste0("/data/zhangh24/software/plink2 --bfile ",temp.dir,eth[i],"all_chr --clump ",temp.dir,"all_chr_assoc.txt --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out ",temp.dir,"LD_clump"))
     system(paste0("mv ",temp.dir,"LD_clump.clumped ",out.dir))
     if(res==2){
       stop()
