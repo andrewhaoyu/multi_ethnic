@@ -13,6 +13,7 @@ library(data.table)
 #install.packages("dplyr")
 #install.packages("vctrs")
 library(dplyr)
+method = "PT"
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 trait <- c("any_cvd","depression",
            "heart_metabolic_disease_burden",
@@ -40,7 +41,7 @@ for(i in 1:length(eth)){
     prs.all <- left_join(clump.snp,sum.data.assoc)
     temp = 1
     out.dir.prs <- paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/PT/",eth[i],"/",trait[l],"/")
-    method = "PT"
+    
     for(k in 1:length(pthres)){
       prs.temp <- prs.all %>% 
         filter(P<=pthres[k]) %>% 

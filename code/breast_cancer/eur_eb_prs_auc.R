@@ -10,7 +10,7 @@ var_name = data.frame(ID = gsub("_",":",prs.snp[,1]),rsID = prs.snp[,2])
 #                sum.data$POS==7571752)
 library(dplyr)
 best.eur.snp = inner_join(var_name,sum.data.train,
-                         by="ID")
+                          by="ID")
 best.eur.snp = best.eur.snp %>% 
   mutate(chr_pos = paste0(CHR,":",POS))
 load("/data/zhangh24/KG.plink/AFR/chr_all_frq.rdata")
@@ -63,19 +63,3 @@ write.table(gwas.summary.data.test,
             col.names = T,
             quote=F)
 #idx <- which(gwas.summary.data.test$POS%in%freq.infor$POS==F)
-res = auc(prs.model.file = "/data/zhangh24/multi_ethnic/result/breast_cancer/best_eur_prsmodelfile", 
-          gwas.summary.stats.file = "/data/zhangh24/multi_ethnic/result/breast_cancer/best_eur_gwas_summary_stat",
-          N0 = 3119,
-          N1 = 2702,
-          soFile = '/data/zhangh24/multi_ethnic/code/breast_cancer/getAdjCorrelation.so',
-          flag.correlation.adj.imputated.data = FALSE,
-          pos_thr = 5e8,
-          KG.plink.pre = '/data/zhangh24/KG.plink/AFR/chr_all')
-cat("\n#######################################\n\n")
-
-cat("Predicted AUC:\t", res[1], "\n", sep = "")
-cat("Predicted AUC's variance:\t", res[2], "\n", sep = "")
-
-cat("\nHave a nice Day!\n")
-
-cat("\n#######################################\n")
