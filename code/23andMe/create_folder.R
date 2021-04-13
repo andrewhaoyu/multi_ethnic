@@ -78,14 +78,34 @@ for(k in 1:length(method)){
 }
 
 
+method = c("TDLD","BestEURPRS_EURcoef",
+           "BestEURPRS_tarcoef",
+           "BestEURPRS_EBcoef",
+           "Weighted_PRS",
+           "TDLD_EB")
+eth <- c("EUR","AFR","AMR","EAS","SAS")
+trait <- c("any_cvd","depression",
+           "heart_metabolic_disease_burden",
+           "height",
+           "iqb.sing_back_musical_note",
+           "migraine_diagnosis",
+           "morning_person")
 for(k in 1:length(method)){
   
   
   #system(paste0("cd /data/zhangh24/multi_ethnic/result/cleaned/clumping_result/",method[k]))
-  for(i in 1:length(eth)){
+  for(i in 1){
     #system(paste0("cd /data/zhangh24/multi_ethnic/result/cleaned/clumping_result/",method[k],"; mkdir ",eth[i]))
-    for(l in 1:length(trait)){
-      system(paste0("cd /data/zhangh24/multi_ethnic/result/cleaned/prs/",method[k],"/",eth[i],"; mkdir ",trait[l]))
-    }
+    #for(l in 1:length(trait)){
+      system(paste0("rm -rf /data/zhangh24/multi_ethnic/result/cleaned/prs/",method[k],"/",eth[i]))
+    #}
   }
 }
+
+
+
+
+
+
+
+#remove EUR from all advanced method folder

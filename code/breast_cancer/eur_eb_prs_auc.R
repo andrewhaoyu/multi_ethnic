@@ -2,6 +2,23 @@ setwd("/data/zhangh24/multi_ethnic/data/AABC_data")
 load("BC_AFR_overall_train.rdata")
 sum.data.train = sum.data
 prs.snp <- read.csv("/data/zhangh24/multi_ethnic/data/breast_cancer_330SNPs.csv",header=T)
+#load eur data
+sum.eur <- fread("/data/zhangh24/breast_cancer_data_analysis/discovery_SNP/prepare_summary_level_statistics/result/icogs_onco_gwas_meta_overall_breast_cancer_summary_level_statistics.txt",header=T)
+colnames(sum.eur)[1] <- "Var_name"
+
+prs.snp.eur <- left_join(prs.snp,sum.eur,by="Var_name") 
+
+prs.eur = prs.snp.eur %>%  
+  select(Var_name,variant,CHR,Position,Effect.allele,
+         EAF3,Beta.meta,sdE.meta,p.meta) %>% 
+  rename(POS = Position,
+         Effect_allele_eur=Effect.allele,
+         EAF.eur = EAF3,
+         Beta.eur = Beta.meta,
+         se.eur = sdE.meta,
+         p.eur = p.meta)
+  
+
 
 var_name = data.frame(ID = gsub("_",":",prs.snp[,1]),rsID = prs.snp[,2])
 # idx <- which(var_name%in%sum.data[,1]==F)
@@ -9,10 +26,13 @@ var_name = data.frame(ID = gsub("_",":",prs.snp[,1]),rsID = prs.snp[,2])
 # jdx <- which(sum.data$CHR==17&
 #                sum.data$POS==7571752)
 library(dplyr)
-best.eur.snp = inner_join(var_name,sum.data.train,
+prs.tar.all = left_join(var_name,sum.data.train,
                           by="ID")
 best.eur.snp = best.eur.snp %>% 
   mutate(chr_pos = paste0(CHR,":",POS))
+
+
+
 load("/data/zhangh24/KG.plink/AFR/chr_all_frq.rdata")
 freq.infor = freq.infor %>% 
   mutate(chr_pos = paste0(CHR,":",POS))
