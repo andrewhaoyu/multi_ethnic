@@ -1,1 +1,1 @@
-system(paste0("cd /data/zhangh24/multi_ethnic/result/cleaned/prs/TDLD; zip -r TDLD.zip TDLD"))
+system(paste0("cd /data/zhangh24/multi_ethnic/result/cleaned/prs/; zip -r TDLD.zip TDLD"))
