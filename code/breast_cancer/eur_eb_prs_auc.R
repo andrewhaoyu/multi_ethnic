@@ -59,42 +59,41 @@ prs.all <- left_join(prs.tar,
 all.equal(prs.all$Effect_allele_eur,prs.all$Effect_allele_tar)
 
 
+source("/data/zhangh24/multi_ethnic/code/stratch/EB_function.R")
 
 
-
-beta_tar <- summary.com.prior$beta_tar
-sd_tar <- summary.com.prior$sd_tar
-beta_eur <- summary.com.prior$beta_eur
-sd_eur <- summary.com.prior$sd_eur
+beta_tar <- prs.all$Beta.tar
+sd_tar <- prs.all$se.tar
+beta_eur <- prs.all$Beta.eur
+sd_eur <- prs.all$se.eur
 
 EBprior = EstimatePrior(beta_tar,sd_tar,
                         beta_eur,sd_eur)
 
+post_beta_mat = EBpost(beta_tar,sd_tar,beta_eur,sd_eur,EBprior)
+post_beta_tar = post_beta_mat[,1,drop=F]
 
-
-
-
-
+prs.tar.all$BETA = post_beta_tar
 
 #prepare data for summary AUC
-prs.model.file = best.eur.snp %>% 
-  mutate(Effect_Allele = ALT,
-         BETA = beta.ALT) %>% 
+prs.model.file = prs.tar.all %>% 
+  mutate(Effect_Allele = ALT) %>% 
   select(KG.ID,Effect_Allele,BETA)
 
 write.table(prs.model.file,
-            file = "/data/zhangh24/multi_ethnic/result/breast_cancer/best_eur_prsmodelfile",
+            file = "/data/zhangh24/multi_ethnic/result/breast_cancer/best_eur_eb_prsmodelfile",
             row.names = F,
             col.names = F,
             quote=F,
             sep = "\t")
-load("/data/zhangh24/multi_ethnic/data/AABC_data/BC_AFR_overall_valid_KGMAF.rdata")
+load("/data/zhangh24/multi_ethnic/data/AABC_data/BC_AFR_overall_valid_KGID.rdata")
 sum.data.vad = sum.data.update
-best.eur.snp.select = best.eur.snp %>% 
-  select(ID,KG.ID,ALT,MAF) %>% 
+best.eur.snp.select = prs.tar.all %>% 
+  mutate(MAF = ifelse(AF_ALT<=0.5,AF_ALT,1-AF_ALT)) %>% 
+  select(ID,ALT,MAF) %>% 
   rename(A1 = ALT)
 
-gwas.summary.data.test = left_join(best.eur.snp.select,
+gwas.summary.data.test = inner_join(best.eur.snp.select,
                                    sum.data.vad,by="ID")
 all.equal(gwas.summary.data.test$A1,
           gwas.summary.data.test$ALT)
@@ -113,3 +112,16 @@ write.table(gwas.summary.data.test,
             col.names = T,
             quote=F)
 #idx <- which(gwas.summary.data.test$POS%in%freq.infor$POS==F)
+res = auc(prs.model.file = "/data/zhangh24/multi_ethnic/result/breast_cancer/best_eur_eb_prsmodelfile", 
+          gwas.summary.stats.file = "/data/zhangh24/multi_ethnic/result/breast_cancer/best_eur_gwas_summary_stat",
+          N0 = 3119,
+          N1 = 2702,
+          soFile = '/data/zhangh24/multi_ethnic/code/breast_cancer/getAdjCorrelation.so',
+          flag.correlation.adj.imputated.data = FALSE,
+          pos_thr = 5e8,
+          KG.plink.pre = '/data/zhangh24/KG.plink/AFR/chr_all')
+cat("\n#######################################\n\n")
+
+cat("Predicted AUC:\t", res[1], "\n", sep = "")
+cat("Predicted AUC's variance:\t", res[2], "\n", sep = "")
+
