@@ -1,10 +1,15 @@
 setwd("/data/zhangh24/multi_ethnic/data/AABC_data")
-load("BC_AFR_overall_train.rdata")
-sum.data.train = sum.data
+load("BC_AFR_overall_train_KGID.rdata")
+sum.data.train = sum.data.update
+library(data.table)
+library(dplyr)
 prs.snp <- read.csv("/data/zhangh24/multi_ethnic/data/breast_cancer_330SNPs.csv",header=T)
 #load eur data
 sum.eur <- fread("/data/zhangh24/breast_cancer_data_analysis/discovery_SNP/prepare_summary_level_statistics/result/icogs_onco_gwas_meta_overall_breast_cancer_summary_level_statistics.txt",header=T)
 colnames(sum.eur)[1] <- "Var_name"
+
+#idx <- which(sum.eur$Position.Onco==29121087)
+
 
 prs.snp.eur <- left_join(prs.snp,sum.eur,by="Var_name") 
 
@@ -16,8 +21,10 @@ prs.eur = prs.snp.eur %>%
          EAF.eur = EAF3,
          Beta.eur = Beta.meta,
          se.eur = sdE.meta,
-         p.eur = p.meta)
-  
+         p.eur = p.meta,
+         rsid=variant)
+
+idx <- which(prs.eur$Var_name=="")
 
 
 var_name = data.frame(ID = gsub("_",":",prs.snp[,1]),rsID = prs.snp[,2])
@@ -26,24 +33,47 @@ var_name = data.frame(ID = gsub("_",":",prs.snp[,1]),rsID = prs.snp[,2])
 # jdx <- which(sum.data$CHR==17&
 #                sum.data$POS==7571752)
 library(dplyr)
-prs.tar.all = left_join(var_name,sum.data.train,
+prs.tar.all = inner_join(var_name,sum.data.train,
                           by="ID")
-best.eur.snp = best.eur.snp %>% 
-  mutate(chr_pos = paste0(CHR,":",POS))
+
+prs.tar = prs.tar.all %>% 
+  rename(Effect_allele_tar = ALT,
+         Beta.tar = beta.ALT,
+         se.tar = SE,
+         p.tar = P,
+         rsid = rsID) %>% 
+  mutate(MAF = ifelse(AF_ALT<=0.5,AF_ALT,1-AF_ALT))%>% 
+  select(rsid,Effect_allele_tar,
+         EAF.tar = MAF,
+         Beta.tar,se.tar,p.tar)
+  
+#combine the two ethnic groups
+prs.all <- left_join(prs.tar,
+                     prs.eur,
+                     by="rsid") %>% 
+  mutate(Beta.eur = ifelse((Effect_allele_eur==EAF.tar)|
+                             is.na(EAF.tar),
+                           Beta.eur,-Beta.eur))
+# idx <- which(prs.all$Effect_allele_eur!=
+#                prs.all$Effect_allele_tar)
+all.equal(prs.all$Effect_allele_eur,prs.all$Effect_allele_tar)
 
 
 
-load("/data/zhangh24/KG.plink/AFR/chr_all_frq.rdata")
-freq.infor = freq.infor %>% 
-  mutate(chr_pos = paste0(CHR,":",POS))
-freq.infor.sub = freq.infor %>% 
-  rename(KG.ID = SNP) %>% 
-  select(KG.ID,
-         chr_pos,MAF)
 
-best.eur.snp = inner_join(best.eur.snp,
-                          freq.infor.sub,
-                          by="chr_pos")
+
+beta_tar <- summary.com.prior$beta_tar
+sd_tar <- summary.com.prior$sd_tar
+beta_eur <- summary.com.prior$beta_eur
+sd_eur <- summary.com.prior$sd_eur
+
+EBprior = EstimatePrior(beta_tar,sd_tar,
+                        beta_eur,sd_eur)
+
+
+
+
+
 
 
 #prepare data for summary AUC
@@ -58,8 +88,8 @@ write.table(prs.model.file,
             col.names = F,
             quote=F,
             sep = "\t")
-load("BC_AFR_overall_valid.rdata")
-sum.data.vad = sum.data
+load("/data/zhangh24/multi_ethnic/data/AABC_data/BC_AFR_overall_valid_KGMAF.rdata")
+sum.data.vad = sum.data.update
 best.eur.snp.select = best.eur.snp %>% 
   select(ID,KG.ID,ALT,MAF) %>% 
   rename(A1 = ALT)

@@ -1,6 +1,6 @@
 setwd("/data/zhangh24/multi_ethnic/data/AABC_data")
-load("BC_AFR_overall_train.rdata")
-sum.data.train = sum.data
+load("BC_AFR_overall_train_KGID.rdata")
+sum.data.train = sum.data.update
 prs.snp <- read.csv("/data/zhangh24/multi_ethnic/data/breast_cancer_330SNPs.csv",header=T)
 
 var_name = data.frame(ID = gsub("_",":",prs.snp[,1]),rsID = prs.snp[,2])
@@ -11,19 +11,19 @@ var_name = data.frame(ID = gsub("_",":",prs.snp[,1]),rsID = prs.snp[,2])
 library(dplyr)
 best.eur.snp = inner_join(var_name,sum.data.train,
                          by="ID")
-best.eur.snp = best.eur.snp %>% 
-  mutate(chr_pos = paste0(CHR,":",POS))
-load("/data/zhangh24/KG.plink/AFR/chr_all_frq.rdata")
-freq.infor = freq.infor %>% 
-  mutate(chr_pos = paste0(CHR,":",POS))
-freq.infor.sub = freq.infor %>% 
-  rename(KG.ID = SNP) %>% 
-  select(KG.ID,
-         chr_pos,MAF)
-
-best.eur.snp = inner_join(best.eur.snp,
-                          freq.infor.sub,
-                          by="chr_pos")
+# best.eur.snp = best.eur.snp %>%
+#   mutate(chr_pos = paste0(CHR,":",POS))
+# load("/data/zhangh24/KG.plink/AFR/chr_all_frq.rdata")
+# freq.infor = freq.infor %>%
+#   mutate(chr_pos = paste0(CHR,":",POS))
+# freq.infor.sub = freq.infor %>%
+#   rename(KG.ID = SNP) %>%
+#   select(KG.ID,
+#          chr_pos,MAF)
+# 
+# best.eur.snp = inner_join(best.eur.snp,
+#                           freq.infor.sub,
+#                           by="chr_pos")
 
 
 #prepare data for summary AUC
@@ -38,13 +38,14 @@ write.table(prs.model.file,
             col.names = F,
             quote=F,
             sep = "\t")
-load("BC_AFR_overall_valid.rdata")
-sum.data.vad = sum.data
+load("BC_AFR_overall_valid_KGID.rdata")
+sum.data.vad = sum.data.update
 best.eur.snp.select = best.eur.snp %>% 
-  select(ID,KG.ID,ALT,MAF) %>% 
+  mutate(MAF = ifelse(AF_ALT<=0.5,AF_ALT,1-AF_ALT)) %>% 
+  select(ID,ALT,MAF) %>% 
   rename(A1 = ALT)
 
-gwas.summary.data.test = left_join(best.eur.snp.select,
+gwas.summary.data.test = inner_join(best.eur.snp.select,
                                    sum.data.vad,by="ID")
 all.equal(gwas.summary.data.test$A1,
           gwas.summary.data.test$ALT)
