@@ -11,6 +11,14 @@ var_name = data.frame(ID = gsub("_",":",prs.snp[,1]),rsID = prs.snp[,2])
 library(dplyr)
 best.eur.snp = inner_join(var_name,sum.data.train,
                          by="ID")
+
+
+
+
+
+
+
+
 # best.eur.snp = best.eur.snp %>%
 #   mutate(chr_pos = paste0(CHR,":",POS))
 # load("/data/zhangh24/KG.plink/AFR/chr_all_frq.rdata")

@@ -13,6 +13,14 @@ colnames(sum.eur)[1] <- "Var_name"
 
 prs.snp.eur <- left_join(prs.snp,sum.eur,by="Var_name") 
 
+
+
+temp <- fread("/gpfs/gsfs11/users/zhangh24/multi_ethnic/data/GHBS_plink/all_chr-merge.missnp",header=F)
+
+#chr.pos = paste0(prs.eur$CHR,":",prs.eur$POS)
+
+#idx <- which(temp%in%chr.pos)
+
 prs.eur = prs.snp.eur %>%  
   select(Var_name,variant,CHR,Position,Effect.allele,
          EAF3,Beta.meta,sdE.meta,p.meta) %>% 
