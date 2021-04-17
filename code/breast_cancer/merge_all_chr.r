@@ -16,7 +16,7 @@
   out.dir = data.dir
   write.table(filename,file = paste0(out.dir,"merge_list.txt"),row.names = F,col.names = F,quote=F)
   
-  system(paste0("/data/zhangh24/software/plink2 --bfile ",data.dir,"chr",1," --merge-list ",data.dir,"merge_list.txt --make-bed --out ",data.dir,"all_chr --exclude /data/zhangh24/multi_ethnic/data/GHBS_plink/all_chr-merge.missnp"))
+  system(paste0("/data/zhangh24/software/plink2 --bfile ",data.dir,"chr",1," --merge-list ",data.dir,"merge_list.txt --make-bed --out ",data.dir,"all_chr"))
   
 #}
 
