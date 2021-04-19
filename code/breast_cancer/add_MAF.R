@@ -37,7 +37,7 @@ save(sum.data.update,file = "/data/zhangh24/multi_ethnic/data/AABC_data/BC_AFR_o
 
 
 
-
+load("BC_AFR_ERneg_valid.rdata")
 load("BC_AFR_overall_train.rdata")
 sum.data = sum.data %>% 
   mutate(chr_pos = paste0(CHR,":",POS))
@@ -53,7 +53,7 @@ save(sum.data.update,file = "/data/zhangh24/multi_ethnic/data/AABC_data/BC_AFR_o
 
 
 
-
+data <- read.csv("/data/zhangh24/multi_ethnic/data/GBHS_pheno.csv",header=T)
 
 
 #subset the breast cancer data to mega list

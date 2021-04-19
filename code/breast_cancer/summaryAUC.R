@@ -148,19 +148,19 @@ auc <- function(prs.model.file = "/data/songl5/Jianxin/AUC.SCZ/data/pruning_impu
 }
 
 
-res = auc(prs.model.file = "/data/zhangh24/multi_ethnic/result/breast_cancer/best_eur_prsmodelfile", 
-          gwas.summary.stats.file = "/data/zhangh24/multi_ethnic/result/breast_cancer/best_eur_gwas_summary_stat",
-          N0 = 3119,
-          N1 = 2702,
-          soFile = '/data/zhangh24/multi_ethnic/code/breast_cancer/getAdjCorrelation.so',
-          flag.correlation.adj.imputated.data = FALSE,
-          pos_thr = 5e8,
-          KG.plink.pre = '/data/zhangh24/KG.plink/AFR/chr_all')
-cat("\n#######################################\n\n")
-
-cat("Predicted AUC:\t", res[1], "\n", sep = "")
-cat("Predicted AUC's variance:\t", res[2], "\n", sep = "")
-
-cat("\nHave a nice Day!\n")
-
-cat("\n#######################################\n")
+# res = auc(prs.model.file = "/data/zhangh24/multi_ethnic/result/breast_cancer/best_eur_prsmodelfile", 
+#           gwas.summary.stats.file = "/data/zhangh24/multi_ethnic/result/breast_cancer/best_eur_gwas_summary_stat",
+#           N0 = 3119,
+#           N1 = 2702,
+#           soFile = '/data/zhangh24/multi_ethnic/code/breast_cancer/getAdjCorrelation.so',
+#           flag.correlation.adj.imputated.data = FALSE,
+#           pos_thr = 5e8,
+#           KG.plink.pre = '/data/zhangh24/KG.plink/AFR/chr_all')
+# cat("\n#######################################\n\n")
+# 
+# cat("Predicted AUC:\t", res[1], "\n", sep = "")
+# cat("Predicted AUC's variance:\t", res[2], "\n", sep = "")
+# 
+# cat("\nHave a nice Day!\n")
+# 
+# cat("\n#######################################\n")

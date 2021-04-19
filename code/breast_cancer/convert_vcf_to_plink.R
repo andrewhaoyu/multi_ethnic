@@ -1,9 +1,7 @@
 args = commandArgs(trailingOnly = T)
 j = as.numeric(args[[1]])
 
-#since the exisiting of multi-allelic snps which plink couldn't handle
-#we need to first convert vcf to bcf format and nameing the snp as CHR:POS:REF:ALT
-#then use plink to convert bcf to plink
+
 #remove all the multi-allelic snps
 library(data.table)
 system(paste0("/data/zhangh24/software/plink2 --vcf /gpfs/gsfs10/users/BC_risk_prediction/ghana/GSA/VCFs_to_share/subtracted_chr",j,".dose.vcf.gz --recode --make-bed --out /data/zhangh24/multi_ethnic/data/GHBS_plink/chr",j," --maf 0.005 --double-id --biallelic-only"))
