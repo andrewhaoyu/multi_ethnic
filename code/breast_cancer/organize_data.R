@@ -20,4 +20,18 @@ for(k in 1:3){
   
 }
 
+library(dplyr)
+library(data.table)
+load("/dcs04/nilanjan/data/23andme/snpinfo/all_snp_info.RData")
+snpinfo.temp = snpinfo
+# idx <- which(is.na(snpinfo$im.data.id))
+# snpinfo[idx[1:10],]
+mega <- fread("/dcs04/nilanjan/data/23andme/cleaned/mega+hapmap3_autosomal_in_1000G",header=F)
+mega.match <- inner_join(mega,snpinfo,by = c("V1"="assay.name"))
+idx <- which(is.na(mega.match$im.data.id))
+print(length(idx))
+
+
+load("/dcs04/nilanjan/data/23andme/cleaned/snpinfo/snpinfo_mega.RData")
+idx <- which(mega$V1%in%snpinfo_mega$assay.name==F)
 

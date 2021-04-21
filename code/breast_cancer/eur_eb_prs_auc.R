@@ -15,7 +15,7 @@ prs.snp.eur <- left_join(prs.snp,sum.eur,by="Var_name")
 
 
 
-temp <- fread("/gpfs/gsfs11/users/zhangh24/multi_ethnic/data/GHBS_plink/all_chr-merge.missnp",header=F)
+
 
 #chr.pos = paste0(prs.eur$CHR,":",prs.eur$POS)
 
@@ -59,8 +59,8 @@ prs.tar = prs.tar.all %>%
 prs.all <- left_join(prs.tar,
                      prs.eur,
                      by="rsid") %>% 
-  mutate(Beta.eur = ifelse((Effect_allele_eur==EAF.tar)|
-                             is.na(EAF.tar),
+  mutate(Beta.eur = ifelse((Effect_allele_eur==Effect_allele_tar)|
+                             is.na(Effect_allele_tar),
                            Beta.eur,-Beta.eur))
 # idx <- which(prs.all$Effect_allele_eur!=
 #                prs.all$Effect_allele_tar)
@@ -120,6 +120,7 @@ write.table(gwas.summary.data.test,
             col.names = T,
             quote=F)
 #idx <- which(gwas.summary.data.test$POS%in%freq.infor$POS==F)
+source("/data/zhangh24/multi_ethnic/code/breast_cancer/summaryAUC.R")
 res = auc(prs.model.file = "/data/zhangh24/multi_ethnic/result/breast_cancer/best_eur_eb_prsmodelfile", 
           gwas.summary.stats.file = "/data/zhangh24/multi_ethnic/result/breast_cancer/best_eur_gwas_summary_stat",
           N0 = 3119,

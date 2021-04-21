@@ -41,7 +41,7 @@ prs.model.file = best.eur.snp %>%
   select(KG.ID,Effect_Allele,BETA)
 
 write.table(prs.model.file,
-            file = "/data/zhangh24/multi_ethnic/result/breast_cancer/best_eur_prsmodelfile",
+            file = "/data/zhangh24/multi_ethnic/result/breast_cancer/best_eur_tarcoef_prsmodelfile",
             row.names = F,
             col.names = F,
             quote=F,
@@ -72,7 +72,7 @@ write.table(gwas.summary.data.test,
             col.names = T,
             quote=F)
 #idx <- which(gwas.summary.data.test$POS%in%freq.infor$POS==F)
-res = auc(prs.model.file = "/data/zhangh24/multi_ethnic/result/breast_cancer/best_eur_prsmodelfile", 
+res = auc(prs.model.file = "/data/zhangh24/multi_ethnic/result/breast_cancer/best_eur_tarcoef_prsmodelfile", 
           gwas.summary.stats.file = "/data/zhangh24/multi_ethnic/result/breast_cancer/best_eur_gwas_summary_stat",
           N0 = 3119,
           N1 = 2702,
