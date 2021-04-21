@@ -33,71 +33,49 @@ load(paste0(data.dir,"snpinfo/snpinfo_mega.RData"))
 snpinfo_mega_filter = snpinfo_mega %>% 
   filter(!is.na(im.data.id)) %>% 
   select(im.data.id,assay.name)
-#genearte index file to match columns in organize prs and parameters
-total = (length(eth)-1)*length(trait)*length(pthres)^2*length(r2_vec)*length(wc_base_vec)
-eth_vec = rep("c",total)
-trait_vec = rep("c",total)
-ptar_vec = rep(0,total)
-peur_vec = rep(0,total)
-col_vec = rep(0,total)
-r_ind_vec = rep(0,total)
-w_ind_vec = rep(0,total)
-temp = 1
 method = "TDLD"
-for(i in 2:length(eth)){
-  for(l in 1:length(trait)){
-    col_num = 1
-    for(r_ind in 1:length(r2_vec)){
-      for(w_ind in 1:length(wc_base_vec)){
-    for(k1 in 1:length(pthres)){
-      for(k2 in 1:length(pthres)){
-        col_vec[temp] = col_num
-        ptar_vec[temp] = k1
-        peur_vec[temp] = k2
-        trait_vec[temp] = trait[l]
-        eth_vec[temp] = eth[i]
-        r_ind_vec[temp] = r_ind
-        w_ind_vec[temp] = w_ind
-        col_num = col_num + 1
-        temp = temp+1
-      }
-    }
-      }
-    }
-   
-    }
-  }
+#genearte index file to match columns in organize prs and parameters
+# total = (length(eth)-1)*length(trait)*length(pthres)^2*length(r2_vec)*length(wc_base_vec)
+# eth_vec = rep("c",total)
+# trait_vec = rep("c",total)
+# ptar_vec = rep(0,total)
+# peur_vec = rep(0,total)
+# col_vec = rep(0,total)
+# r_ind_vec = rep(0,total)
+# w_ind_vec = rep(0,total)
 
-index.match = data.frame(eth_vec,trait_vec,ptar_vec,peur_vec,col_vec,r_ind_vec,
-                         w_ind_vec)
-save(index.match,file = paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/",method,"/index.match.rdata"))
+# temp = 1
+# method = "TDLD"
+# for(i in 2:length(eth)){
+#   for(l in 1:length(trait)){
+#     col_num = 1
+#     for(r_ind in 1:length(r2_vec)){
+#       for(w_ind in 1:length(wc_base_vec)){
+#     for(k1 in 1:length(pthres)){
+#       for(k2 in 1:length(pthres)){
+#         col_vec[temp] = col_num
+#         ptar_vec[temp] = k1
+#         peur_vec[temp] = k2
+#         trait_vec[temp] = trait[l]
+#         eth_vec[temp] = eth[i]
+#         r_ind_vec[temp] = r_ind
+#         w_ind_vec[temp] = w_ind
+#         col_num = col_num + 1
+#         temp = temp+1
+#       }
+#     }
+#       }
+#     }
+#    
+#     }
+#   }
+# 
+# index.match = data.frame(eth_vec,trait_vec,ptar_vec,peur_vec,col_vec,r_ind_vec,
+#                          w_ind_vec)
+# save(index.match,file = paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/",method,"/index.match.rdata"))
 
 # for(i in 1:length(eth)){
 #   for(l in 1:length(trait)){
-col_num = 1
-#run through all the prs to get unique number of snps
-rs.id.list = list()
-out.dir.prs <- paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/",method,"/",eth[i],"/",trait[l],"/")
-for(r_ind in 1:length(r2_vec)){
-  for(w_ind in 1:length(wc_base_vec)){ 
-    
-    for(k1 in 1:length(pthres)){
-      for(k2 in 1:length(pthres)){
-        print(col_num)
-        prs.file <- fread(paste0(out.dir.prs,col_num,"_",method,"_rind_",r_ind,"_wcind_",w_ind,"_ptar_",k1,"_peur_",k2),header=T)
-        rs.id.list[[col_num]] = prs.file[,1,drop=F]
-        col_num = col_num+1
-      }
-    }
-  }
-}
-rs.id = unique(rbindlist(rs.id.list))
-prs.snp = left_join(rs.id,snpinfo_mega_filter,by=c("SNP"="assay.name")) %>% 
-  arrange(im.data.id)
-
-
-
-
 col_num = 1
 #run through all the prs to get unique number of snps
 rs.id.list = list()
@@ -139,5 +117,6 @@ for(r_ind in 1:length(r2_vec)){
   }
 }
 prs.snp = prs.snp[,-1]
+
 out.dir.organize.prs <- paste0("/data/zhangh24/multi_ethnic/result/cleaned/organize_prs/",method,"/",eth[i],"/",trait[l],"/")
 write.table(prs.snp,file = paste0(out.dir.organize.prs,"prs.file"),row.names = F,col.names = F,quote=F)
