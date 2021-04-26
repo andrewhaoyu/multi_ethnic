@@ -10,13 +10,13 @@
   temp = 1
   filename = rep("c",total)
   for(j in 2:22){
-    filename[temp] = paste0(data.dir,"chr",j)
+    filename[temp] = paste0(data.dir,"chr",j,"_temp")
     temp = temp+1
   }
   out.dir = data.dir
   write.table(filename,file = paste0(out.dir,"merge_list.txt"),row.names = F,col.names = F,quote=F)
   
-  system(paste0("/data/zhangh24/software/plink2 --bfile ",data.dir,"chr",1," --merge-list ",data.dir,"merge_list.txt --make-bed --out ",data.dir,"all_chr"))
+  system(paste0("/data/zhangh24/software/plink2 --bfile ",data.dir,"chr",1,"_temp --merge-list ",data.dir,"merge_list.txt --make-bed --out ",data.dir,"all_chr_temp"))
   
 #}
 
