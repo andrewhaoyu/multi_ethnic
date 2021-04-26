@@ -6,7 +6,7 @@ j = as.numeric(args[[1]])
 library(data.table)
 library(dplyr)
 system(paste0("/data/zhangh24/software/plink2 --vcf /gpfs/gsfs10/users/BC_risk_prediction/ghana/GSA/VCFs_to_share/subtracted_chr",j,".dose.vcf.gz --recode --make-bed --out /data/zhangh24/multi_ethnic/data/GBHS_plink/chr",j,"_temp --maf 0.001 --double-id"))
-bim <- fread(paste0("/gpfs/gsfs11/users/zhangh24/multi_ethnic/data/GHBS_plink/chr",j,".bim"),header=F)
+bim <- fread(paste0("/gpfs/gsfs11/users/zhangh24/multi_ethnic/data/GBHS_plink/chr",j,".bim"),header=F)
 id = bim %>% mutate(id = paste0(V2,":",V6,":",V5)) %>% 
   select(id)
 bim$V2 = id
