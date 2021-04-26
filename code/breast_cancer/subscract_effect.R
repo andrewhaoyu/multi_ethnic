@@ -15,14 +15,10 @@ for(l in 1:3){
   setwd("/data/zhangh24/multi_ethnic/data/")
   #load ghana
   load(paste0("./GBHS_sum/",trait[l],"_sum.rdata"))
-  #remove all the multi-allelic id
-  load(paste0("./GHBS_plink/all.dup.id.rdata"))
   library(dplyr)
   library(tidyverse)
   sum.data.update = sum.data %>% 
-    unite("chr.pos",CHR,POS,sep=":",remove=F) %>% 
-    filter(chr.pos%in%dup.id==F)
-  
+    unite("chr.pos",CHR,POS,sep=":",remove=F) 
   
   sum.data.ga = sum.data.update %>% 
     select(BETA,SE,MAF,P,chr.pos,Eff_allele,Ref_allele) %>% 
