@@ -8,7 +8,7 @@ l =1
 load(paste0("./AABC_data/BC_AFR_",trait[l],"remove_GHBS.rdata"))
 sum.data = sum.data %>% 
   unite("chr.pos",CHR,POS,sep=":",remove=F)
-#idx <- which(sum.data$chr.pos=="1:121287994")
+#idx <- which(sum.data$chr.pos=="7:74341926")
 #load eur coefficients
 sum.eur <- fread("/data/zhangh24/breast_cancer_data_analysis/discovery_SNP/prepare_summary_level_statistics/result/icogs_onco_gwas_meta_overall_breast_cancer_summary_level_statistics.txt",header=T)
 sum.eur.update = sum.eur %>% 

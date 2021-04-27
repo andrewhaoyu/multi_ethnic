@@ -19,7 +19,7 @@ for(l in 1:3){
   library(tidyverse)
   sum.data.update = sum.data %>% 
     unite("chr.pos",CHR,POS,sep=":",remove=F) 
-  #idx <- which(sum.data$POS==220671050)
+  #idx <- which(sum.data$POS==114445880)
   sum.data.ga = sum.data.update %>% 
     select(BETA,SE,MAF,P,chr.pos,Eff_allele,Ref_allele) %>% 
     rename(BETA.GA = BETA,

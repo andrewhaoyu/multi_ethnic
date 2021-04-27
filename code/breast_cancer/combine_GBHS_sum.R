@@ -6,7 +6,7 @@ outpheno <- c("overall","erpos","erneg")
 library(data.table)
 library(dplyr)
 
-for(i1 in 2:3){
+for(i1 in 1:3){
   data.list = list()
     for(j in 1:22){
     data = fread(paste0(pheno[i1],"/","summary_All_sub_type_add_info_",j,".csv"),header=T)  
