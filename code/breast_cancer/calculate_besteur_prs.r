@@ -93,17 +93,17 @@ prs.file =cbind(prs.eur,BETA_tar=prs.tar$BETA,BETA_EB)
 # idx <- which(prs.snp.tar$chr.pos%in%prs.snp.eur$chr.pos==F)
 # jdx = which(sum.data$chr.pos=="7:74341926")
 
-write.table(prs.file,file = "/data/zhangh24/multi_ethnic/result/breast_cancer/prs/best_eurprs",row.names = F,col.names = T,quote=F)
+write.table(prs.file,file = paste0("/data/zhangh24/multi_ethnic/result/breast_cancer/prs/best_eurprs_",trait[l]),row.names = F,col.names = T,quote=F)
 out.dir.prs = "/data/zhangh24/multi_ethnic/result/breast_cancer/prs/"
 data.dir = "/data/zhangh24/multi_ethnic/data/"
-res <- system(paste0("/data/zhangh24/software/plink2_alpha --score-col-nums 3,4,5 --score ",out.dir.prs,"best_eurprs header no-mean-imputation --bfile ",data.dir,"GBHS_plink/all_chr --out ",out.dir.prs,"prs_best_eur"))
+res <- system(paste0("/data/zhangh24/software/plink2_alpha --score-col-nums 3,4,5 --score ",out.dir.prs,"best_eurprs_",trait[l]," header no-mean-imputation --bfile ",data.dir,"GBHS_plink/all_chr --out ",out.dir.prs,"prs_best_eur_",trait[l]))
 
 if(l==1){
 auc.est = rep(0,3)
 auc.se = rep(0,3)
 names(auc.est) = c("EUR_coef","tar_coef","EB_coef")
 for(k in 1:3){
-  prs.score = fread("/data/zhangh24/multi_ethnic/result/breast_cancer/prs/prs_best_eur.sscore")
+  prs.score = fread(paste0("/data/zhangh24/multi_ethnic/result/breast_cancer/prs/prs_best_eur_",trait[l],".sscore"))
   prs.score = prs.score %>% 
     separate(IID,into=c("ID","ohter_id","nci_id"),remove=F)
   
