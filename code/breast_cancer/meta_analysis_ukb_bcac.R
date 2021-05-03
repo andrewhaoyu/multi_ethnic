@@ -1,0 +1,5 @@
+setwd("/data/zhangh24/multi_ethnic/data/")
+load("./AABC_data/BC_EUR_overall_aligned.rdata")
+library(tidyverse)
+library(data.table)
+ukb.sum <- fread("ukb_gera_breast_meta.txt",header=T)

@@ -89,7 +89,7 @@ for(l in 1:3){
 #subscract ghana effect from meta analysis data
 
 
-load(paste0("./AABC_data/BC_AFR_",trait[l],"remove_GHBS.rdata"))
-#setwd("")
-load("/data/zhangh24/multi_ethnic/result/LD_simulation_new/snp.infor.match37_38.rdata")
-mega.chr.pos = fread("/data//zhangh24/multi_ethnic/result/LD_simulation_new/mega_snp_chr_pos.txt",header=F)
+# load(paste0("./AABC_data/BC_AFR_",trait[l],"remove_GHBS.rdata"))
+# #setwd("")
+# load("/data/zhangh24/multi_ethnic/result/LD_simulation_new/snp.infor.match37_38.rdata")
+# mega.chr.pos = fread("/data//zhangh24/multi_ethnic/result/LD_simulation_new/mega_snp_chr_pos.txt",header=F)

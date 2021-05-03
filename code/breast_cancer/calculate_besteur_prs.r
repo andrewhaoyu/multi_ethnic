@@ -126,7 +126,7 @@ for(k in 1:3){
     auc.se = rep(0,3)
     names(auc.est) = c("EUR_coef","tar_coef","EB_coef")
     for(k in 1:3){
-      prs.score = fread("/data/zhangh24/multi_ethnic/result/breast_cancer/prs/prs_best_eur.sscore")
+      prs.score = fread(paste0("/data/zhangh24/multi_ethnic/result/breast_cancer/prs/prs_best_eur_",trait[l],".sscore"))
       prs.score = prs.score %>% 
         separate(IID,into=c("ID","ohter_id","nci_id"),remove=F)
       
@@ -153,7 +153,7 @@ for(k in 1:3){
     auc.se = rep(0,3)
     names(auc.est) = c("EUR_coef","tar_coef","EB_coef")
     for(k in 1:3){
-      prs.score = fread("/data/zhangh24/multi_ethnic/result/breast_cancer/prs/prs_best_eur.sscore")
+      prs.score = fread(paste0("/data/zhangh24/multi_ethnic/result/breast_cancer/prs/prs_best_eur_",trait[l],".sscore"))
       prs.score = prs.score %>% 
         separate(IID,into=c("ID","ohter_id","nci_id"),remove=F)
       
