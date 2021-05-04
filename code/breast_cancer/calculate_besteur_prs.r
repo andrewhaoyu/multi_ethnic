@@ -129,7 +129,7 @@ for(k in 1:3){
                             EV6+EV7+EV8+EV9+EV10,
                           data=pheno.update, precision=seq(0.1,0.9, by=0.1))
     boot_result <- boot(data = pheno.update,statistic = AUCEstimate,
-                        R = 2000,scorename = paste0("SCORE",k,"_AVG"),
+                        R = 5000,scorename = paste0("SCORE",k,"_AVG"),
                         tar_trait = "overall_status")
     boot.ci(boot_result, type="bca")
     #roc_obj = roc(pheno.update$ERneg,pheno.update$SCORE)
@@ -162,7 +162,7 @@ for(k in 1:3){
                             EV6+EV7+EV8+EV9+EV10,
                           data=pheno.update, precision=seq(0.1,0.9, by=0.1))
     boot_result <- boot(data = pheno.update,statistic = AUCEstimate,
-                        R = 2000,scorename = paste0("SCORE",k,"_AVG"),
+                        R = 5000,scorename = paste0("SCORE",k,"_AVG"),
                         tar_trait = "ERpos")
     boot.ci(boot_result, type="bca")
     auc.est[k] = roc_obj$auc
@@ -199,7 +199,7 @@ for(k in 1:3){
                            EV6+EV7+EV8+EV9+EV10,
                          data=pheno.update, precision=seq(0.1,0.9, by=0.1))
       boot_result <- boot(data = pheno.update,statistic = AUCEstimate,
-                          R = 2000,scorename = paste0("SCORE",k,"_AVG"),
+                          R = 5000,scorename = paste0("SCORE",k,"_AVG"),
                           tar_trait = "ERneg")
       boot.ci(boot_result, type="bca")
       #roc_obj = roc(pheno.update$ERneg,pheno.update$SCORE)
