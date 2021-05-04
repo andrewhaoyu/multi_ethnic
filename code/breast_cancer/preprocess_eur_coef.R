@@ -116,23 +116,23 @@ load(paste0("./AABC_data/BC_AFR_",trait[l],"remove_GHBS.rdata"))
 sum.data = sum.data %>% 
   unite("chr.pos",CHR,POS,sep=":",remove=F)
 #load eur coefficients
-#sum.eur <- fread("/data/zhangh24/breast_cancer_data_analysis/discovery_SNP/prepare_summary_level_statistics/result/oncoarray_bcac_public_release_oct17.txt",header=T)
+sum.eur <- fread("/data/zhangh24/breast_cancer_data_analysis/discovery_SNP/prepare_summary_level_statistics/result/cimba_onco_icogs_brca1_combined_results.txt",header=T)
 #colnames(sum.eur)[1] <- "Var_name"
 sum.eur.update = sum.eur %>% 
   select(var_name,
-         bcac_onco_icogs_gwas_erneg_beta,
-         bcac_onco_icogs_gwas_erneg_se,bcac_onco_icogs_gwas_erneg_P1df,
-         chr,position_b37,a1,a0,
-         bcac_onco_icogs_gwas_erneg_eaf_controls,bcac_onco2_erneg_r2) %>% 
+         onco_icogs_bc_effect,
+         onco_icogs_bc_se,onco_icogs_bc_pval,
+         chr,position,onco_effect,onco_baseline,
+         exp_freq_a1,onco_bc_info) %>% 
   rename(CHR = chr,
-         POS = position_b37,
-         Eff_allele_eur = a1,
-         Ref_allele_eur = a0,
-         EAF_eur = bcac_onco_icogs_gwas_erneg_eaf_controls,
-         R2_eur = bcac_onco2_erneg_r2,
-         Beta_eur = bcac_onco_icogs_gwas_erneg_beta,
-         Se_eur = bcac_onco_icogs_gwas_erneg_se,
-         p_eur = bcac_onco_icogs_gwas_erneg_P1df)
+         POS = position,
+         Eff_allele_eur = onco_effect,
+         Ref_allele_eur = onco_baseline,
+         EAF_eur = exp_freq_a1,
+         R2_eur = onco_bc_info,
+         Beta_eur = onco_icogs_bc_effect,
+         Se_eur = onco_icogs_bc_se,
+         p_eur = onco_icogs_bc_pval)
 sum.eur.update = sum.eur.update %>% 
   unite("chr.pos",CHR,POS,sep=":",remove=T)
 
