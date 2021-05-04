@@ -1,11 +1,20 @@
 args = commandArgs(trailingOnly = T)
 l = as.numeric(args[[1]])
 #best eur prs
-
+AUCEstimate <- function(data, indices,tar_trait,scorename) {
+  d <- data[indices,] # allows boot to select sample
+  roc_obj <- roc.binary(status=tar_trait, variable=scorename,
+                        confounders=~EV1+EV2+EV3+EV4+EV5+
+                          EV6+EV7+EV8+EV9+EV10,
+                        data=d, precision=seq(0.1,0.9, by=0.1))
+  return(roc_obj$auc)
+} 
 
 setwd("/data/zhangh24/multi_ethnic/data/")
 library(data.table)
 library(tidyverse)
+library(RISCA)
+library(boot)
 
 #load GHBS_id
 bim <- fread("/data/zhangh24/multi_ethnic/data/GBHS_plink/all_chr.bim",header=F) 
@@ -115,10 +124,17 @@ for(k in 1:3){
       mutate(overall_status=ifelse(Status=="Control",0,1))
     
     pheno.update = left_join(pheno,prs.score,by=c("SB_ID"="ID"))
-    library(pROC)
-    roc_obj = roc(pheno.update$overall_status,pheno.update$SCORE)
-    auc.est[k] = auc(roc_obj)
-    auc.se[k] = sqrt(var(roc_obj))
+    roc_obj <- roc.binary(status="overall_status", variable=paste0("SCORE",k,"_AVG"),
+                          confounders=~EV1+EV2+EV3+EV4+EV5+
+                            EV6+EV7+EV8+EV9+EV10,
+                          data=pheno.update, precision=seq(0.1,0.9, by=0.1))
+    boot_result <- boot(data = pheno.update,statistic = AUCEstimate,
+                        R = 2000,scorename = paste0("SCORE",k,"_AVG"),
+                        tar_trait = "overall_status")
+    boot.ci(boot_result, type="bca")
+    #roc_obj = roc(pheno.update$ERneg,pheno.update$SCORE)
+    auc.est[k] = roc_obj$auc
+    auc.se[k] = sqrt(var(boot_result[[2]]))
     
   }
 }else if(l==2){
@@ -141,11 +157,16 @@ for(k in 1:3){
       filter(ERpos!=888)
     
     pheno.update = left_join(pheno,prs.score,by=c("SB_ID"="ID"))
-    library(pROC)
-    roc_obj = roc(pheno.update$ERpos,pheno.update$SCORE)
-    auc.est[k] = auc(roc_obj)
-    auc.se[k] = sqrt(var(roc_obj))
-    
+    roc_obj <- roc.binary(status="ERpos", variable=paste0("SCORE",k,"_AVG"),
+                          confounders=~EV1+EV2+EV3+EV4+EV5+
+                            EV6+EV7+EV8+EV9+EV10,
+                          data=pheno.update, precision=seq(0.1,0.9, by=0.1))
+    boot_result <- boot(data = pheno.update,statistic = AUCEstimate,
+                        R = 2000,scorename = paste0("SCORE",k,"_AVG"),
+                        tar_trait = "ERpos")
+    boot.ci(boot_result, type="bca")
+    auc.est[k] = roc_obj$auc
+    auc.se[k] = sqrt(var(boot_result[[2]]))
   }
   
   }else if(l==3){
@@ -167,11 +188,23 @@ for(k in 1:3){
                                TRUE ~ 888)) %>% 
         filter(ERneg!=888)
       
+      
+      
       pheno.update = left_join(pheno,prs.score,by=c("SB_ID"="ID"))
-      library(pROC)
-      roc_obj = roc(pheno.update$ERneg,pheno.update$SCORE)
-      auc.est[k] = auc(roc_obj)
-      auc.se[k] = sqrt(var(roc_obj))
+      
+     
+      
+      roc_obj <- roc.binary(status="ERneg", variable=paste0("SCORE",k,"_AVG"),
+                         confounders=~EV1+EV2+EV3+EV4+EV5+
+                           EV6+EV7+EV8+EV9+EV10,
+                         data=pheno.update, precision=seq(0.1,0.9, by=0.1))
+      boot_result <- boot(data = pheno.update,statistic = AUCEstimate,
+                          R = 2000,scorename = paste0("SCORE",k,"_AVG"),
+                          tar_trait = "ERneg")
+      boot.ci(boot_result, type="bca")
+      #roc_obj = roc(pheno.update$ERneg,pheno.update$SCORE)
+      auc.est[k] = roc_obj$auc
+      auc.se[k] = sqrt(var(boot_result[[2]]))
       
     }
 }
