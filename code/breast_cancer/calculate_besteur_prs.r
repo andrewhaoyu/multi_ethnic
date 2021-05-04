@@ -1,4 +1,6 @@
 args = commandArgs(trailingOnly = T)
+#l =1,2,3 for overall, ERpos, ERneg using BCAC
+#l = 4 for overall using BCAC and UKB meta
 l = as.numeric(args[[1]])
 #best eur prs
 AUCEstimate <- function(data, indices,tar_trait,scorename) {
@@ -24,7 +26,7 @@ bim = bim %>%
   rename(GBHS_id = V2)
 
 
-trait = c("overall","erpos","erneg")
+trait = c("overall","erpos","erneg","overall_ukb_meta")
 
 prs.snp <- read.csv("/data/zhangh24/multi_ethnic/data/breast_cancer_330SNPs.csv",header=T)
 prs.snp = prs.snp %>% 
@@ -41,8 +43,9 @@ prs.snp.eur = left_join(prs.snp,sum.data,by="chr.pos") %>%
 
 # jdx <- which(bim$V4==106358620)
 # idx <- which(sum.data$POS==187503758 )
-
-
+#idx <- which(prs.snp.eur.temp$ID%in%prs.snp.eur$ID==F)
+#idx <- which(sum.data$chr.pos =="4:84370124")
+#idx <- which(sum.data.temp$chr.pos =="4:84370124")
 prs.snp.eur.update = left_join(prs.snp.eur,bim,by="chr.pos") %>% 
   filter(((Eff_allele==V5)&(Ref_allele==V6))|
            (Eff_allele==V6)&(Ref_allele==V5))
@@ -55,7 +58,12 @@ prs.file = prs.snp.eur.update %>%
 prs.eur = prs.file
 
 #prepare afr coefficients
-load(paste0("./AABC_data/BC_AFR_",trait[l],"remove_GHBS.rdata"))
+if(l==4){
+  load(paste0("./AABC_data/BC_AFR_",trait[1],"remove_GHBS.rdata"))  
+}else{
+  load(paste0("./AABC_data/BC_AFR_",trait[l],"remove_GHBS.rdata"))  
+}
+
 
 sum.data = sum.data %>% 
   unite("chr.pos",CHR,POS,sep=":",remove=F)
@@ -129,7 +137,7 @@ for(k in 1:3){
                             EV6+EV7+EV8+EV9+EV10,
                           data=pheno.update, precision=seq(0.1,0.9, by=0.1))
     boot_result <- boot(data = pheno.update,statistic = AUCEstimate,
-                        R = 5000,scorename = paste0("SCORE",k,"_AVG"),
+                        R = 3000,scorename = paste0("SCORE",k,"_AVG"),
                         tar_trait = "overall_status")
     boot.ci(boot_result, type="bca")
     #roc_obj = roc(pheno.update$ERneg,pheno.update$SCORE)
@@ -162,7 +170,7 @@ for(k in 1:3){
                             EV6+EV7+EV8+EV9+EV10,
                           data=pheno.update, precision=seq(0.1,0.9, by=0.1))
     boot_result <- boot(data = pheno.update,statistic = AUCEstimate,
-                        R = 5000,scorename = paste0("SCORE",k,"_AVG"),
+                        R = 3000,scorename = paste0("SCORE",k,"_AVG"),
                         tar_trait = "ERpos")
     boot.ci(boot_result, type="bca")
     auc.est[k] = roc_obj$auc
@@ -199,7 +207,7 @@ for(k in 1:3){
                            EV6+EV7+EV8+EV9+EV10,
                          data=pheno.update, precision=seq(0.1,0.9, by=0.1))
       boot_result <- boot(data = pheno.update,statistic = AUCEstimate,
-                          R = 5000,scorename = paste0("SCORE",k,"_AVG"),
+                          R = 3000,scorename = paste0("SCORE",k,"_AVG"),
                           tar_trait = "ERneg")
       boot.ci(boot_result, type="bca")
       #roc_obj = roc(pheno.update$ERneg,pheno.update$SCORE)
@@ -207,7 +215,38 @@ for(k in 1:3){
       auc.se[k] = sqrt(var(boot_result[[2]]))
       
     }
-}
+  }else if(l==4){
+    
+    auc.est = rep(0,3)
+    auc.se = rep(0,3)
+    names(auc.est) = c("EUR_coef","tar_coef","EB_coef")
+    for(k in 1:3){
+      prs.score = fread(paste0("/data/zhangh24/multi_ethnic/result/breast_cancer/prs/prs_best_eur_",trait[l],".sscore"))
+      prs.score = prs.score %>% 
+        separate(IID,into=c("ID","ohter_id","nci_id"),remove=F)
+      
+      prs.score = prs.score %>% select(ID,paste0("SCORE",k,"_AVG"))
+      pheno <- fread(paste0(data.dir,"GBHS_pheno.csv"))
+      colnames(pheno)[5] = "ER_status"
+      
+      pheno = pheno %>% 
+        mutate(overall_status=ifelse(Status=="Control",0,1))
+      
+      pheno.update = left_join(pheno,prs.score,by=c("SB_ID"="ID"))
+      roc_obj <- roc.binary(status="overall_status", variable=paste0("SCORE",k,"_AVG"),
+                            confounders=~EV1+EV2+EV3+EV4+EV5+
+                              EV6+EV7+EV8+EV9+EV10,
+                            data=pheno.update, precision=seq(0.1,0.9, by=0.1))
+      boot_result <- boot(data = pheno.update,statistic = AUCEstimate,
+                          R = 3000,scorename = paste0("SCORE",k,"_AVG"),
+                          tar_trait = "overall_status")
+      boot.ci(boot_result, type="bca")
+      #roc_obj = roc(pheno.update$ERneg,pheno.update$SCORE)
+      auc.est[k] = roc_obj$auc
+      auc.se[k] = sqrt(var(boot_result[[2]]))
+      
+    }
+  }
 
 auc.result = list(auc.est,auc.se)
 save(auc.result,file = paste0("/data/zhangh24/multi_ethnic/result/breast_cancer/result/auc_result_",l))
