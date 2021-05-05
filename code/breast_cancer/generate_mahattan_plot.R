@@ -300,7 +300,7 @@ abline(h=ifelse(yLine<opt$break.top,
 text(5,1,expression(paste(lambda[1000]," = ")),cex = 1.5)
 text(5.7,1,paste(lambda_1000),cex = 1.5)
 
-title(paste0(trait_name[i2]," for ",eth[i1]))
+title(paste0(trait[l]))
 dev.off()
 
 # plot(1,1)
