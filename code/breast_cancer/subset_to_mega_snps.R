@@ -1,11 +1,23 @@
 trait = c("overall","erpos","erneg")
 setwd("/data/zhangh24/multi_ethnic/data/")
-load(paste0("./AABC_data/BC_AFR_",trait[l],"remove_GHBS.rdata"))
-library(tidyverse)
-mega <- fread("/data/zhangh24/multi_ethnic/result/LD_simulation_new/mega-hm3-rsid.txt",header=F)
-bim <- fread("/data/zhangh24/KG.plink/KG.all.chr.bim",header=F)
-mega.match = inner_join(mega,snp.infor.match,by=c("V1"="rs_id"))
-dim(mega.match)
-#load("/data/zhangh24/multi_ethnic/result/LD_simulation_new/snp.infor.match37_38.rdata")
-snp.infor.match.update = snp.infor.match %>% 
-  unite("chr.pos",CHR,)
+for(l in 1:3){
+  load(paste0("./AABC_data/BC_AFR_",trait[l],"remove_GHBS.rdata"))
+  library(tidyverse)
+  load(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_new/mega.match.rdata"))
+  #load("/data/zhangh24/multi_ethnic/result/LD_simulation_new/snp.infor.match37_38.rdata")
+  sum.data.update = sum.data %>% 
+    unite("chr.pos",CHR,POS,sep=":",remove=F)
+  
+  mega.match.update = mega.match %>% 
+    unite("chr.pos",CHR,POS,sep=":")
+  
+  mega.sum = inner_join(mega.match.update,
+                        sum.data.update,by="chr.pos") 
+  mega.sum.update = mega.sum %>% 
+    filter(((Eff_allele==REF)&(Ref_allele==ALT))|
+             ((Eff_allele==ALT)&(Ref_allele==REF)))
+  sum.data = mega.sum.update %>% 
+    select(V1,chr.pos,colnames(sum.data))
+  save(sum.data,file = paste0("./AABC_data/BC_AFR_",trait[l],"remove_GHBS_mega.rdata"))
+  
+}
