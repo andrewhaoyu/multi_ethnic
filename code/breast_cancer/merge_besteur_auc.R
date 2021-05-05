@@ -3,7 +3,7 @@ result.table.list = list()
 library(data.table)
 l = 1
 
-for(l in 1:3){
+for(l in 1:4){
   load(paste0("/data/zhangh24/multi_ethnic/result/breast_cancer/result/auc_result_",l))
   result.table = data.frame()
   for(k in 1:3){

@@ -1,0 +1,11 @@
+trait = c("overall","erpos","erneg")
+setwd("/data/zhangh24/multi_ethnic/data/")
+load(paste0("./AABC_data/BC_AFR_",trait[l],"remove_GHBS.rdata"))
+library(tidyverse)
+mega <- fread("/data/zhangh24/multi_ethnic/result/LD_simulation_new/mega-hm3-rsid.txt",header=F)
+bim <- fread("/data/zhangh24/KG.plink/KG.all.chr.bim",header=F)
+mega.match = inner_join(mega,snp.infor.match,by=c("V1"="rs_id"))
+dim(mega.match)
+#load("/data/zhangh24/multi_ethnic/result/LD_simulation_new/snp.infor.match37_38.rdata")
+snp.infor.match.update = snp.infor.match %>% 
+  unite("chr.pos",CHR,)
