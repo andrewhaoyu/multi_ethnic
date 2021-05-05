@@ -15,6 +15,8 @@ for(l in 1:3){
   setwd("/data/zhangh24/multi_ethnic/data/")
   #load ghana
   load(paste0("./GBHS_sum/",trait[l],"_sum.rdata"))
+
+  
   library(dplyr)
   library(tidyverse)
   sum.data.update = sum.data %>% 
