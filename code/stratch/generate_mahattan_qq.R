@@ -1,52 +1,64 @@
 com.args = commandArgs(trailingOnly = T)
-#l trait
-#i1 original (1) or remove (2)
+#i1 ethnic group
+#i2 trait
+#i3 =1 means mega+hapmap i3 = 2 means all SNPs
+i1 = as.numeric(com.args[[1]])
+i2 = as.numeric(com.args[[2]])
+i3 = as.numeric(com.args[[3]])
+eth <- c("EUR","AFR","AMR","EAS","SAS")
+trait <- c("any_cvd","depression",
+           "heart_metabolic_disease_burden",
+           "height",
+           "iqb.sing_back_musical_note",
+           "migraine_diagnosis",
+           "morning_person")
 
-l = as.numeric(com.args[[1]])
-i1 = as.numeric(com.args[[2]])
+trait_name = c("Any CVD","Depression",
+               "Heart metabolic disease burden",
+               "Height",
+               "Sing back musical note",
+               "Migraine Diagnosis",
+               "Morning Person")
+setwd("/dcs04/nilanjan/data/23andme/cleaned")
 library(data.table)
 library(qqman)
-library(tidyverse)
-library(readr)
-library("plotrix")
-library("data.table")
-library("RColorBrewer")
-library("optparse")
-
-trait = c("overall","erpos","erneg")
-setwd("/data/zhangh24/multi_ethnic/data/")
-source("/data/zhangh24/multi_ethnic/code/stratch/theme_publication.R")
-if(i1==1){
-  load(paste0("./GBHS_sum/",trait[l],"_sum.rdata"))
+library(dplyr)
+if(i3==1){
+  data <- fread(paste0(eth[i1],"/sumdat/",trait[i2],"_passQC_noNA_matchinfo_matchMAFnoNA_common_mega+hapmap3_cleaned.txt"),header=T)  
 }else{
-  load(paste0("./AABC_data/BC_AFR_",trait[l],"remove_GHBS.rdata"))
+  data <- fread(paste0(eth[i1],"/sumdat/",trait[i2],"_passQC_noNA_matchinfo_matchMAFnoNA_common.txt"),header=T)  
+  data = data %>% 
+    mutate(CHR=gsub("chr","",scaffold)) %>% 
+    rename(rsid = assay.name,
+           BP = position,
+           FREQ_A1 = freq.a,
+           P = pvalue) %>% 
+    mutate(CHR= ifelse(CHR=="X",23,CHR)) %>% 
+    select(rsid,CHR,BP,FREQ_A1,P)
 }
 
-sum.data.rank = sum.data[order(sum.data$P),]
-head(sum.data.rank)
 
-dat = sum.data %>% 
-  unite("chr.pos",CHR,POS,remove=F) %>% 
-  rename(SNP = chr.pos,
-         BP = POS) %>% 
-  select(SNP,CHR,BP,P,MAF) 
-  
+dat = data %>% 
+  mutate(MAF = ifelse(FREQ_A1<=0.5,FREQ_A1,1-FREQ_A1)) %>% 
+  select(rsid,CHR,BP,P,MAF) %>% 
+  rename(SNP = rsid)
 
-sample_size = data.frame(cases=c(9235,4295,2635,8336,3999,2358),
-                         controls = c(10184,10184,10184,8554,8554,8554))
-
-N_effect = (sample_size$cases*sample_size$controls)/
-  (sample_size$cases+sample_size$controls)
-sample_size$N_effect = N_effect
+sample_size <- as.data.frame(fread("/dcs04/nilanjan/data/hzhang1/multi_ethnic/data/23_sample_size.csv",header=T))
+library(readr)
 library(dplyr)
 x = dat$P
 z = qnorm(x / 2)
-lambda = round(median(z^2,na.rm = T) / qchisq(0.5,1), 3)
+lambda = round(median(z^2) / qchisq(0.5,1), 3)
 
-N.effect  <- sample_size[(i1-1)*3+l,"N_effect"]
+idx <- which(sample_size$eth==eth[i1]&
+               sample_size$Disease==trait[i2])
+N.effect  <- sample_size[idx,"N_effect"]
 #rescale lambda to 1000 subjects
-
+if(i2%in%c(1:2,5:7)){
   lambda_1000 = round(1+500*(lambda-1)/N.effect ,3)
+}else{
+  lambda_1000 = round(1+1000*(lambda-1)/N.effect  ,3)
+}
 
 
 convert.qval.pval = function(qvalues) {
@@ -108,9 +120,8 @@ scale_x_continuous(label = axis.set$CHR, breaks = axis.set$center) +
   labs(x = NULL, 
        y = "-log10(p)", 
        linetype = "",
-       title = paste0(trait[l]))+
+       title = paste0(trait_name[i2]," for ",eth[i1]))+
   #subtitle = "A2: Critically ill COVID19+ vs. population controls;\nB1: Hospitalized COVID19+ vs non-hospitalized COVID19+;\nB2: Hospitalized COVID19+ vs. population controls;\nC2: Reported SARS-CoV-2 infection vs. population controls") + 
-  theme_Publication()+
   theme(
     legend.position = "top",
     panel.border = element_blank(),
@@ -120,11 +131,14 @@ scale_x_continuous(label = axis.set$CHR, breaks = axis.set$center) +
     plot.title = element_text(size = 12, face = "bold"),
     plot.subtitle = element_text(size = 8)
   )
+if(i3==1){
+  outpath <-"/dcs04/nilanjan/data/hzhang1/multi_ethnic/result"  
+}else{
+  outpath <-"/dcs04/nilanjan/data/hzhang1/multi_ethnic/result"  
+}
 
-  outpath <-"/data/zhangh24/multi_ethnic/result/breast_cancer/result/manqq/"  
 
-
-ggsave(filename=paste0("man_",trait[l],"_",i1,".png"),
+ggsave(filename=paste0("man_",eth[i1],"_",trait[i2],".png"),
        plot=manhplot, device="png",
        path=outpath,
        width=9, height=4, units="in", dpi=300)
@@ -140,6 +154,10 @@ ggsave(filename=paste0("man_",trait[l],"_",i1,".png"),
 
 
 
+library("plotrix")
+library("data.table")
+library("RColorBrewer")
+library("optparse")
 
 
 
@@ -244,7 +262,7 @@ opt =  list(break.top = 15,
             top.size = 0.125)
 
 
-png(filename = paste0(outpath,"/QQ_",trait[l],"_",i1,".png"), width = 8, height = 8, units = "in",res=300)
+png(filename = paste0(outpath,"/QQ_",eth[i1],"_",trait[i2],".png"), width = 8, height = 8, units = "in",res=300)
 xlim <- c(0,max(fx,na.rm=T))
 ylim <- c(0,max(fy,na.rm=T))
 maxY <- max(fy,na.rm=T)
@@ -302,11 +320,8 @@ abline(h=ifelse(yLine<opt$break.top,
 text(5,1,expression(paste(lambda[1000]," = ")),cex = 1.5)
 text(5.7,1,paste(lambda_1000),cex = 1.5)
 
-title(paste0(trait[l]))
+title(paste0(trait_name[i2]," for ",eth[i1]))
 dev.off()
 
 # plot(1,1)
 # text(1,0.8,expression(paste(lambda[1000]," = ",buquote(.(lambda_1000)))),cex = 1.5)
-
-# lambda_vec = c(lambda,lambda_1000)
-# save(lambda_vec,file = paste0("/data/zhangh24/multi_ethnic/result/cleaned/lambda_value/lambda_vec_",i1,"_",i2,"_",i3,".rdata"))

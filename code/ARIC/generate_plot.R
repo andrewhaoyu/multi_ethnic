@@ -58,9 +58,11 @@ result.ARIC = rbind(ARIC.result.CT,
                     ARIC.result.TDLDEB,
                     ARIC.result.TDLDSLEB)
 result.ARIC = result.ARIC %>% 
+  filter(method_vec!="SCT")
+result.ARIC = result.ARIC %>% 
   mutate(method_vec = factor(method_vec,
                              levels = c("C+T",
-                                        "SCT",
+                                        #"SCT",
                                         "LDpred2",
                                         "Best EUR SNP (C+T)",
                                         "Best EUR SNP + target coefficients (C+T)",
@@ -77,7 +79,7 @@ uvals = unique(result.ARIC$method_vec)
 n.single = 9
 
 
-single.color =  brewer.pal(n.single, "Blues")[c(4,5,7)]
+single.color =  brewer.pal(n.single, "Blues")[c(4,6)]
 n.EUR = 9
 
 
