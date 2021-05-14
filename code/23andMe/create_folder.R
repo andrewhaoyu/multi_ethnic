@@ -46,11 +46,13 @@ for(k in 1:length(method)){
 
 
 #create folder for prs
-method = c("PT","TDLD","BestEURPRS_EURcoef",
-           "BestEURPRS_tarcoef",
-           "BestEURPRS_EBcoef",
-           "Weighted_PRS",
-           "TDLD_EB")
+# method = c("PT","TDLD","BestEURPRS_EURcoef",
+#            "BestEURPRS_tarcoef",
+#            "BestEURPRS_EBcoef",
+#            "Weighted_PRS",
+#            "TDLD_EB")
+method = c("TDLD_EB",
+           "TDLD_EBall")
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 trait <- c("any_cvd","depression",
            "heart_metabolic_disease_burden",
@@ -90,11 +92,8 @@ for(k in 1:length(method)){
 }
 
 #remove EUR from the following folder
-method = c("TDLD","BestEURPRS_EURcoef",
-           "BestEURPRS_tarcoef",
-           "BestEURPRS_EBcoef",
-           "Weighted_PRS",
-           "TDLD_EB")
+method = c("TDLD_EB",
+           "TDLD_EBall")
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 trait <- c("any_cvd","depression",
            "heart_metabolic_disease_burden",
