@@ -118,14 +118,26 @@ sd_eur <- best.prs.com$SD.EUR
 beta_other_mat = best.prs.com$beta.mat
 sd_other_mat = best.prs.com$sd.mat
 source("/data/zhangh24/multi_ethnic/code/stratch/EB_function.R")
-EBprior = EstimatePrior(beta_tar,sd_tar,
-                        beta_eur,sd_eur)
+EBPrior = EstimatePriorMulti(beta_tar,sd_tar,
+                                 beta_eur,sd_eur,
+                                 beta_other_mat,
+                                 sd_other_mat)
 beta_tar <- summary.com$BETA.TAR
 sd_tar <- summary.com$SD.TAR
 beta_eur <- summary.com$BETA.EUR
 sd_eur <- summary.com$SD.EUR
-post_beta_mat = EBpost(beta_tar,sd_tar,beta_eur,sd_eur,EBprior)
+beta_other_mat = summary.com$beta.mat
+sd_other_mat = summary.com$sd.mat
+
+
+post_beta_mat = EBpostMulti(beta_tar,sd_tar,
+                            beta_eur,sd_eur,beta_other_mat,
+                            sd_other_mat,
+                            EBPrior)
 post_beta_tar = post_beta_mat[,1,drop=F]
+
+
+
 colnames(post_beta_tar) = "BETA"
 summary.com$BETA = post_beta_tar
 colnames(summary.com)[1] = "SNP"
@@ -136,7 +148,7 @@ colnames(summary.com)[1] = "SNP"
 # for(l in 1:length(trait)){
 out.dir = paste0("/data/zhangh24/multi_ethnic/result/cleaned/clumping_result/TDLD/",eth[i],"/",trait[l],"/")
 temp = 1
-method = "TDLD_EB"
+method = "TDLD_EBall"
 out.dir.prs <- paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/",method,"/",eth[i],"/",trait[l],"/")
 for(r_ind in 1:length(r2_vec)){
   wc_vec = wc_base_vec/r2_vec[r_ind]
