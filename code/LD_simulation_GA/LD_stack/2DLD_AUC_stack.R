@@ -115,7 +115,7 @@ pthres <- c(5E-08,5E-07,5E-06,5E-05,5E-04,5E-03,5E-02,5E-01)
                             pthres_vec1,pthres_vec2,
                             r2_ind_vec,
                             wc_ind_vec)
-  
+  save(result.data,file = "/data/zhangh24/multi_ethnic/result/AMR_TDLD_for_plot.rdata")
   prs.sum = colSums(prs.mat)
   idx <- which(prs.sum!=0)
   #drop the prs with all 0

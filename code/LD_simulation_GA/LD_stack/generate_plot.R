@@ -192,9 +192,16 @@ for(m in 1:4){
   
 
 
+prediction.result.sub <- prediction.result %>% 
+  filter(eth.vec!="EUR"&
+           m_vec ==m) %>% 
+  filter(method_vec%in%c("Best EUR SNP (C+T)"))
 
-
-
+prediction.result.sub2 <- prediction.result %>% 
+  filter(eth.vec!="EUR"&
+           m_vec ==m) %>% 
+  filter(method_vec%in%c("TDLD-SLEB"))
+mean(prediction.result.sub2$r2.vec/prediction.result.sub$r2.vec-1)
 # #predictoin_result ratio
 # total = 2220
 # eth.vec = rep("c",total)

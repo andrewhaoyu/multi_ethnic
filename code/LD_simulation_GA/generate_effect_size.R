@@ -49,9 +49,9 @@ cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
 #i for genetic correlation vec
 #j for negative selection alphs
 temp = 1
-for(i in 1:2){
-  for(j in 1:3){
-    for(l in 1:3){
+# for(i in 1:2){
+#   #for(j in 1:3){
+#     for(l in 1:3){
       eth <- c("EUR","AFR","AMR","EAS","SAS")
       cau.snp.infor <- cau.snp.infor.list[[l]]
       library(data.table)
@@ -142,9 +142,9 @@ for(i in 1:2){
       }
       
       
-  }
-}
-}
+#   }
+# #}
+# }
 i1 = 1
 select.cau <- read.table(paste0(cur.dir,eth[i],"/select.cau_rho",l,"_",i1),header=F)
 select.cau1 = select.cau

@@ -330,3 +330,19 @@ dev.off()
 
 lambda_vec = c(lambda,lambda_1000)
 save(lambda_vec,file = paste0("/data/zhangh24/multi_ethnic/result/cleaned/lambda_value/lambda_vec_",i1,"_",i2,"_",i3,".rdata"))
+
+
+
+
+
+
+
+
+head(sample_size)
+sample_size = sample_size %>% 
+  mutate(N_case = ifelse(is.na(N_case),0,N_case))
+sample_size = sample_size %>% 
+  mutate(N_total = N_control + N_case)
+avg_sample = sample_size %>% 
+  group_by(eth) %>% 
+  summarize(avg_N = mean(N_total))
