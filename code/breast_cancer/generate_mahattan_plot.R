@@ -1,6 +1,6 @@
 com.args = commandArgs(trailingOnly = T)
 #l trait
-#i1 original (1) or remove (2)
+#i1 Ghana (i1=1) and AABC remove Ghana (i1 =2)
 
 l = as.numeric(com.args[[1]])
 i1 = as.numeric(com.args[[2]])
@@ -24,12 +24,20 @@ if(i1==1){
 
 sum.data.rank = sum.data[order(sum.data$P),]
 head(sum.data.rank)
-
-dat = sum.data %>% 
-  unite("chr.pos",CHR,POS,remove=F) %>% 
-  rename(SNP = chr.pos,
-         BP = POS) %>% 
-  select(SNP,CHR,BP,P,MAF) 
+#different format for overall breast cancer
+if(i1==2&l==1){
+  dat = sum.data %>% 
+    rename(SNP = chr.pos,
+           BP = POS) %>% 
+    select(SNP,CHR,BP,P,MAF) 
+}else{
+  dat = sum.data %>% 
+    unite("chr.pos",CHR,POS,remove=F) %>% 
+    rename(SNP = chr.pos,
+           BP = POS) %>% 
+    select(SNP,CHR,BP,P,MAF) 
+  
+}
   
 
 sample_size = data.frame(cases=c(9235,4295,2635,8336,3999,2358),

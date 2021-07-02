@@ -36,6 +36,11 @@ sum.data.match = inner_join(sum.data.ga,
            (Effect_allele==Ref_allele_GA)&(Alt_allele==Eff_allele_GA)) 
 sum.data.match =sum.data.match %>% 
   mutate(MAF = ifelse(Freq1<=0.5,Freq1,1-Freq1)) %>% 
-  select(chr.pos,ID,CHR,POS,Effect_allele,Alt_allele,MAF,Effect,StdErr,P)
+  select(chr.pos,ID,CHR,POS,Effect_allele,Alt_allele,MAF,Effect,StdErr,P) %>% 
+  
 sum.data = sum.data.match
+sum.data = sum.data %>% 
+  mutate(POS = as.numeric(POS),
+         CHR=as.numeric(CHR))
+  
 save(sum.data,file = paste0("./AABC_data/BC_AFR_",trait[l],"remove_GHBS.rdata"))
