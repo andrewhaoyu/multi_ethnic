@@ -25,7 +25,7 @@ colnames(select.cau) <- c("snpid","effect_size")
 #the fifth column is minor allele
 #need to match the minor allele with the coding allele
 snp.infor <- read.table(paste0("/lscratch/",sid,"/test/",eth[i],"_select.cau.snp.bim"))
-colnames(snp.infor) <- c("chr","snpid","nonthing","position","minor allele","major allele")
+colnames(snp.infor) <- c("chr","snpid","nonthing","position","minor","major")
 library(tidyr)
 library(dplyr)
 select.cau.infor <- left_join(select.cau,snp.infor,by="snpid")
@@ -75,32 +75,33 @@ for(i_rep in 1:10){
 
 
 
+#####generate heritability table for different genetic architecture
+total <- 5*5
+eth_vec <- rep("c",total)
+#l_vec <- rep(0,total)
+i1_vec <- rep(0,total)
+#m_vec <- rep(0,total)
+herit_vec <- rep(0,total)
+eth <- c("EUR","AFR","AMR","EAS","SAS")
+cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
+out.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
+eth <- c("EUR","AFR","AMR","EAS","SAS")
+temp <- 1
 
-# total <- 5*3*4
-# eth_vec <- rep("c",total)
-# l_vec <- rep(0,total)
-# m_vec <- rep(0,total)
-# herit_vec <- rep(0,total)
-# eth <- c("EUR","AFR","AMR","EAS","SAS")
-# cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
-# out.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
-# eth <- c("EUR","AFR","AMR","EAS","SAS")
-# temp <- 1
-# 
-# for(i in 1:5){
-#   for(l in 1:3){
-#     #for(m in 1:4){
-#       select.cau <- read.table(paste0(out.dir,eth[i],"/select.cau_rho",l,"_",i1),header=F)
-#       eth_vec[temp] <- eth[i]
-#       l_vec[temp] <- l
-#       m_vec[temp] <- m
-#       herit_vec[temp] <- nrow(select.cau)*var(select.cau$V2)
-#       temp = temp + 1
-#     #}
-#   }
-# }
-# herita.table <- data.frame(eth_vec,l_vec,m_vec,herit_vec)
-# save(herita.table,file = paste0(out.dir,"herit_table.rdata"))
+for(i in 1:5){
+ # for(l in 1:3){
+    for(i1 in 1:5){
+      select.cau <- read.table(paste0(out.dir,eth[i],"/select.cau_rho",l,"_",i1),header=F)
+      eth_vec[temp] <- eth[i]
+      #l_vec[temp] <- l
+      i1_vec[temp] <- i1
+      herit_vec[temp] <- nrow(select.cau)*var(select.cau$V2)
+      temp = temp + 1
+    }
+  #}
+}
+herita.table <- data.frame(eth_vec,herit_vec,i1_vec)
+save(herita.table,file = paste0(out.dir,"herit_table.rdata"))
 
 # for(i in 1:5){
 #   for(l in 1:3){

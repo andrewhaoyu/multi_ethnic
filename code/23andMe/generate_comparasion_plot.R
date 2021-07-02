@@ -79,9 +79,10 @@ temp = 1
           temp = temp+1
         }else{
           #the other methods need to separate tuning and validation dataset
-          result = read.csv(paste0("./testing_summary/",eth_group[i],"_",trait[l],"_",method_vec[i1]))
-          idx.max = which.max(result)
           result = read.csv(paste0("./validation_summary/",eth_group[i],"_",trait[l],"_",method_vec[i1]))
+          idx.max = which.max(result)
+          result = read.csv(paste0("./testing_summary/",eth_group[i],"_",trait[l],"_",method_vec[i1]))
+          #result2 = read.csv(paste0("./validation_summary/",eth_group[i],"_",trait[l],"_",method_vec[i1]))
           plot.data = data.frame(result = result[idx.max],
                                  eth = eth_name[i],
                                  trait = trait_name[l],
@@ -106,7 +107,7 @@ prediction.result$method_vec = factor(prediction.result$method_vec,
                                      "TDLD-EB",
                                      "TDLD-SLEB",
                                      "TDLD-SLEB (all ethnics)"))
-
+prediction.result$Method = prediction.result$method_vec
 prediction.result$index = rep("1",nrow(prediction.result))
 prediction.result$eth = factor(prediction.result$eth,
                        levels = c("European","African American",
@@ -159,7 +160,7 @@ run_plot = function(filler, values) {
   values = values %>% pull(colour)
   names(values) = labels
   ggplot(
-    prediction.result.sub %>% 
+    prediction.result %>% 
       filter(category %in% filler),
     aes(x= index,y=result,
         group=method_vec))+
@@ -180,6 +181,8 @@ legs = lapply(sort(unique(col_df$category)), run_plot)
 legs = lapply(legs, getLegend)
 p.leg = plot_grid(NULL,NULL,legs[[1]],legs[[2]], legs[[3]],NULL,align="v",ncol=1,rel_heights=c(1,1,0.7,1,1.2,1))
 print(p.leg)
+
+
 
 prediction.result.sub = prediction.result %>% 
   filter(trait %in% c("Any CVD","Depression",
