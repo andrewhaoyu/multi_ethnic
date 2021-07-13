@@ -47,7 +47,7 @@ for(k in 1:length(dup.id)){
 prs.all = prs.all[-remove.idx,]
 n_pthres <- length(pthres)
 q_range = data.frame(rep("p_value",n_pthres),rep(0,n_pthres),rep(0.5,n_pthres))
-
+write.table(q_range,file = paste0(temp.dir,"q_range_file"),col.names = T,row.names = F,quote=F)
 prs.file <- prs.all %>% 
   select(SNP,A1,BETA)
 write.table(prs.file,file = paste0(temp.dir,"prs_file"),col.names = T,row.names = F,quote=F)
