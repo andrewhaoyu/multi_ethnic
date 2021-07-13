@@ -38,13 +38,16 @@ sum.data = sum.data %>%
 prs.all <- left_join(clump.snp,sum.data,by="SNP")
 #find all the duplicated SNPs and keep the more significant one
 dup.id <- prs.all$SNP[duplicated(prs.all$SNP)]
-remove.idx = rep(0,length(dup.id))
-for(k in 1:length(dup.id)){
-  jdx <- which(prs.all$SNP==dup.id[k])
-  which.max(prs.all$P[jdx])
-  remove.idx[k] = jdx[which.max(prs.all$P[jdx])]
+if(length(dup.id)!=0){
+  remove.idx = rep(0,length(dup.id))
+  for(k in 1:length(dup.id)){
+    jdx <- which(prs.all$SNP==dup.id[k])
+    which.max(prs.all$P[jdx])
+    remove.idx[k] = jdx[which.max(prs.all$P[jdx])]
+  }
+  prs.all = prs.all[-remove.idx,]
+  
 }
-prs.all = prs.all[-remove.idx,]
 n_pthres <- length(pthres)
 q_range = data.frame(rep("p_value",n_pthres),rep(0,n_pthres),rep(0.5,n_pthres))
 write.table(q_range,file = paste0(temp.dir,"q_range_file"),col.names = T,row.names = F,quote=F)
