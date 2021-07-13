@@ -6,8 +6,8 @@ library(tidyverse)
 #load AFR coefficients
 l =1 
 load(paste0("./AABC_data/BC_AFR_",trait[l],"remove_GHBS.rdata"))
-sum.data = sum.data %>% 
-  unite("chr.pos",CHR,POS,sep=":",remove=F)
+# sum.data = sum.data %>% 
+#   unite("chr.pos",CHR,POS,sep=":",remove=F)
 #idx <- which(sum.data$chr.pos=="7:74341926")
 #load eur coefficients
 sum.eur <- fread("/data/zhangh24/breast_cancer_data_analysis/discovery_SNP/prepare_summary_level_statistics/result/icogs_onco_gwas_meta_overall_breast_cancer_summary_level_statistics.txt",header=T)
@@ -32,14 +32,14 @@ sum.eur.update = sum.eur.update %>%
 sum.eur.match = inner_join(sum.data,
                            sum.eur.update,
                            by="chr.pos") %>% 
-  filter(((Eff_allele==Eff_allele_eur)&(Ref_allele==Ref_allele_eur))|
-           ((Eff_allele==Ref_allele_eur)&(Ref_allele==Eff_allele_eur)))
+  filter(((Effect_allele==Eff_allele_eur)&(Alt_allele==Ref_allele_eur))|
+           ((Effect_allele==Ref_allele_eur)&(Alt_allele==Eff_allele_eur)))
 
 sum.eur.match.update = sum.eur.match %>% 
-  mutate(Beta_eur_update = ifelse(Eff_allele_eur==Eff_allele,Beta_eur,-Beta_eur),
+  mutate(Beta_eur_update = ifelse(Eff_allele_eur==Effect_allele,Beta_eur,-Beta_eur),
          MAF_eur = ifelse(EAF_eur<=0.5,EAF_eur,1-EAF_eur)) %>% 
-  select(ID,chr.pos,CHR,POS,Eff_allele,Ref_allele,Beta_eur_update,
-         Se_eur,p_eur,R2_eur,MAF_eur,KG.ID) 
+  select(ID,chr.pos,CHR,POS,Effect_allele,Alt_allele,Beta_eur_update,
+         Se_eur,p_eur,R2_eur,MAF_eur) 
 sum.data = sum.eur.match.update
 save(sum.data,file ="./AABC_data/BC_EUR_overall_aligned.rdata")
 

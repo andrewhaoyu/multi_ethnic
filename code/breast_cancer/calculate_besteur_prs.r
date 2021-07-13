@@ -36,9 +36,10 @@ prs.snp = prs.snp %>%
   select(variant,chr.pos,Reference.allele,Effect.allele)
 
 load(paste0("./AABC_data/BC_EUR_",trait[l],"_aligned.rdata"))
+#match best eur SNP with AABC summary level statistics
 prs.snp.eur = left_join(prs.snp,sum.data,by="chr.pos") %>% 
-  filter(((Eff_allele==Effect.allele)&(Ref_allele==Reference.allele))|
-           (Eff_allele==Reference.allele)&(Ref_allele==Effect.allele)) %>% 
+  filter(((Effect_allele==Effect.allele)&(Alt_allele==Reference.allele))|
+           (Effect_allele==Reference.allele)&(Alt_allele==Effect.allele)) %>% 
   select(c(colnames(sum.data),"chr.pos","variant"))
 
 # jdx <- which(bim$V4==106358620)
@@ -46,14 +47,15 @@ prs.snp.eur = left_join(prs.snp,sum.data,by="chr.pos") %>%
 #idx <- which(prs.snp.eur.temp$ID%in%prs.snp.eur$ID==F)
 #idx <- which(sum.data$chr.pos =="4:84370124")
 #idx <- which(sum.data.temp$chr.pos =="4:84370124")
+#match best eur SNP with AABC summary level statistics and Ghana genotype data
 prs.snp.eur.update = left_join(prs.snp.eur,bim,by="chr.pos") %>% 
-  filter(((Eff_allele==V5)&(Ref_allele==V6))|
-           (Eff_allele==V6)&(Ref_allele==V5))
+  filter(((Effect_allele==V5)&(Alt_allele==V6))|
+           (Effect_allele==V6)&(Alt_allele==V5))
 #prepare eur coefficients
 prs.file = prs.snp.eur.update %>% 
-  select(GBHS_id,Eff_allele,Beta_eur_update) %>% 
+  select(GBHS_id,Effect_allele,Beta_eur_update) %>% 
   rename(SNP=GBHS_id,
-         A1 = Eff_allele,
+         A1 = Effect_allele,
          BETA = Beta_eur_update)
 prs.eur = prs.file
 
@@ -65,23 +67,24 @@ if(l==4){
 }
 
 
-sum.data = sum.data %>% 
-  unite("chr.pos",CHR,POS,sep=":",remove=F)
+# sum.data = sum.data %>% 
+#   unite("chr.pos",CHR,POS,sep=":",remove=F)
 
 
 prs.snp.tar = left_join(prs.snp,sum.data,by="chr.pos") %>% 
-  filter(((Eff_allele==Effect.allele)&(Ref_allele==Reference.allele))|
-           (Eff_allele==Reference.allele)&(Ref_allele==Effect.allele)) %>% 
+  filter(((Effect_allele==Effect.allele)&(Alt_allele==Reference.allele))|
+           (Effect_allele==Reference.allele)&(Alt_allele==Effect.allele)) %>% 
   select(c(colnames(sum.data),"chr.pos","variant"))
 
 
 prs.snp.tar.update = left_join(prs.snp.tar,bim,by="chr.pos") %>% 
-  filter(((Eff_allele==V5)&(Ref_allele==V6))|
-           (Eff_allele==V6)&(Ref_allele==V5))
+  filter(((Effect_allele==V5)&(Alt_allele==V6))|
+           (Effect_allele==V6)&(Alt_allele==V5))
 prs.file = prs.snp.tar.update %>% 
-  select(GBHS_id,Eff_allele,BETA) %>% 
+  select(GBHS_id,Effect_allele,Effect) %>% 
   rename(SNP=GBHS_id,
-         A1 = Eff_allele)
+         A1 = Effect_allele,
+         BETA = Effect)
 prs.tar = prs.file
 
 all.equal(prs.tar$SNP,prs.eur$SNP)
@@ -92,10 +95,9 @@ all.equal(prs.tar$A1,prs.eur$A1)
 source("/data/zhangh24/multi_ethnic/code/stratch/EB_function.R")
 
 beta_tar <- prs.tar$BETA
-sd_tar <- prs.snp.tar.update$SE
+sd_tar <- prs.snp.tar.update$StdErr
 beta_eur <- prs.eur$BETA
 sd_eur <- prs.snp.eur.update$Se_eur
-
 EBprior = EstimatePrior(beta_tar,sd_tar,
                         beta_eur,sd_eur)
 
@@ -115,6 +117,7 @@ out.dir.prs = "/data/zhangh24/multi_ethnic/result/breast_cancer/prs/"
 data.dir = "/data/zhangh24/multi_ethnic/data/"
 res <- system(paste0("/data/zhangh24/software/plink2_alpha --score-col-nums 3,4,5 --score ",out.dir.prs,"best_eurprs_",trait[l]," header no-mean-imputation --bfile ",data.dir,"GBHS_plink/all_chr --out ",out.dir.prs,"prs_best_eur_",trait[l]))
 
+#calculate AUC for different traits
 if(l==1){
 auc.est = rep(0,3)
 auc.se = rep(0,3)

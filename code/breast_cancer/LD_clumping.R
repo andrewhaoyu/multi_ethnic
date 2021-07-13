@@ -15,17 +15,18 @@ system(paste0("cp /data/zhangh24/multi_ethnic/data/GBHS_plink/all_chr.bim ",temp
 system(paste0("cp /data/zhangh24/multi_ethnic/data/GBHS_plink/all_chr.fam ",temp.dir,"all_chr.fam"))
 trait = c("overall","erpos","erneg")
 setwd("/data/zhangh24/multi_ethnic/data/")
-# if(i1 ==1){
-#   load(paste0("./AABC_data/BC_AFR_",trait[l],"remove_GHBS.rdata"))
-# }else{
-#   load(paste0("./AABC_data/BC_AFR_",trait[l],"remove_GHBS_mega.rdata"))
-# }
+if(i1 ==1){
+  load(paste0("./AABC_data/BC_AFR_",trait[l],"remove_GHBS.rdata"))
+}else{
+  load(paste0("./AABC_data/BC_AFR_",trait[l],"remove_GHBS_mega.rdata"))
+}
 
-sum.data = fread("./AABC_data/final_metal_4aa_no_ghana1.txt")
+#sum.data = fread("./AABC_data/final_metal_4aa_no_ghana1.txt")
 sum.data.assoc = sum.data %>% 
-  select(CHR,ID,POS,Eff_allele,BETA,P) %>% 
+  select(CHR,ID,POS,Effect_allele,Effect,P) %>% 
   rename(SNP=ID,
-         A1 = Eff_allele)
+         A1 = Effect_allele,
+         BETA = Effect)
 write.table(sum.data.assoc,file = paste0(temp.dir,"sum.data.assoc"),row.names = F,col.names = T,quote=F)
 # sum.data.filter = sum.data %>% 
 #   filter(Rsq_ave>=0.3&MAF>=0.01)
