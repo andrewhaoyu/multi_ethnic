@@ -59,9 +59,9 @@ p.value.file <- prs.all %>%
 write.table(p.value.file,file = paste0(temp.dir,"p_value_file"),col.names = T,row.names = F,quote=F)
 if(i1==1){
   res <- system(paste0("/data/zhangh24/software/plink2 --q-score-range ",temp.dir,"q_range_file ",temp.dir,"p_value_file header --threads 2 --score ",temp.dir,"prs_file header no-sum no-mean-imputation --bfile ",temp.dir,"all_chr --out ",temp.dir,"prs_",trait[l]))
-  res = system(paste0("mv ",temp.dir,"*.profile ",out.dir,))
+  res = system(paste0("mv ",temp.dir,"*.profile ",out.dir))
 }else{
   res <- system(paste0("/data/zhangh24/software/plink2 --q-score-range ",temp.dir,"q_range_file ",temp.dir,"p_value_file header --threads 2 --score ",temp.dir,"prs_file header no-sum no-mean-imputation --bfile ",temp.dir,"all_chr --out ",temp.dir,"prs_",trait[l],"_mega"))
-  res = system(paste0("mv ",temp.dir,"*.profile ",out.dir,))
+  res = system(paste0("mv ",temp.dir,"*.profile ",out.dir))
 }
 
