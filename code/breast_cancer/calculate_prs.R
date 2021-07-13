@@ -18,9 +18,11 @@ out.dir <-  "/data/zhangh24/multi_ethnic/result/breast_cancer/result/"
 if(i1 ==1){
   load(paste0("./AABC_data/BC_AFR_",trait[l],"remove_GHBS.rdata"))
   LD <- as.data.frame(fread(paste0(out.dir,"/LD_clump_",trait[l],".clumped")))
+  
 }else{
   load(paste0("./AABC_data/BC_AFR_",trait[l],"remove_GHBS_mega.rdata"))
   LD <- as.data.frame(fread(paste0(out.dir,"/LD_clump_",trait[l],"_mega.clumped")))
+  
 }
 
 
@@ -28,9 +30,10 @@ if(i1 ==1){
 
 clump.snp <- LD[,3,drop=F] 
 sum.data = sum.data %>% 
-  select(CHR,ID,POS,Eff_allele,BETA,P) %>% 
+  select(CHR,ID,POS,Effect_allele,Effect,P) %>% 
   rename(SNP=ID,
-         A1 = Eff_allele)
+         A1 = Effect_allele,
+         BETA = Effect)
 
 prs.all <- left_join(clump.snp,sum.data,by="SNP")
 #find all the duplicated SNPs and keep the more significant one
@@ -56,5 +59,6 @@ if(i1==1){
   res = system(paste0("mv ",temp.dir,"*.profile ",out.dir,))
 }else{
   res <- system(paste0("/data/zhangh24/software/plink2 --q-score-range ",temp.dir,"q_range_file ",temp.dir,"p_value_file header --threads 2 --score ",temp.dir,"prs_file header no-sum no-mean-imputation --bfile ",temp.dir,"all_chr --out ",temp.dir,"prs_",trait[l],"_mega"))
+  res = system(paste0("mv ",temp.dir,"*.profile ",out.dir,))
 }
 
