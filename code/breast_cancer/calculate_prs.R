@@ -49,6 +49,7 @@ if(length(dup.id)!=0){
   
 }
 n_pthres <- length(pthres)
+q_range = data.frame(rep("p_value",n_pthres),rep(0,n_pthres),rep(0.5,n_pthres))
 temp = 1
 for(k in 1:length(pthres)){
   prs.file <- prs.all %>% filter(P<=pthres[k]) 
@@ -64,7 +65,7 @@ for(k in 1:length(pthres)){
   
 }
 q_range = q_range[1:(temp-1),]
-q_range = data.frame(rep("p_value",n_pthres),rep(0,n_pthres),rep(0.5,n_pthres))
+
 write.table(q_range,file = paste0(temp.dir,"q_range_file"),col.names = T,row.names = F,quote=F)
 prs.file <- prs.all %>% 
   select(SNP,A1,BETA)
@@ -77,7 +78,7 @@ if(i1==1){
   res <- system(paste0("/data/zhangh24/software/plink2 --q-score-range ",temp.dir,"q_range_file ",temp.dir,"p_value_file header --threads 2 --score ",temp.dir,"prs_file header no-sum no-mean-imputation --bfile ",temp.dir,"all_chr --out ",temp.dir,"prs_",trait[l]))
   res = system(paste0("mv ",temp.dir,"*.profile ",out.dir.prs))
 }else{
-  res <- system(paste0("/data/zhangh24/software/plink2 --q-score-range ",temp.dir,"q_range_file ",temp.dir,"p_value_file header --threads 2 --score ",temp.dir,"prs_file header no-sum no-mean-imputation --bfile ",temp.dir,"all_chr --out ",temp.dir,"prs_",trait[l],"_mega"))
+  res <- system(paste0("/data/zhangh24/software/plink2 --q-score-range ",temp.dir,"q_range_file ",temp.dir,"p_value_file header --threads 2 --score ",out.dir.prs,"prs_file header no-sum no-mean-imputation --bfile ",temp.dir,"all_chr --out ",temp.dir,"prs_",trait[l],"_mega"))
   res = system(paste0("mv ",temp.dir,"*.profile ",out.dir.prs))
 }
 

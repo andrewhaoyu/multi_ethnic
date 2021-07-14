@@ -12,7 +12,7 @@ library(boot)
 trait = c("overall","erpos","erneg")
 data.dir = "/data/zhangh24/multi_ethnic/data/"
 
-out.dir <-  "/data/zhangh24/multi_ethnic/result/breast_cancer/result/"
+out.dir.prs = "/data/zhangh24/multi_ethnic/result/breast_cancer/prs/"
 if(i1 ==1){
   load(paste0("./AABC_data/BC_AFR_",trait[l],"remove_GHBS.rdata"))
   LD <- as.data.frame(fread(paste0(out.dir,"/LD_clump_",trait[l],".clumped")))
