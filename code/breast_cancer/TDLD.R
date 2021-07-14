@@ -67,7 +67,8 @@ system(paste0("rm ",temp.dir,"*.fam"))
 idx <- which((summary.com$P<summary.com$peur)|is.na(summary.com$peur))
 #Ghana data used ID instead of rsid
 sum.com.tar <- summary.com[idx,] %>% 
-  select(CHR,ID,BP,A1,BETA,P) 
+  select(CHR,ID,BP,A1,BETA,P) %>% 
+  rename(SNP =ID)
 write.table(sum.com.tar,file = paste0(temp.dir,eth[i],"_all_chr_assoc.txt"),col.names = T,row.names = F,quote=F)
 system(paste0("cp /data/zhangh24/multi_ethnic/data/GBHS_plink/all_chr.bed ",temp.dir,eth[i],"all_chr.bed"))
 system(paste0("cp /data/zhangh24/multi_ethnic/data/GBHS_plink/all_chr.bim ",temp.dir,eth[i],"all_chr.bim"))
