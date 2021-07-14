@@ -42,10 +42,41 @@ sum.eur.match.update = sum.eur.match %>%
          Se_eur,p_eur,R2_eur,MAF_eur) 
 sum.data = sum.eur.match.update
 save(sum.data,file ="./AABC_data/BC_EUR_overall_aligned.rdata")
+load("./AABC_data/BC_EUR_overall_aligned.rdata")
+load(paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_new/mega.match.rdata"))
+#add the 330 best EUR SNPs
+prs.snp <- read.csv("/data/zhangh24/multi_ethnic/data/breast_cancer_330SNPs.csv",header=T)
+#remove the original SNPs from MEGA
+idx <- which(mega.match$V1%in%prs.snp$variant)
+mega.match = mega.match[-idx,]
+
+prs.snp.sub  = prs.snp %>% 
+  select(variant,CHR,Position,Reference.allele,Effect.allele) %>% 
+  rename(V1 = variant,
+         POS  = Position,
+         REF = Reference.allele,
+         ALT =Effect.allele )
+mega.match = rbind(prs.snp.sub,mega.match)
 
 
+mega.match.update = mega.match %>% 
+  unite("chr.pos",CHR,POS,sep=":")
+
+mega.sum = inner_join(mega.match.update,
+                      sum.data,by="chr.pos") 
+
+mega.sum.update = mega.sum %>% 
+  filter(((Effect_allele==REF)&(Alt_allele==ALT))|
+           ((Effect_allele==ALT)&(Alt_allele==REF)))
+sum.data = mega.sum.update %>% 
+  select(V1,chr.pos,colnames(sum.data))
+
+#put the 330 SNPs in EUR to be significant to ensure the selection
+idx <- which(sum.data$V1%in%prs.snp.sub$V1)
 
 
+sum.data$p_eur = 0
+save(sum.data,file = "./AABC_data/BC_EUR_overall_mega_aligned.rdata")
 
 
 #process ER+ bc
