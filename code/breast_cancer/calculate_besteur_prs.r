@@ -241,7 +241,7 @@ for(k in 1:3){
   }
 
 auc.result = list(auc.est,auc.se)
-save(auc.result,file = paste0("/data/zhangh24/multi_ethnic/result/breast_cancer/result/auc_result_",l))
+save(auc.result,file = paste0("/data/zhangh24/multi_ethnic/result/breast_cancer/result/besteur_auc_result_",l))
 
 
 
