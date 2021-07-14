@@ -15,7 +15,7 @@ library(data.table)
 library(dplyr)
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 trait = c("overall","erpos","erneg")
-setwd("/data/zhangh24/multi_ethnic/")
+setwd("/data/zhangh24/multi_ethnic/data/")
 r2_vec = c(0.01,0.05,0.1,0.2,0.5,0.8)
 wc_base_vec = c(50,100)
 method = "TDLD"
@@ -33,7 +33,7 @@ sum.data.assoc = sum.tar %>%
          A1 = Effect_allele,
          BETA = Effect,
          BP = POS) %>% 
-  select(CHR,SNP,BP,A1,BETA,P) 
+  select(CHR,SNP,BP,A1,BETA,P,ID) 
 #get the min p-value for between the target ethnic group and EUR for shared snp
 summary.com <- left_join(sum.data.assoc,sum.eur.select,by="SNP")
 temp = 1
@@ -44,14 +44,15 @@ for(r_ind in 1:length(r2_vec)){
     LD <- as.data.frame(fread(paste0(out.dir,"TDLD_rind_",r_ind,"_wcind_",w_ind,".clumped")))
     clump.snp <- LD
     prs.all <- left_join(clump.snp,summary.com)
-    
+    colSums(is.na(prs.all))
     
     for(k1 in 1:length(pthres)){
       for(k2 in 1:length(pthres)){
         prs.temp <- prs.all %>% 
           filter((P<=pthres[k1]|
                     peur<=pthres[k2])) %>% 
-          select(SNP,BETA)
+          select(ID,BETA) %>% 
+          rename(SNP=ID)
         if(nrow(prs.temp)>0){
           write.table(prs.temp,file = paste0(out.dir.prs,temp,"_",method,"_rind_",r_ind,"_wcind_",w_ind,"_ptar_",k1,"_peur_",k2),row.names = F,col.names = T,quote=F)  
           temp = temp + 1
