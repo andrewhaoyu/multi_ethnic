@@ -39,14 +39,16 @@ prs.all <- left_join(clump.snp,sum.data,by="SNP")
 #find all the duplicated SNPs and keep the more significant one
 dup.id <- prs.all$SNP[duplicated(prs.all$SNP)]
 if(length(dup.id)!=0){
-  remove.idx = rep(0,length(dup.id))
+  #keep more space in case of multiple duplication
+  remove.idx = rep(0,2*length(dup.id))
+  temp = 1
   for(k in 1:length(dup.id)){
     jdx <- which(prs.all$SNP==dup.id[k])
-    
-    remove.idx[k] = jdx[-which.min(prs.all$P[jdx])]
+    dup.length = length(jdx[-which.min(prs.all$P[jdx])])
+     remove.idx[temp:(temp-1+dup.length)] = jdx[-which.min(prs.all$P[jdx])]
+       temp = temp+dup.length
   }
-  
-  
+  remove.idx = remove.idx[1:(temp-dup.length)]
 }
 prs.all = prs.all[-remove.idx,]
 n_pthres <- length(pthres)
