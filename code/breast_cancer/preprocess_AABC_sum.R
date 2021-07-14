@@ -18,15 +18,16 @@ l = 1
 trait = c("overall","erpos","erneg")
 #match SNP in Ghana study
 #load ghana
-load(paste0("./GBHS_sum/",trait[l],"_sum.rdata"))
-sum.data.update = sum.data %>% 
+bim = fread("/data/zhangh24/multi_ethnic/data/GBHS_plink/all_chr.bim")
+colnames(bim) = c("CHR","GA_ID","na","POS","Allele1","Allele2")
+sum.data.update = bim %>% 
   unite("chr.pos",CHR,POS,sep=":",remove=F) 
 #idx <- which(sum.data$POS==114445880)
 sum.data.ga = sum.data.update %>% 
-  select(chr.pos,Eff_allele,Ref_allele) %>% 
+  select(chr.pos,GA_ID,Allele1,Allele2) %>% 
   rename(
-         Eff_allele_GA=Eff_allele,
-         Ref_allele_GA = Ref_allele) 
+         Eff_allele_GA=Allele1,
+         Ref_allele_GA = Allele2) 
 
 
 sum.data.match = inner_join(sum.data.ga,
@@ -36,8 +37,14 @@ sum.data.match = inner_join(sum.data.ga,
            (Effect_allele==Ref_allele_GA)&(Alt_allele==Eff_allele_GA)) 
 sum.data.match =sum.data.match %>% 
   mutate(MAF = ifelse(Freq1<=0.5,Freq1,1-Freq1)) %>% 
-  select(chr.pos,ID,CHR,POS,Effect_allele,Alt_allele,MAF,Effect,StdErr,P) %>% 
-  
+  select(chr.pos,GA_ID,CHR,POS,Effect_allele,Alt_allele,MAF,Effect,StdErr,P) %>% 
+  sum.data.match = sum.data.match %>%  rename(ID= GA_ID)
+
+
+
+
+
+
 sum.data = sum.data.match
 sum.data = sum.data %>% 
   mutate(POS = as.numeric(POS),

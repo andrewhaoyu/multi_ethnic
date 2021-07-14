@@ -18,12 +18,6 @@ library(tidyverse)
 library(RISCA)
 library(boot)
 
-#load GHBS_id
-bim <- fread("/data/zhangh24/multi_ethnic/data/GBHS_plink/all_chr.bim",header=F) 
-bim = bim %>% 
-  unite("chr.pos",V1,V4,sep=":",remove=F)
-bim = bim %>% 
-  rename(GBHS_id = V2)
 
 
 trait = c("overall","erpos","erneg","overall_ukb_meta")
@@ -34,7 +28,7 @@ prs.snp = prs.snp %>%
 
 prs.snp = prs.snp %>% 
   select(variant,chr.pos,Reference.allele,Effect.allele)
-
+#ID of this data is from Ghana ID
 load(paste0("./AABC_data/BC_EUR_",trait[l],"_aligned.rdata"))
 #match best eur SNP with AABC summary level statistics
 prs.snp.eur = left_join(prs.snp,sum.data,by="chr.pos") %>% 
@@ -47,14 +41,12 @@ prs.snp.eur = left_join(prs.snp,sum.data,by="chr.pos") %>%
 #idx <- which(prs.snp.eur.temp$ID%in%prs.snp.eur$ID==F)
 #idx <- which(sum.data$chr.pos =="4:84370124")
 #idx <- which(sum.data.temp$chr.pos =="4:84370124")
-#match best eur SNP with AABC summary level statistics and Ghana genotype data
-prs.snp.eur.update = left_join(prs.snp.eur,bim,by="chr.pos") %>% 
-  filter(((Effect_allele==V5)&(Alt_allele==V6))|
-           (Effect_allele==V6)&(Alt_allele==V5))
+
+
 #prepare eur coefficients
-prs.file = prs.snp.eur.update %>% 
-  select(GBHS_id,Effect_allele,Beta_eur_update) %>% 
-  rename(SNP=GBHS_id,
+prs.file = prs.snp.eur %>% 
+  select(ID,Effect_allele,Beta_eur_update) %>% 
+  rename(SNP=ID,
          A1 = Effect_allele,
          BETA = Beta_eur_update)
 prs.eur = prs.file
@@ -77,12 +69,9 @@ prs.snp.tar = left_join(prs.snp,sum.data,by="chr.pos") %>%
   select(c(colnames(sum.data),"chr.pos","variant"))
 
 
-prs.snp.tar.update = left_join(prs.snp.tar,bim,by="chr.pos") %>% 
-  filter(((Effect_allele==V5)&(Alt_allele==V6))|
-           (Effect_allele==V6)&(Alt_allele==V5))
-prs.file = prs.snp.tar.update %>% 
-  select(GBHS_id,Effect_allele,Effect) %>% 
-  rename(SNP=GBHS_id,
+prs.file = prs.snp.tar %>% 
+  select(ID,Effect_allele,Effect) %>% 
+  rename(SNP=ID,
          A1 = Effect_allele,
          BETA = Effect)
 prs.tar = prs.file
@@ -95,9 +84,9 @@ all.equal(prs.tar$A1,prs.eur$A1)
 source("/data/zhangh24/multi_ethnic/code/stratch/EB_function.R")
 
 beta_tar <- prs.tar$BETA
-sd_tar <- prs.snp.tar.update$StdErr
+sd_tar <- prs.snp.tar$StdErr
 beta_eur <- prs.eur$BETA
-sd_eur <- prs.snp.eur.update$Se_eur
+sd_eur <- prs.snp.eur$Se_eur
 EBprior = EstimatePrior(beta_tar,sd_tar,
                         beta_eur,sd_eur)
 

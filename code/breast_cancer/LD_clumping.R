@@ -21,6 +21,8 @@ if(i1 ==1){
   load(paste0("./AABC_data/BC_AFR_",trait[l],"remove_GHBS_mega.rdata"))
 }
 
+# bim <- fread(paste0(temp.dir,"all_chr.bim"))
+# idx <- which(bim$V1==5&bim$V4==1279790)
 #sum.data = fread("./AABC_data/final_metal_4aa_no_ghana1.txt")
 sum.data.assoc = sum.data %>% 
   select(CHR,ID,POS,Effect_allele,Effect,P) %>% 
