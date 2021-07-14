@@ -75,7 +75,7 @@ sum.data = mega.sum.update %>%
 idx <- which(sum.data$V1%in%prs.snp.sub$V1)
 
 
-sum.data$p_eur = 0
+sum.data$p_eur[idx] = 0
 save(sum.data,file = "./AABC_data/BC_EUR_overall_mega_aligned.rdata")
 
 

@@ -32,6 +32,7 @@ sum.data.assoc = sum.tar %>%
   select(CHR,SNP,BP,A1,BETA,P,ID) 
 
 summary.com <- left_join(sum.data.assoc,sum.eur.select,by="SNP")
+colSums(is.na(summary.com))
 #select the SNPs from EUR p-value
 idx <- which(summary.com$peur<summary.com$P)
 summary.com.EUR <- summary.com[idx,] %>% 
@@ -111,7 +112,7 @@ out.dir = paste0("/data/zhangh24/multi_ethnic/result/breast_cancer/result/clump_
     LD.EUR <- LD.EUR[,3,drop=F]
     LD.tar <- LD.tar[,3,drop=F]
     #match Ghana ID to Mega ID
-    LD.tar.update = left_join(LD.tar,summary.com) %>% 
+    LD.tar.update = left_join(LD.tar,summary.com,by=c("SNP"="ID")) %>% 
       select(SNP)
     LD <- rbind(LD.EUR,LD.tar.update)
     write.table(LD,file = paste0(out.dir,"TDLD_rind_",r_ind,"_wcind_",w_ind,".clumped"),row.names = F,quote=F)
