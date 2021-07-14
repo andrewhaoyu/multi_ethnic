@@ -1,3 +1,11 @@
+startend <- function(num,size,ind){
+  split.all <- split(1:num,cut(1:num,size))
+  temp <- split.all[[ind]]
+  start <- temp[1]
+  end <- temp[length(temp)]
+  return(c(start,end))
+}
+
 args = commandArgs(trailingOnly = T)
 l = as.numeric(args[[1]])
 i1 = as.numeric(args[[2]])
@@ -11,21 +19,55 @@ library(RISCA)
 library(boot)
 trait = c("overall","erpos","erneg")
 data.dir = "/data/zhangh24/multi_ethnic/data/"
-
+l = 1
 out.dir.prs = "/data/zhangh24/multi_ethnic/result/breast_cancer/prs/"
-if(i1 ==1){
-  load(paste0("./AABC_data/BC_AFR_",trait[l],"remove_GHBS.rdata"))
-  LD <- as.data.frame(fread(paste0(out.dir,"/LD_clump_",trait[l],".clumped")))
+n.rep = 2
+
+auc.vec.test.rep = matrix(0,length(pthres),n.rep)
+auc.vec.vad.rep = matrix(0,length(pthres),n.rep)
+
+for(k in 1:length(pthres)){
+  if(i1==1){
+    prs.score = fread(paste0(out.dir.prs,"prs_",trait[l],".p_value_",k,".profile"),header=T)
+  }else{
+    prs.score = fread(paste0(out.dir.prs,"prs_",trait[l],"_mega.p_value_",k,".profile"),header=T)
+  }
   
-}else{
-  load(paste0("./AABC_data/BC_AFR_",trait[l],"remove_GHBS_mega.rdata"))
-  LD <- as.data.frame(fread(paste0(out.dir,"/LD_clump_",trait[l],"_mega.clumped")))
   
-}
-
-
-
-
+  
+  prs.score = prs.score %>% 
+    separate(IID,into=c("ID","ohter_id","nci_id"),remove=F)
+  pheno <- fread(paste0(data.dir,"GBHS_pheno.csv"))
+  colnames(pheno)[5] = "ER_status"
+  
+  pheno = pheno %>% 
+    mutate(overall_status=ifelse(Status=="Control",0,1))
+  
+  pheno.update = left_join(pheno,prs.score,by=c("SB_ID"="ID"))
+  #cross-validation for the data
+  for(i_rep in 1:n.rep){
+    start.end <- startend(nrow(pheno.update),n.rep,i_rep)
+    vad.id = c(start.end[1]:start.end[2])
+    test.id = setdiff(c(1:nrow(pheno.update)),vad.id)
+    test.data <- pheno.update[test.id,]
+    vad.data <- pheno.update[vad.id,]
+    roc_obj <- roc.binary(status="overall_status", variable=paste0("SCORE",k,"_AVG"),
+                          confounders=~EV1+EV2+EV3+EV4+EV5+
+                            EV6+EV7+EV8+EV9+EV10,
+                          data=test.data, precision=seq(0.1,0.9, by=0.1))
+    auc.vec.test.rep[k,i_rep] = roc_obj$auc
+    roc_obj <- roc.binary(status="overall_status", variable=paste0("SCORE",k,"_AVG"),
+                          confounders=~EV1+EV2+EV3+EV4+EV5+
+                            EV6+EV7+EV8+EV9+EV10,
+                          data=vad.data, precision=seq(0.1,0.9, by=0.1))
+    
+    auc.vec.vad.rep[k,i_rep] = roc_obj$auc
+  }
+  
+  }
+  
+  
+  
 clump.snp <- LD[,3,drop=F] 
 sum.data = sum.data %>% 
   select(CHR,ID,POS,Effect_allele,Effect,P) %>% 
