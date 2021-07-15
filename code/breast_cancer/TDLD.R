@@ -113,7 +113,8 @@ out.dir = paste0("/data/zhangh24/multi_ethnic/result/breast_cancer/result/clump_
     LD.tar <- LD.tar[,3,drop=F]
     #match Ghana ID to Mega ID
     LD.tar.update = left_join(LD.tar,summary.com,by=c("SNP"="ID")) %>% 
-      select(SNP)
+      select(SNP.y) %>% 
+      rename(SNP=SNP.y)
     LD <- rbind(LD.EUR,LD.tar.update)
     write.table(LD,file = paste0(out.dir,"TDLD_rind_",r_ind,"_wcind_",w_ind,".clumped"),row.names = F,quote=F)
   #}

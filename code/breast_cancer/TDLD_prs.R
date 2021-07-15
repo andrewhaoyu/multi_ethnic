@@ -1,4 +1,4 @@
-args = commandArgs(trailingOnly = T)
+#args = commandArgs(trailingOnly = T)
 #i represent ethnic group
 #j represent chromosome
 #l represent the causal SNPs proportion
