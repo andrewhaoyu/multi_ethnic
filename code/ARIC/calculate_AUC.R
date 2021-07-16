@@ -187,7 +187,7 @@ for(i in 1:2){
     step = step+1
   }
   
-}
+
 
 r2.result = data.frame(eth = eth_vec,
                        trait = trait_vec,

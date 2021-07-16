@@ -17,7 +17,7 @@ library(data.table)
 library(tidyverse)
 library(RISCA)
 library(boot)
-
+library(ROCnReg)
 
 
 trait = c("overall","erpos","erneg","overall_ukb_meta")
@@ -121,20 +121,21 @@ for(k in 1:3){
   colnames(pheno)[5] = "ER_status"
   
     pheno = pheno %>% 
-      mutate(overall_status=ifelse(Status=="Control",0,1))
+      mutate(overall_status=ifelse(Status=="Control",0,1)) %>%
+      filter(Age>=18&Age<99)
     
     pheno.update = left_join(pheno,prs.score,by=c("SB_ID"="ID"))
     roc_obj <- roc.binary(status="overall_status", variable=paste0("SCORE",k,"_AVG"),
                           confounders=~EV1+EV2+EV3+EV4+EV5+
-                            EV6+EV7+EV8+EV9+EV10,
+                            EV6+EV7+EV8+EV9+EV10+Age,
                           data=pheno.update, precision=seq(0.1,0.9, by=0.1))
-    boot_result <- boot(data = pheno.update,statistic = AUCEstimate,
-                        R = 3000,scorename = paste0("SCORE",k,"_AVG"),
-                        tar_trait = "overall_status")
-    boot.ci(boot_result, type="bca")
+    # boot_result <- boot(data = pheno.update,statistic = AUCEstimate,
+    #                     R = 3000,scorename = paste0("SCORE",k,"_AVG"),
+    #                     tar_trait = "overall_status")
+    #boot.ci(boot_result, type="bca")
     #roc_obj = roc(pheno.update$ERneg,pheno.update$SCORE)
     auc.est[k] = roc_obj$auc
-    auc.se[k] = sqrt(var(boot_result[[2]]))
+    #auc.se[k] = sqrt(var(boot_result[[2]]))
     
   }
 }else if(l==2){

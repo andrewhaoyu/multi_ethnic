@@ -1,0 +1,22 @@
+library(ROCnReg)
+data(psa)
+# Select the last measurement
+newpsa <- psa[!duplicated(psa$id, fromLast = TRUE),]
+newpsa$l_marker1 <- log(newpsa$marker1)
+AROC_bnp <- AROC.bnp(formula.h = l_marker1 ~ f(age, K = 0),
+                     group = "status",
+                     tag.h = 0,
+                     data = newpsa,
+                     standardise = TRUE,
+                     p = seq(0,1,l=101),
+                     compute.lpml = TRUE,
+                     compute.WAIC = TRUE,
+                     compute.DIC = TRUE,
+                     pauc = pauccontrol(compute = TRUE, focus = "FPF", value = 0.5),
+                     density = densitycontrol.aroc(compute = TRUE, grid.h = NA, newdata = NA),
+                     prior.h = priorcontrol.bnp(m0 = rep(0, 4), S0 = 10*diag(4), nu = 6, Psi = diag(4),
+                                                a = 2, b = 0.5, alpha = 1, L =10),
+                     mcmc = mcmccontrol(nsave = 500, nburn = 100, nskip = 1))
+tmp = summary(AROC_bnp)
+as.numeric(strsplit(gsub("Area under the covariate-adjusted ROC curve:","",tmp$AUC)," ")[[1]][[2]])
+  
