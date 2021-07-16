@@ -25,6 +25,7 @@ trait = c("overall","erpos","erneg")
 setwd("/data/zhangh24/multi_ethnic/data/")
 #load best TDLD result
 method = "TDLD"
+out.dir = paste0("/data/zhangh24/multi_ethnic/result/breast_cancer/result/clump_result/")
 load(paste0("/data/zhangh24/multi_ethnic/result/breast_cancer/result/auc_tdld.rdata"))
 result = auc.tdld[[2]]
 idx <- which.max(result[,1])
