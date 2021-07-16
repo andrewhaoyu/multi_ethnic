@@ -81,14 +81,6 @@ sum.com = sum.com %>%
          z_stat_tar = BETA.TAR/SE.TAR)
 #align with best tdld prs
 source("/data/zhangh24/multi_ethnic/code/stratch/EB_function.R")
-#align alleles
-sum.com = sum.com %>% 
-  mutate(beta_eur=ifelse(A1_tar==A1_eur,
-                         beta_eur,
-                         -beta_eur),
-         A1_eur =ifelse(A1_eur==A1_tar,A1_eur,A1_tar)) %>% 
-  mutate(z_stat_eur = beta_eur/se_eur,
-         z_stat_tar = beta_tar/se_tar)
 best.prs.com = left_join(best.snp,sum.com)
 beta_tar <- best.prs.com$BETA.TAR
 sd_tar <- best.prs.com$SE.TAR
