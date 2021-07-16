@@ -20,3 +20,11 @@ AROC_bnp <- AROC.bnp(formula.h = l_marker1 ~ f(age, K = 0),
 tmp = summary(AROC_bnp)
 as.numeric(strsplit(gsub("Area under the covariate-adjusted ROC curve:","",tmp$AUC)," ")[[1]][[2]])
   
+
+
+
+auc.result.vec = rep(0,100)
+for(si in 1:100){
+  load(paste0("/data/zhangh24/multi_ethnic/result/breast_cancer/result/auc_tdld",si,".rdata"))  
+  auc.result.vec[si] = auc.tdld[[1]]
+}

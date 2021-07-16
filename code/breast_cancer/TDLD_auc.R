@@ -5,8 +5,6 @@ startend <- function(num,size,ind){
   end <- temp[length(temp)]
   return(c(start,end))
 }
-args = as.numeric(commandArgs(trailingOnly = T))
-si = as.numeric(args[[1]])
 library(tidyverse)
 library(data.table)
 pthres <- c(5E-08,5E-07,5E-06,5E-05,5E-04,5E-03,5E-02,5E-01,1.0)
@@ -37,7 +35,7 @@ total = length(r2_vec)*length(wc_base_vec)*length(pthres)^2
   
   pheno <- fread(paste0(data.dir,"GBHS_pheno.csv"))
   colnames(pheno)[5] = "ER_status"
-  set.seed(si)
+  set.seed(83)
   #random order pheno.update so that cases and controls are split
   pheno = pheno[sample(c(1:nrow(pheno))),]
   pheno = pheno %>% 
@@ -156,4 +154,4 @@ total = length(r2_vec)*length(wc_base_vec)*length(pthres)^2
 auc.tdld = list(TDLD.result,result.data)
   
 
-save(auc.tdld,file = paste0("/data/zhangh24/multi_ethnic/result/breast_cancer/result/auc_tdld",si,".rdata"))
+save(auc.tdld,file = paste0("/data/zhangh24/multi_ethnic/result/breast_cancer/result/auc_tdld.rdata"))
