@@ -112,49 +112,48 @@ total = length(r2_vec)*length(wc_base_vec)*length(pthres)^2
                             r2.vec,
                             wc.vec)
   
-  SL.libray <- c(
-    "SL.glmnet",
-    #"SL.ridge",
-    "SL.nnet"
-  )
-  prs.mat = as.data.frame(prs.mat)
-  prs.mat = prs.mat %>%
-    select(which(!colSums(prs.mat)%in% 0))
-  mtx = cor(prs.mat)
-  drop = findCorrelation(mtx,cutoff=0.98)
-  drop = names(prs.mat)[drop]
-  prs.mat.new = prs.mat %>%
-    select(-all_of(drop))
-  #prs.mat <- data.frame(ID = pheno.update$SB_ID,prs.mat.new)
-  auc.sl.rep = rep(0,n.rep)
-  for(i_rep in 1:n.rep){
-    start.end <- startend(nrow(pheno.update),n.rep,i_rep)
-    vad.id = c(start.end[1]:start.end[2])
-    test.id = setdiff(c(1:nrow(pheno.update)),vad.id)
-    test.data <- pheno.update[test.id,]
-    vad.data <- pheno.update[vad.id,]
-    y.test = test.data$overall_status
-    y.vad = vad.data$overall_status
-    x.test = prs.mat.new[test.id,]
-    x.vad = prs.mat.new[vad.id,]
-    sl = SuperLearner(Y = y.test, X = x.test, family = binomial(),
-                      # For a real analysis we would use V = 10.
-                      # V = 3,
-                      SL.library = SL.libray)
-
-    y.pred <- predict(sl,x.vad,onlySL = TRUE)
-
-    vad.data = data.frame(vad.data,sl.prt = y.pred[[1]])
-
-    roc_obj <- roc.binary(status="overall_status", variable=paste0("sl.prt"),
-                          confounders=~EV1+EV2+EV3+EV4+EV5+
-                            EV6+EV7+EV8+EV9+EV10+Age,
-                          data=vad.data, precision=seq(0.1,0.9, by=0.1))
-    auc.sl.rep[i_rep] = roc_obj$auc
-  }
-  
-auc.tdld = list(TDLD.result,result.data,
-                tdld.sl = mean(auc.sl.rep))
+  # SL.libray <- c(
+  #   "SL.glmnet",
+  #   #"SL.ridge",
+  #   "SL.nnet"
+  # )
+  # prs.mat = as.data.frame(prs.mat)
+  # prs.mat = prs.mat %>%
+  #   select(which(!colSums(prs.mat)%in% 0))
+  # mtx = cor(prs.mat)
+  # drop = findCorrelation(mtx,cutoff=0.98)
+  # drop = names(prs.mat)[drop]
+  # prs.mat.new = prs.mat %>%
+  #   select(-all_of(drop))
+  # #prs.mat <- data.frame(ID = pheno.update$SB_ID,prs.mat.new)
+  # auc.sl.rep = rep(0,n.rep)
+  # for(i_rep in 1:n.rep){
+  #   start.end <- startend(nrow(pheno.update),n.rep,i_rep)
+  #   vad.id = c(start.end[1]:start.end[2])
+  #   test.id = setdiff(c(1:nrow(pheno.update)),vad.id)
+  #   test.data <- pheno.update[test.id,]
+  #   vad.data <- pheno.update[vad.id,]
+  #   y.test = test.data$overall_status
+  #   y.vad = vad.data$overall_status
+  #   x.test = prs.mat.new[test.id,]
+  #   x.vad = prs.mat.new[vad.id,]
+  #   sl = SuperLearner(Y = y.test, X = x.test, family = binomial(),
+  #                     # For a real analysis we would use V = 10.
+  #                     # V = 3,
+  #                     SL.library = SL.libray)
+  # 
+  #   y.pred <- predict(sl,x.vad,onlySL = TRUE)
+  # 
+  #   vad.data = data.frame(vad.data,sl.prt = y.pred[[1]])
+  # 
+  #   roc_obj <- roc.binary(status="overall_status", variable=paste0("sl.prt"),
+  #                         confounders=~EV1+EV2+EV3+EV4+EV5+
+  #                           EV6+EV7+EV8+EV9+EV10+Age,
+  #                         data=vad.data, precision=seq(0.1,0.9, by=0.1))
+  #   auc.sl.rep[i_rep] = roc_obj$auc
+  # }
+  # 
+auc.tdld = list(TDLD.result,result.data)
   
 
 save(auc.tdld,file = paste0("/data/zhangh24/multi_ethnic/result/breast_cancer/result/auc_tdld",si,".rdata"))
