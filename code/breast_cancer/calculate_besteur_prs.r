@@ -120,10 +120,11 @@ for(k in 1:3){
   pheno <- fread(paste0(data.dir,"GBHS_pheno.csv"))
   colnames(pheno)[5] = "ER_status"
   
-    pheno = pheno %>% 
-      mutate(overall_status=ifelse(Status=="Control",0,1)) %>%
-      filter(Age>=18&Age<99)
-    
+  pheno = pheno %>% 
+    mutate(overall_status=ifelse(Status=="Control",0,1)) %>% 
+    filter(Age>=18&Age<99) %>% 
+    mutate(Age = as.numeric(Age))
+  
     pheno.update = left_join(pheno,prs.score,by=c("SB_ID"="ID"))
     roc_obj <- roc.binary(status="overall_status", variable=paste0("SCORE",k,"_AVG"),
                           confounders=~EV1+EV2+EV3+EV4+EV5+

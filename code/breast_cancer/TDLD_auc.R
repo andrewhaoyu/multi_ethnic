@@ -40,7 +40,9 @@ total = length(r2_vec)*length(wc_base_vec)*length(pthres)^2
   pheno = pheno[sample(c(1:nrow(pheno))),]
   pheno = pheno %>% 
     mutate(overall_status=ifelse(Status=="Control",0,1)) %>% 
-    filter(Age>=18&Age<99)
+    filter(Age>=18&Age<99) %>% 
+    mutate(Age = as.numeric(Age))
+  
   prs.mat = matrix(0,nrow(pheno),total)
   p.eur.vec = rep(0,total)
   p.tar.vec = rep(0,total)

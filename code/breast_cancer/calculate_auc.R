@@ -29,9 +29,11 @@ for(i1 in 1:2){
     pheno <- fread(paste0(data.dir,"GBHS_pheno.csv"))
     colnames(pheno)[5] = "ER_status"
     
+    
     pheno = pheno %>% 
       mutate(overall_status=ifelse(Status=="Control",0,1)) %>% 
-      filter(Age>=18&Age<99)
+      filter(Age>=18&Age<99) %>% 
+      mutate(Age = as.numeric(Age))
     set.seed(93)
     pheno = pheno[sample(c(1:nrow(pheno))),]
     
