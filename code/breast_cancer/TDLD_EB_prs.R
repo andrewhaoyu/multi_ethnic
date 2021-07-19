@@ -5,7 +5,9 @@
 #m represent the training sample size
 #i_rep represent simulation replication
 #i1 represent the genetic architecture
-
+args = commandArgs(trailingOnly = T)
+r_ind = as.numeric(args[[1]])
+w_ind = as.numeric(args[[2]])
 i = 2
 l = 1
 sid<-Sys.getenv('SLURM_JOB_ID')
@@ -23,19 +25,7 @@ library(dplyr)
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 trait = c("overall","erpos","erneg")
 setwd("/data/zhangh24/multi_ethnic/data/")
-#load best TDLD result
-method = "TDLD"
-out.dir = paste0("/data/zhangh24/multi_ethnic/result/breast_cancer/result/clump_result/")
-load(paste0("/data/zhangh24/multi_ethnic/result/breast_cancer/result/auc_tdld.rdata"))
-result = auc.tdld[[2]]
-idx <- which.max(result[,1])
-r_ind = result$r2.vec[idx]
-w_ind = result$wc.vec[idx]
-k1 = result$p.eur.vec[idx]
-k2 = result$p.tar.vec[idx]
-method= "TDLD"
-out.dir.prs = "/data/zhangh24/multi_ethnic/result/breast_cancer/prs/"
-best.snp <- as.data.frame(fread(paste0(out.dir,"TDLD_rind_",r_ind,"_wcind_",w_ind,".clumped")))
+
 
 r2_vec = c(0.01,0.05,0.1,0.2,0.5,0.8)
 wc_base_vec = c(50,100)
@@ -79,9 +69,30 @@ sum.com = sum.com %>%
                         Effect_allele_EUR,Effect_allele_TAR)) %>% 
   mutate(z_stat_eur = BETA.EUR/SE.EUR,
          z_stat_tar = BETA.TAR/SE.TAR)
+
+#load best TDLD result
+method = "TDLD"
+out.dir = paste0("/data/zhangh24/multi_ethnic/result/breast_cancer/result/clump_result/")
+load(paste0("/data/zhangh24/multi_ethnic/result/breast_cancer/result/auc_tdld.rdata"))
+result = auc.tdld[[2]]
+idx <- which.max(result[,1])
+r_ind = result$r2.vec[idx]
+w_ind = result$wc.vec[idx]
+k1 = result$p.eur.vec[idx]
+k2 = result$p.tar.vec[idx]
+method= "TDLD"
+out.dir.prs = "/data/zhangh24/multi_ethnic/result/breast_cancer/prs/"
+LD <- as.data.frame(fread(paste0(out.dir,"TDLD_rind_",r_ind,"_wcind_",w_ind,".clumped")))
+
+best.prs.com = left_join(LD,sum.com,by="SNP") %>% 
+  filter(peur<pthres[k1]|
+           ptar<pthres[k2]) 
+
+
+
 #align with best tdld prs
 source("/data/zhangh24/multi_ethnic/code/stratch/EB_function.R")
-best.prs.com = left_join(best.snp,sum.com)
+#best.prs.com = left_join(best.snp,sum.com)
 beta_tar <- best.prs.com$BETA.TAR
 sd_tar <- best.prs.com$SE.TAR
 beta_eur <- best.prs.com$BETA.EUR
@@ -109,9 +120,9 @@ q_range = data.frame(
   pthres,stringsAsFactors = F)
 write.table(q_range,file = paste0(temp.dir,"2Dq_range_file"),row.names = F,col.names = F,quote=F)
 out.dir.prs = "/data/zhangh24/multi_ethnic/result/breast_cancer/prs/"
-for(r_ind in 1:length(r2_vec)){
+#for(r_ind in 1:length(r2_vec)){
   wc_vec = wc_base_vec/r2_vec[r_ind]
-  for(w_ind in 1:length(wc_vec)){
+ # for(w_ind in 1:length(wc_vec)){
     LD <- as.data.frame(fread(paste0(out.dir,"TDLD_rind_",r_ind,"_wcind_",w_ind,".clumped")))
     clump.snp <- LD
     prs.all <- left_join(clump.snp,summary.com)
@@ -169,5 +180,5 @@ for(r_ind in 1:length(r2_vec)){
         
       }
     }
-  }
-}
+ # }
+#}
