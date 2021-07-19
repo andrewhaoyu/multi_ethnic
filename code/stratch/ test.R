@@ -24,7 +24,11 @@ as.numeric(strsplit(gsub("Area under the covariate-adjusted ROC curve:","",tmp$A
 
 
 auc.result.vec = rep(0,100)
+auc.result.sl.vec = rep(0,100)
 for(si in 1:100){
-  load(paste0("/data/zhangh24/multi_ethnic/result/breast_cancer/result/auc_tdld",si,".rdata"))  
-  auc.result.vec[si] = auc.tdld[[1]]
+  load(paste0("/data/zhangh24/multi_ethnic/result/breast_cancer/result/auc_tdld_eb",si,".rdata"))  
+  auc.result.vec[si] = auc.tdld.eb[[1]]
+  auc.result.sl.vec[si] = auc.tdld.eb[[3]]
 }
+which.max(auc.result.vec)
+which.max(auc.result.sl.vec)
