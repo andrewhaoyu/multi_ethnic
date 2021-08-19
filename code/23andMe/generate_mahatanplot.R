@@ -6,6 +6,9 @@ i1 = as.numeric(com.args[[1]])
 i2 = as.numeric(com.args[[2]])
 i3 = as.numeric(com.args[[3]])
 eth <- c("EUR","AFR","AMR","EAS","SAS")
+eth_name = c("European","African American",
+             "Latino","East Asian",
+             "South Asian")
 trait <- c("any_cvd","depression",
            "heart_metabolic_disease_burden",
            "height",
