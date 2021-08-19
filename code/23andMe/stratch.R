@@ -160,9 +160,9 @@ library("plotrix")
 library("data.table")
 library("RColorBrewer")
 library("optparse")
-
-
-
+library(qqman)
+head(gwasResults)
+gwasResults$MAF = runif(nrow(gwasResults),0.01,0.5)
 # option_list <- list(
 #   make_option("--input", type="character", default="",
 #               help="Input file, tab delimited; required columns: 'MAF' and 'PVALUE'"),
@@ -223,6 +223,7 @@ qqplotdata <- function(logpvector){
   }
   return(qqdata)
 }
+dat = gwasResults
 yLine <- c(-log10(5E-8))
 colLine <- c("red")
 dat$log10P = -log10(dat$P)
@@ -325,7 +326,8 @@ text(5.7,1,paste(lambda_1000),cex = 1.5)
 
 title(paste0(trait_name[i2]," for ",eth[i1]))
 dev.off()
-
+legend(1,95,legend = paste0("MAF ",fbin),
+       col = legendcol,lty = 1:2,0.8)
 # plot(1,1)
 # text(1,0.8,expression(paste(lambda[1000]," = ",buquote(.(lambda_1000)))),cex = 1.5)
 

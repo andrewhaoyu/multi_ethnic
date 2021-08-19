@@ -49,6 +49,7 @@ cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
 #i for genetic correlation vec
 #j for negative selection alphs
 temp = 1
+i1 = 1
 # for(i in 1:2){
 #   #for(j in 1:3){
 #     for(l in 1:3){
@@ -110,7 +111,7 @@ temp = 1
                         gr23,gr24,gr25,
                         gr34,gr35,
                         gr45)
-      save(Sigma,file = paste0(cur.dir,"/causal_Sigma_",i1,".rdata"))
+     # save(Sigma,file = paste0(cur.dir,"/causal_Sigma_",i1,".rdata"))
       library(mvtnorm)
       #beta represent standarize scale effect-size
       set.seed(666)
@@ -146,7 +147,14 @@ temp = 1
 # #}
 # }
 i1 = 1
-select.cau <- read.table(paste0(cur.dir,eth[i],"/select.cau_rho",l,"_",i1),header=F)
+#generate number of causal SNPs for l = 2
+l = 2
+n.cau = rep(0,5)
+for(i in 1:5){
+  select.cau <- read.table(paste0(cur.dir,eth[i],"/select.cau_rho",l,"_",i1),header=F)
+  n.cau[i] = nrow(select.cau)
+}
+n.cau[c(2,3,4,1,5)]
 select.cau1 = select.cau
 herit <- nrow(select.cau)*var(select.cau$V2)
 print(herit)
@@ -229,13 +237,17 @@ for(l in 1:3){
   library(dplyr)
   MAF <- cau.snp.infor %>% select(EUR,AFR,AMR,EAS,SAS)
   MAF <- as.data.frame(MAF)
+  total.herit = rep(0,5)
   for(i in 1:5){
     idx <- which(eth.bi[,i]==1)
     #beta.ori <- beta[idx,i]/sqrt(2*MAF[idx,i]*(1-MAF[idx,i]))
     select.cau <- cbind(cau.snp.infor[idx,1],
                         beta[idx,i])
+  #  total.herit[i] = sum(select.cau$V2^2)
     write.table(select.cau,file = paste0(cur.dir,eth[i],"/select.cau_rho",l,"_",i1),row.names = F,col.names = F,quote=F)
   }
+  
+  total.herit[c(2,3,4,1,5)]
   
 }
 

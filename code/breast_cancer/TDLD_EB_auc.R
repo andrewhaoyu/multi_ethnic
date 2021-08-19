@@ -1,5 +1,3 @@
-args = commandArgs(trailingOnly = T)
-si = as.numeric(args[[1]])
 startend <- function(num,size,ind){
   split.all <- split(1:num,cut(1:num,size))
   temp <- split.all[[ind]]
@@ -37,7 +35,7 @@ auc.vec.vad.rep = matrix(0,total,n.rep)
 
 pheno <- fread(paste0(data.dir,"GBHS_pheno.csv"))
 colnames(pheno)[5] = "ER_status"
-set.seed(si)
+set.seed(83)
 #random order pheno.update so that cases and controls are split
 pheno = pheno[sample(c(1:nrow(pheno))),]
 pheno = pheno %>% 
@@ -159,4 +157,4 @@ auc.tdld.eb = list(TDLD.EB.result,result.data,
                 mean(auc.sl.rep),auc.sl.rep)
 
 
-save(auc.tdld.eb,file = paste0("/data/zhangh24/multi_ethnic/result/breast_cancer/result/auc_tdld_eb",si,".rdata"))
+save(auc.tdld.eb,file = paste0("/data/zhangh24/multi_ethnic/result/breast_cancer/result/auc_tdld_eb.rdata"))

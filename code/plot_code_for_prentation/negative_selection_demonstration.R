@@ -37,7 +37,8 @@ p = ggplot(plot.data,aes(MAF,beta,col=Negative_selection))+
   theme(axis.text = element_text(size = rel(1.2)),
         axis.title = element_text(face = "bold",size = rel(1.2)),
         legend.text = element_text(size = rel(1.2)),
-        legend.title = element_text(face = "bold",size = rel(1.2)))
+        legend.title = element_text(face = "bold",size = rel(1.2)))+
+  labs(col='Negative selection') 
 png(file = paste0("./result/presentation_plot/Negative_selection.png"),width = 8, height = 6, units = "in",res = 300)
 print(p)
 dev.off()

@@ -32,3 +32,5 @@ for(si in 1:100){
 }
 which.max(auc.result.vec)
 which.max(auc.result.sl.vec)
+
+idx <- which.max(result.data$auc.test.vec)
