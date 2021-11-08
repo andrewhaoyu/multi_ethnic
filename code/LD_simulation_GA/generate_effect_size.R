@@ -139,6 +139,7 @@ i1 = 1
         #beta.ori <- beta[idx,i]/sqrt(2*MAF[idx,i]*(1-MAF[idx,i]))
         select.cau <- cbind(cau.snp.infor[idx,1],
                             beta[idx,i])
+        #print(sum(select.cau$V2^2))
         write.table(select.cau,file = paste0(cur.dir,eth[i],"/select.cau_rho",l,"_",i1),row.names = F,col.names = F,quote=F)
       }
       
@@ -243,8 +244,8 @@ for(l in 1:3){
     #beta.ori <- beta[idx,i]/sqrt(2*MAF[idx,i]*(1-MAF[idx,i]))
     select.cau <- cbind(cau.snp.infor[idx,1],
                         beta[idx,i])
-  #  total.herit[i] = sum(select.cau$V2^2)
-    write.table(select.cau,file = paste0(cur.dir,eth[i],"/select.cau_rho",l,"_",i1),row.names = F,col.names = F,quote=F)
+    total.herit[i] = sum(select.cau$V2^2)
+#    write.table(select.cau,file = paste0(cur.dir,eth[i],"/select.cau_rho",l,"_",i1),row.names = F,col.names = F,quote=F)
   }
   
   total.herit[c(2,3,4,1,5)]
@@ -325,12 +326,13 @@ for(l in 1:3){
     #beta.ori <- beta[idx,i]/sqrt(2*MAF[idx,i]*(1-MAF[idx,i]))
     select.cau <- cbind(cau.snp.infor[idx,1],
                         beta[idx,i])
-    write.table(select.cau,file = paste0(cur.dir,eth[i],"/select.cau_rho",l,"_",i1),row.names = F,col.names = F,quote=F)
+    total.herit[i] = sum(select.cau$V2^2)
+    #write.table(select.cau,file = paste0(cur.dir,eth[i],"/select.cau_rho",l,"_",i1),row.names = F,col.names = F,quote=F)
   }
   
 }
 
-
+total.herit[c(2,3,4,1,5)]
 
 
 
@@ -416,9 +418,10 @@ for(l in 1:3){
     
     select.cau <- cbind(cau.snp.infor[idx,1],
                         u[idx])
-    write.table(select.cau,file = paste0(cur.dir,eth[i],"/select.cau_rho",l,"_",i1),row.names = F,col.names = F,quote=F)
+    total.herit[i] = sum(select.cau$V2^2)
+    #write.table(select.cau,file = paste0(cur.dir,eth[i],"/select.cau_rho",l,"_",i1),row.names = F,col.names = F,quote=F)
   }
-  
+  total.herit[c(2,3,4,1,5)]
 }
 
 

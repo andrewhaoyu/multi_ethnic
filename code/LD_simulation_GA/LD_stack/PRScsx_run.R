@@ -68,7 +68,7 @@ for(j in 1:22){
                 " --ref_dir=",path_to_ref,
                 " --bim_prefix=",path_to_bim,
                 " --sst_file=",path_to_sum,"EUR_sumstats.txt,",path_to_sum,eth[i],"_sumstats.txt",
-                " --n_gwas=100000,",size_list[m],
+                " --n_gwas=100000,",as.character(size_list[m]),
                 " --pop=EUR,",eth[i],
                 " --chrom=",j,
                 " --phi=1e-2", 
