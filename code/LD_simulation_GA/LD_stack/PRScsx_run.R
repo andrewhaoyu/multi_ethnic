@@ -63,12 +63,12 @@ for(j in 1:22){
   path_to_ref = paste0(temp.dir,"1KGLD")
   path_to_bim = paste0(temp.dir,"all_chr_test.mega")
   path_to_sum = paste0(temp.dir)
-  size_list = c(15000,45000,80000,100000)
+  size_list = c("15000","45000","80000","100000")
   system(paste0("python /data/zhangh24/software/PRScsx/PRScsx.py", 
                 " --ref_dir=",path_to_ref,
                 " --bim_prefix=",path_to_bim,
                 " --sst_file=",path_to_sum,"EUR_sumstats.txt,",path_to_sum,eth[i],"_sumstats.txt",
-                " --n_gwas=100000,",as.character(size_list[m]),
+                " --n_gwas=100000,",size_list[m],
                 " --pop=EUR,",eth[i],
                 " --chrom=",j,
                 " --phi=1e-2", 
