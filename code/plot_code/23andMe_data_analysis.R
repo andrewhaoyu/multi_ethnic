@@ -300,6 +300,84 @@ eth = eth[1:(temp-1)]
 
 result = data.frame(relative_R2,trait,eth)
 
-result %>% group_by(eth) %>% 
+bintrait = c("Any CVD","Depression",
+               "SBMN",
+               "Migraine Diagnosis",
+               "Morning Person")
+contrait = c( "Heart metabolic disease burden",
+             "Height")
+
+
+result %>% filter(trait %in%contrait) %>% 
+  group_by(eth) %>% 
   summarise(mean(relative_R2))
+result %>% filter(trait %in%bintrait) %>% 
+  group_by(eth) %>% 
+  summarise(mean(relative_R2))
+
 prediction.result.sub %>% filter(trait =="Any CVD")
+
+
+
+
+
+
+
+
+#realtive improvement 
+
+prediction.result.sub = prediction.result %>% 
+  mutate(R2 = ifelse(trait %in% c("Heart metabolic disease burden","Height"),
+                     result,
+                     ifelse(result<0.5,0,qnorm(result)^2*2))) %>% 
+  filter(method_vec%in%c("TDLD-SLEB","TDLD-SLEB (all ethnics)"))
+trait = rep("c",1000)
+eth = rep("c",1000)
+relative_R2 = rep(0,1000)
+temp = 1
+for(k in 1:(nrow(prediction.result.sub)/2)){
+  relative_R2[temp] = as.numeric((prediction.result.sub[2*temp,"R2"]-prediction.result.sub[2*temp-1,"R2"])/prediction.result.sub[2*temp-1,"R2"])
+  trait[temp] = as.character(prediction.result.sub[2*temp,"trait"])
+  eth[temp] = as.character(prediction.result.sub$eth[2*temp])
+  temp = temp + 1
+}
+
+relative_R2 = relative_R2[1:(temp-1)]
+trait = trait[1:(temp-1)]
+eth = eth[1:(temp-1)]
+
+result = data.frame(relative_R2,trait,eth)
+
+bintrait = c("Any CVD","Depression",
+             "SBMN",
+             "Migraine Diagnosis",
+             "Morning Person")
+contrait = c( "Heart metabolic disease burden",
+              "Height")
+
+
+result.sub = result %>% filter(trait %in%contrait)
+mean(result.sub$relative_R2)
+
+
+
+
+result.sub = result %>% filter(trait %in%bintrait) 
+
+
+mean(result.sub$relative_R2)
+
+
+
+
+
+%>% 
+  group_by(eth) %>% 
+  summarise(mean(relative_R2))
+
+prediction.result.sub %>% filter(trait =="Any CVD")
+
+
+
+
+

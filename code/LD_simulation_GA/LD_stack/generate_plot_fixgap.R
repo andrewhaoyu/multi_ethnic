@@ -6,10 +6,78 @@ library(dplyr)
 library(RColorBrewer)
 library(grid)
 library(gridExtra)
-
+library(tidyverse)
+library(data.table)
 load(paste0("LD.clump.result.CT.rdata"))
 LD.clump.result <- LD.result.list[[1]] %>% 
-  mutate(method_vec = rep("C+T"))
+  mutate(method_vec = rep("C+T")) %>% 
+  filter(eth.vec == "EUR"&
+           m_vec== 4)
+load(paste0("LD.clump.result.EB.rdata"))
+EB.result = EB.result %>% 
+  filter(method_vec=="TDLD-SLEB")
+prediction.result <- rbind(LD.clump.result,
+                           EB.result)
+
+
+prediction.result = prediction.result %>% 
+  mutate(cau_vec = case_when(
+    l_vec== 1 ~ paste0("Causal SNPs Proportion = 0.01"),
+    l_vec== 2 ~ paste0("Causal SNPs Proportion = 0.001"),
+    l_vec== 3 ~ paste0("Causal SNPs Proportion = 5E-04")
+  ),
+  sample_size = case_when(
+    m_vec == 1~ "15000",
+    m_vec == 2~ "45000",
+    m_vec == 3~ "80000",
+    m_vec == 4~ "100000"
+  )) %>% 
+  mutate(cau_vec = factor(cau_vec,
+                          levels = c("Causal SNPs Proportion = 0.01",
+                                     "Causal SNPs Proportion = 0.001",
+                                     "Causal SNPs Proportion = 5E-04")),
+         sample_size = factor(sample_size,
+                              levels = c("15000","45000","80000","100000")))
+for(i1 in 1:5){
+  result.sub.list = list()
+  for(l in 1:3){
+    result.sub = prediction.result %>% 
+      filter(l_vec==l&
+               ga_vec ==i1&
+               eth.vec!="EUR")
+    result.sub.EUR = prediction.result %>% 
+      filter(l_vec==l&
+               ga_vec ==i1&
+               eth.vec=="EUR")
+    result.sub$relative.r2 = result.sub$r2.vec/result.sub.EUR$r2.vec
+    result.sub.list[[l]] = result.sub
+  }
+   result.sub = rbindlist(result.sub.list)
+  p <- ggplot(result.sub,aes(x= sample_size,y=relative.r2,group=eth.vec))+
+    geom_line(aes(color=eth.vec),size = 1)+
+    geom_point(aes(color=eth.vec))+
+    theme_Publication()+
+    ylab("Relative R2")+
+    xlab("Training sample size")+
+    labs(color = "Ethnic group")+
+    facet_grid(cols=vars(cau_vec))+
+    #scale_color_brewer(palette = "Paired")+
+    scale_colour_Publication()+
+    ggtitle(paste0("Relative performance of TDLD-SLEB over single ethnic European C + T"))+
+    geom_hline(yintercept=1, linetype="dashed", 
+               color = "red")+
+    theme(legend.text=element_text(size=12))
+  
+ 
+  png(file = paste0("./fix_gap_summary_GA_",i1,".png"),
+      width = 9, height = 6, res = 300,units = "in")
+  print(p)
+  dev.off()
+  }
+
+
+
+
 
 
 
@@ -48,9 +116,8 @@ p <- ggplot(LD.clump.result.plot,aes(x= sample_size,y=r2.vec,group=eth.vec))+
   xlab("Training sample size")+
   labs(color = "Ethnic group")+
   facet_grid(cols=vars(cau_vec))+
-  scale_colour_Publication()+
   #scale_color_brewer(palette = "Paired")+
-  #scale_color_npg()+
+  scale_color_npg()+
   ggtitle("Prediction performance across ethnic groups using P+T")
 
 
@@ -63,7 +130,7 @@ p <- ggplot(LD.clump.result.plot,aes(x= sample_size,y=r2.vec,group=eth.vec))+
   labs(color = "Ethnic group")+
   facet_grid(cols=vars(cau_vec))+
   #scale_color_brewer(palette = "Paired")+
-  #scale_color_npg()+
+  scale_color_npg()+
   ggtitle("Prediction performance across ethnic groups using P+T")
 
 setwd("/Users/zhangh24/GoogleDrive/multi_ethnic/result/LD_simulation_GA")
