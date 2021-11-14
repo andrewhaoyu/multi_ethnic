@@ -1,13 +1,7 @@
-out.dir.sum <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
-i = as.numeric(args[[1]])
-l = as.numeric(args[[2]])
-m = as.numeric(args[[3]])
-i_rep = as.numeric(args[[4]])
-i1 = as.numeric(args[[5]])
-j = as.numeric(args[[6]])
-
 eth = c("EUR","AFR","AMR","EAS","SAS")
 result.list = list()
+out.dir.sum <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
+temp = 1
 for(i in 2:5){
   file.path = paste0(out.dir.sum,eth[i],"/prscsx/")
   file = dir(file.path,pattern="rho")
@@ -19,8 +13,10 @@ for(i in 2:5){
           for(j in 1:22){
             filename = paste0("rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_",eth[i],
                               "_pst_eff_a1_b0.5_phi1e-02_chr",j,".txt")
-            if(file%in%filename==F){
-              
+            if(filename%in%file==F){
+              temp.file = paste0("Rscript /data/zhangh24/multi_ethnic/code/LD_simulation_GA/LD_stack/stratch/PRScsx_run_temp.R ",i," ",l," ",m," ",i_rep," ",i1," ",j)
+              result.list[[temp]] = temp.file
+              temp = temp + 1
             }
           }
         }
@@ -28,3 +24,10 @@ for(i in 2:5){
     }
   }
 }
+library(data.table)
+result.file = data.frame()
+for(k in 1:(temp-1)){
+  result.file[k,1] = result.list[[k]]
+}
+write.table(result.file,file = "/data/zhangh24/multi_ethnic/code/LD_simulation_GA/LD_stack/stratch/generate_prscsx_submit.sh",
+            row.names = F,col.names = F,quote=F)
