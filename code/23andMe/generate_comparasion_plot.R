@@ -112,6 +112,10 @@ prediction.result$index = rep("1",nrow(prediction.result))
 prediction.result$eth = factor(prediction.result$eth,
                        levels = c("European","African American",
                                   "Latino","East Asian","South Asian"))
+
+save(prediction.result,file = "/Users/zhangh24/GoogleDrive/multi_ethnic/result/23andme/prediction_summary.rdata")
+
+
 uvals = unique(prediction.result$method_vec)
 
 n.single = 9
