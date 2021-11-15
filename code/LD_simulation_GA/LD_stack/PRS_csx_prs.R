@@ -10,6 +10,7 @@ i = as.numeric(args[[1]])
 l = as.numeric(args[[2]])
 m = as.numeric(args[[3]])
 i1 = as.numeric(args[[4]])
+library(dplyr)
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
 out.dir.sum <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
 out.dir <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/LD_stack/"
@@ -45,7 +46,7 @@ for(i_rep in 1:n_rep){
 
 prs = cbind(prs_infor,Beta)
 #colnames(prs) = c("CHR","rs_id","POS","A1","A2","BETA")
-library(dplyr)
+
 snp.infor = snp.infor.match %>% 
   rename(SNP=id) %>% 
   select(SNP,rs_id)
