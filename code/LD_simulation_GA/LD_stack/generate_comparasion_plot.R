@@ -19,7 +19,7 @@ load(paste0("LD.clump.result.EB.rdata"))
 load(paste0("LD.clump.result.alleth.EB.rdata"))
 load(paste0("LDpred2.result.rdata"))
 load(paste0("LDpredEUR.result.rdata"))
-
+load(paste0("prscsx.result.rdata"))
 LD.clump.result <- LD.result.list[[1]] %>% 
   mutate(method_vec = rep("C+T"))
 
@@ -36,6 +36,7 @@ prediction.result <- rbind(LD.clump.result,
                            eursnp.result,
                            LDpredEUR.result,
                            weightedprs.result,
+                           prscsx.result,
                            TDLD.result,
                            EB.result,
                            alleth.EB.result)
@@ -68,6 +69,7 @@ prediction.result = prediction.result %>%
                                        "Best EUR SNP + EB coefficients (C+T)",
                                        "Best EUR PRS (LDpred2)",
                                        "Weighted PRS",
+                                       "PRS-CSx",
                                        "TDLD",
                                        "TDLD-EB",
                                        "TDLD-SLEB",
@@ -92,7 +94,7 @@ EUR.color = brewer.pal(n.EUR, "Greens")[c(4,5,6,7)]
 
  
 n.multi = 9
-multi.color = brewer.pal(n.multi, "Oranges")[c(3:7)]
+multi.color = brewer.pal(n.multi, "Oranges")[c(3:8)]
 colour = c(single.color,EUR.color,multi.color)
 col_df = tibble(
   colour = c(single.color,EUR.color,multi.color),
@@ -106,6 +108,7 @@ col_df = tibble(
                                        "Best EUR PRS (LDpred2)"
                                        ) ~ "EUR PRS based method",
                        method_vec%in%c("Weighted PRS",
+                                       "PRS-CSx",
                                        "TDLD",
                                        "TDLD-EB",
                                        "TDLD-SLEB",
@@ -178,9 +181,9 @@ for(m in 1:4){
       ggtitle(title)+
       theme(legend.position = "none")
     p = plot_grid(p.null,p.leg,nrow=1,rel_widths = c(3.5,1))
-    print(p)
+    #print(p)
     png(file = paste0("./method_compare_result_size_",m,"_summary_GA_",i1,".png"),
-        width = 13, height = 8, res = 300,units = "in")
+        width = 13, height = 9, res = 300,units = "in")
     print(p)
     dev.off()
     
