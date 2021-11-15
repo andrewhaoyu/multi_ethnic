@@ -10,6 +10,11 @@ i = as.numeric(args[[1]])
 l = as.numeric(args[[2]])
 m = as.numeric(args[[3]])
 i1 = as.numeric(args[[4]])
+cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
+out.dir.sum <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
+out.dir <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/LD_stack/"
+eth <- c("EUR","AFR","AMR","EAS","SAS")
+
 sid <- Sys.getenv("SLURM_JOB_ID")
 dir.create(paste0('/lscratch/',sid,'/test/'),showWarnings = F)
 temp.dir = paste0('/lscratch/',sid,'/test/')
@@ -18,10 +23,6 @@ temp.dir.prs = paste0('/lscratch/',sid,'/test/prs/')
 library(data.table)
 system(paste0("cp ",cur.dir,eth[i],"/all_chr_test.mega.* ",temp.dir))
 system(paste0("ls ",temp.dir))
-cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
-out.dir.sum <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
-out.dir <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/LD_stack/"
-eth <- c("EUR","AFR","AMR","EAS","SAS")
 setwd("/data/zhangh24/multi_ethnic/")
 load("./result/LD_simulation_new/snp.infor.match37_38.rdata")
 setwd(paste0(out.dir.sum,eth[i],"/prscsx/"))
