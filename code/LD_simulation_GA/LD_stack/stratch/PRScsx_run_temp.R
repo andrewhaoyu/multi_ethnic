@@ -6,6 +6,7 @@ m = as.numeric(args[[3]])
 i_rep = as.numeric(args[[4]])
 i1 = as.numeric(args[[5]])
 j = as.numeric(args[[6]])
+v = as.numeric(args[[7]])
 library(data.table)
 library(tidyverse)
 eth <- c("EUR","AFR","AMR","EAS","SAS")
@@ -56,7 +57,7 @@ bim = read.table(paste0(cur.dir,eth[i],"/all_chr_test.mega.bim"))
 bim.update =inner_join(summary.tar,bim,by = c("SNP"="V2")) %>% 
   select(V1,rs_id,V3,V4,V5,V6)
 write.table(bim.update,file = paste0(temp.dir,"all_chr_test.mega.bim"),row.names = F,col.names = F,quote=F)
-
+phi = c(1E-6,1E-4)
 # for(j in 1:22){
   print(j)
   #create bim file for prscsx
@@ -72,7 +73,7 @@ write.table(bim.update,file = paste0(temp.dir,"all_chr_test.mega.bim"),row.names
                 " --n_gwas=100000,",size_list[m],
                 " --pop=EUR,",eth[i],
                 " --chrom=",j,
-                " --phi=1e-2", 
+                " --phi=",phi[v],  
                 " --out_dir=",out.dir.sum,eth[i],"/prscsx",
                 " --out_name=rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
   
