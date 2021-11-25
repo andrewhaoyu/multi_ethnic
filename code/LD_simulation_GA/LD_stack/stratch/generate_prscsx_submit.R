@@ -1,11 +1,11 @@
 eth = c("EUR","AFR","AMR","EAS","SAS")
 result.list = list()
 out.dir.sum <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
-phi = c(1e-04,1e-06)
+phi = c("1e-02","1e-04","1e-06")
 temp = 1
   
   for(i in 2:5){
-    for(v in 1:2){
+    for(v in 1:3){
       file.path = paste0(out.dir.sum,eth[i],"/prscsx/")
       file = dir(file.path,pattern=paste0("phi",phi[v]))
     for(l in 1:3){

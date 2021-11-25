@@ -57,7 +57,7 @@ bim = read.table(paste0(cur.dir,eth[i],"/all_chr_test.mega.bim"))
 bim.update =inner_join(summary.tar,bim,by = c("SNP"="V2")) %>% 
   select(V1,rs_id,V3,V4,V5,V6)
 write.table(bim.update,file = paste0(temp.dir,"all_chr_test.mega.bim"),row.names = F,col.names = F,quote=F)
-phi = c(1E-6,1E-4)
+phi = c(1E-02,1E-04,1E-6)
 # for(j in 1:22){
   print(j)
   #create bim file for prscsx
