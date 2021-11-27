@@ -11,7 +11,7 @@ eth <- c("EUR","AFR","AMR","EAS","SAS")
 library(data.table)
 
 
-phi = c("1e-02","1e-04","1e-6")
+phi = c("1e-02","1e-04","1e-06")
 
 # for(v in 1:3){
 #   for(i in 2:5){
