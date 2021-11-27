@@ -27,38 +27,82 @@ system(paste0("ls ",temp.dir))
 setwd("/data/zhangh24/multi_ethnic/")
 load("./result/LD_simulation_new/snp.infor.match37_38.rdata")
 setwd(paste0(out.dir.sum,eth[i],"/prscsx/"))
-i_rep = 1
-
-prs = fread(paste0("rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_",eth[i],
-                   "_pst_eff_a1_b0.5_phi1e-02.txt"))
-prs_infor = prs %>% 
-  select(V2,V4)
-colnames(prs_infor) = c("rs_id","A1")
-n_rep = 10
-Beta = matrix(0,nrow(prs),n_rep)
-for(i_rep in 1:n_rep){
-  print(i_rep)
+phi = c("1e-02","1e-04","1e-06")
+for(v in 1:3){
+  i_rep = 1
+  #load target population posterior
   prs = fread(paste0("rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_",eth[i],
-                     "_pst_eff_a1_b0.5_phi1e-02.txt"))
-  Beta[,i_rep] = prs$V6
+                     "_pst_eff_a1_b0.5_phi",phi[v],".txt"))
+  prs_infor = prs %>% 
+    select(V2,V4)
+  colnames(prs_infor) = c("rs_id","A1")
+  n_rep = 10
+  Beta = matrix(0,nrow(prs),n_rep)
+  for(i_rep in 1:n_rep){
+    print(i_rep)
+    prs = fread(paste0("rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_",eth[i],
+                       "_pst_eff_a1_b0.5_phi",phi[v],".txt"))
+    Beta[,i_rep] = prs$V6
+    
+  }
+  
+  prs = cbind(prs_infor,Beta)
+  #colnames(prs) = c("CHR","rs_id","POS","A1","A2","BETA")
+  
+  snp.infor = snp.infor.match %>% 
+    rename(SNP=id) %>% 
+    select(SNP,rs_id)
+  
+  prs.match = left_join(prs,snp.infor,by=c("rs_id"="rs_id"))
+  
+  prs.file <- prs.match %>% 
+    select(SNP,A1,paste0("V",c(1:n_rep)))
+  colSums(is.na(prs.file))
+  write.table(prs.file,file = paste0(temp.dir.prs,"prs_file"),col.names = T,row.names = F,quote=F)
+  
+  res = system(paste0("/data/zhangh24/software/plink2_alpha --score-col-nums 3,4,5,6,7,8,9,10,11,12 --threads 2 --score ",temp.dir.prs,"prs_file  header no-mean-imputation --bfile ",temp.dir,"all_chr_test.mega  --out ",temp.dir.prs,"prs_csx_",eth[i],"_rho_",l,"_size_",m,"_GA_",i1,"_phi",phi[v]))
+  system(paste0("mv ",temp.dir.prs,"/prs_csx_",eth[i],"_rho_",l,"_size_",m,"_GA_",i1,"_phi",phi[v],".sscore ",out.dir.sum,eth[i],"/prscsx/"))
+  
+  
+  #load eur population posterior
+  i_rep = 1
+  #load target population posterior
+  prs = fread(paste0("rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_EUR_pst_eff_a1_b0.5_phi"
+                     ,phi[v],".txt"))
+  prs_infor = prs %>% 
+    select(V2,V4)
+  colnames(prs_infor) = c("rs_id","A1")
+  n_rep = 10
+  Beta = matrix(0,nrow(prs),n_rep)
+  for(i_rep in 1:n_rep){
+    print(i_rep)
+    prs = fread(paste0("rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_EUR_pst_eff_a1_b0.5_phi"
+                       ,phi[v],".txt"))
+    Beta[,i_rep] = prs$V6
+    
+  }
+  
+  prs = cbind(prs_infor,Beta)
+  #colnames(prs) = c("CHR","rs_id","POS","A1","A2","BETA")
+  
+  snp.infor = snp.infor.match %>% 
+    rename(SNP=id) %>% 
+    select(SNP,rs_id)
+  
+  prs.match = left_join(prs,snp.infor,by=c("rs_id"="rs_id"))
+  
+  prs.file <- prs.match %>% 
+    select(SNP,A1,paste0("V",c(1:n_rep)))
+  colSums(is.na(prs.file))
+  write.table(prs.file,file = paste0(temp.dir.prs,"prs_file"),col.names = T,row.names = F,quote=F)
+  
+  res = system(paste0("/data/zhangh24/software/plink2_alpha --score-col-nums 3,4,5,6,7,8,9,10,11,12 --threads 2 --score ",temp.dir.prs,"prs_file  header no-mean-imputation --bfile ",temp.dir,"all_chr_test.mega  --out ",temp.dir.prs,"prs_csx_EUR_rho_",l,"_size_",m,"_GA_",i1,"_phi",phi[v]))
+  system(paste0("mv ",temp.dir.prs,"/prs_csx_EUR_rho_",l,"_size_",m,"_GA_",i1,"_phi",phi[v],".sscore ",out.dir.sum,eth[i],"/prscsx/"))
   
 }
 
-prs = cbind(prs_infor,Beta)
-#colnames(prs) = c("CHR","rs_id","POS","A1","A2","BETA")
 
-snp.infor = snp.infor.match %>% 
-  rename(SNP=id) %>% 
-  select(SNP,rs_id)
 
-prs.match = left_join(prs,snp.infor,by=c("rs_id"="rs_id"))
 
-prs.file <- prs.match %>% 
-  select(SNP,A1,paste0("V",c(1:n_rep)))
-colSums(is.na(prs.file))
-write.table(prs.file,file = paste0(temp.dir.prs,"prs_file"),col.names = T,row.names = F,quote=F)
-
-res = system(paste0("/data/zhangh24/software/plink2_alpha --score-col-nums 3,4,5,6,7,8,9,10,11,12 --threads 2 --score ",temp.dir.prs,"prs_file  header no-mean-imputation --bfile ",temp.dir,"all_chr_test.mega  --out ",temp.dir.prs,"prs_csx_rho_",l,"_size_",m,"_GA_",i1))
-system(paste0("mv ",temp.dir.prs,"/prs_csx_rho_",l,"_size_",m,"_GA_",i1,".sscore ",out.dir.sum,eth[i],"/prscsx/"))
 
 #temp = fread(paste0(out.dir.sum,eth[i],"/prscsx/prs_csx_rho_",l,"_size_",m,"_GA_",i1,".sscore"))
