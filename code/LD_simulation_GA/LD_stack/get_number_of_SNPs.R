@@ -35,7 +35,7 @@ out.dir.sum <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
 out.dir <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/LD_stack/"
 setwd("/data/zhangh24/multi_ethnic/")
 
-
+n.rep = 10
 total <- 1
 eth.vec <- rep("c",total)
 n.snp.result <- rep(0,total)
