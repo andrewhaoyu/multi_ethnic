@@ -70,7 +70,7 @@ setwd("/Users/zhangh24/GoogleDrive/multi_ethnic/result/LD_simulation_GA")
 # library(ggplot2)
 # library(ggsci)
 #standard heritability
-herita.table
+load("herit_table.rdata")
 # sample_size <- factor(rep(c("15000","45000","80000","100000"),6),
 #                                            levels=c("15000","45000","80000","100000"))
 cau_vec <- as.character(LD.clump.result$l_vec)
@@ -90,7 +90,8 @@ herita.table <- cbind(herita.table,sample_size,cau_vec)
 herita.table$eth_vec <- factor(herita.table$eth_vec,
                                #levels =c("EUR","AFR","AMR","EAS","SAS"))
                                levels =c("EUR","AFR","AMR","EAS","SAS"))
-p <- ggplot(herita.table,aes(x= cau_vec,y=herit_vec))+
+herita.table.sub = herita.table %>% filter(m_vec==1&l_vec==1)
+p <- ggplot(herita.table.sub,aes(x= cau_vec,y=herit_vec))+
   geom_bar(aes(fill=eth_vec),
            stat="identity",
            position = position_dodge())+
@@ -102,8 +103,7 @@ p <- ggplot(herita.table,aes(x= cau_vec,y=herit_vec))+
   scale_fill_nejm()+
   ggtitle("Underlying heritability for different ethnic groups")
 
-
-
+print(p)
 
 
 custom.col <- c("#FFDB6D", "#C4961A", "#F4EDCA", 

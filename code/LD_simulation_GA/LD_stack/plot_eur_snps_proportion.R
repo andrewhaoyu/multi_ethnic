@@ -87,9 +87,9 @@ colnames(data_long)[1] = c("eth")
                                    SNP_Categories = as.character(SNP_Categories))
   data_long[6,2] = "EA SNPs shared with other non-EA populaitons"
   data_long = data_long %>% mutate(SNP_Categories = factor(SNP_Categories,
-                                                              levels = c("SNPs shared with EA",
-                                                                          "SNPs only shared with non-EA populations",
-                                                                         "EA SNPs shared with other non-EA populaitons",
+                                                              levels = c("SNPs shared with EUR",
+                                                                          "SNPs only shared with non-EUR populations",
+                                                                         "EA SNPs shared with other non-EUR populaitons",
                                                                           "Population-specific SNPs")))
 scale_fill_Publication <- function(...){
   library(scales)

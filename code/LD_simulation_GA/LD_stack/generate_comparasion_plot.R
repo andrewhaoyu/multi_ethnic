@@ -75,11 +75,11 @@ prediction.result = prediction.result %>%
                                        "TDLD-SLEB",
                                        "TDLD-SLEB (all ethnics)"
                                        ))) %>% 
-  mutate(ga_arc = case_when(ga_vec==1 ~"Fixed common SNP heritability",
-                            ga_vec==2 ~"Strong negative selection",
-                            ga_vec==3 ~"Less correlation",
-                            ga_vec==4 ~"No negative selection",
-                            ga_vec==5 ~"Mild negative selection",
+  mutate(ga_arc = case_when(ga_vec==1 ~"Fixed common SNP heritability with strong negative selection",
+                            ga_vec==2 ~"Fixed whole genome heritability with strong negative selection",
+                            ga_vec==3 ~"Fixed common SNP heritability with strong negative selection (r=0.6)",
+                            ga_vec==4 ~"Fixed common SNP heritability with no negative selection",
+                            ga_vec==5 ~"Fixed common SNP heritability with mild negative selection",
                             ))
 uvals = unique(prediction.result$method_vec)
 
@@ -182,8 +182,9 @@ for(m in 1:4){
       theme(legend.position = "none")
     p = plot_grid(p.null,p.leg,nrow=1,rel_widths = c(3.5,1))
     #print(p)
+    #print(p)
     png(file = paste0("./method_compare_result_size_",m,"_summary_GA_",i1,".png"),
-        width = 13, height = 9, res = 300,units = "in")
+        width = 19, height = 12, res = 300,units = "in")
     print(p)
     dev.off()
     
@@ -194,11 +195,12 @@ for(m in 1:4){
 }
   
 
-
+i1 = 1
+m = 1
 prediction.result.sub <- prediction.result %>% 
   filter(eth.vec!="EUR"&
            m_vec ==m) %>% 
-  filter(method_vec%in%c("Best EUR SNP (C+T)"))
+  filter(method_vec%in%c("Weighted PRS"))
 
 prediction.result.sub2 <- prediction.result %>% 
   filter(eth.vec!="EUR"&

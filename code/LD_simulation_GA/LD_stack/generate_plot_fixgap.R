@@ -67,10 +67,15 @@ for(i1 in 1:5){
     geom_hline(yintercept=1, linetype="dashed", 
                color = "red")+
     theme(legend.text=element_text(size=12))
-  
+  print(p)
+  if(i1 ==1){
+    p1 = p
+  }else if(i1==2){
+    p2 = p
+  }
  
   png(file = paste0("./fix_gap_summary_GA_",i1,".png"),
-      width = 9, height = 6, res = 300,units = "in")
+      width = 12.6, height = 7, res = 300,units = "in")
   print(p)
   dev.off()
   }
