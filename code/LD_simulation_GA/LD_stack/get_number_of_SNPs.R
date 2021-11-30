@@ -288,6 +288,7 @@ eb.result <- data.frame(eth.vec,
                               method_vec = method_vec)
 #PRS-CSx result
 setwd(paste0(out.dir.sum,eth[i],"/prscsx/"))
+method_vec = "PRS-CSx"
 phi = c("1e-02","1e-04","1e-06")
 snp.list = list()
 temp = 1
