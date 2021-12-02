@@ -1,6 +1,6 @@
 args = commandArgs(trailingOnly = T)
-t_rep = args[[1]]
-k = args[[2]]
+t_rep = as.numeric(args[[1]])
+k = as.numeric(args[[2]])
 #test the running time and memory for TDLD-SLEB and PRS-CSx on CHR 22
 time1 = proc.time()
 i = 2
