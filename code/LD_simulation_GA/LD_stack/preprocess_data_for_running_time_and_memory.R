@@ -69,3 +69,36 @@ y_test = y_test_mat[1:10000,i_rep]
 y_vad = y_test_mat[10001:20000,i_rep]
 save(y_test,file = paste0(out.dir,"y_test.rdata"))
 save(y_vad,file = paste0(out.dir,"y_vad.rdata"))
+
+#prepare data for prscsx
+setwd("/data/zhangh24/multi_ethnic/")
+load(paste0(out.dir.sum,"time_mem/eur_sumdata.rdata"))
+prs_cs_ref = read.table("/gpfs/gsfs11/users/zhangh24/software/PRScsx/1KGLD/snpinfo_mult_1kg_hm3",header=T)
+prs_cs_ref = prs_cs_ref %>% select(SNP)
+summary.eur = inner_join(summary.eur,prs_cs_ref,by = c("rs_id"="SNP"))
+library(tidyverse)
+summary.eur = summary.eur %>% 
+  separate(SNP,into=c("non_im","non_im2","first_allele","second_allele"),
+           remove=F) %>% 
+  mutate(A2 =ifelse(A1==second_allele,first_allele,second_allele)) %>% 
+  rename(P = peur) %>% 
+  select(rs_id,A1,A2,BETA,P) %>% 
+  rename(SNP=rs_id)
+write.table(summary.eur,file = paste0(out.dir,"EUR_sumstats.txt"),row.names = F,col.names = T,quote=F)
+#merge with prs-csx reference data
+#prepare target summary stat for a specific chr
+load(paste0(out.dir.sum,"time_mem/tar_sumdata.rdata"))
+#merge with prs-csx reference data
+summary.tar = inner_join(summary.tar,prs_cs_ref,by = c("rs_id"="SNP"))
+summary.tar.sub = summary.tar %>% 
+  separate(SNP,into=c("non_im","non_im2","first_allele","second_allele"),
+           remove=F) %>% 
+  mutate(A2 =ifelse(A1==second_allele,first_allele,second_allele)) %>% 
+  select(rs_id,A1,A2,BETA,P) %>% 
+  rename(SNP=rs_id)
+write.table(summary.tar.sub,file = paste0(out.dir,eth[i],"_sumstats.txt"),row.names = F,col.names = T,quote=F)
+bim = read.table(paste0(out.dir,"AFR_ref_chr22.bim"))
+bim.update =inner_join(summary.tar,bim,by = c("SNP"="V2")) %>% 
+  select(V1,rs_id,V3,V4,V5,V6)
+write.table(bim.update,file = paste0(out.dir,"AFR_ref_chr22_rs_id.bim"),row.names = F,col.names = F,quote=F)
+#phi = c(1E-6,1E-4)
