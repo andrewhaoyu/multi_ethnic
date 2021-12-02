@@ -109,6 +109,7 @@ out.dir = paste0("/data/zhangh24/multi_ethnic/result/cleaned/clumping_result/TDL
 temp = 1
 method = "TDLD_EB"
 out.dir.prs <- paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/",method,"/",eth[i],"/",trait[l],"/")
+
 for(r_ind in 1:length(r2_vec)){
   wc_vec = wc_base_vec/r2_vec[r_ind]
   for(w_ind in 1:length(wc_vec)){
