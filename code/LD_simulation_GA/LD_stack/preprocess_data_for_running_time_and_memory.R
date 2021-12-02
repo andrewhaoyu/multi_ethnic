@@ -48,6 +48,40 @@ summary.tar = summary.tar.match
 save(summary.eur,file = paste0(out.dir.sum,"time_mem/eur_sumdata.rdata"))
 save(summary.tar,file = paste0(out.dir.sum,"time_mem/tar_sumdata.rdata"))
 
+#prepare SNPs for other ethnic groups
+summary.eur.select = summary.eur %>% 
+  rename(beta_eur = BETA) %>% 
+  mutate(sd_eur=beta_eur/STAT) %>% 
+  select(SNP,A1,beta_eur,sd_eur,peur) %>% 
+  rename(A1.EUR = A1)
+summary.com <- left_join(summary.tar,summary.eur.select,by="SNP")
+i_can <- setdiff(c(2:5),i)
+beta.mat.list = list()
+sd.mat.list = list()
+temp = 1
+
+
+
+for(i_sub in i_can){
+  sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_GA/",eth[i_sub],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))
+  colnames(sum.data)[2] <- "SNP"
+  sum.data = sum.data %>% 
+    mutate(sd.sub = BETA/STAT) %>% 
+    rename(A1.sub = A1,
+           BETA.sub = BETA) %>% 
+    select(SNP,A1.sub,BETA.sub,sd.sub)
+  summary.com.temp <- left_join(summary.com,sum.data,by="SNP")
+  #match allele
+  summary.com.temp = summary.com.temp %>% 
+    mutate(BETA.sub.new = ifelse(A1==A1.sub,BETA.sub,-BETA.sub)) 
+  beta.mat.list[[temp]] =  summary.com.temp %>% select(BETA.sub.new)
+  sd.mat.list[[temp]] = summary.com.temp %>% select(sd.sub)
+  temp = temp+1
+}
+beta.mat = bind_cols(beta.mat.list)
+sd.mat = bind_cols(sd.mat.list)
+save(beta.mat,file=paste0(out.dir, "other_ethnic_beta_mat"))
+save(sd.mat,file = paste0(out.dir,"other_ethnic_sd_mat"))
 #prepare the data for clumping reference
 snp.list = unique(c(summary.eur$SNP,summary.tar$SNP))
 write.table(snp.list,file = paste0(out.dir.sum,"time_mem/extract_snp_list.txt"),row.names = F,col.names = F,quote=F)

@@ -1,5 +1,5 @@
 args = commandArgs(trailingOnly = T)
-t_rep = args[[1]]
+t_rep = as.numeric(args[[1]])
 #test the running time and memory for TDLD-SLEB and PRS-CSx on CHR 22
 time1 = proc.time()
 i = 2
@@ -116,12 +116,12 @@ q_range = data.frame(rep("p_value",n_pthres),rep(0,n_pthres),rep(0.5,n_pthres))
 temp = 1
 
 for(k2 in 1:length(pthres)){
- 
- 
-    q_range[temp,1] = paste0("p_value_",k2)
-    q_range[temp,3] = pthres[k2]
-    temp = temp+1
- 
+  
+  
+  q_range[temp,1] = paste0("p_value_",k2)
+  q_range[temp,3] = pthres[k2]
+  temp = temp+1
+  
 }
 q_range = q_range[1:(temp-1),]
 write.table(q_range,file = paste0(temp.dir.prs,"q_range_file"),row.names = F,col.names = F,quote=F)
@@ -141,7 +141,7 @@ for(r_ind in 1:length(r2_vec)){
     #combine the statistics with SNPs after clumping
     prs.all <- left_join(LD,summary.com,by="SNP") 
     colSums(is.na(prs.all))
-
+    
     for(k1 in 1:length(pthres)){
       #keep al the SNPs with peur pass the threshold
       prs.file = prs.all %>% 
@@ -153,18 +153,18 @@ for(r_ind in 1:length(r2_vec)){
       p.value.file <- prs.file %>% 
         select(SNP,P)
       write.table(p.value.file,file = paste0(temp.dir.prs,"p_value_file"),col.names = T,row.names = F,quote=F)
-     
+      
       old.out.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
       res = system(paste0("/data/zhangh24/software/plink2 --q-score-range ",temp.dir.prs,"q_range_file ",temp.dir.prs,"p_value_file header --threads 2 --score ",temp.dir.prs,"prs_file header no-sum no-mean-imputation --bfile ",temp.dir,"AFR_test_mega_chr22 --exclude ",old.out.dir,eth[i],"/duplicated.id --out ",temp.dir.prs,"prs_2DLD_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1))
       print("step2 finished")
-     
+      
       
       #system(paste0("/data/zhangh24/software/plink2 --score ",cur.dir,eth[i],"/prs/prs_file_pvalue_",k,"_rho_",l,"_size_",m,,"_rep_",i_rep," no-sum no-mean-imputation --bfile ",cur.dir,eth[i],"/all_chr.tag --exclude /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/duplicated.id  --out ",cur.dir,eth[i],"/prs/prs_",k,"_rho_",l,"_size_",m))
     }
     
   }
   
-    
+  
 }
 
 #find the optimal r2 performance based on testing data
@@ -182,7 +182,7 @@ for(r_ind in 1:length(r2_vec)){
   for(w_ind in 1:length(wc_vec)){
     for(k1 in 1:length(pthres)){
       for(k2 in 1:length(pthres)){
-
+        
         filename <- paste0(temp.dir.prs,"prs_2DLD_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1,".p_value_",k2,".profile")
         prs.temp <- fread(filename)  
         prs.score <- prs.temp$SCORE
@@ -213,24 +213,38 @@ LD.tar <- LD.tar[,3,drop=F]
 LD <- rbind(LD.EUR,LD.tar)
 
 #combine the statistics with SNPs after clumping
+load(paste0(out.dir,"other_ethnic_beta_mat"))
+load(paste0(out.dir,"other_ethnic_sd_mat"))
+summary.com$beta_mat = beta.mat
+summary.com$sd_mat = sd.mat
 summary.com.prior = left_join(LD,summary.com,by="SNP") %>% 
   filter(peur<p.k1|
            P<p.k2)
-beta_tar <- summary.com.prior$beta_tar
-sd_tar <- summary.com.prior$sd_tar
-beta_eur <- summary.com.prior$beta_eur
-sd_eur <- summary.com.prior$sd_eur
 
-EBprior = EstimatePrior(beta_tar,sd_tar,
-                        beta_eur,sd_eur)
+beta_tar = summary.com.prior$beta_tar
+sd_tar = summary.com.prior$sd_tar
+beta_eur = summary.com.prior$beta_eur
+sd_eur = summary.com.prior$sd_eur
+beta_other_mat = summary.com.prior$beta_mat
+sd_other_mat = summary.com.prior$sd_mat
+
+prior.sigma = EstimatePriorMulti(beta_tar,sd_tar,
+                                 beta_eur,sd_eur,
+                                 beta_other_mat,
+                                 sd_other_mat)
+
 beta_tar <- summary.com$beta_tar
 sd_tar <- summary.com$sd_tar
 beta_eur <- summary.com$beta_eur
 sd_eur <- summary.com$sd_eur
+beta_other_mat <- summary.com$beta_mat
+sd_other_mat <- summary.com$sd_mat
 
-post_beta_tar = EBpost(beta_tar,sd_tar,beta_eur,sd_eur,EBprior)[,1,drop=F]
-
-summary.com$BETA  = post_beta_tar
+post_beta_tar = EBpostMulti(beta_tar,sd_tar,
+                            beta_eur,sd_eur,beta_other_mat,
+                            sd_other_mat,
+                            prior.sigma)[,1,drop=F]
+summary.com$BETA = post_beta_tar
 #calculate the prs using TDLD-EB
 for(r_ind in 1:length(r2_vec)){
   wc_vec = wc_base_vec/r2_vec[r_ind]
@@ -337,4 +351,4 @@ sl = SuperLearner(Y = y_test, X = prs.mat, family = gaussian(),
                   SL.library = SL.libray)
 #y.pred <- predict(sl, x.vad, onlySL = TRUE)
 time = proc.time()-time1
-save(time,file = paste0(out.dir,"TDLD_SLEB_trep_",t_rep,".rdata"))
+save(time,file = paste0(out.dir,"TDLD_SLEBalleth_trep_",t_rep,".rdata"))
