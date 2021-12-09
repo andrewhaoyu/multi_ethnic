@@ -63,5 +63,6 @@ result.wide = spread(result,key = "method_vec",value = "n.snp.vec") %>%
                                      "5E-04")),
          sample_size = factor(sample_size,
                               levels = c("15000","45000","80000","100000")))
+range(result.wide[,8]/result.wide[,6])
 write.csv(result.wide,file = "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/LD_stack/number_of_snps.csv",row.names = F)
 
