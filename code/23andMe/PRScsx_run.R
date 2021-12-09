@@ -72,17 +72,17 @@ contriat = c("heart_metabolic_disease_burden",
              "height")
 
 if(trait[l]%in%bintrait){
-  n_eur = as.numeric(4*sample_size %>% 
+  n_eur = as.integer(4*sample_size %>% 
     filter(eth=="EUR"&
              Disease==trait[l]) %>% select(N_effect))
-  n_tar = as.numeric(4*sample_size %>% 
+  n_tar = as.integer(4*sample_size %>% 
                        filter(eth==eth[i]&
                                 Disease==trait[l]) %>% select(N_effect))
 }else{
-  n_eur = as.numeric(sample_size %>% 
+  n_eur = as.integer(sample_size %>% 
                        filter(eth=="EUR"&
                                 Disease==trait[l]) %>% select(N_control))
-  n_tar = as.numeric(sample_size %>% 
+  n_tar = as.integer(sample_size %>% 
                        filter(eth==eth[i]&
                                 Disease==trait[l]) %>% select(N_effect))
 }
