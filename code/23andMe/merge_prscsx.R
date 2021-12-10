@@ -15,7 +15,7 @@ trait <- c("any_cvd","depression",
            "morning_person")
 
 #connect chr data into one
-phi = c("1e+00","1e-02","1e-04","1e-6")
+phi = c("1e+00","1e-02","1e-04","1e-06")
 out.dir.prs = paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/PRSCSx/",eth[i],"/",trait[l],"/")
 for(v in 1:4){
   data.list = list()
