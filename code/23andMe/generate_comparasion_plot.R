@@ -145,8 +145,8 @@ LDpred2 = R2.ldpred2 %>%
   result = R2,
   method_vec = "LDpred2") %>% 
   select(result,eth,trait,method_vec)
-LDpred2 = LDpred2 %>% 
-  filter(eth!="European")
+# LDpred2 = LDpred2 %>% 
+#   filter(eth!="European")
 prediction.result = rbind(prediction.result,LDpred2)
 prediction.result$method_vec = factor(prediction.result$method_vec,
                           levels = c("C+T",
@@ -174,7 +174,7 @@ prediction.result.table = prediction.result %>%
   mutate(sigma2 = ifelse(trait%in%
                            c("Heart metabolic disease burden","Height"),NA,sigma2)) %>% 
   select(eth,trait,Method,result,sigma2)
-write.csv(prediction.result.table,file = "/Users/zhangh24/GoogleDrive/multi_ethnic/result/23andme/prediction_summary.csv",row.names = F)
+# write.csv(prediction.result.table,file = "/Users/zhangh24/GoogleDrive/multi_ethnic/result/23andme/prediction_summary.csv",row.names = F)
 
 uvals = factor(c("C+T",
                           "LDpred2",
@@ -278,13 +278,23 @@ prediction.result.sub = prediction.result %>%
                                           "Latino","East Asian","South Asian")))
 
 #create benchmark C+T results for european to plot for other ethnic group
-prediction.result.European = prediction.result %>% 
+prediction.result.European.CT = prediction.result %>% 
   filter(trait %in% c("Any CVD","Depression",
                       "SBMN",
                       "Migraine Diagnosis",
                       "Morning Person")) %>% 
-  filter(eth=="European") %>% 
+  filter(eth=="European"&
+           method_vec=="C+T") %>% 
   select(result,trait)
+prediction.result.European.LDpred2 = prediction.result %>% 
+  filter(trait %in% c("Any CVD","Depression",
+                      "SBMN",
+                      "Migraine Diagnosis",
+                      "Morning Person")) %>% 
+  filter(eth=="European"&
+           method_vec=="LDpred2") %>% 
+  select(result,trait)
+
 sigma2toauc = function(x){
   ifelse(x==0,0.50,round(pnorm(0.5*sqrt(x)),2))
 }
@@ -305,7 +315,7 @@ p.null <- ggplot(prediction.result.sub)+
         axis.ticks.x=element_blank())+
   scale_fill_manual(values = colour) +
   theme(legend.position = "none")+
-  geom_hline(data = prediction.result.European, aes(yintercept = sigma2toauc(result)), linetype = "dashed",color = "red")
+  geom_hline(data = prediction.result.European.CT, aes(yintercept = sigma2toauc(result)), linetype = "dashed",color = "red")
 
 print(p.null)
 p = plot_grid(p.null,p.leg,nrow=1,rel_widths = c(3,1))

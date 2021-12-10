@@ -107,3 +107,14 @@ system(paste0("python /data/zhangh24/software/PRScsx/PRScsx.py",
               " --phi=",phi[v],  
               " --out_dir=",out.dir.prs,
               " --out_name=sum"))
+
+
+
+
+# out.file = paste0("/data/zhangh24/multi_ethnic/result/cleaned/organize_prs/PRSCSx/")
+# for(i in 1:5){
+#   system(paste0("mkdir ",out.file,eth[i],"/"))
+#   for(l in 1:7){
+#     system(paste0("mkdir ",out.file,eth[i],"/",trait[l]))  
+#   }
+# }
