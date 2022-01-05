@@ -1,7 +1,7 @@
 #calculate the LD-score for each ethnic using 1000 genome data
 args = commandArgs(trailingOnly = T)
 i = as.numeric(args[[1]])
-j = as.numeric(args[[2]])
+l = as.numeric(args[[2]])
 
 eth = c("EUR","AFR","AMR","EAS","SAS")
 trait <- c("any_cvd","depression",
