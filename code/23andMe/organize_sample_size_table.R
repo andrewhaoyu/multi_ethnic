@@ -53,3 +53,22 @@ sample.size.table %>% group_by(trait) %>%
   mutate(mean(per_trait_sum))
 sample.size.table %>% group_by(eth) %>% 
   summarize(average = mean(total))
+
+
+
+sample.size.table %>% filter(eth!="European") %>% 
+  group_by(trait) %>% 
+  summarise(per_trait_sum = sum(total)) %>% 
+  mutate(mean(per_trait_sum))
+
+
+sample.size.table %>% filter(eth=="African American"&
+                               trait =="Height") 
+
+sample.size.table %>% filter(
+                               trait =="Height") 
+sample.size.table = sample.size.table %>% 
+  mutate(total.cases = train.case + tun.case +  vad.case,
+         total.control = train.control + tun.control + vad.control)
+sample.size.table %>% filter(
+  trait =="Any CVD") 

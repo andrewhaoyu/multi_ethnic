@@ -30,6 +30,10 @@ alleth.EB.result = alleth.EB.result %>%
   filter(method_vec=="TDLD-SLEB (all ethnics)")
 weightedprs.result = weightedprs.result %>% 
   mutate(method_vec = "Weighted PRS")
+EB.result = EB.result %>% 
+  mutate(method_vec=ifelse(method_vec=="TDLD-SLEB","TDLD-SLEB (two ethnics)",method_vec))
+alleth.EB.result = alleth.EB.result %>% 
+  mutate(method_vec=ifelse(method_vec=="TDLD-SLEB (all ethnics)","TDLD-SLEB (five ethnics)",method_vec))
 prediction.result <- rbind(LD.clump.result,
                            SCT.clump.result,
                            LDpred2.result,
@@ -72,8 +76,8 @@ prediction.result = prediction.result %>%
                                        "PRS-CSx",
                                        "TDLD",
                                        "TDLD-EB",
-                                       "TDLD-SLEB",
-                                       "TDLD-SLEB (all ethnics)"
+                                       "TDLD-SLEB (two ethnics)",
+                                       "TDLD-SLEB (five ethnics)"
                                        ))) %>% 
   mutate(ga_arc = case_when(ga_vec==1 ~"Fixed common SNP heritability with strong negative selection",
                             ga_vec==2 ~"Fixed whole genome heritability with strong negative selection",
@@ -81,38 +85,46 @@ prediction.result = prediction.result %>%
                             ga_vec==4 ~"Fixed common SNP heritability with no negative selection",
                             ga_vec==5 ~"Fixed common SNP heritability with mild negative selection",
                             ))
+
+prediction.result = prediction.result %>% 
+  filter(method_vec%in%
+           c("C+T",
+             "LDpred2",
+             "Best EUR SNP (C+T)",
+             "Best EUR PRS (LDpred2)",
+             "Weighted PRS",
+             "PRS-CSx",
+             "TDLD-SLEB (two ethnics)",
+             "TDLD-SLEB (five ethnics)"
+           ))
+
 uvals = unique(prediction.result$method_vec)
 
 n.single = 9
 
 
-single.color =  brewer.pal(n.single, "Blues")[c(4,5,7)]
+single.color =  brewer.pal(n.single, "Blues")[c(4,7)]
 n.EUR = 9
 
 
-EUR.color = brewer.pal(n.EUR, "Greens")[c(4,5,6,7)]
+EUR.color = brewer.pal(n.EUR, "Greens")[c(4,7)]
 
  
 n.multi = 9
-multi.color = brewer.pal(n.multi, "Oranges")[c(3:8)]
+multi.color = brewer.pal(n.multi, "Oranges")[c(3,5,7,9)]
 colour = c(single.color,EUR.color,multi.color)
 col_df = tibble(
   colour = c(single.color,EUR.color,multi.color),
   method_vec = uvals,
   category = case_when(method_vec%in%c("C+T",
-                                       "SCT",
                                        "LDpred2") ~ "Single ethnic method",
                        method_vec%in%c("Best EUR SNP (C+T)",
-                                       "Best EUR SNP + target coefficients (C+T)",
-                                       "Best EUR SNP + EB coefficients (C+T)",
                                        "Best EUR PRS (LDpred2)"
                                        ) ~ "EUR PRS based method",
                        method_vec%in%c("Weighted PRS",
                                        "PRS-CSx",
-                                       "TDLD",
-                                       "TDLD-EB",
-                                       "TDLD-SLEB",
-                                       "TDLD-SLEB (all ethnics)") ~ "Multi ethnic method")
+                                       "TDLD-SLEB (two ethnics)",
+                                       "TDLD-SLEB (five ethnics)") ~ "Multi ethnic method")
 ) %>% 
   mutate(category = factor(category,levels = c("Single ethnic method",
                                                   "EUR PRS based method",

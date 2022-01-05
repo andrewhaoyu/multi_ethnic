@@ -37,10 +37,10 @@ p= ggplot(data = plot.data, aes(x=peur, y=ptar)) +
   geom_tile(aes(fill=r2),colour = "white")+
   scale_fill_gradient2(low = "grey94",
                        high = "dodgerblue4") +
-  fte_theme()+
+  theme_Publication()+
   labs(x = paste0("EUR -log10(P-value)"),
-       y = paste0("Tar -log10(P-value)")) +
-  ggtitle(NULL)+
+       y = paste0("AFR -log10(P-value)")) +
+  ggtitle("Adjusted R2 for AFR populations")+
   scale_x_discrete(expand = c(0, 0)) +
   scale_y_discrete(expand = c(0, 0)) +
   labs(fill = "R2")+

@@ -1,3 +1,4 @@
+setwd("/Users/zhangh24/GoogleDrive/multi_ethnic/")
 pthres <- c(5E-08,1E-07,5E-07,1E-06,5E-06,1E-05,5E-05,1E-04,1E-03,1E-02,1E-01,0.5)
 R2 = c(0.04,0.042,0.045,0.046,0.052,0.056,0.054,0.050,0.048,0.042,0.039,0.032)
 plot.data = data.frame(x = log10(pthres),R2) 
@@ -5,8 +6,8 @@ library(tidyverse)
 library(ggplot2)
 
 p = ggplot(plot.data,aes(x,R2))+
-  geom_point()+
-  geom_line()+theme_Publication()+
+  geom_point(size = 2)+
+  geom_line(size = 1.5)+theme_Publication()+
   #theme(axis.text.y=element_blank())+
   ylab("R2")+
   xlab("log10(P)")+

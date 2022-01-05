@@ -15,7 +15,7 @@ library(ggplot2)
  p = ggplot(plot.data,aes(risk,y))+
   geom_line()+theme_Publication()+
   theme(axis.text.y=element_blank())+
-  ylab("Frequncy")+
+  ylab("Density")+
   xlab("Lifetime absolute risk (%)")+
   geom_area(aes(fill =risk_category ))+
   scale_fill_brewer(palette = "OrRd")+
@@ -29,6 +29,23 @@ png(file = paste0("./result/presentation_plot/EUR_risk_stratition.png"),width = 
 print(p)
 dev.off()
   
+p = ggplot(plot.data,aes(risk,y))+
+  geom_line(size = 2)+theme_Publication()+
+  theme(axis.text.y=element_blank(),
+        axis.text.x=element_blank())+
+  ylab(NULL)+
+  xlab(NULL)+
+  geom_area(aes(fill =risk_category ))+
+  scale_fill_brewer(palette = "OrRd")+
+  #geom_vline(xintercept = 15,linetype = "dashed")+
+  #geom_vline(xintercept = 25,linetype = "dashed")+
+  scale_x_continuous(expand = c(0,0))+
+  scale_y_continuous(expand = c(0,0))+
+  ggtitle(NULL)+
+  theme(legend.position="none")
+png(file = paste0("./result/presentation_plot/simple_risk_stratition.png"),width = 12, height = 6, units = "in",res = 300)
+print(p)
+dev.off()
 
 
 
@@ -52,7 +69,7 @@ plot.data = data.frame(risk,y) %>%
 p = ggplot(plot.data,aes(risk,y))+
   geom_line()+theme_Publication()+
   theme(axis.text.y=element_blank())+
-  ylab("Frequncy")+
+  ylab("Density")+
   xlab("Lifetime absolute risk (%)")+
   geom_area(aes(fill =risk_category ))+
   scale_fill_brewer(palette = "OrRd")+
@@ -64,4 +81,5 @@ p = ggplot(plot.data,aes(risk,y))+
 png(file = paste0("./result/presentation_plot/AFR_risk_stratition.png"),width = 12, height = 6, units = "in",res = 300)
 print(p)
 dev.off()
+
 
