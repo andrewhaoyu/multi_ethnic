@@ -25,7 +25,7 @@ if(j==6){
   dim(bim.hla)
   write.table(bim.hla$V2,file = paste0(temp.dir,"remove_region"),row.names = F,col.names = F,quote=F)
   system(paste0("/data/zhangh24/software/plink2 --bfile ",temp.dir,"chr",j," --exclude ",temp.dir,"remove_region --make-bed --out ",temp.dir,"chr_clean",j))
-  system(paste0("source activate ldsc; ", 
+  system(paste0("cd /home/zhangh24/; source activate ldsc; ", 
                 "cd /data/zhangh24/KGref_MEGA/GRCh37/",eth[i],"; ",
                 "python /data/zhangh24/ldsc/ldsc.py ",
                 "--bfile ",temp.dir,"chr_clean",j," ",
@@ -33,7 +33,7 @@ if(j==6){
                 "--out /data/zhangh24/KGref_MEGA/GRCh37/",eth[i],"/",eth[i],"_ldsc/",j))
   
 }else{
-  system(paste0("source activate ldsc; ", 
+  system(paste0("cd /home/zhangh24/; source activate ldsc; ", 
                 "cd /data/zhangh24/KGref_MEGA/GRCh37/",eth[i],"; ",
                 "python /data/zhangh24/ldsc/ldsc.py ",
                 "--bfile ",temp.dir,"chr",j," ",
@@ -42,3 +42,4 @@ if(j==6){
   
 }
 
+#need to create snp list based on the file for ldsc
