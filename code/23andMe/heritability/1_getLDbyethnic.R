@@ -2,6 +2,7 @@
 args = commandArgs(trailingOnly = T)
 i = as.numeric(args[[1]])
 j = as.numeric(args[[2]])
+
 eth = c("EUR","AFR","AMR","EAS","SAS")
 #create temp file folder
 sid<-Sys.getenv('SLURM_JOB_ID')
@@ -25,7 +26,7 @@ if(j==6){
   dim(bim.hla)
   write.table(bim.hla$V2,file = paste0(temp.dir,"remove_region"),row.names = F,col.names = F,quote=F)
   system(paste0("/data/zhangh24/software/plink2 --bfile ",temp.dir,"chr",j," --exclude ",temp.dir,"remove_region --make-bed --out ",temp.dir,"chr_clean",j))
-  system(paste0("cd /home/zhangh24/; source activate ldsc; ", 
+  system(paste0("conda env create --file /data/zhangh24/ldsc/environment.yml; source activate ldsc; ", 
                 "cd /data/zhangh24/KGref_MEGA/GRCh37/",eth[i],"; ",
                 "python /data/zhangh24/ldsc/ldsc.py ",
                 "--bfile ",temp.dir,"chr_clean",j," ",
@@ -33,7 +34,7 @@ if(j==6){
                 "--out /data/zhangh24/KGref_MEGA/GRCh37/",eth[i],"/",eth[i],"_ldsc/",j))
   
 }else{
-  system(paste0("cd /home/zhangh24/; source activate ldsc; ", 
+  system(paste0("conda env create --file /data/zhangh24/ldsc/environment.yml; source activate ldsc; ", 
                 "cd /data/zhangh24/KGref_MEGA/GRCh37/",eth[i],"; ",
                 "python /data/zhangh24/ldsc/ldsc.py ",
                 "--bfile ",temp.dir,"chr",j," ",
@@ -41,5 +42,5 @@ if(j==6){
                 "--out /data/zhangh24/KGref_MEGA/GRCh37/",eth[i],"/",eth[i],"_ldsc/",j))
   
 }
-
+system(paste0("rm -rf ",temp.dir))
 #need to create snp list based on the file for ldsc
