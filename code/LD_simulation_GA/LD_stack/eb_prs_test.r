@@ -11,7 +11,7 @@ i = as.numeric(args[[2]])
 l = as.numeric(args[[3]])
 m = as.numeric(args[[4]])
 i1 = as.numeric(args[[5]])
-
+r2_ind = as.numeric(args[[6]])
 
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
@@ -158,7 +158,8 @@ idx <- which(duplicated(summary.com$SNP))
 if(length(idx)!=0){
   summary.com = summary.com[-idx,]
 }
-for(r_ind in 1:length(r2_vec)){
+r_ind = r2_vec[r2_ind]
+#for(r_ind in 1:length(r2_vec)){
   wc_vec = wc_base_vec/r2_vec[r_ind]
   for(w_ind in 1:length(wc_vec)){
     print(c(r_ind,w_ind))
@@ -227,7 +228,7 @@ for(r_ind in 1:length(r2_vec)){
     
   }
   
-}
+#}
 
 
 #pthres <- c(1E-10,1E-09,5E-08,1E-07,2.5E-07,5E-07,7.5E-07,1E-06,2.5E-06,5E-06,7.5E-06,1E-05,2.5e-05,5E-05,7.5e-05,1E-04,2.5E-04,5E-04,7.5E-04,1E-03)
