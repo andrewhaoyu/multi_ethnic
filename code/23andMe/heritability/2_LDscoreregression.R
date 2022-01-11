@@ -47,6 +47,7 @@ library(dplyr)
                     "--w-ld-chr ",ref.dir,eth[i],"_ldsc/ ",
                     "--out ",temp.dir,"result "))
       result.folder = paste0("/data/zhangh24/multi_ethnic/result/cleaned/herit/",eth[i],"/",trait[l])
+      system(paste0("less ",temp.dir,"result.log"))
       system(paste0("mv ",temp.dir,"result.log ",result.folder ))
       
     }else{

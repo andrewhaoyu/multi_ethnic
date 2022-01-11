@@ -48,33 +48,33 @@ eth = c("EUR","AFR","AMR","EAS","SAS")
 #   }
 # }
 #need to create snp list based on the file for ldsc    
-# data.dir = "/data/zhangh24/KGref_MEGA/GRCh37/"
-# library(data.table)
-# for(i in 1:5){
-#   data.list = list()
-#   for(j in 1:22){
-#     bim = fread(paste0(data.dir,eth[i],"/chr",j,".bim"))  
-#     data.list[[j]] = bim
-#   }
-#   data = rbindlist(data.list)
-#   data.select = data %>% 
-#     select(V2,V5,V6) %>% 
-#     rename(SNP=V2,
-#            A1 = V5,
-#            A2 = V6)
-#   fwrite(data.select,file = paste0(data.dir,eth[i],"/snp_list"),row.names = F,col.names = T,quote=F,sep = " ")
-# }
+data.dir = "/data/zhangh24/KGref_MEGA/GRCh37/"
+library(data.table)
+for(i in 1:5){
+  data.list = list()
+  for(j in 1:22){
+    bim = fread(paste0(data.dir,eth[i],"/chr",j,".bim"))
+    data.list[[j]] = bim
+  }
+  data = rbindlist(data.list)
+  data.select = data %>%
+    select(V2,V5,V6) %>%
+    rename(SNP=V2,
+           A1 = V5,
+           A2 = V6)
+  fwrite(data.select,file = paste0(data.dir,eth[i],"/snp_list"),row.names = F,col.names = T,quote=F,sep = " ")
+}
 # #create result folder for ldsc
-# trait <- c("any_cvd","depression",
-#            "heart_metabolic_disease_burden",
-#            "height",
-#            "iqb.sing_back_musical_note",
-#            "migraine_diagnosis",
-#            "morning_person")
-# result.dir = "/data/zhangh24/multi_ethnic/result/cleaned/herit"
-# for(i in 1:5){
-#   system(paste0("cd ",result.dir,"; mkdir ",eth[i]))
-#   for(l in 1:7){
-#     system(paste0("cd ",result.dir,"/",eth[i],"; mkdir ",trait[l]))
-#   }
-# }
+trait <- c("any_cvd","depression",
+           "heart_metabolic_disease_burden",
+           "height",
+           "iqb.sing_back_musical_note",
+           "migraine_diagnosis",
+           "morning_person")
+result.dir = "/data/zhangh24/multi_ethnic/result/cleaned/herit"
+for(i in 1:5){
+  system(paste0("cd ",result.dir,"; mkdir ",eth[i]))
+  for(l in 1:7){
+    system(paste0("cd ",result.dir,"/",eth[i],"; mkdir ",trait[l]))
+  }
+}
