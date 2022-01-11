@@ -48,4 +48,5 @@ result.long.c = data.frame(eth_vec,trait_vec,   h2_new = paste0(h2_vec," (",se_v
 
 library(tidyr)
 result.wide = spread(result.long.c,eth_vec,h2_new)
+result.wide
 
