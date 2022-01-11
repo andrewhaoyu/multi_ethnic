@@ -105,6 +105,90 @@ roc_obj = roc.binary(status = "Y",
                      precision=seq(0.05,0.95, by=0.05))
 roc_obj$auc
 
+#code for PRS-CSx PRS 
+#use linear combination PRS matrix with target and eur population
+#for linear traits
+#Y is outcome
+#X are covariates
+#two datasets available
+#1 represent tuning; 2 represent validation
+#PRS is a matrix with eight columns
+#1-4 represent PRS based on target population, 5-6 represent PRS based on EUR population
+#1 match 5, 2 match 6, 3 match 7, 4 match 8. we have four tuning parameters
+N = 10000
+Y1 = rnorm(N)
+p = 10
+X1 = matrix(rnorm(N*p),N,p)
+colnames(X1) = paste0("PC",c(1:p))
+sex1 = factor(c(rep("male",N/2),rep("female",N/2)))
+X_covar1 = data.frame(X1,sex = sex1)
+PRS_all1 = matrix(rnorm(N*8),N,8)
+data1 = data.frame(Y = Y1,X_covar1)
+#record the R2 and regression coefficients
+coefficient_mat = matrix(0,4,2)
+r2_vec = rep(0,4)
+for(k in 1:4){
+  PRS1 = PRS_all1[,c(k,k+4),drop=F]
+  
+  #data1 is tuning dataset with all 
+  model1 = lm(Y~PC1+PC2+PC3+PC4+PC5+PC6+
+                PC7+PC8+PC9+PC10+sex,data = data1)
+  residual = model1$residuals
+  model2 = lm(residual~PRS1[,1]+PRS1[,2])
+  r2_vec[k] = summary(model2)$r.squared
+  coefficient_mat[k,] = coef(model2)[2:3]
+}
+idx <- which.max(r2_vec)
+weight = coefficient_mat[idx,]
+#evaluate the weighted PRS on validation dataset
+Y2 = rnorm(N)
+X2 = matrix(rnorm(N*p),N,p)
+colnames(X2) = paste0("PC",c(1:p))
+sex2 = factor(c(rep("male",N/2),rep("female",N/2)))
+X_covar2 = data.frame(X2,sex = sex2)
+PRS_all2 = matrix(rnorm(N*8),N,8)
+PRS2 = PRS_all2[,c(idx,idx+4),drop=F]
+#Calculate the weighted PRS using weights from tuning data
+PRS = PRS2%*%weight
+data2 = data.frame(Y = Y2,X_covar2)
+model1 = lm(Y~PC1+PC2+PC3+PC4+PC5+PC6+
+              PC7+PC8+PC9+PC10+sex,data = data2)
+residual = model1$residuals
+model2 = lm(residual~PRS)
+summary(model2)$r.square
+
+
+
+
+#for binary traits
+Y1 = rep(c(rep(1,N/2),rep(0,N/2)))
+data1 <- data.frame(Y = Y1,PRS1,X_covar1)
+coefficient_mat = matrix(0,4,2)
+deviance_vec = rep(0,4)
+for(k in 1:4){
+  PRS1 = PRS_all1[,c(k,k+4),drop=F]
+  
+  #data1 is tuning dataset with all 
+  model1 = glm(Y1~PRS1+PC1+PC2+PC3+PC4+PC5+PC6+
+                 PC7+PC8+PC9+PC10+sex,family= "binomial",
+               data=data1)
+  deviance_vec[k] = summary(model1)$deviance
+  coefficient_mat[k,] = coef(model1)[2:3]
+}
+idx = which.min(deviance_vec)
+weight = coefficient_mat[k,]
+PRS2 = PRS_all2[,c(idx,idx+4),drop=F]
+#load validation dataset
+Y2= rep(c(rep(1,N/2),rep(0,N/2)))
+PRS = PRS2%*%weight
+data2 = data.frame(Y = Y2,PRS = PRS,X_covar2)
+roc_obj = roc.binary(status = "Y",
+                     variable = "PRS",
+                     confounders = ~PC1+PC2+PC3+PC4+PC5+PC6+
+                       PC7+PC8+PC9+PC10+sex,
+                     data = data2,
+                     precision=seq(0.05,0.95, by=0.05))
+roc_obj$auc
 
 
 #Super learning algorithm

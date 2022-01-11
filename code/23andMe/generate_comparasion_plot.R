@@ -23,13 +23,14 @@ trait_name = c("Any CVD","Depression",
                "SBMN",
                "Migraine Diagnosis",
                "Morning Person")
-method_vec = c("PT","BESTEUR","weighted_PRS","tdld","TDLD_EB","TDLD_SLEB","TDLD_SLEBall")
+method_vec = c("PT","BESTEUR","BESTEURLDPred2","weighted_PRS","tdld","TDLD_EB","TDLD_SLEB","TDLD_SLEBall")
 method_name = c("C+T","Best EUR SNP (C+T)",
+                "Best EUR SNP (LDpred2)",
                 "Weighted PRS",
                 "TDLD",
                 "TDLD-EB",
-                "TDLD-SLEB",
-                "TDLD-SLEB (all ethnics)")
+                "CT-SLEB (two ethnics)",
+                "CT-SLEB (five ethnics)")
 besteur_methodname = c("Best EUR SNP (C+T)",
                        "Best EUR SNP + target coefficients (C+T)",
                        "Best EUR SNP + EB coefficients (C+T)")
@@ -92,7 +93,17 @@ temp = 1
         colnames(plot.data)[1] = "result"
         plot.data.list[[temp]] = plot.data
         temp = temp+1
-      }else{
+      }else if(method_vec[i1]=="BESTEURLDPred2"){
+        result = read.csv(paste0("./ldpred2_EUR/",eth_group[i],"_",trait[l],"_ldpred2_baseline_testing"))
+        plot.data = data.frame(result = result,
+                               eth = eth_name[i],
+                               trait = trait_name[l],
+                               method_vec = method_name[i1])
+        colnames(plot.data)[1] = "result"
+        plot.data.list[[temp]] = plot.data
+        temp = temp+1
+      }
+      else{
         #the other methods need to separate tuning and validation dataset
         result = read.csv(paste0("./validation_summary/",eth_group[i],"_",trait[l],"_",method_vec[i1]))
         idx.max = which.max(result)
@@ -113,6 +124,7 @@ temp = 1
   }
 }
 prediction.result = rbindlist(plot.data.list)
+#load LDPred2 single ethic results
 load("/Users/zhangh24/GoogleDrive/multi_ethnic/result/23andme/R2.ldpred2.RData")
 eth_group = c("european","african_american",
               "latino","east_asian","south_asian")
@@ -147,18 +159,24 @@ LDpred2 = R2.ldpred2 %>%
   select(result,eth,trait,method_vec)
 # LDpred2 = LDpred2 %>% 
 #   filter(eth!="European")
+
 prediction.result = rbind(prediction.result,LDpred2)
+#load prs-csx result
+prs.csx = read.csv("../PRS-CSx.csv",header = T)
+prediction.result = rbind(prediction.result,prs.csx)
+
+prediction.result = prediction.result %>% 
+  filter(method_vec%in%c("TDLD-EB","TDLD","Best EUR SNP + EB coefficients (C+T)",
+                         "Best EUR SNP + target coefficients (C+T)")==F)
 prediction.result$method_vec = factor(prediction.result$method_vec,
-                          levels = c("C+T",
-                                     "LDpred2",
-                                     "Best EUR SNP (C+T)",
-                                     "Best EUR SNP + target coefficients (C+T)",
-                                     "Best EUR SNP + EB coefficients (C+T)",
-                                     "Weighted PRS",
-                                     "TDLD",
-                                     "TDLD-EB",
-                                     "TDLD-SLEB",
-                                     "TDLD-SLEB (all ethnics)"))
+                                      levels = c("C+T",
+                                                 "LDpred2",
+                                                 "Best EUR SNP (C+T)",
+                                                 "Best EUR SNP (LDpred2)",
+                                                 "Weighted PRS",
+                                                 "PRS-CSx",
+                                                 "CT-SLEB (two ethnics)",
+                                                 "CT-SLEB (five ethnics)"))
 prediction.result$Method = prediction.result$method_vec
 prediction.result$index = rep("1",nrow(prediction.result))
 prediction.result$eth = factor(prediction.result$eth,
@@ -179,36 +197,32 @@ prediction.result.table = prediction.result %>%
 uvals = factor(c("C+T",
                           "LDpred2",
                           "Best EUR SNP (C+T)",
-                          "Best EUR SNP + target coefficients (C+T)",
-                          "Best EUR SNP + EB coefficients (C+T)",
+                          "Best EUR SNP (LDpred2)",
                           "Weighted PRS",
-                          "TDLD",
-                          "TDLD-EB",
-                          "TDLD-SLEB",
-                          "TDLD-SLEB (all ethnics)"),
+                          "PRS-CSx",
+                 "CT-SLEB (two ethnics)",
+                 "CT-SLEB (five ethnics)"),
                levels= c("C+T",
                          "LDpred2",
                          "Best EUR SNP (C+T)",
-                         "Best EUR SNP + target coefficients (C+T)",
-                         "Best EUR SNP + EB coefficients (C+T)",
+                         "Best EUR SNP (LDpred2)",
                          "Weighted PRS",
-                         "TDLD",
-                         "TDLD-EB",
-                         "TDLD-SLEB",
-                         "TDLD-SLEB (all ethnics)"))
+                         "PRS-CSx",
+                         "CT-SLEB (two ethnics)",
+                         "CT-SLEB (five ethnics)"))
 
 n.single = 9
 
 
-single.color =  brewer.pal(n.single, "Blues")[c(5,7)]
+single.color =  brewer.pal(n.single, "Blues")[c(4,7)]
 n.EUR = 9
 
 
-EUR.color = brewer.pal(n.EUR, "Greens")[c(4,5,6)]
+EUR.color = brewer.pal(n.EUR, "Greens")[c(4,7)]
 
 
 n.multi = 9
-multi.color = brewer.pal(n.multi, "Oranges")[c(3:7)]
+multi.color = brewer.pal(n.multi, "Oranges")[c(3,5,7,9)]
 colour = c(single.color,EUR.color,multi.color)
 col_df = tibble(
   colour = c(single.color,EUR.color,multi.color),
@@ -216,14 +230,12 @@ col_df = tibble(
   category = case_when(method_vec%in%c("C+T",
                                        "LDpred2") ~ "Single ethnic method",
                        method_vec%in%c("Best EUR SNP (C+T)",
-                                       "Best EUR SNP + target coefficients (C+T)",
-                                       "Best EUR SNP + EB coefficients (C+T)"
+                                       "Best EUR SNP (LDpred2)"
                        ) ~ "EUR PRS based method",
                        method_vec%in%c("Weighted PRS",
-                                       "TDLD",
-                                       "TDLD-EB",
-                                       "TDLD-SLEB",
-                                       "TDLD-SLEB (all ethnics)") ~ "Multi ethnic method")
+                                       "PRS-CSx",
+                                       "CT-SLEB (two ethnics)",
+                                       "CT-SLEB (five ethnics)") ~ "Multi ethnic method")
 ) %>%   mutate(category = factor(category,levels = c("Single ethnic method",
                                                                  "EUR PRS based method",
                                                                  "Multi ethnic method")))
@@ -277,7 +289,7 @@ prediction.result.sub = prediction.result %>%
                     levels = c("African American",
                                           "Latino","East Asian","South Asian")))
 
-#create benchmark C+T results for european to plot for other ethnic group
+#create benchmark C+T or LDPred2 results for european to plot for other ethnic group
 prediction.result.European.CT = prediction.result %>% 
   filter(trait %in% c("Any CVD","Depression",
                       "SBMN",
@@ -293,11 +305,25 @@ prediction.result.European.LDpred2 = prediction.result %>%
                       "Morning Person")) %>% 
   filter(eth=="European"&
            method_vec=="LDpred2") %>% 
+  
   select(result,trait)
+prediction.result.European =prediction.result %>% 
+  filter(trait %in% c("Any CVD",
+                      "Depression",
+                      "SBMN",
+                      "Migraine Diagnosis",
+                      "Morning Person")) %>% 
+  filter(eth=="European"&
+           method_vec%in%c("C+T","LDpred2")) %>% 
+  group_by(trait) %>% 
+  summarise(newresult = max(result))
+#replace result by better results in CT and LDpred2
+ 
+  
 
-sigma2toauc = function(x){
-  ifelse(x==0,0.50,round(pnorm(0.5*sqrt(x)),2))
-}
+# sigma2toauc = function(x){
+#   ifelse(x==0,0.50,round(pnorm(0.5*sqrt(x)),2))
+# }
 prediction.result.sub = prediction.result.sub %>%
   mutate(sigma2 = ifelse(result<0.5,0,qnorm(result)^2*2))
 
@@ -315,7 +341,7 @@ p.null <- ggplot(prediction.result.sub)+
         axis.ticks.x=element_blank())+
   scale_fill_manual(values = colour) +
   theme(legend.position = "none")+
-  geom_hline(data = prediction.result.European.CT, aes(yintercept = sigma2toauc(result)), linetype = "dashed",color = "red")
+  geom_hline(data = prediction.result.European.CT, aes(yintercept = result), linetype = "dashed",color = "red")
 
 print(p.null)
 p = plot_grid(p.null,p.leg,nrow=1,rel_widths = c(3,1))
@@ -323,38 +349,39 @@ png(filename = "../comparasion_plot/bin_comparasion.png",width=17,height = 12,un
 print(p)
 dev.off()
 
-#convert AUC to liability scale variance
-#AUC = pnorm(sqrt(sigma^2/2))
-#sigma^2 = qnorm(AUC)^2*2
-prediction.result.sub = prediction.result.sub %>% 
-  mutate(sigma2 = ifelse(result<0.5,0,qnorm(result)^2*2))
-
-p.null <- ggplot(prediction.result.sub)+
-  geom_bar(aes(x = index,y = sigma2,fill=method_vec),
-           position = position_dodge(),
-           stat = "identity")+
-  theme_Publication()+
-  ylab("Liability scale variance")+
-  facet_grid(vars(trait),vars(eth))+
-  theme_Publication()+
-  #coord_cartesian(ylim = c(0.47, 0.65)) +
-  theme(axis.title.x=element_blank(),
-        axis.text.x=element_blank(),
-        axis.ticks.x=element_blank())+
-  scale_fill_manual(values = colour) +
-  theme(legend.position = "none")
-
-p = plot_grid(p.null,p.leg,nrow=1,rel_widths = c(3,1))
-png(filename = "../comparasion_plot/bin_comparasion_r2.png",width=17,height = 11,units = "in",res = 300)
-print(p)
-dev.off()
+# #convert AUC to liability scale variance
+# #AUC = pnorm(sqrt(sigma^2/2))
+# #sigma^2 = qnorm(AUC)^2*2
+# prediction.result.sub = prediction.result.sub %>% 
+#   mutate(sigma2 = ifelse(result<0.5,0,qnorm(result)^2*2))
+# 
+# p.null <- ggplot(prediction.result.sub)+
+#   geom_bar(aes(x = index,y = sigma2,fill=method_vec),
+#            position = position_dodge(),
+#            stat = "identity")+
+#   theme_Publication()+
+#   ylab("Liability scale variance")+
+#   facet_grid(vars(trait),vars(eth))+
+#   theme_Publication()+
+#   #coord_cartesian(ylim = c(0.47, 0.65)) +
+#   theme(axis.title.x=element_blank(),
+#         axis.text.x=element_blank(),
+#         axis.ticks.x=element_blank())+
+#   scale_fill_manual(values = colour) +
+#   theme(legend.position = "none")
+# 
+# p = plot_grid(p.null,p.leg,nrow=1,rel_widths = c(3,1))
+# png(filename = "../comparasion_plot/bin_comparasion_r2.png",width=17,height = 11,units = "in",res = 300)
+# print(p)
+# dev.off()
 
 
                                                
 prediction.result.European = prediction.result %>% 
   filter(trait %in% c("Heart metabolic disease burden","Height")) %>% 
   filter(eth=="European") %>% 
-  select(result,trait)
+  group_by(trait) %>% 
+  summarize(newresult = max(result))
 prediction.result.sub = prediction.result %>% 
   filter(trait %in% c("Heart metabolic disease burden","Height")) %>% 
   filter(eth!="European") %>% 
@@ -376,7 +403,7 @@ p.null <- ggplot(prediction.result.sub)+
         axis.ticks.x=element_blank())+
   scale_fill_manual(values = colour) +
   theme(legend.position = "none")+
-  geom_hline(data = prediction.result.European, aes(yintercept = result), linetype = "dashed",color = "red")
+  geom_hline(data = prediction.result.European, aes(yintercept = newresult), linetype = "dashed",color = "red")
 
 
 
