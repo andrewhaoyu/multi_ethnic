@@ -4,8 +4,8 @@ i = as.numeric(args[[1]])
 j = as.numeric(args[[2]])
 
 eth = c("EUR","AFR","AMR","EAS","SAS")
-for(i in 1:5){
-  for(j in 1:22){
+# for(i in 1:5){
+#   for(j in 1:22){
     sid<-Sys.getenv('SLURM_JOB_ID')
     dir.create(paste0('/lscratch/',sid,'/test'),showWarnings = FALSE)
     temp.dir = paste0('/lscratch/',sid,'/test/',eth[i],"/")
@@ -27,7 +27,7 @@ for(i in 1:5){
       dim(bim.hla)
       write.table(bim.hla$V2,file = paste0(temp.dir,"remove_region"),row.names = F,col.names = F,quote=F)
       system(paste0("/data/zhangh24/software/plink2 --bfile ",temp.dir,"chr",j," --exclude ",temp.dir,"remove_region --make-bed --out ",temp.dir,"chr_clean",j))
-      system(paste0("source activate /home/zhangh24/miniconda3/envs/ldsc; ", 
+      system(paste0("module load ldsc; ", 
                     "cd /data/zhangh24/KGref_MEGA/GRCh37/",eth[i],"; ",
                     "python /data/zhangh24/ldsc/ldsc.py ",
                     "--bfile ",temp.dir,"chr_clean",j," ",
@@ -35,7 +35,7 @@ for(i in 1:5){
                     "--out /data/zhangh24/KGref_MEGA/GRCh37/",eth[i],"/",eth[i],"_ldsc/",j))
       
     }else{
-      system(paste0("source activate /home/zhangh24/miniconda3/envs/ldsc; ", 
+      system(paste0("module load ldsc;", 
                     "cd /data/zhangh24/KGref_MEGA/GRCh37/",eth[i],"; ",
                     "python /data/zhangh24/ldsc/ldsc.py ",
                     "--bfile ",temp.dir,"chr",j," ",
@@ -45,8 +45,8 @@ for(i in 1:5){
     }
     system(paste0("rm -rf ",temp.dir))
     #need to create snp list based on the file for ldsc    
-  }
-}
+#   }
+# }
 #need to create snp list based on the file for ldsc    
 # data.dir = "/data/zhangh24/KGref_MEGA/GRCh37/"
 # library(data.table)
