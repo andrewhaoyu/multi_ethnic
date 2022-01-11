@@ -27,20 +27,41 @@ eth = c("EUR","AFR","AMR","EAS","SAS")
       dim(bim.hla)
       write.table(bim.hla$V2,file = paste0(temp.dir,"remove_region"),row.names = F,col.names = F,quote=F)
       system(paste0("/data/zhangh24/software/plink2 --bfile ",temp.dir,"chr",j," --exclude ",temp.dir,"remove_region --make-bed --out ",temp.dir,"chr_clean",j))
-      system(paste0("module load ldsc; ", 
-                    "cd /data/zhangh24/KGref_MEGA/GRCh37/",eth[i],"; ",
-                    "python /data/zhangh24/ldsc/ldsc.py ",
-                    "--bfile ",temp.dir,"chr_clean",j," ",
-                    "--l2 --ld-wind-kb 2000 ",
-                    "--out /data/zhangh24/KGref_MEGA/GRCh37/",eth[i],"/",eth[i],"_ldsc/",j))
+      if(i==3){
+        system(paste0("module load ldsc; ", 
+                      "cd /data/zhangh24/KGref_MEGA/GRCh37/",eth[i],"; ",
+                      "python /data/zhangh24/ldsc/ldsc.py ",
+                      "--bfile ",temp.dir,"chr_clean",j," ",
+                      "--l2 --ld-wind-kb 1000 ",
+                      "--out /data/zhangh24/KGref_MEGA/GRCh37/",eth[i],"/",eth[i],"_ldsc/",j))
+        
+      }else{
+        system(paste0("module load ldsc; ", 
+                      "cd /data/zhangh24/KGref_MEGA/GRCh37/",eth[i],"; ",
+                      "python /data/zhangh24/ldsc/ldsc.py ",
+                      "--bfile ",temp.dir,"chr_clean",j," ",
+                      "--l2 --ld-wind-kb 2000 ",
+                      "--out /data/zhangh24/KGref_MEGA/GRCh37/",eth[i],"/",eth[i],"_ldsc/",j))
+        
+      }
       
     }else{
-      system(paste0("module load ldsc;", 
-                    "cd /data/zhangh24/KGref_MEGA/GRCh37/",eth[i],"; ",
-                    "python /data/zhangh24/ldsc/ldsc.py ",
-                    "--bfile ",temp.dir,"chr",j," ",
-                    "--l2 --ld-wind-kb 2000 ",
-                    "--out /data/zhangh24/KGref_MEGA/GRCh37/",eth[i],"/",eth[i],"_ldsc/",j))
+      if(i==3){
+        system(paste0("module load ldsc; ", 
+                      "cd /data/zhangh24/KGref_MEGA/GRCh37/",eth[i],"; ",
+                      "python /data/zhangh24/ldsc/ldsc.py ",
+                      "--bfile ",temp.dir,"chr_clean",j," ",
+                      "--l2 --ld-wind-kb 1000 ",
+                      "--out /data/zhangh24/KGref_MEGA/GRCh37/",eth[i],"/",eth[i],"_ldsc/",j))
+      }else{
+        system(paste0("module load ldsc;", 
+                      "cd /data/zhangh24/KGref_MEGA/GRCh37/",eth[i],"; ",
+                      "python /data/zhangh24/ldsc/ldsc.py ",
+                      "--bfile ",temp.dir,"chr",j," ",
+                      "--l2 --ld-wind-kb 2000 ",
+                      "--out /data/zhangh24/KGref_MEGA/GRCh37/",eth[i],"/",eth[i],"_ldsc/",j))
+        
+      }
       
     }
     system(paste0("rm -rf ",temp.dir))
