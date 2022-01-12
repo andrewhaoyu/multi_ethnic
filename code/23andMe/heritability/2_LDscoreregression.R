@@ -39,7 +39,7 @@ library(dplyr)
                     " --out ",temp.dir,"sum_align",
                     " --merge-alleles ",ref.dir,"snp_list",
                     " --signed-sumstats Z,0",
-                    " --info-min 0.3 --maf-min 0.01; "))
+                    " --info-min 0.3 --maf-min 0.05; "))
       system(paste0("module load ldsc; ",
                     "/data/zhangh24/ldsc/ldsc.py ",
                     "--h2 ",temp.dir,"sum_align.sumstats.gz ",
@@ -72,7 +72,7 @@ library(dplyr)
                     " --out ",temp.dir,"sum_align",
                     " --merge-alleles ",ref.dir,"snp_list",
                     " --signed-sumstats Z,0",
-                    " --info-min 0.3 --maf-min 0.01; "))
+                    " --info-min 0.3 --maf-min 0.05; "))
       system(paste0("module load ldsc; ",
                     "/data/zhangh24/ldsc/ldsc.py ",
                     "--h2 ",temp.dir,"sum_align.sumstats.gz ",

@@ -27,7 +27,7 @@ eth = c("EUR","AFR","AMR","EAS","SAS")
       dim(bim.hla)
       write.table(bim.hla$V2,file = paste0(temp.dir,"remove_region"),row.names = F,col.names = F,quote=F)
       system(paste0("/data/zhangh24/software/plink2 --bfile ",temp.dir,"chr",j," --exclude ",temp.dir,"remove_region --make-bed --out ",temp.dir,"chr_clean",j))
-      if(i==3){
+      if(i!=2){
         #AMR 1000 genomes data is relateively limited
         system(paste0("module load ldsc; ", 
                       "cd /data/zhangh24/KGref_MEGA/GRCh37/",eth[i],"; ",
@@ -47,7 +47,7 @@ eth = c("EUR","AFR","AMR","EAS","SAS")
       }
       
     }else{
-      if(i==3){
+      if(i!=2){
         system(paste0("module load ldsc;", 
                       "cd /data/zhangh24/KGref_MEGA/GRCh37/",eth[i],"; ",
                       "python /data/zhangh24/ldsc/ldsc.py ",
