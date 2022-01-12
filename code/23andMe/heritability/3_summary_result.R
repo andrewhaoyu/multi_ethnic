@@ -39,7 +39,7 @@ for(i in 1:5){
   }
 }
 sigma2toauc = function(x){
-  ifelse(x==0,0.50,round(pnorm(0.5*sqrt(x)),2))
+  ifelse(x==0,0.50,round(pnorm(sqrt(0.5*x)),2))
 }
 result.long = data.frame(eth_vec,trait_vec,h2_vec,se_vec,
                          h2_new = paste0(h2_vec," (",se_vec,")"),
@@ -49,4 +49,5 @@ result.long.c = data.frame(eth_vec,trait_vec,   h2_new = paste0(h2_vec," (",se_v
 library(tidyr)
 result.wide = spread(result.long.c,eth_vec,h2_new)
 result.wide
-
+result.wide = spread(result.long,eth_vec,auc)
+result.wide

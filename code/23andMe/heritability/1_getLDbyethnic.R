@@ -52,7 +52,7 @@ eth = c("EUR","AFR","AMR","EAS","SAS")
                       "cd /data/zhangh24/KGref_MEGA/GRCh37/",eth[i],"; ",
                       "python /data/zhangh24/ldsc/ldsc.py ",
                       "--bfile ",temp.dir,"chr",j," ",
-                      "--l2 --ld-wind-kb 2000 ",
+                      "--l2 --ld-wind-kb 1000 ",
                       "--out /data/zhangh24/KGref_MEGA/GRCh37/",eth[i],"/",eth[i],"_ldsc/",j))
       }else{
         system(paste0("module load ldsc;", 
