@@ -163,18 +163,21 @@ LDpred2 = R2.ldpred2 %>%
 prediction.result = rbind(prediction.result,LDpred2)
 #load prs-csx result
 prs.csx = read.csv("../PRS-CSx.csv",header = T)
+
 prediction.result = rbind(prediction.result,prs.csx)
 
 prediction.result = prediction.result %>% 
   filter(method_vec%in%c("TDLD-EB","TDLD","Best EUR SNP + EB coefficients (C+T)",
                          "Best EUR SNP + target coefficients (C+T)")==F)
+prediction.result = prediction.result %>% 
+  filter(method_vec!="PRS-CSx")
 prediction.result$method_vec = factor(prediction.result$method_vec,
                                       levels = c("C+T",
                                                  "LDpred2",
                                                  "Best EUR SNP (C+T)",
                                                  "Best EUR SNP (LDpred2)",
                                                  "Weighted PRS",
-                                                 "PRS-CSx",
+                               #                  "PRS-CSx",
                                                  "CT-SLEB (two ethnics)",
                                                  "CT-SLEB (five ethnics)"))
 prediction.result$Method = prediction.result$method_vec
@@ -184,6 +187,7 @@ prediction.result$eth = factor(prediction.result$eth,
                                   "Latino","East Asian","South Asian"))
 
 save(prediction.result,file = "/Users/zhangh24/GoogleDrive/multi_ethnic/result/23andme/prediction_summary.rdata")
+write.csv(prediction.result, file = "/Users/zhangh24/GoogleDrive/multi_ethnic/result/23andme/prediction_summary.csv")
 sigma2toauc = function(x){
   ifelse(x==0,0.50,round(pnorm(0.5*sqrt(x)),2))
 }
@@ -199,7 +203,7 @@ uvals = factor(c("C+T",
                           "Best EUR SNP (C+T)",
                           "Best EUR SNP (LDpred2)",
                           "Weighted PRS",
-                          "PRS-CSx",
+                        #  "PRS-CSx",
                  "CT-SLEB (two ethnics)",
                  "CT-SLEB (five ethnics)"),
                levels= c("C+T",
@@ -207,7 +211,7 @@ uvals = factor(c("C+T",
                          "Best EUR SNP (C+T)",
                          "Best EUR SNP (LDpred2)",
                          "Weighted PRS",
-                         "PRS-CSx",
+                         #"PRS-CSx",
                          "CT-SLEB (two ethnics)",
                          "CT-SLEB (five ethnics)"))
 
@@ -222,7 +226,8 @@ EUR.color = brewer.pal(n.EUR, "Greens")[c(4,7)]
 
 
 n.multi = 9
-multi.color = brewer.pal(n.multi, "Oranges")[c(3,5,7,9)]
+#multi.color = brewer.pal(n.multi, "Oranges")[c(3,5,7,9)]
+multi.color = brewer.pal(n.multi, "Oranges")[c(3,7,9)]
 colour = c(single.color,EUR.color,multi.color)
 col_df = tibble(
   colour = c(single.color,EUR.color,multi.color),
@@ -394,7 +399,7 @@ p.null <- ggplot(prediction.result.sub)+
            position = position_dodge(),
            stat = "identity")+
   theme_Publication()+
-  ylab("R2")+
+  ylab(expression(bold(R^2)))+
   facet_grid(vars(trait),vars(eth),scales = "free")+
   theme_Publication()+
   #coord_cartesian(ylim = c(0.47, 0.65)) +

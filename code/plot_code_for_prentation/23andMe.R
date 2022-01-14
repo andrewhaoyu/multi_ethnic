@@ -23,18 +23,9 @@ trait_name = c("Any CVD","Depression",
                "SBMN",
                "Migraine Diagnosis",
                "Morning Person")
-method_vec = c("PT","BESTEUR","weighted_PRS","tdld","TDLD_EB","TDLD_SLEB","TDLD_SLEBall")
-method_name = c("C+T","Best EUR SNP (C+T)",
-                "Weighted PRS",
-                "TDLD",
-                "TDLD-EB",
-                "TDLD-SLEB",
-                "TDLD-SLEB (all ethnics)")
-besteur_methodname = c("Best EUR SNP (C+T)",
-                       "Best EUR SNP + target coefficients (C+T)",
-                       "Best EUR SNP + EB coefficients (C+T)")
+
 source("/Users/zhangh24/GoogleDrive/multi_ethnic/code/stratch/theme_publication.R")
-pthres <- c(5E-08,5E-07,5E-06,5E-05,5E-04,5E-03,5E-02,5E-01,1.0)
+
 #load all results
 plot.data.list = list()
 library(tidyverse)
@@ -46,146 +37,27 @@ library(RColorBrewer)
 library(grid)
 library(gridExtra)
 library(cowplot)
-temp = 1
-
-for(l in 1:7){
-  for(i in 1:5){
-    for(i1 in 1:length(method_vec)){
-      if(i==1&i1==1){
-        result = read.csv(paste0("./validation_summary/",eth_group[i],"_",trait[l],"_",method_vec[i1]))
-        idx.max = which.max(result)
-        result = read.csv(paste0("./testing_summary/",eth_group[i],"_",trait[l],"_",method_vec[i1]))
-        #result2 = read.csv(paste0("./validation_summary/",eth_group[i],"_",trait[l],"_",method_vec[i1]))
-        plot.data = data.frame(result = result[idx.max],
-                               eth = eth_name[i],
-                               trait = trait_name[l],
-                               method_vec = method_name[i1])
-        colnames(plot.data)[1] = "result"
-        plot.data.list[[temp]] = plot.data
-        temp = temp+1
-      }else if(i==1&i1!=1){
-        #do nothing since European only have single ethnic method 
-      }else {
-        if(method_vec[i1]=="BESTEUR"){
-          #BEST EUR doens't need tuning parameters
-          result = read.csv(paste0("./testing_summary/",eth_group[i],"_",trait[l],"_",method_vec[i1]))
-          #three different BEST EUR methods
-          for(k in 1:3){
-            plot.data = data.frame(result = result[k],
-                                   eth = eth_name[i],
-                                   trait = trait_name[l],
-                                   method_vec = besteur_methodname[k])
-            colnames(plot.data)[1] = "result"
-            plot.data.list[[temp]] = plot.data
-            
-            temp = temp+1
-            
-          }
-          
-        }else if(method_vec[i1]%in%c("weighted_PRS","TDLD_SLEB","TDLD_SLEBall")){
-          #weighted PRS, TDLD-SLEB and TDLD-SLEB all ethnic only need validation
-          result = read.csv(paste0("./summary_",method_vec[i1],"/",eth_group[i],"_",trait[l]))
-          plot.data = data.frame(result = result,
-                                 eth = eth_name[i],
-                                 trait = trait_name[l],
-                                 method_vec = method_name[i1])
-          colnames(plot.data)[1] = "result"
-          plot.data.list[[temp]] = plot.data
-          temp = temp+1
-        }else{
-          #the other methods need to separate tuning and validation dataset
-          result = read.csv(paste0("./validation_summary/",eth_group[i],"_",trait[l],"_",method_vec[i1]))
-          idx.max = which.max(result)
-          result = read.csv(paste0("./testing_summary/",eth_group[i],"_",trait[l],"_",method_vec[i1]))
-          #result2 = read.csv(paste0("./validation_summary/",eth_group[i],"_",trait[l],"_",method_vec[i1]))
-          plot.data = data.frame(result = result[idx.max],
-                                 eth = eth_name[i],
-                                 trait = trait_name[l],
-                                 method_vec = method_name[i1])
-          colnames(plot.data)[1] = "result"
-          plot.data.list[[temp]] = plot.data
-          temp = temp+1
-        }
-        
-      }
-      
-    }
-  }
-}
-prediction.result = rbindlist(plot.data.list)
-load("/Users/zhangh24/GoogleDrive/multi_ethnic/result/23andme/R2.ldpred2.RData")
-eth_group = c("european","african_american",
-              "latino","east_asian","south_asian")
-eth_name = c("European","African American",
-             "Latino","East Asian","South Asian")
-trait_name = c("Any CVD","Depression",
-               "Heart metabolic disease burden",
-               "Height",
-               "SBMN",
-               "Migraine Diagnosis",
-               "Morning Person")
-LDpred2 = R2.ldpred2 %>% 
-  mutate(eth = case_when(
-    Race=="AFR" ~ "African American",
-    Race=="EUR" ~ "European",
-    Race=="AMR" ~ "Latino",
-    Race=="EAS" ~ "East Asian",
-    Race=="SAS" ~ "South Asian"
-    
-  ),
-  trait = case_when(
-    Trait=="any_cvd" ~ "Any CVD",
-    Trait=="depression" ~ "Depression",
-    Trait=="heart_metabolic_disease_burden" ~ "Heart metabolic disease burden",
-    Trait=="height" ~ "Height",
-    Trait=="iqb.sing_back_musical_note" ~ "SBMN",
-    Trait=="migraine_diagnosis" ~ "Migraine Diagnosis",
-    Trait=="morning_person" ~ "Morning Person"
-  ),
-  result = R2,
-  method_vec = "LDpred2") %>% 
-  select(result,eth,trait,method_vec)
-# LDpred2 = LDpred2 %>% 
-#   filter(eth!="European")
-prediction.result = rbind(prediction.result,LDpred2)
+load("/Users/zhangh24/GoogleDrive/multi_ethnic/result/23andme/prediction_summary.rdata")
 prediction.result = prediction.result %>% 
-  mutate(method_vec=ifelse(method_vec=="TDLD-SLEB","CT-SLEB (two ethnics)",method_vec)) %>% 
-  mutate(method_vec=ifelse(method_vec=="TDLD-SLEB (all ethnics)","CT-SLEB (five ethnics)",method_vec)) %>% 
-  filter(method_vec%in%c("TDLD-EB","TDLD","Best EUR SNP + EB coefficients (C+T)",
-                         "Best EUR SNP + target coefficients (C+T)")==F)
-prediction.result$method_vec = factor(prediction.result$method_vec,
-                                      levels = c("C+T",
-                                                 "LDpred2",
-                                                 "Best EUR SNP (C+T)",
-                                                 "Weighted PRS",
-                                                 "CT-SLEB (two ethnics)",
-                                                 "CT-SLEB (five ethnics)"))
-prediction.result$Method = prediction.result$method_vec
-prediction.result$index = rep("1",nrow(prediction.result))
-prediction.result$eth = factor(prediction.result$eth,
-                               levels = c("European","African American",
-                                          "Latino","East Asian","South Asian"))
-
-save(prediction.result,file = "/Users/zhangh24/GoogleDrive/multi_ethnic/result/23andme/prediction_summary.rdata")
-sigma2toauc = function(x){
-  ifelse(x==0,0.50,round(pnorm(0.5*sqrt(x)),2))
-}
-prediction.result.table = prediction.result %>% 
-  mutate(sigma2 = ifelse(result<0.5,0,qnorm(result)^2*2)) %>% 
-  mutate(sigma2 = ifelse(trait%in%
-                           c("Heart metabolic disease burden","Height"),NA,sigma2)) %>% 
-  select(eth,trait,Method,result,sigma2)
+  filter(Method!="PRS-CSx")
+# prediction.result.table = prediction.result %>% 
+#   mutate(sigma2 = ifelse(result<0.5,0,qnorm(result)^2*2)) %>% 
+#   mutate(sigma2 = ifelse(trait%in%
+#                            c("Heart metabolic disease burden","Height"),NA,sigma2)) %>% 
+#   select(eth,trait,Method,result,sigma2)
 # write.csv(prediction.result.table,file = "/Users/zhangh24/GoogleDrive/multi_ethnic/result/23andme/prediction_summary.csv",row.names = F)
 
 uvals = factor(c("C+T",
                  "LDpred2",
                  "Best EUR SNP (C+T)",
+                 "Best EUR SNP (LDpred2)",
                  "Weighted PRS",
                  "CT-SLEB (two ethnics)",
                  "CT-SLEB (five ethnics)"),
                levels= c("C+T",
                          "LDpred2",
                          "Best EUR SNP (C+T)",
+                         "Best EUR SNP (LDpred2)",
                          "Weighted PRS",
                          "TDLD",
                          "CT-SLEB (two ethnics)",
@@ -198,7 +70,7 @@ single.color =  brewer.pal(n.single, "Blues")[c(5,7)]
 n.EUR = 9
 
 
-EUR.color = brewer.pal(n.EUR, "Greens")[c(5)]
+EUR.color = brewer.pal(n.EUR, "Greens")[c(5,7)]
 
 
 n.multi = 9
@@ -210,12 +82,9 @@ col_df = tibble(
   category = case_when(method_vec%in%c("C+T",
                                        "LDpred2") ~ "Single ethnic method",
                        method_vec%in%c("Best EUR SNP (C+T)",
-                                       "Best EUR SNP + target coefficients (C+T)",
-                                       "Best EUR SNP + EB coefficients (C+T)"
+                                       "Best EUR SNP (LDpred2)"
                        ) ~ "EUR PRS based method",
                        method_vec%in%c("Weighted PRS",
-                                       "TDLD",
-                                       "TDLD-EB",
                                        "CT-SLEB (two ethnics)",
                                        "CT-SLEB (five ethnics)") ~ "Multi ethnic method")
 ) %>%   mutate(category = factor(category,levels = c("Single ethnic method",
@@ -289,9 +158,6 @@ prediction.result.European.LDpred2 = prediction.result %>%
            method_vec=="LDpred2") %>% 
   select(result,trait)
 
-sigma2toauc = function(x){
-  ifelse(x==0,0.50,round(pnorm(0.5*sqrt(x)),2))
-}
 prediction.result.sub = prediction.result.sub %>%
   mutate(sigma2 = ifelse(result<0.5,0,qnorm(result)^2*2))
 prediction.result.sub = prediction.result.sub %>% 
@@ -312,7 +178,7 @@ p.null <- ggplot(prediction.result.sub)+
         axis.ticks.x=element_blank())+
   scale_fill_manual(values = colour) +
   theme(legend.position = "none")+
-  geom_hline(data = prediction.result.European.CT, aes(yintercept = sigma2toauc(result)), linetype = "dashed",color = "red")
+  geom_hline(data = prediction.result.European.CT, aes(yintercept =result), linetype = "dashed",color = "red")
 
 print(p.null)
 p = plot_grid(p.null,p.leg,nrow=1,rel_widths = c(3,1))
@@ -363,31 +229,3 @@ dev.off()
 
 
 
-#change AUC to R2
-prediction.result.sub = prediction.result %>% 
-  mutate(R2 = ifelse(trait %in% c("Heart metabolic disease burden","Height"),
-                     result,
-                     ifelse(result<0.5,0,qnorm(result)^2*2))) %>% 
-  filter(method_vec%in%c("Weighted PRS","TDLD-SLEB"))
-
-#generate relative R2 improvment
-trait = rep("c",1000)
-eth = rep("c",1000)
-relative_R2 = rep(0,1000)
-temp = 1
-for(k in 1:(nrow(prediction.result.sub)/2)){
-  relative_R2[temp] = as.numeric((prediction.result.sub[2*temp,"R2"]-prediction.result.sub[2*temp-1,"R2"])/prediction.result.sub[2*temp-1,"R2"])
-  trait[temp] = as.character(prediction.result.sub[2*temp,"trait"])
-  eth[temp] = as.character(prediction.result.sub$eth[2*temp])
-  temp = temp + 1
-}
-
-relative_R2 = relative_R2[1:(temp-1)]
-trait = trait[1:(temp-1)]
-eth = eth[1:(temp-1)]
-
-result = data.frame(relative_R2,trait,eth)
-
-result %>% group_by(eth) %>% 
-  summarise(mean(relative_R2))
-prediction.result.sub %>% filter(trait =="Any CVD")

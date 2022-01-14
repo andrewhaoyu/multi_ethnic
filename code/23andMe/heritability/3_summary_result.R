@@ -39,15 +39,18 @@ for(i in 1:5){
   }
 }
 sigma2toauc = function(x){
-  ifelse(x==0,0.50,round(pnorm(sqrt(0.5*x)),2))
+  ifelse(x==0,0.50,round(pnorm(sqrt(0.5*x)),3))
 }
 result.long = data.frame(eth_vec,trait_vec,h2_vec,se_vec,
-                         h2_new = paste0(h2_vec," (",se_vec,")"),
-                         auc = sigma2toauc(h2_vec))
-result.long.c = data.frame(eth_vec,trait_vec,   h2_new = paste0(h2_vec," (",se_vec,")"))
+                         h2_new = paste0(round(h2_vec,3)," (",round(se_vec,3),")"),
+                        )
+result.long.h2 = data.frame(eth_vec,trait_vec,   h2_new = paste0(round(h2_vec,3)," (",round(se_vec,3),")"))
 
 library(tidyr)
-result.wide = spread(result.long.c,eth_vec,h2_new)
+result.wide = spread(result.long.h2,eth_vec,h2_new)
 result.wide
-result.wide = spread(result.long,eth_vec,auc)
-result.wide
+result.long.auc = data.frame(eth_vec,trait_vec,    auc = sigma2toauc(h2_vec))
+result.wide.auc = spread(result.long.auc,eth_vec,auc)
+result.wide.auc
+write.csv(result.wide,"/data/zhangh24/multi_ethnic/result/cleaned/herit/herit.table.csv")
+write.csv(result.wide.auc,"/data/zhangh24/multi_ethnic/result/cleaned/herit/herit.table.auc.csv")

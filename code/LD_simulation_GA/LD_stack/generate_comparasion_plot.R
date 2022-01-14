@@ -31,9 +31,9 @@ alleth.EB.result = alleth.EB.result %>%
 weightedprs.result = weightedprs.result %>% 
   mutate(method_vec = "Weighted PRS")
 EB.result = EB.result %>% 
-  mutate(method_vec=ifelse(method_vec=="TDLD-SLEB","TDLD-SLEB (two ethnics)",method_vec))
+  mutate(method_vec=ifelse(method_vec=="TDLD-SLEB","CT-SLEB (two ethnics)",method_vec))
 alleth.EB.result = alleth.EB.result %>% 
-  mutate(method_vec=ifelse(method_vec=="TDLD-SLEB (all ethnics)","TDLD-SLEB (five ethnics)",method_vec))
+  mutate(method_vec=ifelse(method_vec=="TDLD-SLEB (all ethnics)","CT-SLEB (five ethnics)",method_vec))
 prediction.result <- rbind(LD.clump.result,
                            SCT.clump.result,
                            LDpred2.result,
@@ -44,7 +44,11 @@ prediction.result <- rbind(LD.clump.result,
                            TDLD.result,
                            EB.result,
                            alleth.EB.result)
-
+prediction.result = prediction.result %>% 
+  filter(method_vec%in%c("SCT","Best EUR SNP + target coefficients (C+T)",
+                         "Best EUR SNP + EB coefficients (C+T)",
+                         "TDLD",
+                         "TDLD-EB")==F)
 
 prediction.result = prediction.result %>% 
   mutate(cau_vec = case_when(
@@ -66,18 +70,18 @@ prediction.result = prediction.result %>%
                               levels = c("15000","45000","80000","100000")),
         method_vec = factor(method_vec,
                             levels = c("C+T",
-                                       "SCT",
+                                       #"SCT",
                                        "LDpred2",
                                        "Best EUR SNP (C+T)",
-                                       "Best EUR SNP + target coefficients (C+T)",
-                                       "Best EUR SNP + EB coefficients (C+T)",
+                                       #"Best EUR SNP + target coefficients (C+T)",
+                                       #"Best EUR SNP + EB coefficients (C+T)",
                                        "Best EUR PRS (LDpred2)",
                                        "Weighted PRS",
                                        "PRS-CSx",
-                                       "TDLD",
-                                       "TDLD-EB",
-                                       "TDLD-SLEB (two ethnics)",
-                                       "TDLD-SLEB (five ethnics)"
+                                      # "TDLD",
+                                      # "TDLD-EB",
+                                       "CT-SLEB (two ethnics)",
+                                       "CT-SLEB (five ethnics)"
                                        ))) %>% 
   mutate(ga_arc = case_when(ga_vec==1 ~"Fixed common SNP heritability with strong negative selection",
                             ga_vec==2 ~"Fixed whole genome heritability with strong negative selection",
@@ -94,8 +98,8 @@ prediction.result = prediction.result %>%
              "Best EUR PRS (LDpred2)",
              "Weighted PRS",
              "PRS-CSx",
-             "TDLD-SLEB (two ethnics)",
-             "TDLD-SLEB (five ethnics)"
+             "CT-SLEB (two ethnics)",
+             "CT-SLEB (five ethnics)"
            ))
 
 uvals = unique(prediction.result$method_vec)
@@ -123,8 +127,8 @@ col_df = tibble(
                                        ) ~ "EUR PRS based method",
                        method_vec%in%c("Weighted PRS",
                                        "PRS-CSx",
-                                       "TDLD-SLEB (two ethnics)",
-                                       "TDLD-SLEB (five ethnics)") ~ "Multi ethnic method")
+                                       "CT-SLEB (two ethnics)",
+                                       "CT-SLEB (five ethnics)") ~ "Multi ethnic method")
 ) %>% 
   mutate(category = factor(category,levels = c("Single ethnic method",
                                                   "EUR PRS based method",
@@ -155,7 +159,7 @@ run_plot = function(filler, values) {
              position = position_dodge())+
     #geom_point(aes(color=method_vec))+
     theme_Publication()+
-    ylab("R2")+
+    ylab(expression(paste0(R^2)))+
     xlab("Sample Size")+
     labs(fill = filler)+
     scale_fill_manual(values = values)
@@ -182,7 +186,7 @@ for(m in 1:4){
                position = position_dodge())+
       #geom_point(aes(color=method_vec))+
       theme_Publication()+
-      ylab("R2")+
+      ylab(expression(bold(R^2)))+
       xlab("Sample Size")+
       labs(fill = "Method")+
       facet_grid(vars(cau_vec),vars(eth.vec))+

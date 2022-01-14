@@ -78,7 +78,7 @@ if(l%in%c(3,4)){#continous traits
                 "--ref-ld-chr /data/zhangh24/ldsc/eas_ldscores/ ",
                 "--w-ld-chr /data/zhangh24/ldsc/eas_ldscores/ ",
                 "--out ",temp.dir,"result "))
-  result.folder = paste0("/data/zhangh24/multi_ethnic/result/cleaned/herit/",eth[i],"/",trait[l])
+  
   system(paste0("less ",temp.dir,"result.log"))
   sigma2toauc = function(x){
     ifelse(x==0,0.50,round(pnorm(0.5*sqrt(x)),2))

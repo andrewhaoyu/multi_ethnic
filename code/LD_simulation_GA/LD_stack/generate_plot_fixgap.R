@@ -13,6 +13,15 @@ LD.clump.result <- LD.result.list[[1]] %>%
   mutate(method_vec = rep("C+T")) %>% 
   filter(eth.vec == "EUR"&
            m_vec== 4)
+load(paste0("LDpred2.result.rdata"))
+LDpred2.result.sub = LDpred2.result %>% 
+  filter(eth.vec=="EUR"&m_vec==4)
+EUR.result = rbind(LD.clump.result,LDpred2.result.sub) %>% 
+  group_by(l_vec,ga_vec) %>% 
+  summarise(eur.result = max(r2.vec))
+
+rbind(LD.clump.result,LDpred2.result.sub) %>% 
+  filter(l_vec==3&ga_vec==3)
 load(paste0("LD.clump.result.EB.rdata"))
 EB.result = EB.result %>% 
   filter(method_vec=="TDLD-SLEB")
@@ -56,14 +65,14 @@ for(i1 in 1:5){
   p <- ggplot(result.sub,aes(x= sample_size,y=relative.r2,group=eth.vec))+
     geom_line(aes(color=eth.vec),size = 1)+
     geom_point(aes(color=eth.vec))+
+    ylab(expression(bold(paste("Relative ", R^2))))+
     theme_Publication()+
-    ylab("Relative R2")+
     xlab("Training sample size")+
     labs(color = "Ethnic group")+
     facet_grid(cols=vars(cau_vec))+
     #scale_color_brewer(palette = "Paired")+
     scale_colour_Publication()+
-    ggtitle(paste0("Relative performance of TDLD-SLEB over single ethnic European C + T"))+
+    ggtitle(paste0("Relative performance of CT-SLEB over single ethnic European PRS"))+
     geom_hline(yintercept=1, linetype="dashed", 
                color = "red")+
     theme(legend.text=element_text(size=12))
