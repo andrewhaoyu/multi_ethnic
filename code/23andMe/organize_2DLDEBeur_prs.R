@@ -130,4 +130,3 @@ prs.snp = prs.snp[,-1]
 out.dir.organize.prs <- paste0("/data/zhangh24/multi_ethnic/result/cleaned/organize_prs/",method,"/",eth_group[i],"/",trait[l],"/")
 #out.dir.organize.prs <- paste0("/data/zhangh24/multi_ethnic/result/cleaned/organize_prs/",method,"/",eth[i],"/",trait[l],"/")
 write.table(prs.snp,file = paste0(out.dir.organize.prs,"prs.file"),row.names = F,col.names = F,quote=F)
-sss

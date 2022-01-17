@@ -18,6 +18,9 @@ library(data.table)
 library(dplyr)
 
 eth <- c("EUR","AFR","AMR","EAS","SAS")
+eth_group = c("european","african_american",
+              "latino","east_asian","south_asian")
+
 trait <- c("any_cvd","depression",
            "heart_metabolic_disease_burden",
            "height",
@@ -105,18 +108,23 @@ gc()
 col_num = 1
 
 total = 4*length(r2_vec)*length(wc_base_vec)*length(pthres)*length(pthres)
-beta_mat = matrix(nrow= nrow(prs.snp),ncol = total)
+beta_mat = data.frame(matrix(nrow= nrow(prs.snp),ncol = total))
 
 out.dir.prs <- paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/",method,"/",eth[i],"/",trait[l],"/")
 
 #generate prs following required format
 col_num = 1
+#column index to represent the current column position
+col_ind = 1
 #run through all the prs to get unique number of snps
 out.dir.prs <- paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/",method,"/",eth[i],"/",trait[l],"/")
-for(i_post in 2:4){
+library(caret)
+for(i_post in 2:5){
   for(r_ind in 1:length(r2_vec)){
     for(w_ind in 1:length(wc_base_vec)){ 
-      
+      #filter out all the highly correlated columns
+      beta_mat_temp = as.data.frame(matrix(nrow = nrow(prs.snp),ncol = length(pthres)^2))
+      temp = 1
       for(k1 in 1:length(pthres)){
         for(k2 in 1:length(pthres)){
           print(col_num)
@@ -124,26 +132,29 @@ for(i_post in 2:4){
           prs.snp.temp = left_join(prs.snp,prs.file,by="SNP") %>% 
             mutate(BETA = ifelse(is.na(BETA),0,BETA)) %>% 
             mutate(BETA = round(BETA,4))
-          beta_mat[,col_num] = prs.snp.temp$BETA
+          beta_mat_temp[,temp] = prs.snp.temp$BETA
           #colnames(prs.snp)[col_num+2] = paste0("BETA",col_num)
           col_num = col_num+1
+          temp = temp + 1
         }
       }
+      
+      mtx = cor(beta_mat_temp)
+      drop = findCorrelation(mtx,cutoff=0.98)
+      drop = names(beta_mat_temp)[drop]
+      beta_mat_temp_new = beta_mat_temp %>% 
+        select(-all_of(drop))
+      beta_mat[,col_ind:ncol(beta_mat_temp_new)] = beta_mat_temp_new
+      col_ind = col_ind+ncol(beta_mat_temp_new)
     }
   }
   
 }
-prs.mat = as.data.frame(beta_mat)
-mtx = cor(beta_mat)
-library(caret)
-drop = findCorrelation(mtx,cutoff=0.98)
-drop = names(beta_mat)[drop]
-beta_mat_new = beta_mat %>% 
-  select(-all_of(drop))
+#save(beta_mat,file = "/data/zhangh24/multi_ethnic/result/beta_mat.rdata")
+beta_mat = beta_mat[,1:(col_ind-1)]
 
-prs.snp = cbind(prs.snp,beta_mat_new)
-prs.snp = prs.snp[,-1]
+prs.snp = cbind(prs.snp,beta_mat)
 prs.snp = prs.snp[,-1]
 
-out.dir.organize.prs <- paste0("/data/zhangh24/multi_ethnic/result/cleaned/organize_prs/",method,"/",eth[i],"/",trait[l],"/")
+out.dir.organize.prs <- paste0("/data/zhangh24/multi_ethnic/result/cleaned/organize_prs/",method,"/",eth_group[i],"/",trait[l],"/")
 write.table(prs.snp,file = paste0(out.dir.organize.prs,"prs.file"),row.names = F,col.names = F,quote=F)
