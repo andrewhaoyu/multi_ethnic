@@ -18,8 +18,6 @@ library(data.table)
 library(dplyr)
 
 eth <- c("EUR","AFR","AMR","EAS","SAS")
-eth_group = c("european","african_american",
-              "latino","east_asian","south_asian")
 trait <- c("any_cvd","depression",
            "heart_metabolic_disease_burden",
            "height",
@@ -35,7 +33,7 @@ load(paste0(data.dir,"snpinfo/snpinfo_mega.RData"))
 snpinfo_mega_filter = snpinfo_mega %>% 
   filter(!is.na(im.data.id)) %>% 
   select(im.data.id,assay.name)
-method = "TDLD_EBeur"
+method = "TDLD_EBalleur"
 #genearte index file to match columns in organize prs and parameters
 # total = (length(eth)-1)*length(trait)*length(pthres)^2*length(r2_vec)*length(wc_base_vec)
 # eth_vec = rep("c",total)
@@ -78,56 +76,74 @@ method = "TDLD_EBeur"
 
 # for(i in 1:length(eth)){
 #   for(l in 1:length(trait)){
-col_num = 1
+col_num = length(pthres)^2
 #run through all the prs to get unique number of snps
 rs.id.list = list()
 out.dir.prs <- paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/",method,"/",eth[i],"/",trait[l],"/")
-for(r_ind in 1:length(r2_vec)){
-  for(w_ind in 1:length(wc_base_vec)){ 
-    
-    for(k1 in 1:length(pthres)){
-      for(k2 in 1:length(pthres)){
-        print(col_num)
-        prs.file <- fread(paste0(out.dir.prs,col_num,"_",method,"_rind_",r_ind,"_wcind_",w_ind,"_ptar_",k1,"_peur_",k2),header=T)
-        rs.id.list[[col_num]] = prs.file[,1,drop=F]
-        col_num = col_num+1
+for(i_post in 2:5){
+  for(r_ind in 1:length(r2_vec)){
+    for(w_ind in 1:length(wc_base_vec)){ 
+      #just need the last p-thresholds to know the number of SNPs in particular r2 and window
+      for(k1 in length(pthres):length(pthres)){
+        for(k2 in length(pthres):length(pthres)){
+          print(col_num)
+          prs.file <- fread(paste0(out.dir.prs,col_num,"_",method,"_rind_",r_ind,"_wcind_",w_ind,"_ptar_",k1,"_peur_",k2),header=T)
+          rs.id.list[[col_num]] = prs.file[,1,drop=F]
+          col_num = col_num+length(pthres)^2
+        }
       }
     }
   }
 }
+
 rs.id = unique(rbindlist(rs.id.list))
 prs.snp = left_join(rs.id,snpinfo_mega_filter,by=c("SNP"="assay.name")) %>% 
   arrange(im.data.id)
+rm(rs.id.list)
+gc()
 
-#generate prs following required format
 col_num = 1
 
-total = length(r2_vec)*length(wc_base_vec)*length(pthres)*length(pthres)
-beta_mat = matrix(0,nrow(prs.snp),total)
+total = 4*length(r2_vec)*length(wc_base_vec)*length(pthres)*length(pthres)
+beta_mat = matrix(nrow= nrow(prs.snp),ncol = total,sparse= T)
 
 out.dir.prs <- paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/",method,"/",eth[i],"/",trait[l],"/")
 
-
-for(r_ind in 1:length(r2_vec)){
-  for(w_ind in 1:length(wc_base_vec)){ 
-    
-    for(k1 in 1:length(pthres)){
-      for(k2 in 1:length(pthres)){
-        print(col_num)
-        prs.file <- fread(paste0(out.dir.prs,col_num,"_",method,"_rind_",r_ind,"_wcind_",w_ind,"_ptar_",k1,"_peur_",k2),header=T)
-        prs.snp.temp = left_join(prs.snp,prs.file,by="SNP") %>% 
-          mutate(BETA = ifelse(is.na(BETA),0,BETA))
-        beta_mat[,col_num] = prs.snp.temp$BETA
-        #colnames(prs.snp)[col_num+2] = paste0("BETA",col_num)
-        col_num = col_num+1
+#generate prs following required format
+col_num = 1
+#run through all the prs to get unique number of snps
+out.dir.prs <- paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/",method,"/",eth[i],"/",trait[l],"/")
+for(i_post in 2:4){
+  for(r_ind in 1:length(r2_vec)){
+    for(w_ind in 1:length(wc_base_vec)){ 
+      
+      for(k1 in 1:length(pthres)){
+        for(k2 in 1:length(pthres)){
+          print(col_num)
+          prs.file <- fread(paste0(out.dir.prs,col_num,"_",method,"_rind_",r_ind,"_wcind_",w_ind,"_ptar_",k1,"_peur_",k2),header=T)
+          prs.snp.temp = left_join(prs.snp,prs.file,by="SNP") %>% 
+            mutate(BETA = ifelse(is.na(BETA),0,BETA)) %>% 
+            mutate(BETA = round(BETA,4))
+          beta_mat[,col_num] = prs.snp.temp$BETA
+          #colnames(prs.snp)[col_num+2] = paste0("BETA",col_num)
+          col_num = col_num+1
+        }
       }
     }
   }
+  
 }
-prs.snp = cbind(prs.snp,beta_mat)
+prs.mat = as.data.frame(beta_mat)
+mtx = cor(beta_mat)
+library(caret)
+drop = findCorrelation(mtx,cutoff=0.98)
+drop = names(beta_mat)[drop]
+beta_mat_new = beta_mat %>% 
+  select(-all_of(drop))
+
+prs.snp = cbind(prs.snp,beta_mat_new)
+prs.snp = prs.snp[,-1]
 prs.snp = prs.snp[,-1]
 
-out.dir.organize.prs <- paste0("/data/zhangh24/multi_ethnic/result/cleaned/organize_prs/",method,"/",eth_group[i],"/",trait[l],"/")
-#out.dir.organize.prs <- paste0("/data/zhangh24/multi_ethnic/result/cleaned/organize_prs/",method,"/",eth[i],"/",trait[l],"/")
+out.dir.organize.prs <- paste0("/data/zhangh24/multi_ethnic/result/cleaned/organize_prs/",method,"/",eth[i],"/",trait[l],"/")
 write.table(prs.snp,file = paste0(out.dir.organize.prs,"prs.file"),row.names = F,col.names = F,quote=F)
-sss
