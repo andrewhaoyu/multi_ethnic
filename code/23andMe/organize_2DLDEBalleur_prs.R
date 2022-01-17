@@ -105,7 +105,7 @@ gc()
 col_num = 1
 
 total = 4*length(r2_vec)*length(wc_base_vec)*length(pthres)*length(pthres)
-beta_mat = matrix(nrow= nrow(prs.snp),ncol = total,sparse= T)
+beta_mat = matrix(nrow= nrow(prs.snp),ncol = total)
 
 out.dir.prs <- paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/",method,"/",eth[i],"/",trait[l],"/")
 

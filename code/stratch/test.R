@@ -83,8 +83,8 @@ for(i_post in 2:5){
   for(r_ind in 1:length(r2_vec)){
     for(w_ind in 1:length(wc_base_vec)){ 
       #just need the last p-thresholds to know the number of SNPs in particular r2 and window
-      for(k1 in length(pthres):length(pthres)){
-        for(k2 in length(pthres):length(pthres)){
+      for(k1 in 1:length(pthres)){
+        for(k2 in 1:length(pthres)){
           print(col_num)
           prs.file <- fread(paste0(out.dir.prs,col_num,"_",method,"_rind_",r_ind,"_wcind_",w_ind,"_ptar_",k1,"_peur_",k2),header=T)
           rs.id.list[[col_num]] = prs.file[,1,drop=F]
