@@ -150,16 +150,14 @@ y.pred <- predict(sl, x.vad, onlySL = TRUE)
 #evaluate the best prs performance on the validation
 model <- lm(y.vad~y.pred[[1]])
 r2.stack <- summary(model)$r.square
-result.data <- data.frame(r2.vec.test,r2.vec.vad,
-                          pthres_vec1,pthres_vec2,
-                          r2_ind_vec,
-                          wc_ind_vec)
+# result.data <- data.frame(r2.vec.test,r2.vec.vad,
+#                           pthres_vec1,pthres_vec2,
+#                           r2_ind_vec,
+#                           wc_ind_vec)
 #standard C+T
-idx <- which.max(r2.vec.test)
-r2.max <- r2.vec.vad[idx]
-r2.list <- list(r2.stack,
-                r2.max,
-                result.data[idx,])
+#idx <- which.max(r2.vec.test)
+#r2.max <- r2.vec.vad[idx]
+r2.list <- list(r2.stack)
 save(r2.list,file = paste0(out.dir,eth[i],"/r2.list_rho_ebtest_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
-save(r2.list,file = paste0(out.dir,eth[i],"/r2.list_rho_eb_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
+#save(r2.list,file = paste0(out.dir,eth[i],"/r2.list_rho_eb_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
 #write.csv(r2.mat,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/ld.clump.auc.csv")
