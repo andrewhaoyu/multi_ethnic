@@ -130,8 +130,8 @@ for(i_post in 2:5){
           print(col_num)
           prs.file <- fread(paste0(out.dir.prs,col_num,"_",method,"_rind_",r_ind,"_wcind_",w_ind,"_ptar_",k1,"_peur_",k2),header=T)
           prs.snp.temp = left_join(prs.snp,prs.file,by="SNP") %>% 
-            mutate(BETA = ifelse(is.na(BETA),0,BETA)) %>% 
-            mutate(BETA = round(BETA,4))
+            mutate(BETA = ifelse(is.na(BETA),0,BETA)) %>%
+            mutate(BETA = round(BETA,4)) 
           beta_mat_temp[,temp] = prs.snp.temp$BETA
           #colnames(prs.snp)[col_num+2] = paste0("BETA",col_num)
           col_num = col_num+1
@@ -151,7 +151,7 @@ for(i_post in 2:5){
   
 }
 #save(beta_mat,file = "/data/zhangh24/multi_ethnic/result/beta_mat.rdata")
-beta_mat = beta_mat[,1:(col_ind-1)]
+beta_mat = beta_mat[,1:(col_ind-ncol(beta_mat_temp_new))]
 
 prs.snp = cbind(prs.snp,beta_mat)
 prs.snp = prs.snp[,-1]
