@@ -11,7 +11,7 @@ i = as.numeric(args[[2]])
 l = as.numeric(args[[3]])
 m = as.numeric(args[[4]])
 i1 = as.numeric(args[[5]])
-r2_ind = as.numeric(args[[6]])
+#r2_ind = as.numeric(args[[6]])
 
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
@@ -159,7 +159,7 @@ if(length(idx)!=0){
   summary.com = summary.com[-idx,]
 }
 r_ind = r2_ind
-#for(r_ind in 1:length(r2_vec)){
+for(r_ind in 1:length(r2_vec)){
   wc_vec = wc_base_vec/r2_vec[r_ind]
   for(w_ind in 1:length(wc_vec)){
     print(c(r_ind,w_ind))
@@ -235,7 +235,7 @@ r_ind = r2_ind
 
 system(paste0("rm -rf ", temp.dir))
 
-#}
+}
 
 
 
