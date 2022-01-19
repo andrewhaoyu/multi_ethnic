@@ -158,7 +158,7 @@ idx <- which(duplicated(summary.com$SNP))
 if(length(idx)!=0){
   summary.com = summary.com[-idx,]
 }
-r_ind = r2_ind
+
 for(r_ind in 1:length(r2_vec)){
   wc_vec = wc_base_vec/r2_vec[r_ind]
   for(w_ind in 1:length(wc_vec)){
