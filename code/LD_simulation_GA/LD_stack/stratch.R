@@ -114,7 +114,7 @@ prs.mat <- prs.mat[,idx]
 prs.mat = as.data.frame(prs.mat)
 mtx = cor(prs.mat[1:n.test,])
 library(caret)
-drop = findCorrelation(mtx,cutoff=cor.cut.vec[r2_ind])
+drop = findCorrelation(mtx,cutoff=cor.cut.vec[cor_ind])
 drop = names(prs.mat)[drop]
 prs.mat.new = prs.mat %>% 
   select(-all_of(drop))
