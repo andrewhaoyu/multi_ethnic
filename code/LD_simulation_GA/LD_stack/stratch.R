@@ -1,326 +1,165 @@
-setwd("/Users/zhangh24/GoogleDrive/multi_ethnic/result/LD_simulation_GA/LD_stack/")
-source("../../../code/LD_simulation_large/theme_Publication.R")
-library(ggplot2)
-library(ggsci)
+#merge the prs by chromosome to one for different ethnic groups
+#i for different ethnic groups
+#l for different causal proportion
+#m for different traning sample size
+args = commandArgs(trailingOnly = T)
+i = as.numeric(args[[1]])
+l = as.numeric(args[[2]])
+m = as.numeric(args[[3]])
+i_rep = as.numeric(args[[4]])
+#i_rep = 2
+i1 = as.numeric(args[[5]])
+cor_ind = as.numeric(args[[6]])
 library(dplyr)
-library(RColorBrewer)
-library(grid)
-library(gridExtra)
-#library(RColorBrewer)
+library(data.table)
+eth <- c("EUR","AFR","AMR","EAS","SAS")
+pthres <- c(5E-08,5E-07,5E-06,5E-05,5E-04,5E-03,5E-02,5E-01,1.0)
+cor.cut.vec = c(0.98,0.90,0.8,0.5,0.3)
+#n <- 120000
 
+#for(m in 1:1){
 
+n.test <- 10000
+n.vad <- n.test
+n.rep = 10
+#r2 mat represent the r2 matrix for the testing dataset
+#column represent the ethnic groups
+#row represent different p-value threshold
+cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
+setwd("/data/zhangh24/multi_ethnic/")
+out.dir <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/LD_stack/"
+y <- as.data.frame(fread(paste0(cur.dir,eth[i],"/phenotypes_rho",l,"_",i1,".phen")))
+y <- y[,2+(1:n.rep),drop=F]
+n <- nrow(y)
+y_test_mat <- y[(100000+1):nrow(y),,drop=F]
 
-load(paste0("LD.clump.result.CT.rdata"))
-# load(paste0("LD.clump.result.SCT.rdata"))
-# load(paste0("eur.snp.reult.rdata"))
-# load(paste0("weightedprs.result.rdata"))
-# load(paste0("LD.clump.result.2DLD.rdata"))
-# load(paste0("LD.clump.result.EB.rdata"))
-# load(paste0("LD.clump.result.alleth.EB.rdata"))
-load(paste0("LDpred2.result.rdata"))
-#load(paste0("LDpredEUR.result.rdata"))
+#for(i_rep in 1:n.rep){
+summary.eur <- as.data.frame(fread(paste0("./result/LD_simulation_GA/",eth[1],"/summary_out_rho_",l,"_size_",4,"_rep_",i_rep,"_GA_",i1)))
+colnames(summary.eur)[9] = "peur"
+colnames(summary.eur)[7] = "beta_eur"
+summary.eur.select = summary.eur %>%
+  select(SNP,beta_eur,peur)
+sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_GA/",eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))
+colnames(sum.data)[2] <- "SNP"
+#combine the target level summary stat with EUR
+summary.com <- left_join(sum.data,summary.eur.select,by="SNP")
 
-LD.clump.result <- LD.result.list[[1]] %>% 
-  mutate(method_vec = rep("C+T"))
+r2_vec = c(0.01,0.05,0.1,0.2,0.5,0.8)
+wc_base_vec = c(50,100)
+neth = 2
+total = neth*length(pthres)^2*length(r2_vec)*length(wc_base_vec)
+r2.vec.test <- rep(0,total)
+r2.vec.vad <- rep(0,total)
+pthres_vec1 <- rep(0,total)
+pthres_vec2 <- rep(0,total)
+r2_ind_vec <- rep(0,total)
+wc_ind_vec <- rep(0,total)
+prs.mat <- matrix(0,n.test+n.vad,total)
+temp = 1
 
-# TDLD.result = TDLD.result %>% 
-#   filter(method_vec=="TDLD")
-# 
-# alleth.EB.result = alleth.EB.result %>% 
-#   filter(method_vec=="TDLD-SLEB (all ethnics)")
-# weightedprs.result = weightedprs.result %>% 
-#   mutate(method_vec = "Weighted PRS")
-prediction.result <- rbind(LD.clump.result,
-                           #SCT.clump.result,
-                           LDpred2.result)
-                           #eursnp.result,
-                           #LDpredEUR.result,
-                           #weightedprs.result,
-                           #TDLD.result,
-                           #EB.result,
-                           #alleth.EB.result)
-
-
-prediction.result = prediction.result %>% 
-  mutate(cau_vec = case_when(
-    l_vec== 1 ~ paste0("Causal SNPs Proportion = 0.01"),
-    l_vec== 2 ~ paste0("Causal SNPs Proportion = 0.001"),
-    l_vec== 3 ~ paste0("Causal SNPs Proportion = 5E-04")
-  ),
-  sample_size = case_when(
-    m_vec == 1~ "15000",
-    m_vec == 2~ "45000",
-    m_vec == 3~ "80000",
-    m_vec == 4~ "100000"
-  )) %>% 
-  mutate(cau_vec = factor(cau_vec,
-                          levels = c("Causal SNPs Proportion = 0.01",
-                                     "Causal SNPs Proportion = 0.001",
-                                     "Causal SNPs Proportion = 5E-04")),
-         sample_size = factor(sample_size,
-                              levels = c("15000","45000","80000","100000")),
-         method_vec = factor(method_vec,
-                             levels = c("C+T",
-                                        "SCT",
-                                        "LDpred2",
-                                        "Best EUR SNP (C+T)",
-                                        "Best EUR SNP + target coefficients (C+T)",
-                                        "Best EUR SNP + EB coefficients (C+T)",
-                                        "Best EUR PRS (LDpred2)",
-                                        "Weighted PRS",
-                                        "TDLD",
-                                        "TDLD-EB",
-                                        "TDLD-SLEB",
-                                        "TDLD-SLEB (all ethnics)"
-                             ))) %>% 
-  mutate(ga_arc = case_when(ga_vec==1 ~"Fixed common SNP heritability",
-                            ga_vec==2 ~"Strong negative selection",
-                            ga_vec==3 ~"Less correlation",
-                            ga_vec==4 ~"No negative selection",
-                            ga_vec==5 ~"Mild negative selection",
-  ))
-uvals = unique(prediction.result$method_vec)
-
-n.single = 9
-
-
-single.color =  brewer.pal(n.single, "Blues")[c(4,5,7)]
-n.EUR = 9
-
-
-EUR.color = brewer.pal(n.EUR, "Greens")[c(4,5,6,7)]
-
-
-n.multi = 9
-multi.color = brewer.pal(n.multi, "Oranges")[c(3:7)]
-colour = c(single.color,EUR.color,multi.color)
-col_df = tibble(
-  colour = c(single.color,EUR.color,multi.color),
-  method_vec = uvals,
-  category = case_when(method_vec%in%c("C+T",
-                                       "SCT",
-                                       "LDpred2") ~ "Single ethnic method",
-                       method_vec%in%c("Best EUR SNP (C+T)",
-                                       "Best EUR SNP + target coefficients (C+T)",
-                                       "Best EUR SNP + EB coefficients (C+T)",
-                                       "Best EUR PRS (LDpred2)"
-                       ) ~ "EUR PRS based method",
-                       method_vec%in%c("Weighted PRS",
-                                       "TDLD",
-                                       "TDLD-EB",
-                                       "TDLD-SLEB",
-                                       "TDLD-SLEB (all ethnics)") ~ "Multi ethnic method")
-) %>% 
-  mutate(category = factor(category,levels = c("Single ethnic method",
-                                               "EUR PRS based method",
-                                               "Multi ethnic method")))
-
-prediction.result.sub = prediction.result %>% 
-  filter(eth.vec=="EUR"&
-           ga_vec==1)
-
-ggplot(prediction.result.sub,aes(x= sample_size,y=r2.vec,group=method_vec))+
-  geom_bar(aes(fill=method_vec),
-           stat="identity",
-           position = position_dodge())+
-  #geom_point(aes(color=method_vec))+
-  theme_Publication()+
-  ylab("R2")+
-  xlab("Sample Size")+
-  labs(fill = "Method")+
-  facet_grid(vars(cau_vec),vars(eth.vec))+
-  scale_fill_nejm()+
-  #scale_fill_manual(values = colour) +
-  theme(axis.text = element_text(size = rel(0.9)),
-        legend.text = element_text(size = rel(0.9)))
-
-# +
-#   ggtitle(title)
-
-
-prediction.result = prediction.result %>% 
-  left_join(col_df)
-getLegend <- function(p) {
-  g <- ggplotGrob(p)
-  k <- which(g$layout$name=="guide-box")
-  g$grobs[[k]]
-}
-
-run_plot = function(filler, values) {
-  values = col_df %>% 
-    filter(category %in% filler)
-  labels = values %>% 
-    pull(method_vec)
-  values = values %>% pull(colour)
-  names(values) = labels
-  ggplot(
-    prediction.result.sub %>% 
-      filter(category %in% filler),
-    aes(x= sample_size,y=r2.vec,
-        group=method_vec))+
-    geom_bar(aes(fill = method_vec),
-             stat="identity",
-             position = position_dodge())+
-    #geom_point(aes(color=method_vec))+
-    theme_Publication()+
-    ylab("R2")+
-    xlab("Sample Size")+
-    labs(fill = filler)+
-    scale_fill_manual(values = values)
-}
-
-library(cowplot)
-m = 1
-for(m in 1:4){
-  for(i1 in 1:5){
+for(r_ind in 1:length(r2_vec)){
+  wc_vec = wc_base_vec/r2_vec[r_ind]
+  for(w_ind in 1:length(wc_vec)){
+    print(c(r_ind,w_ind))
     
-    prediction.result.sub <- prediction.result %>% 
-      filter(ga_vec==i1&
-               eth.vec!="EUR"&
-               m_vec ==m)
-    title = prediction.result.sub$ga_arc[1]
-    legs = lapply(sort(unique(col_df$category)), run_plot)
+    LD <- as.data.frame(fread(paste0(out.dir,eth[i],"/LD_clump_two_way_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped")))
+    clump.snp <- LD
     
-    legs = lapply(legs, getLegend)
-    p.leg = plot_grid(NULL,NULL,legs[[1]],legs[[2]], legs[[3]],NULL,align="v",ncol=1,rel_heights=c(1,1,0.8,0.9,1.2,1.2))
-    print(p.leg)
-    p.null <- ggplot(prediction.result.sub,aes(x= sample_size,y=r2.vec,group=method_vec))+
-      geom_bar(aes(fill=method_vec),
-               stat="identity",
-               position = position_dodge())+
-      #geom_point(aes(color=method_vec))+
-      theme_Publication()+
-      ylab("R2")+
-      xlab("Sample Size")+
-      labs(fill = "Method")+
-      facet_grid(vars(cau_vec),vars(eth.vec))+
-      scale_fill_nejm()+
-      #scale_fill_manual(values = colour) +
-      theme(axis.text = element_text(size = rel(0.9)),
-            legend.text = element_text(size = rel(0.9)))+
-      ggtitle(title)
+    #    colnames(sum.data)[2] <- "SNP"
     
-    # +
-    #   theme(legend.position = "none")
-    p = plot_grid(p.null,p.leg,nrow=1,rel_widths = c(3.5,1))
-    print(p)
-    png(file = paste0("./method_compare_result_size_",m,"_summary_GA_",i1,".png"),
-        width = 13, height = 8, res = 300,units = "in")
-    print(p)
-    dev.off()
+    #for(k in 1:length(pthres)){
     
+    prs.clump = left_join(clump.snp,summary.com,by="SNP")
+    
+    for(k1 in 1:length(pthres)){
+      for(k2 in 1:length(pthres)){
+        prs.all <- prs.clump %>%
+          filter(peur<=pthres[k1]|
+                   P<=pthres[k2])
+        if(nrow(prs.all)>0){
+          filename <- paste0(out.dir,eth[i],"/prs/prs_eb_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1,".p_value_",k2,".profile")
+          prs.temp <- fread(filename)  
+          prs.score <- prs.temp$SCORE
+          prs.mat[,temp] = prs.score
+          temp = temp+1
+        }else{
+          prs.mat[,temp] = 0
+          temp = temp+1
+        }
+        #load eur prs
+        if(nrow(prs.all)>0){
+          filename <- paste0(out.dir,eth[i],"/prs/prs_ebeur_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1,".p_value_",k2,".profile")
+          prs.temp <- fread(filename)  
+          prs.score <- prs.temp$SCORE
+          prs.mat[,temp] = prs.score
+          temp = temp+1
+        }else{
+          prs.mat[,temp] = 0
+          temp = temp+1
+        }
+      }
+    }
     
   }
-  
-  
 }
+result.data <- data.frame(r2.vec.test,r2.vec.vad,
+                          pthres_vec1,pthres_vec2,
+                          r2_ind_vec,
+                          wc_ind_vec)
+prs.sum = colSums(prs.mat)
+idx <- which(prs.sum!=0)
+#drop the prs with all 0
+prs.mat <- prs.mat[,idx]
+#drop the columns with perfect correlation
+prs.mat = as.data.frame(prs.mat)
+mtx = cor(prs.mat[1:n.test,])
+library(caret)
+drop = findCorrelation(mtx,cutoff=cor.cut.vec[r2_ind])
+drop = names(prs.mat)[drop]
+prs.mat.new = prs.mat %>% 
+  select(-all_of(drop))
+library(SuperLearner)
+library(ranger)
+x.test = as.data.frame(prs.mat.new[1:n.test,])
+x.vad= as.data.frame(prs.mat.new[(1+n.test):(n.test+n.vad),])
 
+SL.libray <- c(
+  #"SL.xgboost"
+  #"SL.randomForest"
+  "SL.glmnet",
+  "SL.ridge",
+  #"SL.bayesglm"
+  #"SL.stepAIC"
+  "SL.nnet"
+  #"SL.ksvm",
+  #"SL.bartMachine", 
+  #"SL.kernelKnn",
+  #"SL.rpartPrune", 
+  #"SL.lm"
+  #"SL.mean"
+)
+y.test = y_test_mat[1:n.test,i_rep]
+y.vad = y_test_mat[(n.test+1):(nrow(y_test_mat)),i_rep]
+sl = SuperLearner(Y = y.test, X = x.test, family = gaussian(),
+                  # For a real analysis we would use V = 10.
+                  # V = 3,
+                  SL.library = SL.libray)
+sl
+y.pred <- predict(sl, x.vad, onlySL = TRUE)
+#names(r2.vec.test) <- names(r2.vec.vad) <- pthres
 
+#evaluate the best prs performance on the validation
+model <- lm(y.vad~y.pred[[1]])
+r2.stack <- summary(model)$r.square
+# result.data <- data.frame(r2.vec.test,r2.vec.vad,
+#                           pthres_vec1,pthres_vec2,
+#                           r2_ind_vec,
+#                           wc_ind_vec)
+#standard C+T
+#idx <- which.max(r2.vec.test)
+#r2.max <- r2.vec.vad[idx]
+r2.list <- list(r2.stack)
+save(r2.list,file = paste0(out.dir,eth[i],"/r2.list_rho_ebgridtest_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
+#save(r2.list,file = paste0(out.dir,eth[i],"/r2.list_rho_eb_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
+#write.csv(r2.mat,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/ld.clump.auc.csv")
 
-prediction.result.sub <- prediction.result %>% 
-  filter(eth.vec!="EUR"&
-           m_vec ==m) %>% 
-  filter(method_vec%in%c("Best EUR SNP (C+T)"))
-
-prediction.result.sub2 <- prediction.result %>% 
-  filter(eth.vec!="EUR"&
-           m_vec ==m) %>% 
-  filter(method_vec%in%c("TDLD-SLEB"))
-mean(prediction.result.sub2$r2.vec/prediction.result.sub$r2.vec-1)
-# #predictoin_result ratio
-# total = 2220
-# eth.vec = rep("c",total)
-# eth = c("EUR","AFR","AMR","EAS","SAS")
-# r2.ratio.vec = rep(0,total)
-# l_vec = rep(0,total)
-# m_vec = rep(0,total)
-# method_vec = rep("c",total)
-# cau_vec = rep("c",total)
-# sample_size = rep(0,total)
-# ga_arc = rep("c",total)
-# method_option = c("TDLD-SLEB","C + T","Weighted-PRS")
-# temp = 1
-# for(l in 1:3){
-#   for(m in 1:4){
-#     for(ga in 1:5){
-#       for(i in 2:5){
-#         prediction.result.sub = prediction.result %>% 
-#           filter(m_vec ==m&
-#                    l_vec==l&
-#                    ga_vec == ga&
-#                    eth.vec ==eth[i])
-#         #baseline is "Best EUR SNP (C+T)"
-#         prediction.result.base = prediction.result.sub %>% 
-#           filter(method_vec =="Best EUR SNP (C+T)")
-#         for(k in 1:length(method_option)){
-#           prediction.result.filter = prediction.result.sub %>% 
-#             filter(method_vec ==method_option[k])
-#           r2.ratio.vec[temp] = prediction.result.filter$r2.vec/prediction.result.base$r2.vec
-#           l_vec[temp] = l
-#           m_vec[temp] = m
-#           ga_vec[temp] = ga
-#           method_vec[temp] = method_option[k]
-#           cau_vec[temp] = as.character(prediction.result.filter$cau_vec)
-#           sample_size[temp] = as.character(prediction.result.filter$sample_size)
-#           ga_arc[temp] = as.character(prediction.result.filter$ga_arc)
-#           eth.vec[temp] = eth[i]
-#           temp = temp+1
-#         }
-#         
-#       }
-#     }
-#   }
-# }
-# total =temp-1
-# r2.ratio.vec = r2.ratio.vec[1:total]
-# l_vec = l_vec[1:total]
-# m_vec = m_vec[1:total]
-# ga_vec= ga_vec[1:total]
-# method_vec = method_vec[1:total]
-# cau_vec = cau_vec[1:total]
-# sample_size = sample_size[1:total]
-# ga_arc = ga_arc[1:total]
-# eth.vec = eth.vec[1:total]
-# prediction.ratio = data.frame(eth.vec,
-#                               r2.ratio.vec,
-#                               l_vec,
-#                               m_vec,
-#                               ga_vec,
-#                               method_vec,
-#                               cau_vec,
-#                               sample_size,
-#                               ga_arc)
-# prediction.ratio = prediction.ratio %>% 
-#   mutate( cau_vec = factor(cau_vec,
-#                                         levels = c("Causal SNPs Proportion = 0.01",
-#                                                    "Causal SNPs Proportion = 0.001",
-#                                                    "Causal SNPs Proportion = 5E-04")),
-#          sample_size = factor(sample_size,
-#                               levels = c("15000","45000","80000","100000")),
-#          method_vec = factor(method_vec,levels = c("C + T","Weighted-PRS","TDLD-SLEB")))
-# 
-# 
-# for(i1 in 1:5){
-#   prediction.result.sub <- prediction.ratio %>% 
-#     filter(ga_vec==i1&
-#              eth.vec!="EUR")
-#   title = prediction.result.sub$ga_arc[1]
-#   p <- ggplot(prediction.result.sub,aes(x= sample_size,y=r2.ratio.vec,group=method_vec))+
-#     geom_line(aes(col=method_vec))+
-#     #geom_point(aes(color=method_vec))+
-#     theme_Publication()+
-#     ylab("R2")+
-#     xlab("Sample Size")+
-#     labs(fill = "Method")+
-#     facet_grid(vars(cau_vec),vars(eth.vec))+
-#     #scale_fill_nejm()+
-#     scale_fill_manual(values = getPalette(colourCount)) +
-#     theme(axis.text = element_text(size = rel(0.9)),
-#           legend.text = element_text(size = rel(0.9)))+
-#     ggtitle(title)
-#   png(file = paste0("./ratio_result_size_",m,"_summary_GA_",i1,".png"),
-#       width = 13, height = 8, res = 300,units = "in")
-#   print(p)
-#   dev.off()
-#   
-# }

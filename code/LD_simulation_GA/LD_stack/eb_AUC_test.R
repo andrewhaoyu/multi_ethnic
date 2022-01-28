@@ -14,6 +14,7 @@ library(dplyr)
 library(data.table)
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 pthres <- c(5E-08,5E-07,5E-06,5E-05,5E-04,5E-03,5E-02,5E-01,1.0)
+
 #n <- 120000
 
 #for(m in 1:1){
