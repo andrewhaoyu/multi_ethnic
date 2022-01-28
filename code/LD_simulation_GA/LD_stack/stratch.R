@@ -159,7 +159,7 @@ r2.stack <- summary(model)$r.square
 #idx <- which.max(r2.vec.test)
 #r2.max <- r2.vec.vad[idx]
 r2.list <- list(r2.stack)
-save(r2.list,file = paste0(out.dir,eth[i],"/r2.list_rho_ebgridtest_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
+save(r2.list,file = paste0(out.dir,eth[i],"/r2.list_rho_ebgridtest_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_cor_ind",cor_ind))
 #save(r2.list,file = paste0(out.dir,eth[i],"/r2.list_rho_eb_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
 #write.csv(r2.mat,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/ld.clump.auc.csv")
 
