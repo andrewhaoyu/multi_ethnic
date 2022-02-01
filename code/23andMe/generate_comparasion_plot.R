@@ -23,14 +23,22 @@ trait_name = c("Any CVD","Depression",
                "SBMN",
                "Migraine Diagnosis",
                "Morning Person")
-method_vec = c("PT","BESTEUR","BESTEURLDPred2","weighted_PRS","tdld","TDLD_EB","TDLD_SLEB","TDLD_SLEBall")
+#method_vec = c("PT","BESTEUR","BESTEURLDPred2","weighted_PRS","PRSCSx","tdld","TDLD_EB","TDLD_SLEB","TDLD_SLEBall")
+# method_name = c("C+T","Best EUR SNP (C+T)",
+#                 "Best EUR SNP (LDpred2)",
+#                 "Weighted PRS",
+#                 "PRS-CSx",
+#                 "TDLD",
+#                 "TDLD-EB",
+#                 "CT-SLEB (two ethnics)",
+#                 "CT-SLEB (five ethnics)")
+method_vec = c("PT","BESTEUR","BESTEURLDPred2","weighted_PRS","PRSCSx")
 method_name = c("C+T","Best EUR SNP (C+T)",
                 "Best EUR SNP (LDpred2)",
                 "Weighted PRS",
-                "TDLD",
-                "TDLD-EB",
-                "CT-SLEB (two ethnics)",
-                "CT-SLEB (five ethnics)")
+                "PRS-CSx",
+                )
+
 besteur_methodname = c("Best EUR SNP (C+T)",
                        "Best EUR SNP + target coefficients (C+T)",
                        "Best EUR SNP + EB coefficients (C+T)")
@@ -83,7 +91,7 @@ temp = 1
           
         }
         
-      }else if(method_vec[i1]%in%c("weighted_PRS","TDLD_SLEB","TDLD_SLEBall")){
+      }else if(method_vec[i1]%in%c("weighted_PRS","PRSCSx","TDLD_SLEB","TDLD_SLEBall")){
         #weighted PRS, TDLD-SLEB and TDLD-SLEB all ethnic only need validation
         result = read.csv(paste0("./summary_",method_vec[i1],"/",eth_group[i],"_",trait[l]))
         plot.data = data.frame(result = result,
@@ -161,25 +169,24 @@ LDpred2 = R2.ldpred2 %>%
 #   filter(eth!="European")
 
 prediction.result = rbind(prediction.result,LDpred2)
-#load prs-csx result
-prs.csx = read.csv("../PRS-CSx.csv",header = T)
 
-prediction.result = rbind(prediction.result,prs.csx)
+#load CT-SLEB result
+tdld = read.csv("../TDLD_EB.csv",header = T)
+
+prediction.result = rbind(prediction.result,tdld)
 
 prediction.result = prediction.result %>% 
   filter(method_vec%in%c("TDLD-EB","TDLD","Best EUR SNP + EB coefficients (C+T)",
                          "Best EUR SNP + target coefficients (C+T)")==F)
-prediction.result = prediction.result %>% 
-  filter(method_vec!="PRS-CSx")
 prediction.result$method_vec = factor(prediction.result$method_vec,
                                       levels = c("C+T",
                                                  "LDpred2",
                                                  "Best EUR SNP (C+T)",
                                                  "Best EUR SNP (LDpred2)",
                                                  "Weighted PRS",
-                               #                  "PRS-CSx",
-                                                 "CT-SLEB (two ethnics)",
-                                                 "CT-SLEB (five ethnics)"))
+                                                "PRS-CSx",
+                                                 "CT-SLEB (two ancestries)",
+                                                 "CT-SLEB (five ancestries)"))
 prediction.result$Method = prediction.result$method_vec
 prediction.result$index = rep("1",nrow(prediction.result))
 prediction.result$eth = factor(prediction.result$eth,
@@ -203,17 +210,17 @@ uvals = factor(c("C+T",
                           "Best EUR SNP (C+T)",
                           "Best EUR SNP (LDpred2)",
                           "Weighted PRS",
-                        #  "PRS-CSx",
-                 "CT-SLEB (two ethnics)",
-                 "CT-SLEB (five ethnics)"),
+                     "PRS-CSx",
+                 "CT-SLEB (two ancestries)",
+                 "CT-SLEB (five ancestries)"),
                levels= c("C+T",
                          "LDpred2",
                          "Best EUR SNP (C+T)",
                          "Best EUR SNP (LDpred2)",
                          "Weighted PRS",
-                         #"PRS-CSx",
-                         "CT-SLEB (two ethnics)",
-                         "CT-SLEB (five ethnics)"))
+                         "PRS-CSx",
+                         "CT-SLEB (two ancestries)",
+                         "CT-SLEB (five ancestries)"))
 
 n.single = 9
 
@@ -226,8 +233,8 @@ EUR.color = brewer.pal(n.EUR, "Greens")[c(4,7)]
 
 
 n.multi = 9
-#multi.color = brewer.pal(n.multi, "Oranges")[c(3,5,7,9)]
-multi.color = brewer.pal(n.multi, "Oranges")[c(3,7,9)]
+multi.color = brewer.pal(n.multi, "Oranges")[c(3,5,7,9)]
+#multi.color = brewer.pal(n.multi, "Oranges")[c(3,7,9)]
 colour = c(single.color,EUR.color,multi.color)
 col_df = tibble(
   colour = c(single.color,EUR.color,multi.color),
@@ -239,8 +246,8 @@ col_df = tibble(
                        ) ~ "EUR PRS based method",
                        method_vec%in%c("Weighted PRS",
                                        "PRS-CSx",
-                                       "CT-SLEB (two ethnics)",
-                                       "CT-SLEB (five ethnics)") ~ "Multi ethnic method")
+                                       "CT-SLEB (two ancestries)",
+                                       "CT-SLEB (five ancestries)") ~ "Multi ethnic method")
 ) %>%   mutate(category = factor(category,levels = c("Single ethnic method",
                                                                  "EUR PRS based method",
                                                                  "Multi ethnic method")))

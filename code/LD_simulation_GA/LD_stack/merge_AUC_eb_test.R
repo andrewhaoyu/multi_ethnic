@@ -32,7 +32,7 @@ for(i in 2:5){
         
         
         for(i_rep in 1:n.rep){
-          filename = paste0(out.dir,eth[i],"/r2.list_rho_ebtest_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)
+          filename = paste0(out.dir,eth[i],"/r2.list_rho_ebgridtest_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_cor_ind",cor_ind)
           
           load(filename)
           r2.stack.temp[i_rep] = r2.list[[1]]
