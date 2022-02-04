@@ -116,6 +116,7 @@ result.data <- data.frame(r2.vec.test,r2.vec.vad,
                           r2_ind_vec,
                           wc_ind_vec)
 
+
 prs.list <- list()
 temp = 1
 for(r_ind in 1:length(r2_vec)){
