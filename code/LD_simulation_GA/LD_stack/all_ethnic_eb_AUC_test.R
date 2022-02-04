@@ -156,10 +156,10 @@ SL.libray <- c(
   #"SL.xgboost"
   #"SL.randomForest"
   "SL.glmnet",
-  "SL.ridge"
+  "SL.ridge",
   #"SL.bayesglm"
   #"SL.stepAIC"
-#  "SL.nnet"
+  "SL.nnet"
   #"SL.ksvm",
   #"SL.bartMachine", 
   #"SL.kernelKnn",
@@ -189,6 +189,6 @@ r2.max <- r2.vec.vad[idx]
 r2.list <- list(r2.stack)
 save(r2.list,file = paste0(out.dir,eth[i],"/r2.list_rho_allethebtest_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
 #write.csv(r2.mat,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/ld.clump.auc.csv")
-# load(paste0(out.dir,eth[i],"/r2.list_rho_alletheb_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
-# load(paste0(out.dir,eth[i],"/r2.list_rho_etheb_test_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
-# load(paste0(out.dir,eth[i],"/r2.list_rho_ebtest_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
+load(paste0(out.dir,eth[i],"/r2.list_rho_alletheb_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
+
+ load(paste0(out.dir,eth[i],"/r2.list_rho_ebtest_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
