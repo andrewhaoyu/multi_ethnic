@@ -105,7 +105,7 @@ if(i_c==2){
   #readin hapmap3 snps
   mega.list <- as.data.frame(fread(paste0(cur.dir,"hm3rsid.txt")))[,1,drop=F]
   colnames(mega.list) = "rs_id"
-  summary.match.EUR = inner_join(summary.com.EUR,mega.list,by="rs_id")
+  summary.match.tar = inner_join(summary.com.tar,mega.list,by="rs_id")
 }else{
   #just use 1kg SNPs
   summary.match.tar = summary.com.tar
