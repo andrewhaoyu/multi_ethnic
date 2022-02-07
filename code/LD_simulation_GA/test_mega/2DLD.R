@@ -132,8 +132,15 @@ for(r_ind in 1:length(r2_vec)){
     r2thr = r2_vec[r_ind]
     kbpthr = wc_vec[w_ind]
     eth <- c("EUR","AFR","AMR","EAS","SAS")
-    out.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/LD_stack/"
-    res = system(paste0("/data/zhangh24/software/plink2 --threads 2 --bfile ",temp.dir,eth[i],"clump_1kgref_all_chr --clump ",temp.dir,eth[i],"_assoc.out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1," --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out ", temp.dir,eth[i],"_LD_clump_two_dim_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind))
+    
+    res = system(paste0("/data/zhangh24/software/plink2 ",
+                        "--threads 2 ",
+                        "--bfile ",temp.dir,eth[i],"clump_1kgref_all_chr ",
+                        "--clump ",temp.dir,eth[i],"_assoc.out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1," ",
+                        "--clump-p1 ",pthr," ",
+                        "--clump-r2 ",r2thr,"  ",
+                        "--clump-kb ",kbpthr," ",
+                        "--out ", temp.dir,eth[i],"_LD_clump_two_dim_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind))
     if(res==2){
       stop()
     }
