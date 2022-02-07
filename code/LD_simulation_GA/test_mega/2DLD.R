@@ -46,7 +46,7 @@ snp.infor = snp.infor.match %>%
 summary.com.EUR = left_join(summary.com.EUR,snp.infor,by="SNP")
 if(i_c==2){
   #readin hapmap3 snps
-  mega.list <- as.data.frame(fread(paste0(cur.dir,"hm3rsid.txt")))  
+  mega.list <- as.data.frame(fread(paste0(cur.dir,"hm3rsid.txt")))[,1,drop=F]
   colnames(mega.list) = "rs_id"
   summary.match.EUR = inner_join(summary.com.EUR,mega.list,by="rs_id")
 }else{
@@ -103,7 +103,7 @@ summary.com.tar = left_join(summary.com.tar,snp.infor,by="SNP")
 
 if(i_c==2){
   #readin hapmap3 snps
-  mega.list <- as.data.frame(fread(paste0(cur.dir,"hm3rsid.txt")))  
+  mega.list <- as.data.frame(fread(paste0(cur.dir,"hm3rsid.txt")))[,1,drop=F]
   colnames(mega.list) = "rs_id"
   summary.match.EUR = inner_join(summary.com.EUR,mega.list,by="rs_id")
 }else{
