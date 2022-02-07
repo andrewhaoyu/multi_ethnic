@@ -9,6 +9,7 @@ m = as.numeric(args[[3]])
 i_rep = as.numeric(args[[4]])
 i1 = 1
 i_c = as.numeric(args[[5]])
+r_ind = as.numeric(args[[6]])
 library(data.table)
 library(dplyr)
 sid<-Sys.getenv('SLURM_JOB_ID')
@@ -74,7 +75,8 @@ system(paste0("cp ",cur.dir,eth[1],"/clump_1kgref_all_chr.fam ",temp.dir,eth[1],
 setwd("/data/zhangh24/multi_ethnic/")
 r2_vec = c(0.01,0.05,0.1,0.2,0.5,0.8)
 wc_base_vec = c(50,100)
-for(r_ind in 1:length(r2_vec)){
+#for(r_ind in 1:length(r2_vec)){
+
   wc_vec = wc_base_vec/r2_vec[r_ind]
   for(w_ind in 1:length(wc_vec)){
     print(c(r_ind,w_ind))
@@ -91,7 +93,7 @@ for(r_ind in 1:length(r2_vec)){
     }
     #system(paste0("mv ",temp.dir,"LD_clump_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped ",out.dir,eth[i],"/"))
   }
-}
+#}
 
 system(paste0("rm ",temp.dir,"*.bim"))
 system(paste0("rm ",temp.dir,"*.bed"))
@@ -124,7 +126,7 @@ system(paste0("cp ",cur.dir,eth[i],"/clump_1kgref_all_chr.bim ",temp.dir,eth[i],
 system(paste0("cp ",cur.dir,eth[i],"/clump_1kgref_all_chr.fam ",temp.dir,eth[i],"clump_1kgref_all_chr.fam"))
 
 
-for(r_ind in 1:length(r2_vec)){
+#for(r_ind in 1:length(r2_vec)){
   wc_vec = wc_base_vec/r2_vec[r_ind]
   for(w_ind in 1:length(wc_vec)){
     print(c(r_ind,w_ind))
@@ -146,7 +148,7 @@ for(r_ind in 1:length(r2_vec)){
     }
     
   }
-}
+#}
 system(paste0("rm ",temp.dir,"*.bim"))
 system(paste0("rm ",temp.dir,"*.bed"))
 system(paste0("rm ",temp.dir,"*.fam"))
