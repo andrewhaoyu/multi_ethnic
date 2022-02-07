@@ -1,14 +1,14 @@
 #LD_clumping for different ethnic groups combined with EUR
 #LD_clumping for EUR
 #load the p-value results
-#i_c for different chips
+#i_c for different chips: 1 for 1kg; 2 for hapmap3
 args = commandArgs(trailingOnly = T)
 i = as.numeric(args[[1]])
 l = as.numeric(args[[2]])
 m = as.numeric(args[[3]])
 i_rep = as.numeric(args[[4]])
-i1 = as.numeric(args[[5]])
-i_c = as.numeric(args[[6]])
+i1 = 1
+i_c = as.numeric(args[[5]])
 library(data.table)
 library(dplyr)
 sid<-Sys.getenv('SLURM_JOB_ID')
@@ -68,9 +68,9 @@ assoc = summary.match.EUR %>%
 
 write.table(assoc,paste0("/lscratch/",sid,"/test/",eth[1],"_assoc.out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1),col.names = T,row.names = F,quote=F)
 
-system(paste0("cp ",cur.dir,eth[1],"/clump_ref_all_chr.bed ",temp.dir,eth[1],"clump_ref_all_chr.bed"))
-system(paste0("cp ",cur.dir,eth[1],"/clump_ref_all_chr.bim ",temp.dir,eth[1],"clump_ref_all_chr.bim"))
-system(paste0("cp ",cur.dir,eth[1],"/clump_ref_all_chr.fam ",temp.dir,eth[1],"clump_ref_all_chr.fam"))
+system(paste0("cp ",cur.dir,eth[1],"/clump_1kgref_all_chr.bed ",temp.dir,eth[1],"clump_1kgref_all_chr.bed"))
+system(paste0("cp ",cur.dir,eth[1],"/clump_1kgref_all_chr.bim ",temp.dir,eth[1],"clump_1kgref_all_chr.bim"))
+system(paste0("cp ",cur.dir,eth[1],"/clump_1kgref_all_chr.fam ",temp.dir,eth[1],"clump_1kgref_all_chr.fam"))
 setwd("/data/zhangh24/multi_ethnic/")
 r2_vec = c(0.01,0.05,0.1,0.2,0.5,0.8)
 wc_base_vec = c(50,100)
@@ -85,7 +85,7 @@ for(r_ind in 1:length(r2_vec)){
     
     #code <- rep("c",5*3*3)
     #system(paste0("/data/zhangh24/software/plink2 --bfile /data/zhangh24/KG.plink/",eth[i],"/chr_all --clump ",cur.dir,eth[i],"/summary_out_MAF_rho_",l,"_size_",m,"_rep_",i_rep,".out --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out ",cur.dir,eth[i],"/LD_clump_rho_",l,"_size_",m,"_rep_",i_rep))
-    res = system(paste0("/data/zhangh24/software/plink2 --threads 2 --bfile ",temp.dir,eth[1],"clump_ref_all_chr --clump ",temp.dir,eth[1],"_assoc.out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1," --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out ", temp.dir,eth[1],"_LD_clump_two_dim_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind))
+    res = system(paste0("/data/zhangh24/software/plink2 --threads 2 --bfile ",temp.dir,eth[1],"clump_1kgref_all_chr --clump ",temp.dir,eth[1],"_assoc.out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1," --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out ", temp.dir,eth[1],"_LD_clump_two_dim_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind))
     if(res==2){
       stop()
     }
@@ -101,8 +101,17 @@ idx <- which((summary.com$P<summary.com$peur)|is.na(summary.com$peur))
 summary.com.tar <- summary.com[idx,]
 summary.com.tar = left_join(summary.com.tar,snp.infor,by="SNP")
 
-#subset SNPs to mega SNPs
-summary.match.tar = inner_join(summary.com.tar,mega.list,by="rs_id")
+if(i_c==2){
+  #readin hapmap3 snps
+  mega.list <- as.data.frame(fread(paste0(cur.dir,"hm3rsid.txt")))  
+  colnames(mega.list) = "rs_id"
+  summary.match.EUR = inner_join(summary.com.EUR,mega.list,by="rs_id")
+}else{
+  #just use 1kg SNPs
+  summary.match.tar = summary.com.tar
+}
+
+
 
 
 assoc = summary.match.tar %>%
@@ -110,9 +119,9 @@ assoc = summary.match.tar %>%
 #%>% 
 #rename(P=peur)
 write.table(assoc,paste0("/lscratch/",sid,"/test/",eth[i],"_assoc.out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1),col.names = T,row.names = F,quote=F)
-system(paste0("cp ",cur.dir,eth[i],"/clump_ref_all_chr.bed ",temp.dir,eth[i],"clump_ref_all_chr.bed"))
-system(paste0("cp ",cur.dir,eth[i],"/clump_ref_all_chr.bim ",temp.dir,eth[i],"clump_ref_all_chr.bim"))
-system(paste0("cp ",cur.dir,eth[i],"/clump_ref_all_chr.fam ",temp.dir,eth[i],"clump_ref_all_chr.fam"))
+system(paste0("cp ",cur.dir,eth[i],"/clump_1kgref_all_chr.bed ",temp.dir,eth[i],"clump_1kgref_all_chr.bed"))
+system(paste0("cp ",cur.dir,eth[i],"/clump_1kgref_all_chr.bim ",temp.dir,eth[i],"clump_1kgref_all_chr.bim"))
+system(paste0("cp ",cur.dir,eth[i],"/clump_1kgref_all_chr.fam ",temp.dir,eth[i],"clump_1kgref_all_chr.fam"))
 
 
 for(r_ind in 1:length(r2_vec)){
@@ -124,7 +133,7 @@ for(r_ind in 1:length(r2_vec)){
     kbpthr = wc_vec[w_ind]
     eth <- c("EUR","AFR","AMR","EAS","SAS")
     out.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/LD_stack/"
-    res = system(paste0("/data/zhangh24/software/plink2 --threads 2 --bfile ",temp.dir,eth[i],"clump_ref_all_chr --clump ",temp.dir,eth[i],"_assoc.out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1," --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out ", temp.dir,eth[i],"_LD_clump_two_dim_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind))
+    res = system(paste0("/data/zhangh24/software/plink2 --threads 2 --bfile ",temp.dir,eth[i],"clump_1kgref_all_chr --clump ",temp.dir,eth[i],"_assoc.out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1," --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out ", temp.dir,eth[i],"_LD_clump_two_dim_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind))
     if(res==2){
       stop()
     }
@@ -146,7 +155,7 @@ for(r_ind in 1:length(r2_vec)){
     LD.EUR <- LD.EUR[,3,drop=F]
     LD.tar <- LD.tar[,3,drop=F]
     LD <- rbind(LD.EUR,LD.tar)
-    write.table(LD,file = paste0(out.dir,eth[i],"/LD_clump_two_way_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped"),row.names = F,quote=F)
+    write.table(LD,file = paste0(out.dir,eth[i],"/LD_clump_two_way_i_c_",i_c,"rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped"),row.names = F,quote=F)
   }
 }
 #LD.test <- as.data.frame(fread(paste0(out.dir,eth[i],"/LD_clump_two_dim_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".clumped")))
