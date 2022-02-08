@@ -11,12 +11,12 @@ i = as.numeric(args[[2]])
 #j = as.numeric(args[[3]])
 l = as.numeric(args[[3]])
 m = as.numeric(args[[4]])
-i1 = as.numeric(args[[5]])
-i_c = as.numeric(args[[6]])
+i1 = 1
+i_c = as.numeric(args[[5]])
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
 old.out.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
-out.dir <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/test_mega/"
+out.dir <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/test_chip/"
 #j = as.numeric(args[[3]])
 sid <- Sys.getenv("SLURM_JOB_ID")
 dir.create(paste0('/lscratch/',sid,'/test/'),showWarnings = F)
@@ -99,12 +99,7 @@ for(r_ind in 1:length(r2_vec)){
       if(res==2){
         stop()
       }
-      res = system(paste0("mv ",temp.dir.prs,"*.profile ",out.dir,eth[i],"/prs/"))
-      if(res==2){
-        stop()
-      }
-      system(paste0("rm -rf ",temp.dir.prs))
-      dir.create(paste0(temp.dir.prs),showWarnings = FALSE)
+     
       
       
       #system(paste0("/data/zhangh24/software/plink2 --score ",cur.dir,eth[i],"/prs/prs_file_pvalue_",k,"_rho_",l,"_size_",m,,"_rep_",i_rep," no-sum no-mean-imputation --bfile ",cur.dir,eth[i],"/all_chr.tag --exclude /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/duplicated.id  --out ",cur.dir,eth[i],"/prs/prs_",k,"_rho_",l,"_size_",m))
@@ -113,6 +108,37 @@ for(r_ind in 1:length(r2_vec)){
   }
   
 }
+
+total = length(r2_vec)*length(wc_vec)*length(pthres)*length(pthres)
+prs.list = list()
+name.file = rep("c",total)
+
+temp = 1
+for(r_ind in 1:length(r2_vec)){
+  wc_vec = wc_base_vec/r2_vec[r_ind]
+  for(w_ind in 1:length(wc_vec)){
+    for(k1 in 1:length(pthres)){
+      for(k2 in 1:length(pthres)){
+     temp.prs.file = fread(paste0(temp.dir.prs,"prs_2DLD_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1,".p_value_",k2,".profile"))
+     prs.list[[temp]] = temp.prs.file[,6,drop=F]
+     name.file[temp] = paste0("r_ind_",r_ind,"_w_ind_",w_ind,"_k1_",k1,"_k2_",k2)
+     temp = temp + 1
+         }
+    }
+  }
+  
+}
+prs.mat = bind_cols(prs.list)
+colnames(prs.mat) = name.file
+prs.id = temp.prs.file[,1:2,drop=F]
+prs.file = cbind(prs.id,prs.mat)
+write.table(prs.file,file = paste0(out.dir,eth[i],"/prs/prs_file_r_ind_",r_ind,"_w_ind_",w_ind,".profile"))
+res = system(paste0("mv ",temp.dir.prs,"*.profile ",out.dir,eth[i],"/prs/"))
+if(res==2){
+  stop()
+}
+system(paste0("rm -rf ",temp.dir.prs))
+dir.create(paste0(temp.dir.prs),showWarnings = FALSE)
 
 
 #pthres <- c(1E-10,1E-09,5E-08,1E-07,2.5E-07,5E-07,7.5E-07,1E-06,2.5E-06,5E-06,7.5E-06,1E-05,2.5e-05,5E-05,7.5e-05,1E-04,2.5E-04,5E-04,7.5E-04,1E-03)
