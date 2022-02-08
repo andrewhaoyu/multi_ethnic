@@ -23,9 +23,16 @@ dir.create(paste0('/lscratch/',sid,'/test/'),showWarnings = F)
 temp.dir = paste0('/lscratch/',sid,'/test/')
 dir.create(paste0('/lscratch/',sid,'/test/prs/'),showWarnings = FALSE)
 temp.dir.prs = paste0('/lscratch/',sid,'/test/prs/')
-
-system(paste0("cp ",cur.dir,eth[i],"/all_chr_test.mega.* ",temp.dir))
-system(paste0("ls ",temp.dir))
+if(i_c==2){
+  #hapmap snps just need the mega subset
+  system(paste0("cp ",cur.dir,eth[i],"/all_chr_test.mega.* ",temp.dir))
+  system(paste0("ls ",temp.dir))
+  
+}else if(i_c==1){
+  #1kg snps
+  
+  system(paste0("cp ",cur.dir,eth[i],"/all_chr.tag.* ",temp.dir))
+}
 
 library(dplyr)
 library(data.table)
@@ -51,7 +58,10 @@ sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_GA/",eth[i],"/sum
 colnames(sum.data)[2] <- "SNP"
 #combine the target level summary stat with EUR
 summary.com <- left_join(sum.data,summary.eur.select,by="SNP")
-
+#remove duplicated snp id
+idx <- which(duplicated(summary.com$SNP))
+dup.id = summary.com$SNP[idx]
+summary.com = summary.com %>% filter(SNP%in%dup.id==F)
 for(r_ind in 1:length(r2_vec)){
   wc_vec = wc_base_vec/r2_vec[r_ind]
   for(w_ind in 1:length(wc_vec)){
@@ -65,6 +75,7 @@ for(r_ind in 1:length(r2_vec)){
     #combine the statistics with SNPs after clumping
     prs.all <- left_join(clump.snp,summary.com,by="SNP") 
     colSums(is.na(prs.all))
+    
     for(k1 in 1:length(pthres)){
       #keep al the SNPs with peur pass the threshold
       
@@ -93,7 +104,23 @@ for(r_ind in 1:length(r2_vec)){
       }
       q_range = q_range[1:(temp-1),]
       write.table(q_range,file = paste0(temp.dir.prs,"q_range_file"),row.names = F,col.names = F,quote=F)
-      res = system(paste0("/data/zhangh24/software/plink2 --q-score-range ",temp.dir.prs,"q_range_file ",temp.dir.prs,"p_value_file header --threads 2 --score ",temp.dir.prs,"prs_file header no-sum no-mean-imputation --bfile ",temp.dir,"all_chr_test.mega --exclude ",old.out.dir,eth[i],"/duplicated.id  --out ",temp.dir.prs,"prs_2DLD_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1))
+      if(i_c==2){
+        res = system(paste0("/data/zhangh24/software/plink2 --q-score-range ",temp.dir.prs,"q_range_file ",temp.dir.prs,"p_value_file header --threads 2 --score ",temp.dir.prs,"prs_file header no-sum no-mean-imputation --bfile ",temp.dir,"all_chr_test.mega --exclude ",old.out.dir,eth[i],"/duplicated.id  --out ",temp.dir.prs,"prs_2DLD_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1))  
+      }else{
+        fam <- as.data.frame(fread(paste0(temp.dir,eth[i],"/all_chr.tag.fam")))
+        ref_fam = fam[100001:120000,]
+        write.table(ref_fam,file = paste0(temp.dir,"/ref_fam.fam"),row.names=F,col.names=F,quote=F)
+        
+        res = system(paste0("/data/zhangh24/software/plink2 ",
+        "--q-score-range ",temp.dir.prs,"q_range_file ",temp.dir.prs,"p_value_file header ",
+        "--threads 2 ",
+        "--keep ",temp.dir,"/ref_fam.fam",
+        "--score ",temp.dir.prs,"prs_file header no-sum no-mean-imputation ",
+        "--bfile ",temp.dir,"all_chr.tag ",
+        "--exclude ",old.out.dir,eth[i],"/duplicated.id  ",
+        "--out ",temp.dir.prs,"prs_2DLD_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1))  
+      }
+      
       print("step2 finished")
       #system(paste0("ls ",temp.dir.prs))
       if(res==2){
@@ -114,25 +141,29 @@ prs.list = list()
 name.file = rep("c",total)
 
 temp = 1
+#files = dir(temp.dir.prs,pattern="prs_2DLD_rho_",full)
+
 for(r_ind in 1:length(r2_vec)){
   wc_vec = wc_base_vec/r2_vec[r_ind]
   for(w_ind in 1:length(wc_vec)){
     for(k1 in 1:length(pthres)){
       for(k2 in 1:length(pthres)){
-     temp.prs.file = fread(paste0(temp.dir.prs,"prs_2DLD_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1,".p_value_",k2,".profile"))
-     prs.list[[temp]] = temp.prs.file[,6,drop=F]
-     name.file[temp] = paste0("r_ind_",r_ind,"_w_ind_",w_ind,"_k1_",k1,"_k2_",k2)
-     temp = temp + 1
+      filename = paste0(temp.dir.prs,"prs_2DLD_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1,".p_value_",k2,".profile")
+     #if(filename%in%files){
+       temp.prs.file = fread(filename)
+       prs.list[[temp]] = temp.prs.file[,6,drop=F]
+       name.file[temp] = paste0("r_ind_",r_ind,"_w_ind_",w_ind,"_k1_",k1,"_k2_",k2)
+       temp = temp + 1
+       
+    # }
          }
     }
   }
   
 }
+name.file = name.file[1:(temp-1)]
 prs.mat = bind_cols(prs.list)
 colnames(prs.mat) = name.file
 prs.id = temp.prs.file[,1:2,drop=F]
 prs.file = cbind(prs.id,prs.mat)
-write.table(prs.file,file = paste0(out.dir,eth[i],"/prs/prs_file_r_ind_",r_ind,"_w_ind_",w_ind,".profile"))
-
-
-
+write.table(prs.file,file = paste0(out.dir,eth[i],"/prs/prs_2DLD_i_c_",i_c,"_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".profile"))
