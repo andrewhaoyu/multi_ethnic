@@ -154,7 +154,7 @@ system(paste0("rm ",temp.dir,"*.bed"))
 system(paste0("rm ",temp.dir,"*.fam"))
 
 
-for(r_ind in 1:length(r2_vec)){
+#for(r_ind in 1:length(r2_vec)){
   wc_vec = wc_base_vec/r2_vec[r_ind]
   for(w_ind in 1:length(wc_vec)){
     print(c(r_ind,w_ind))
@@ -166,7 +166,7 @@ for(r_ind in 1:length(r2_vec)){
     LD <- rbind(LD.EUR,LD.tar)
     write.table(LD,file = paste0(out.dir,eth[i],"/LD_clump_two_way_i_c_",i_c,"rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped"),row.names = F,quote=F)
   }
-}
+#}
 #LD.test <- as.data.frame(fread(paste0(out.dir,eth[i],"/LD_clump_two_dim_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".clumped")))
 # summary.com = summary.com %>% 
 #   mutate(p_update=pmin(P,peur,na.rm = T))
