@@ -133,24 +133,6 @@ colnames(prs.mat) = name.file
 prs.id = temp.prs.file[,1:2,drop=F]
 prs.file = cbind(prs.id,prs.mat)
 write.table(prs.file,file = paste0(out.dir,eth[i],"/prs/prs_file_r_ind_",r_ind,"_w_ind_",w_ind,".profile"))
-res = system(paste0("mv ",temp.dir.prs,"*.profile ",out.dir,eth[i],"/prs/"))
-if(res==2){
-  stop()
-}
-system(paste0("rm -rf ",temp.dir.prs))
-dir.create(paste0(temp.dir.prs),showWarnings = FALSE)
-
-
-#pthres <- c(1E-10,1E-09,5E-08,1E-07,2.5E-07,5E-07,7.5E-07,1E-06,2.5E-06,5E-06,7.5E-06,1E-05,2.5e-05,5E-05,7.5e-05,1E-04,2.5E-04,5E-04,7.5E-04,1E-03)
-
-system(paste0("rm -rf ", temp.dir))
-
-#}
-
-
-
-
-
 
 
 
