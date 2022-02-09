@@ -115,7 +115,7 @@ for(r_ind in 1:length(r2_vec)){
         "--q-score-range ",temp.dir.prs,"q_range_file ",temp.dir.prs,"p_value_file header ",
         "--threads 2 ",
         "--score ",temp.dir.prs,"prs_file header no-sum no-mean-imputation ",
-        "--bfile ",temp.dir,"all_chr.tag ",
+        "--bfile ",temp.dir,"all_chr_test.tag ",
         "--exclude ",old.out.dir,eth[i],"/duplicated.id  ",
         "--out ",temp.dir.prs,"prs_2DLD_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1))  
       }
