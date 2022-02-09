@@ -31,7 +31,7 @@ if(i_c==2){
 }else if(i_c==1){
   #1kg snps
   
-  system(paste0("cp ",cur.dir,eth[i],"/all_chr.tag.* ",temp.dir))
+  system(paste0("cp ",cur.dir,eth[i],"/all_chr_test.tag.* ",temp.dir))
 }
 
 library(dplyr)
@@ -107,14 +107,13 @@ for(r_ind in 1:length(r2_vec)){
       if(i_c==2){
         res = system(paste0("/data/zhangh24/software/plink2 --q-score-range ",temp.dir.prs,"q_range_file ",temp.dir.prs,"p_value_file header --threads 2 --score ",temp.dir.prs,"prs_file header no-sum no-mean-imputation --bfile ",temp.dir,"all_chr_test.mega --exclude ",old.out.dir,eth[i],"/duplicated.id  --out ",temp.dir.prs,"prs_2DLD_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1))  
       }else{
-        fam <- as.data.frame(fread(paste0(temp.dir,eth[i],"/all_chr.tag.fam")))
-        ref_fam = fam[100001:120000,]
-        write.table(ref_fam,file = paste0(temp.dir,"/ref_fam.fam"),row.names=F,col.names=F,quote=F)
-        
+        # fam <- as.data.frame(fread(paste0(temp.dir,eth[i],"/all_chr.tag.fam")))
+        # ref_fam = fam[100001:120000,]
+        # write.table(ref_fam,file = paste0(temp.dir,"/ref_fam.fam"),row.names=F,col.names=F,quote=F)
+        # 
         res = system(paste0("/data/zhangh24/software/plink2 ",
         "--q-score-range ",temp.dir.prs,"q_range_file ",temp.dir.prs,"p_value_file header ",
         "--threads 2 ",
-        "--keep ",temp.dir,"/ref_fam.fam",
         "--score ",temp.dir.prs,"prs_file header no-sum no-mean-imputation ",
         "--bfile ",temp.dir,"all_chr.tag ",
         "--exclude ",old.out.dir,eth[i],"/duplicated.id  ",
