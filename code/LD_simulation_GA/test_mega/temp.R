@@ -281,4 +281,19 @@ write.table(prs.mat,file = paste0(out.dir,eth[i],"/prs/prs_eb_i_c_",i_c,"_rho_",
 
 
 
+prs.list = list()
+temp = 1
+#for(k1 in 1:length(pthres)){
+for(k1 in 1:length(pthres)){
+  prs.temp = fread(paste0(out.dir,eth[i],"/prs/prs_eb_i_c_",i_c,"_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1,".profile"))
+  prs.list[[temp]] = prs.temp[,4:ncol(prs.temp)]
+#  colnames(prs.list[[temp]]) = paste0(names,"_","p_value_",k1,"_p_value_",k2)
+  temp = temp + 1
+}
+#}
+prs.mat = cbind(prs.temp[,2:3],bind_cols(prs.list))
+write.table(prs.mat,file = paste0(out.dir,eth[i],"/prs/prs_eb_i_c_",i_c,"_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".profile"))
+
+
+
 
