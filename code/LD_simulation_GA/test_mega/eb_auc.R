@@ -27,7 +27,7 @@ n.rep = 10
 #row represent different p-value threshold
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
 setwd("/data/zhangh24/multi_ethnic/")
-out.dir <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/LD_stack/"
+out.dir <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/test_chip/"
 y <- as.data.frame(fread(paste0(cur.dir,eth[i],"/phenotypes_rho",l,"_",i1,".phen")))
 y <- y[,2+(1:n.rep),drop=F]
 n <- nrow(y)
@@ -46,66 +46,14 @@ summary.com <- left_join(sum.data,summary.eur.select,by="SNP")
 
 r2_vec = c(0.01,0.05,0.1,0.2,0.5,0.8)
 wc_base_vec = c(50,100)
-neth = 2
-total = neth*length(pthres)^2*length(r2_vec)*length(wc_base_vec)
-r2.vec.test <- rep(0,total)
-r2.vec.vad <- rep(0,total)
-pthres_vec1 <- rep(0,total)
-pthres_vec2 <- rep(0,total)
-r2_ind_vec <- rep(0,total)
-wc_ind_vec <- rep(0,total)
-prs.mat <- matrix(0,n.test+n.vad,total)
-temp = 1
+r2.vec.test <- rep(0,length(pthres)^2*length(r2_vec)*length(wc_base_vec))
 
-for(r_ind in 1:length(r2_vec)){
-  wc_vec = wc_base_vec/r2_vec[r_ind]
-  for(w_ind in 1:length(wc_vec)){
-    print(c(r_ind,w_ind))
-    
-    LD <- as.data.frame(fread(paste0(out.dir,eth[i],"/LD_clump_two_way_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped")))
-    clump.snp <- LD
-    
-    #    colnames(sum.data)[2] <- "SNP"
-    
-    #for(k in 1:length(pthres)){
-    
-    prs.clump = left_join(clump.snp,summary.com,by="SNP")
-    
-    for(k1 in 1:length(pthres)){
-      for(k2 in 1:length(pthres)){
-        prs.all <- prs.clump %>%
-          filter(peur<=pthres[k1]|
-                   P<=pthres[k2])
-        if(nrow(prs.all)>0){
-          filename <- paste0(out.dir,eth[i],"/prs/prs_eb_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1,".p_value_",k2,".profile")
-          prs.temp <- fread(filename)  
-          prs.score <- prs.temp$SCORE
-          prs.mat[,temp] = prs.score
-          temp = temp+1
-        }else{
-          prs.mat[,temp] = 0
-          temp = temp+1
-        }
-        #load eur prs
-        if(nrow(prs.all)>0){
-          filename <- paste0(out.dir,eth[i],"/prs/prs_ebeur_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1,".p_value_",k2,".profile")
-          prs.temp <- fread(filename)  
-          prs.score <- prs.temp$SCORE
-          prs.mat[,temp] = prs.score
-          temp = temp+1
-        }else{
-          prs.mat[,temp] = 0
-          temp = temp+1
-        }
-      }
-    }
-    
-  }
-}
-result.data <- data.frame(r2.vec.test,r2.vec.vad,
-                          pthres_vec1,pthres_vec2,
-                          r2_ind_vec,
-                          wc_ind_vec)
+temp = 1
+#all prs is written in one file
+prs.all = fread(paste0(out.dir,eth[i],"/prs/prs_eb_i_c_",i_c,"_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",6,"_wcind_",2,".profile"))
+#drop the first three id columns
+prs.mat = as.data.frame(prs.all[,-c(1:3),drop=F])
+
 prs.sum = colSums(prs.mat)
 idx <- which(prs.sum!=0)
 #drop the prs with all 0
@@ -159,6 +107,6 @@ r2.stack <- summary(model)$r.square
 #idx <- which.max(r2.vec.test)
 #r2.max <- r2.vec.vad[idx]
 r2.list <- list(r2.stack)
-save(r2.list,file = paste0(out.dir,eth[i],"/r2.list_rho_ebtest_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
+save(r2.list,file = paste0(out.dir,eth[i],"/r2.list_eb_i_c_",i_c,"_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
 #save(r2.list,file = paste0(out.dir,eth[i],"/r2.list_rho_eb_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
 #write.csv(r2.mat,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/ld.clump.auc.csv")
