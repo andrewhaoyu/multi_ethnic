@@ -12,7 +12,7 @@ l = 1
 m = 1
 i1 = 1
 i_c = 1
-
+k1 = as.numeric(args[[1]])
 
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
