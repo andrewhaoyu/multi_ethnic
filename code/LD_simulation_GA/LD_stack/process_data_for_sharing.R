@@ -19,6 +19,7 @@ i = as.numeric(args[[1]])
 j = as.numeric(args[[2]])
 eth = c("EUR","AFR","AMR","EAS","SAS")
 
+
 library(data.table)
 library(dplyr)
 sid<-Sys.getenv('SLURM_JOB_ID')
