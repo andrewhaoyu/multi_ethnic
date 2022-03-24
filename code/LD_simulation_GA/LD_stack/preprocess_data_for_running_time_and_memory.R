@@ -14,7 +14,7 @@ temp.dir.LD <- paste0('/lscratch/',sid,'/test/LD/')
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
 out.dir.sum <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
-out.dir <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/LD_stack/"
+out.dir <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/time_mem/"
 #load EUR clumping summary data
 summary.eur <- as.data.frame(fread(paste0(out.dir.sum,eth[1],"/summary_out_rho_",l,"_size_",4,"_rep_",i_rep,"_GA_",i1)))  
 colnames(summary.eur)[9] = "peur"
@@ -89,6 +89,13 @@ system(paste0("cp ",cur.dir,eth[1],"/clump_ref_all_chr.bed ",temp.dir,eth[1],"cl
 res = system(paste0("/data/zhangh24/software/plink2 --threads 2 --bfile ",cur.dir,eth[1],"/clump_ref_all_chr --extract ",out.dir.sum,"time_mem/extract_snp_list.txt --out ", out.dir.sum,"time_mem/EUR_ref_chr22 --make-bed"))
 res = system(paste0("/data/zhangh24/software/plink2 --threads 2 --bfile ",cur.dir,eth[2],"/clump_ref_all_chr --extract ",out.dir.sum,"time_mem/extract_snp_list.txt --out ", out.dir.sum,"time_mem/AFR_ref_chr22 --make-bed"))
 
+
+# system(paste0("/data/zhangh24/software/plink2 --threads 2 --bfile /data/zhangh24/KG.plink/EUR/chr_all --extract ",out.dir.sum,"time_mem/extract_snp_list.txt --out /data/zhangh24/KG.plink/EUR/EUR_ref_1kg_chr22 --make-bed"))
+# system(paste0("/data/zhangh24/software/plink2 --threads 2 --bfile /data/zhangh24/KG.plink/AFR/chr_all --extract ",out.dir.sum,"time_mem/extract_snp_list.txt --out /data/zhangh24/KG.plink/AFR/AFR_ref_1kg_chr22 --make-bed"))
+
+
+
+
 #prepare the data for prs calculation
 system(paste0("/data/zhangh24/software/plink2 --threads 2 --bfile ",cur.dir,eth[2],"/all_chr_test.mega --extract ",out.dir.sum,"time_mem/extract_snp_list.txt --out ", out.dir.sum,"time_mem/AFR_test_mega_chr22 --make-bed"))
               
@@ -136,3 +143,12 @@ bim.update =inner_join(summary.tar,bim,by = c("SNP"="V2")) %>%
   select(V1,rs_id,V3,V4,V5,V6)
 write.table(bim.update,file = paste0(out.dir,"AFR_ref_chr22_rs_id.bim"),row.names = F,col.names = F,quote=F)
 #phi = c(1E-6,1E-4)
+
+fam = fread(paste0(out.dir.sum,"/time_mem/AFR_test_mega_chr22.fam"),header=F)
+fam_test = fam[1:10000,]
+fam_vad = fam[1:10000,]
+write.table(fam_test, file = paste0(out.dir.sum,"/time_mem/test_id.fam"),row.names = F,col.names = F,quote=F)
+write.table(fam_vad, file = paste0(out.dir.sum,"/time_mem/vad_id.fam"),row.names = F,col.names = F,quote=F)
+#prepare the data for CTSLEB demonstration
+system(paste0("/data/zhangh24/software/plink2 --threads 2 --bfile ",out.dir.sum,"time_mem/AFR_test_mega_chr22 --keep ",out.dir.sum,"time_mem/test_id.fam --out ", out.dir.sum,"time_mem/AFR_test_chr22 --make-bed"))
+system(paste0("/data/zhangh24/software/plink2 --threads 2 --bfile ",out.dir.sum,"time_mem/AFR_test_mega_chr22 --keep ",out.dir.sum,"time_mem/vad_id.fam --out ", out.dir.sum,"time_mem/AFR_vad_chr22 --make-bed"))

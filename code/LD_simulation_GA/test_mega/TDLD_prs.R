@@ -11,6 +11,7 @@ i = as.numeric(args[[2]])
 #j = as.numeric(args[[3]])
 l = as.numeric(args[[3]])
 m = as.numeric(args[[4]])
+#i_c=1 for mega; i_c=2 for 1kg
 i1 = 1
 i_c = as.numeric(args[[5]])
 eth <- c("EUR","AFR","AMR","EAS","SAS")

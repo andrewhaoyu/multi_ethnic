@@ -38,8 +38,7 @@ library(grid)
 library(gridExtra)
 library(cowplot)
 load("/Users/zhangh24/GoogleDrive/multi_ethnic/result/23andme/prediction_summary.rdata")
-prediction.result = prediction.result %>% 
-  filter(Method!="PRS-CSx")
+
 # prediction.result.table = prediction.result %>% 
 #   mutate(sigma2 = ifelse(result<0.5,0,qnorm(result)^2*2)) %>% 
 #   mutate(sigma2 = ifelse(trait%in%
@@ -52,16 +51,17 @@ uvals = factor(c("C+T",
                  "Best EUR SNP (C+T)",
                  "Best EUR SNP (LDpred2)",
                  "Weighted PRS",
-                 "CT-SLEB (two ethnics)",
-                 "CT-SLEB (five ethnics)"),
+                 "PRS-CSx",
+                 "CT-SLEB (two ancestries)",
+                 "CT-SLEB (five ancestries)"),
                levels= c("C+T",
                          "LDpred2",
                          "Best EUR SNP (C+T)",
                          "Best EUR SNP (LDpred2)",
                          "Weighted PRS",
-                         "TDLD",
-                         "CT-SLEB (two ethnics)",
-                         "CT-SLEB (five ethnics)"))
+                         "PRS-CSx",
+                         "CT-SLEB (two ancestries)",
+                         "CT-SLEB (five ancestries)"))
 
 n.single = 9
 
@@ -74,7 +74,7 @@ EUR.color = brewer.pal(n.EUR, "Greens")[c(5,7)]
 
 
 n.multi = 9
-multi.color = brewer.pal(n.multi, "Oranges")[c(3,5,7)]
+multi.color = brewer.pal(n.multi, "Oranges")[c(3,5,7,9)]
 colour = c(single.color,EUR.color,multi.color)
 col_df = tibble(
   colour = c(single.color,EUR.color,multi.color),
@@ -85,8 +85,9 @@ col_df = tibble(
                                        "Best EUR SNP (LDpred2)"
                        ) ~ "EUR PRS based method",
                        method_vec%in%c("Weighted PRS",
-                                       "CT-SLEB (two ethnics)",
-                                       "CT-SLEB (five ethnics)") ~ "Multi ethnic method")
+                                       "PRS-CSx",
+                                       "CT-SLEB (two ancestries)",
+                                       "CT-SLEB (five ancestries)") ~ "Multi ethnic method")
 ) %>%   mutate(category = factor(category,levels = c("Single ethnic method",
                                                      "EUR PRS based method",
                                                      "Multi ethnic method")))
@@ -189,6 +190,46 @@ dev.off()
 
 
 prediction.result.European = prediction.result %>% 
+  filter(trait %in% c("Heart metabolic disease burden")==T&
+           method_vec=="C+T") %>% 
+  filter(eth=="European") %>% 
+  select(result,trait)
+prediction.result.sub = prediction.result %>% 
+  filter(trait %in% c("Heart metabolic disease burden")) %>% 
+  filter(eth!="European") %>% 
+  mutate(eth = factor(eth,
+                      levels = c("African American",
+                                 "Latino","East Asian","South Asian")))
+
+p.null <- ggplot(prediction.result.sub)+
+  geom_bar(aes(x = index,y = result,fill=method_vec),
+           position = position_dodge(),
+           stat = "identity")+
+  theme_Publication()+
+  ylab("R2")+
+  facet_grid(vars(trait),vars(eth),scales = "free")+
+  theme_Publication()+
+  #coord_cartesian(ylim = c(0.47, 0.65)) +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())+
+  scale_fill_manual(values = colour) +
+  theme(legend.position = "none")+
+  geom_hline(data = prediction.result.European, aes(yintercept = result), linetype = "dashed",color = "red")
+
+
+
+p = plot_grid(p.null,p.leg,nrow=1,rel_widths = c(3,1))
+#theme(strip.text.y = element_blank())
+#library(RColorBrewer)
+png(filename = "../../presentation_plot/23andme_heart.png",width=12,height = 8,units = "in",res = 300)
+print(p)
+dev.off()
+
+
+
+
+prediction.result.European = prediction.result %>% 
   filter(trait %in% c("Height")==T&
            method_vec=="C+T") %>% 
   filter(eth=="European") %>% 
@@ -224,8 +265,4 @@ p = plot_grid(p.null,p.leg,nrow=1,rel_widths = c(3,1))
 png(filename = "../../presentation_plot/23andme_height.png",width=12,height = 8,units = "in",res = 300)
 print(p)
 dev.off()
-
-
-
-
 

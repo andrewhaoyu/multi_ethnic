@@ -13,9 +13,9 @@ methodname = c("C+T",
            "Best EUR SNP (C+T)",
            "Best EUR SNP (LDpred2)",
            "Weighted PRS",
-           #                  "PRS-CSx",
-           "CT-SLEB (two ethnics)",
-           "CT-SLEB (five ethnics)")
+            "PRS-CSx",
+           "CT-SLEB (two ancestries)",
+           "CT-SLEB (five ancestries)")
 sigma2toauc = function(x){
   ifelse(x==0,0.50,round(pnorm(0.5*sqrt(x)),2))
 }

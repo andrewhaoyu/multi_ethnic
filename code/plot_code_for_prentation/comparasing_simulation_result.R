@@ -15,25 +15,39 @@ load(paste0("LD.clump.result.SCT.rdata"))
 load(paste0("eur.snp.reult.rdata"))
 load(paste0("weightedprs.result.rdata"))
 load(paste0("LD.clump.result.2DLD.rdata"))
-load(paste0("LD.clump.result.EB.rdata"))
-load(paste0("LD.clump.result.alleth.EB.rdata"))
-load(paste0("LDpred2.result.rdata"))
+load(paste0("LD.clump.result.EBtest.rdata"))
+load(paste0("LD.clump.result.allethtest.EB.rdata"))
+load("LDpred2.result.021622")
+
+
 load(paste0("LDpredEUR.result.rdata"))
 load(paste0("prscsx.result.rdata"))
 LD.clump.result <- LD.result.list[[1]] %>% 
   mutate(method_vec = rep("C+T"))
 
-TDLD.result = TDLD.result %>% 
-  filter(method_vec=="TDLD")
 
-alleth.EB.result = alleth.EB.result %>% 
-  filter(method_vec=="TDLD-SLEB (all ethnics)")
 weightedprs.result = weightedprs.result %>% 
   mutate(method_vec = "Weighted PRS")
+prediction.result <- rbind(LD.clump.result,
+                           SCT.clump.result,
+                           LDpred2.result,
+                           eursnp.result,
+                           LDpredEUR.result,
+                           weightedprs.result,
+                           prscsx.result,
+                           TDLD.result,
+                           EB.result,
+                           alleth.EB.result)
+prediction.result = prediction.result %>% 
+  filter(method_vec%in%c("SCT","Best EUR SNP + target coefficients (C+T)",
+                         "Best EUR SNP + EB coefficients (C+T)",
+                         "TDLD",
+                         "TDLD-EB")==F)
+
 EB.result = EB.result %>% 
-  mutate(method_vec=ifelse(method_vec=="TDLD-SLEB","CT-SLEB (two ethnics)",method_vec))
+  mutate(method_vec=ifelse(method_vec=="CT-SLEB (two ancestries)","CT-SLEB (two ethnics)",method_vec))
 alleth.EB.result = alleth.EB.result %>% 
-  mutate(method_vec=ifelse(method_vec=="TDLD-SLEB (all ethnics)","CT-SLEB (five ethnics)",method_vec))
+  mutate(method_vec=ifelse(method_vec=="CT-SLEB (five ancestries)","CT-SLEB (five ethnics)",method_vec))
 prediction.result <- rbind(LD.clump.result,
                            SCT.clump.result,
                            LDpred2.result,

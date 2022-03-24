@@ -13,7 +13,7 @@ LD.clump.result <- LD.result.list[[1]] %>%
   mutate(method_vec = rep("C+T")) %>% 
   filter(eth.vec == "EUR"&
            m_vec== 4)
-load(paste0("LDpred2.result.rdata"))
+load("LDpred2.result.021622")
 LDpred2.result.sub = LDpred2.result %>% 
   filter(eth.vec=="EUR"&m_vec==4)
 EUR.result = rbind(LD.clump.result,LDpred2.result.sub) %>% 
@@ -22,9 +22,9 @@ EUR.result = rbind(LD.clump.result,LDpred2.result.sub) %>%
 
 rbind(LD.clump.result,LDpred2.result.sub) %>% 
   filter(l_vec==3&ga_vec==3)
-load(paste0("LD.clump.result.EB.rdata"))
+load(paste0("LD.clump.result.EBtest.rdata"))
 EB.result = EB.result %>% 
-  filter(method_vec=="TDLD-SLEB")
+  filter(method_vec=="CT-SLEB (two ancestries)")
 prediction.result <- rbind(LD.clump.result,
                            EB.result)
 
@@ -65,17 +65,21 @@ for(i1 in 1:5){
   p <- ggplot(result.sub,aes(x= sample_size,y=relative.r2,group=eth.vec))+
     geom_line(aes(color=eth.vec),size = 1)+
     geom_point(aes(color=eth.vec))+
-    ylab(expression(bold(paste("Relative ", R^2))))+
+    ylab(expression(bold(paste(R^2, "of CT-SLEB in the target population / ",R^2," of EUR PRS in EUR"))))+
     theme_Publication()+
     xlab("Training sample size")+
-    labs(color = "Ethnic group")+
+    labs(color = "Ancestry group")+
     facet_grid(cols=vars(cau_vec))+
     #scale_color_brewer(palette = "Paired")+
     scale_colour_Publication()+
-    ggtitle(paste0("Relative performance of CT-SLEB over single ethnic European PRS"))+
+    ggtitle(paste0("Prediction performances of CT-SLEB among target ancestries over the EUR PRS in EUR"))+
     geom_hline(yintercept=1, linetype="dashed", 
                color = "red")+
-    theme(legend.text=element_text(size=12))
+    theme(legend.text=element_text(size=12),
+          axis.text = element_text(size=12),
+          axis.title.y = element_text(angle=90,vjust =2,size = 12))+
+    theme(plot.title = element_text(face = "bold",
+                                    size = rel(1.0), hjust = 0.5))
   print(p)
   if(i1 ==1){
     p1 = p
@@ -84,7 +88,7 @@ for(i1 in 1:5){
   }
  
   png(file = paste0("./fix_gap_summary_GA_",i1,".png"),
-      width = 12.6, height = 7, res = 300,units = "in")
+      width = 13, height = 7, res = 300,units = "in")
   print(p)
   dev.off()
   }

@@ -40,12 +40,12 @@ for(i in 2:5){
           
           
         }
-        eth.vec[temp:(temp+1)] = rep(eth[i],1)
-        r2.vec[temp:(temp+1)] <- c(mean(r2.stack.temp))
-        l_vec[temp:(temp+1)] <- rep(l,1)
-        m_vec[temp:(temp+1)] <- rep(m,1)
-        ga_vec[temp:(temp+1)] <- rep(i1,1)
-        method_vec[temp:(temp+1)] <- c("CT-SLEB (five ancestries)")
+        eth.vec[temp] = rep(eth[i],1)
+        r2.vec[temp] <- c(mean(r2.stack.temp))
+        l_vec[temp] <- rep(l,1)
+        m_vec[temp] <- rep(m,1)
+        ga_vec[temp] <- rep(i1,1)
+        method_vec[temp] <- c("CT-SLEB (five ancestries)")
         temp = temp+1
       }
     }

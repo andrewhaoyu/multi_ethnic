@@ -64,8 +64,8 @@ for(m in 1:4){
       #geom_point(aes(color=method_vec))+
       theme_Publication()+
       ylab(expression(bold(R^2)))+
-      xlab("Sample Size")+
-      labs(fill = "Method")+
+      xlab("Training sample Size")+
+      labs(fill = "SNP set")+
       facet_grid(vars(cau_vec),vars(eth.vec))+
       scale_fill_Publication()+
       #scale_fill_manual(values = colour) +

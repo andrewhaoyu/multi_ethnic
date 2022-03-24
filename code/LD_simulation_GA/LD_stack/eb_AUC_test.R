@@ -87,7 +87,8 @@ for(r_ind in 1:length(r2_vec)){
           temp = temp+1
         }
         #load eur prs
-        if(nrow(prs.all)>0){
+        #take out all the population-specific files
+        if(nrow(prs.all)>0&(sum(is.na(prs.all$beta_eur))<nrow(prs.all))){
           filename <- paste0(out.dir,eth[i],"/prs/prs_ebeur_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1,".p_value_",k2,".profile")
           prs.temp <- fread(filename)  
           prs.score <- prs.temp$SCORE

@@ -40,12 +40,12 @@ for(i in 2:5){
           
           
         }
-        eth.vec[temp:(temp+1)] = rep(eth[i],1)
-        r2.vec[temp:(temp+1)] <- c(mean(r2.stack.temp))
-        l_vec[temp:(temp+1)] <- rep(l,1)
-        m_vec[temp:(temp+1)] <- rep(m,1)
-        ga_vec[temp:(temp+1)] <- rep(i1,1)
-        method_vec[temp:(temp+1)] <- c("CT-SLEB (two ancestries)")
+        eth.vec[temp] = rep(eth[i],1)
+        r2.vec[temp] <- c(mean(r2.stack.temp))
+        l_vec[temp] <- rep(l,1)
+        m_vec[temp] <- rep(m,1)
+        ga_vec[temp] <- rep(i1,1)
+        method_vec[temp] <- c("CT-SLEB (two ancestries)")
         temp = temp+1
       }
     }
@@ -94,7 +94,7 @@ for(i in 2:5){
           filename = paste0(out.dir,eth[i],"/r2.list_rho_ebtest_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)
           
          if(filename%in%files==F){
-           filelist[temp] = paste0("Rscript /data/zhangh24/multi_ethnic/code/LD_simulation_GA/LD_stack/eb_AUC_test.R ",
+           filescript[temp] = paste0("Rscript /data/zhangh24/multi_ethnic/code/LD_simulation_GA/LD_stack/eb_AUC_test.R ",
                                      i," ",l," ",m," ",i_rep," ",i1)
            temp = temp+1
          }

@@ -15,25 +15,19 @@ load(paste0("LD.clump.result.SCT.rdata"))
 load(paste0("eur.snp.reult.rdata"))
 load(paste0("weightedprs.result.rdata"))
 load(paste0("LD.clump.result.2DLD.rdata"))
-load(paste0("LD.clump.result.EB.rdata"))
-load(paste0("LD.clump.result.alleth.EB.rdata"))
-load(paste0("LDpred2.result.rdata"))
+load(paste0("LD.clump.result.EBtest.rdata"))
+load(paste0("LD.clump.result.allethtest.EB.rdata"))
+load("LDpred2.result.021622")
+
+
 load(paste0("LDpredEUR.result.rdata"))
 load(paste0("prscsx.result.rdata"))
 LD.clump.result <- LD.result.list[[1]] %>% 
   mutate(method_vec = rep("C+T"))
 
-TDLD.result = TDLD.result %>% 
-  filter(method_vec=="TDLD")
 
-alleth.EB.result = alleth.EB.result %>% 
-  filter(method_vec=="TDLD-SLEB (all ethnics)")
 weightedprs.result = weightedprs.result %>% 
   mutate(method_vec = "Weighted PRS")
-EB.result = EB.result %>% 
-  mutate(method_vec=ifelse(method_vec=="TDLD-SLEB","CT-SLEB (two ethnics)",method_vec))
-alleth.EB.result = alleth.EB.result %>% 
-  mutate(method_vec=ifelse(method_vec=="TDLD-SLEB (all ethnics)","CT-SLEB (five ethnics)",method_vec))
 prediction.result <- rbind(LD.clump.result,
                            SCT.clump.result,
                            LDpred2.result,
@@ -62,6 +56,8 @@ prediction.result = prediction.result %>%
     m_vec == 3~ "80000",
     m_vec == 4~ "100000"
   )) %>% 
+  mutate(method_vec=ifelse(method_vec=="C+T","CT",method_vec)) %>% 
+  mutate(method_vec=ifelse(method_vec=="Best EUR SNP (C+T)","Best EUR SNP (CT)",method_vec)) %>% 
   mutate(cau_vec = factor(cau_vec,
                           levels = c("Causal SNPs Proportion = 0.01",
                                      "Causal SNPs Proportion = 0.001",
@@ -69,10 +65,10 @@ prediction.result = prediction.result %>%
         sample_size = factor(sample_size,
                               levels = c("15000","45000","80000","100000")),
         method_vec = factor(method_vec,
-                            levels = c("C+T",
+                            levels = c("CT",
                                        #"SCT",
                                        "LDpred2",
-                                       "Best EUR SNP (C+T)",
+                                       "Best EUR SNP (CT)",
                                        #"Best EUR SNP + target coefficients (C+T)",
                                        #"Best EUR SNP + EB coefficients (C+T)",
                                        "Best EUR PRS (LDpred2)",
@@ -80,28 +76,28 @@ prediction.result = prediction.result %>%
                                        "PRS-CSx",
                                       # "TDLD",
                                       # "TDLD-EB",
-                                       "CT-SLEB (two ethnics)",
-                                       "CT-SLEB (five ethnics)"
+                                       "CT-SLEB (two ancestries)",
+                                       "CT-SLEB (five ancestries)"
                                        ))) %>% 
   mutate(ga_arc = case_when(ga_vec==1 ~"Fixed common SNP heritability with strong negative selection",
-                            ga_vec==2 ~"Fixed whole genome heritability with strong negative selection",
-                            ga_vec==3 ~"Fixed common SNP heritability with strong negative selection (r=0.6)",
+                            ga_vec==2 ~"Fixed per-SNP heritability with strong negative selection",
+                            ga_vec==3 ~"Fixed per-SNP heritability with strong negative selection (r=0.6)",
                             ga_vec==4 ~"Fixed common SNP heritability with no negative selection",
                             ga_vec==5 ~"Fixed common SNP heritability with mild negative selection",
                             ))
 
 prediction.result = prediction.result %>% 
   filter(method_vec%in%
-           c("C+T",
+           c("CT",
              "LDpred2",
-             "Best EUR SNP (C+T)",
+             "Best EUR SNP (CT)",
              "Best EUR PRS (LDpred2)",
              "Weighted PRS",
              "PRS-CSx",
-             "CT-SLEB (two ethnics)",
-             "CT-SLEB (five ethnics)"
+             "CT-SLEB (two ancestries)",
+             "CT-SLEB (five ancestries)"
            ))
-
+save(prediction.result,file = "prediction.result.summary.rdata")
 uvals = unique(prediction.result$method_vec)
 
 n.single = 9
@@ -120,19 +116,19 @@ colour = c(single.color,EUR.color,multi.color)
 col_df = tibble(
   colour = c(single.color,EUR.color,multi.color),
   method_vec = uvals,
-  category = case_when(method_vec%in%c("C+T",
-                                       "LDpred2") ~ "Single ethnic method",
-                       method_vec%in%c("Best EUR SNP (C+T)",
+  category = case_when(method_vec%in%c("CT",
+                                       "LDpred2") ~ "Single ancestry method",
+                       method_vec%in%c("Best EUR SNP (CT)",
                                        "Best EUR PRS (LDpred2)"
                                        ) ~ "EUR PRS based method",
                        method_vec%in%c("Weighted PRS",
                                        "PRS-CSx",
-                                       "CT-SLEB (two ethnics)",
-                                       "CT-SLEB (five ethnics)") ~ "Multi ethnic method")
+                                       "CT-SLEB (two ancestries)",
+                                       "CT-SLEB (five ancestries)") ~ "Multi-ancestry method")
 ) %>% 
-  mutate(category = factor(category,levels = c("Single ethnic method",
+  mutate(category = factor(category,levels = c("Single ancestry method",
                                                   "EUR PRS based method",
-                                                  "Multi ethnic method")))
+                                                  "Multi-ancestry method")))
 
 prediction.result = prediction.result %>% 
   left_join(col_df)
@@ -187,7 +183,7 @@ for(m in 1:4){
       #geom_point(aes(color=method_vec))+
       theme_Publication()+
       ylab(expression(bold(R^2)))+
-      xlab("Sample Size")+
+      xlab("Training sample Size")+
       labs(fill = "Method")+
       facet_grid(vars(cau_vec),vars(eth.vec))+
       #scale_fill_nejm()+
@@ -320,3 +316,12 @@ mean(prediction.result.sub2$r2.vec/prediction.result.sub$r2.vec-1)
 #   dev.off()
 #   
 # }
+
+
+# load(paste0("R2.LDpred2.mega.rdata"))
+# colnames(R2.ldpred2.mega) = c("l_vec","m_vec","ga_vec","eth.vec",
+#                               "r2.vec","P-value","p","p.common","h2")
+# LDpred2.result = R2.ldpred2.mega %>% 
+#    mutate(method_vec = "LDpred2") %>% 
+#   dplyr::select(eth.vec,r2.vec,l_vec,m_vec,method_vec,ga_vec)
+# save(LDpred2.result,file = "LDpred2.result.021622")
