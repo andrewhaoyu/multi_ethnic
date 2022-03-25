@@ -70,8 +70,8 @@ library(dplyr)
 cur.dir = "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
 out.dir <-  paste0(cur.dir,eth[i],"/",eth[i],"_mega/")
 
-system(paste0("cd " ,cur.dir,"; ",
-"zip -r ",eth[i],"_mega.zip ",eth[i],"_mega/"))
+system(paste0("cd " ,cur.dir,eth[i],"; ",
+"zip -r ",eth[i],"_mega.zip ",eth[i],"_mega"))
 
 for(j in 1:22){
   system(paste0("cd ",cur.dir,eth[i],"; ",
