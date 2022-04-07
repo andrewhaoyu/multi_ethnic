@@ -46,17 +46,17 @@ load("/Users/zhangh24/GoogleDrive/multi_ethnic/result/23andme/prediction_summary
 #   select(eth,trait,Method,result,sigma2)
 # write.csv(prediction.result.table,file = "/Users/zhangh24/GoogleDrive/multi_ethnic/result/23andme/prediction_summary.csv",row.names = F)
 
-uvals = factor(c("C+T",
+uvals = factor(c("CT",
                  "LDpred2",
-                 "Best EUR SNP (C+T)",
+                 "Best EUR SNP (CT)",
                  "Best EUR SNP (LDpred2)",
                  "Weighted PRS",
                  "PRS-CSx",
                  "CT-SLEB (two ancestries)",
                  "CT-SLEB (five ancestries)"),
-               levels= c("C+T",
+               levels= c("CT",
                          "LDpred2",
-                         "Best EUR SNP (C+T)",
+                         "Best EUR SNP (CT)",
                          "Best EUR SNP (LDpred2)",
                          "Weighted PRS",
                          "PRS-CSx",
@@ -79,18 +79,18 @@ colour = c(single.color,EUR.color,multi.color)
 col_df = tibble(
   colour = c(single.color,EUR.color,multi.color),
   method_vec = uvals,
-  category = case_when(method_vec%in%c("C+T",
-                                       "LDpred2") ~ "Single ethnic method",
-                       method_vec%in%c("Best EUR SNP (C+T)",
+  category = case_when(method_vec%in%c("CT",
+                                       "LDpred2") ~ "Single ancestry method",
+                       method_vec%in%c("Best EUR SNP (CT)",
                                        "Best EUR SNP (LDpred2)"
                        ) ~ "EUR PRS based method",
                        method_vec%in%c("Weighted PRS",
                                        "PRS-CSx",
                                        "CT-SLEB (two ancestries)",
-                                       "CT-SLEB (five ancestries)") ~ "Multi ethnic method")
-) %>%   mutate(category = factor(category,levels = c("Single ethnic method",
+                                       "CT-SLEB (five ancestries)") ~ "Multi-ancestry method")
+) %>%   mutate(category = factor(category,levels = c("Single ancestry method",
                                                      "EUR PRS based method",
-                                                     "Multi ethnic method")))
+                                                     "Multi-ancestry method")))
 prediction.result = prediction.result %>% 
   left_join(col_df)
 getLegend <- function(p) {
@@ -148,7 +148,7 @@ prediction.result.European.CT = prediction.result %>%
                       "Migraine Diagnosis",
                       "Morning Person")) %>% 
   filter(eth=="European"&
-           method_vec=="C+T") %>% 
+           method_vec=="CT") %>% 
   select(result,trait)
 prediction.result.European.LDpred2 = prediction.result %>% 
   filter(trait %in% c("Any CVD","Depression",
@@ -191,7 +191,7 @@ dev.off()
 
 prediction.result.European = prediction.result %>% 
   filter(trait %in% c("Heart metabolic disease burden")==T&
-           method_vec=="C+T") %>% 
+           method_vec=="CT") %>% 
   filter(eth=="European") %>% 
   select(result,trait)
 prediction.result.sub = prediction.result %>% 
@@ -231,7 +231,7 @@ dev.off()
 
 prediction.result.European = prediction.result %>% 
   filter(trait %in% c("Height")==T&
-           method_vec=="C+T") %>% 
+           method_vec=="CT") %>% 
   filter(eth=="European") %>% 
   select(result,trait)
 prediction.result.sub = prediction.result %>% 

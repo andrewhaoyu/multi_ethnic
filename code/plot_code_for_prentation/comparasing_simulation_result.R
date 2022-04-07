@@ -23,9 +23,12 @@ load("LDpred2.result.021622")
 load(paste0("LDpredEUR.result.rdata"))
 load(paste0("prscsx.result.rdata"))
 LD.clump.result <- LD.result.list[[1]] %>% 
-  mutate(method_vec = rep("C+T"))
+  mutate(method_vec = rep("C+T")) %>% 
+  mutate(method_vec=ifelse(method_vec=="C+T","CT",method_vec))
 
-
+eursnp.result = eursnp.result %>% 
+  mutate(method_vec=ifelse(method_vec=="Best EUR SNP (C+T)","Best EUR SNP (CT)",method_vec))
+  
 weightedprs.result = weightedprs.result %>% 
   mutate(method_vec = "Weighted PRS")
 prediction.result <- rbind(LD.clump.result,
@@ -45,9 +48,9 @@ prediction.result = prediction.result %>%
                          "TDLD-EB")==F)
 
 EB.result = EB.result %>% 
-  mutate(method_vec=ifelse(method_vec=="CT-SLEB (two ancestries)","CT-SLEB (two ethnics)",method_vec))
+  mutate(method_vec=ifelse(method_vec=="CT-SLEB (two ethnics)","CT-SLEB (two ancestries)",method_vec))
 alleth.EB.result = alleth.EB.result %>% 
-  mutate(method_vec=ifelse(method_vec=="CT-SLEB (five ancestries)","CT-SLEB (five ethnics)",method_vec))
+  mutate(method_vec=ifelse(method_vec=="CT-SLEB (five ethnics)","CT-SLEB (five ancestries)",method_vec))
 prediction.result <- rbind(LD.clump.result,
                            SCT.clump.result,
                            LDpred2.result,
@@ -79,10 +82,10 @@ prediction.result = prediction.result %>%
          sample_size = factor(sample_size,
                               levels = c("15000","45000","80000","100000")),
          method_vec = factor(method_vec,
-                             levels = c("C+T",
+                             levels = c("CT",
                                         "SCT",
                                         "LDpred2",
-                                        "Best EUR SNP (C+T)",
+                                        "Best EUR SNP (CT)",
                                         "Best EUR SNP + target coefficients (C+T)",
                                         "Best EUR SNP + EB coefficients (C+T)",
                                         "Best EUR PRS (LDpred2)",
@@ -90,8 +93,8 @@ prediction.result = prediction.result %>%
                                         "PRS-CSx",
                                         "TDLD",
                                         "TDLD-EB",
-                                        "CT-SLEB (two ethnics)",
-                                        "CT-SLEB (five ethnics)"
+                                        "CT-SLEB (two ancestries)",
+                                        "CT-SLEB (five ancestries)"
                              ))) %>% 
   mutate(ga_arc = case_when(ga_vec==1 ~"Fixed common SNP heritability with strong negative selection",
                             ga_vec==2 ~"Fixed whole genome heritability with strong negative selection",
@@ -102,14 +105,14 @@ prediction.result = prediction.result %>%
 
 prediction.result = prediction.result %>% 
   filter(method_vec%in%
-           c("C+T",
+           c("CT",
              "LDpred2",
-             "Best EUR SNP (C+T)",
+             "Best EUR SNP (CT)",
              "Best EUR PRS (LDpred2)",
              "Weighted PRS",
              "PRS-CSx",
-             "CT-SLEB (two ethnics)",
-             "CT-SLEB (five ethnics)"
+             "CT-SLEB (two ancestries)",
+             "CT-SLEB (five ancestries)"
            ))
 
 uvals = unique(prediction.result$method_vec)
@@ -130,19 +133,19 @@ colour = c(single.color,EUR.color,multi.color)
 col_df = tibble(
   colour = c(single.color,EUR.color,multi.color),
   method_vec = uvals,
-  category = case_when(method_vec%in%c("C+T",
-                                       "LDpred2") ~ "Single ethnic method",
-                       method_vec%in%c("Best EUR SNP (C+T)",
+  category = case_when(method_vec%in%c("CT",
+                                       "LDpred2") ~ "Single ancestry method",
+                       method_vec%in%c("Best EUR SNP (CT)",
                                        "Best EUR PRS (LDpred2)"
                        ) ~ "EUR PRS based method",
                        method_vec%in%c("Weighted PRS",
                                        "PRS-CSx",
-                                       "CT-SLEB (two ethnics)",
-                                       "CT-SLEB (five ethnics)") ~ "Multi ethnic method")
+                                       "CT-SLEB (two ancestries)",
+                                       "CT-SLEB (five ancestries)") ~ "Multi-ancestry method")
 ) %>% 
-  mutate(category = factor(category,levels = c("Single ethnic method",
+  mutate(category = factor(category,levels = c("Single ancestry method",
                                                "EUR PRS based method",
-                                               "Multi ethnic method")))
+                                               "Multi-ancestry method")))
 
 prediction.result = prediction.result %>% 
   left_join(col_df)
@@ -220,6 +223,40 @@ library(cowplot)
     png(file = paste0("../../presentation_plot/simple_compare_methods.png"),
         width = 10, height = 8, res = 300,units = "in")
     print(p.null)
+    dev.off()
+    
+    
+    prediction.result.sub <- prediction.result %>% 
+      filter(ga_vec==i1&
+               eth.vec!="EUR"&
+               m_vec ==m&
+               l_vec==3&
+               eth.vec=="EAS")
+    p.null <- ggplot(prediction.result.sub,aes(x= sample_size,y=r2.vec,group=method_vec))+
+      geom_bar(aes(fill=method_vec),
+               stat="identity",
+               position = position_dodge())+
+      #geom_point(aes(color=method_vec))+
+      theme_Publication()+
+      ylab("R2")+
+      xlab("Sample Size")+
+      labs(fill = "Method")+
+      facet_grid(vars(cau_vec),vars(eth.vec))+
+      #scale_fill_nejm()+
+      scale_fill_manual(values = colour) +
+      theme(axis.text = element_text(size = rel(0.9)),
+            legend.text = element_text(size = rel(0.9)))+
+      ggtitle("R2 Performance on the Validation Dataset")+
+      theme(legend.position = "none")
+    p = plot_grid(p.null,p.leg,nrow=1,rel_widths = c(3.5,1))
+    png(file = paste0("../../presentation_plot/single_ethnic_single_cau_compare_methods_large.png"),
+        width = 14, height = 8, res = 300,units = "in")
+    print(p)
+    dev.off()
+    p = plot_grid(p.null,p.leg,nrow=1,rel_widths = c(3.5,1))
+    png(file = paste0("../../presentation_plot/single_ethnic_single_cau_compare_methods.png"),
+        width = 14, height = 8, res = 300,units = "in")
+    print(p)
     dev.off()
     
     prediction.result.sub <- prediction.result %>% 
