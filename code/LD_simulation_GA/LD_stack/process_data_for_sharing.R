@@ -1,4 +1,4 @@
-
+## goal process genotype data for sharing ##
 #load("/data/zhangh24/multi_ethnic/result/LD_simulation_new/snp.infor.rdata")
 # dup.id.list = list()
 # library(data.table)
@@ -58,10 +58,6 @@
 # args = commandArgs(trailingOnly = T)
 # i = as.numeric(args[[1]])
 #eth = c("EUR","AFR","AMR","EAS","SAS")
-library(data.table)
-library(dplyr)
-
-
 # library(data.table)
 # library(dplyr)
 # cur.dir = "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
@@ -75,6 +71,8 @@ library(dplyr)
 #                 "rm chr",j,"train.mega.* ; ",
 #                 "rm chr",j,".mega.* "))
 # }
+
+##process summary level statistics##
 args = commandArgs(trailingOnly = T)
 i = as.numeric(args[[1]])
 l = as.numeric(args[[2]])
@@ -112,15 +110,15 @@ n.rep = 10
       "summary_rho_",l,"_size_",m,"_GA_",i1," ;",
       "rm summary_rho_",l,"_size_",m,"_GA_",i1))
      
-      y <- as.data.frame(fread(paste0(out.dir.sum,eth[i],"/phenotypes_rho",l,"_",i1)))
-      y <- y[,1:(2+n.rep),drop=F]
-      colnames(y) = c("FID","IID",paste0("pheno_",c(1:10)))
-      write.table(y,file = paste0(out.dir.sum,eth[i],"/pheno_combine/pheno_rho_",l,"_GA_",i1),
-                  row.names = F,col.names = T,quote=F)
-      system(paste0("cd " ,out.dir.sum,eth[i],"/pheno_combine/ ; ",
-                    "zip pheno_rho_",l,"_GA_",i1,".zip ",
-                    "pheno_rho_",l,"_GA_",i1," ;",
-                    "rm pheno_rho_",l,"_GA_",i1))
+      # y <- as.data.frame(fread(paste0(out.dir.sum,eth[i],"/phenotypes_rho",l,"_",i1)))
+      # y <- y[,1:(2+n.rep),drop=F]
+      # colnames(y) = c("FID","IID",paste0("pheno_",c(1:10)))
+      # write.table(y,file = paste0(out.dir.sum,eth[i],"/pheno_combine/pheno_rho_",l,"_GA_",i1),
+      #             row.names = F,col.names = T,quote=F)
+      # system(paste0("cd " ,out.dir.sum,eth[i],"/pheno_combine/ ; ",
+      #               "zip pheno_rho_",l,"_GA_",i1,".zip ",
+      #               "pheno_rho_",l,"_GA_",i1," ;",
+      #               "rm pheno_rho_",l,"_GA_",i1))
       
 #     }
 #   }
