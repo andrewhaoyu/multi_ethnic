@@ -34,3 +34,7 @@ which.max(auc.result.vec)
 which.max(auc.result.sl.vec)
 
 idx <- which.max(result.data$auc.test.vec)
+
+library(data.table)
+data1 = fread("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/EUR/summary_combine/summary_rho_1_size_1_GA_1")
+data2 = fread("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/EUR/summary_combine/summary_rho_1_size_1_GA_5")

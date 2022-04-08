@@ -87,12 +87,24 @@ n.rep = 10
 # for(i in 1:5){
 #   for(l in 1:3){
 #     for(m in 1:4){
+
+#summary GA_3:5 only has mega+hm3 snps
+#summary GA_1:2 has 1KG snps
+#for sharing purpose, we restrct to mega+hm3 snps
+summmary.data.ref = as.data.frame(fread(paste0(out.dir.sum,eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",1,"_GA_",3)))
+snp.ref = summmary.data.ref[,"SNP",drop=F]
+idx <- which(duplicated(snp.ref))
+snp.ref = snp.ref[-idx,,drop=F]
+
       effect_mat_list = list()
       names_list = list()
       for(i_rep in 1:n.rep){
         summary.data <- as.data.frame(fread(paste0(out.dir.sum,eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))
+        idx <- which(duplicated(summary.data$SNP))
+        summary.data = summary.data[-idx,]
         summary.data = summary.data %>%
           mutate(SE = BETA/STAT)
+        summary.data.select = left_join(snp.ref,summary.data)
         coeff_mat = summary.data %>%
           select(BETA,SE,P)
         effect_mat_list[[i_rep]] = coeff_mat
