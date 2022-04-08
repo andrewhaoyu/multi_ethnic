@@ -105,12 +105,12 @@ snp.ref = snp.ref[-idx,,drop=F]
         summary.data = summary.data %>%
           mutate(SE = BETA/STAT)
         summary.data.select = left_join(snp.ref,summary.data)
-        coeff_mat = summary.data %>%
+        coeff_mat = summary.data.select %>%
           select(BETA,SE,P)
         effect_mat_list[[i_rep]] = coeff_mat
         names_list[[i_rep]] = paste0(c("BETA_rep_","SE_rep_","P_rep_"),i_rep)
       }
-      snp.infor = summary.data %>% 
+      snp.infor = summary.data.select %>% 
         select(SNP,CHR,BP,A1)
       effect_mat = bind_cols(effect_mat_list)
       names = as.vector(sapply(names_list,paste0))
