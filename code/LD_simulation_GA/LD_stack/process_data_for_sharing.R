@@ -72,7 +72,7 @@
 #                 "rm chr",j,".mega.* "))
 # }
 
-##process summary level statistics##
+#process summary level statistics##
 args = commandArgs(trailingOnly = T)
 i = as.numeric(args[[1]])
 l = as.numeric(args[[2]])
@@ -110,7 +110,7 @@ snp.ref = snp.ref[-idx,,drop=F]
         effect_mat_list[[i_rep]] = coeff_mat
         names_list[[i_rep]] = paste0(c("BETA_rep_","SE_rep_","P_rep_"),i_rep)
       }
-      snp.infor = summary.data.select %>% 
+      snp.infor = summary.data.select %>%
         select(SNP,CHR,BP,A1)
       effect_mat = bind_cols(effect_mat_list)
       names = as.vector(sapply(names_list,paste0))
@@ -122,17 +122,54 @@ snp.ref = snp.ref[-idx,,drop=F]
       "zip summary_rho_",l,"_size_",m,"_GA_",i1,".zip ",
       "summary_rho_",l,"_size_",m,"_GA_",i1," ;",
       "rm summary_rho_",l,"_size_",m,"_GA_",i1))
-     
-      # y <- as.data.frame(fread(paste0(out.dir.sum,eth[i],"/phenotypes_rho",l,"_",i1)))
-      # y <- y[,1:(2+n.rep),drop=F]
-      # colnames(y) = c("FID","IID",paste0("pheno_",c(1:10)))
-      # write.table(y,file = paste0(out.dir.sum,eth[i],"/pheno_combine/pheno_rho_",l,"_GA_",i1),
-      #             row.names = F,col.names = T,quote=F)
-      # system(paste0("cd " ,out.dir.sum,eth[i],"/pheno_combine/ ; ",
-      #               "zip pheno_rho_",l,"_GA_",i1,".zip ",
-      #               "pheno_rho_",l,"_GA_",i1," ;",
-      #               "rm pheno_rho_",l,"_GA_",i1))
-      
+
+# #compress summary statistics#
+# out.dir.sum <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
+# eth <- c("EUR","AFR","AMR","EAS","SAS")
+# # for(i in 1:5){
+# #   system(paste0("cd " ,out.dir.sum,eth[i]," ; ",
+# #                       "zip -r ",eth[i],"_summary_combine.zip ",
+# #                       "summary_combine ;"))
+# # }
+# for(i in 1:5){
+#   system(paste0("cd " ,out.dir.sum,eth[i]," ; ",
+#                 "rm -rf summary_combine;"))
+# }
+
+
+#compress phenotypes data
+# args = commandArgs(trailingOnly = T)
+
+# library(data.table)
+# library(dplyr)
+# eth <- c("EUR","AFR","AMR","EAS","SAS")
+# out.dir.sum <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
+# n.rep = 10
+# for(i in 1:5){
+#   for(l in 1:3){
+#     for(i1 in 1:5){
+#       y <- as.data.frame(fread(paste0(out.dir.sum,eth[i],"/phenotypes_rho",l,"_",i1,".phen")))
+#       y <- y[,1:(2+n.rep),drop=F]
+#       colnames(y) = c("FID","IID",paste0("pheno_",c(1:10)))
+#       write.table(y,file = paste0(out.dir.sum,eth[i],"/pheno_combine/pheno_rho_",l,"_GA_",i1),
+#                   row.names = F,col.names = T,quote=F)
+#       system(paste0("cd " ,out.dir.sum,eth[i],"/pheno_combine/ ; ",
+#                     "zip pheno_rho_",l,"_GA_",i1,".zip ",
+#                     "pheno_rho_",l,"_GA_",i1," ;",
+#                     "rm pheno_rho_",l,"_GA_",i1))
+#       
+#     }
+#   }
+# }
+# for(i in 1:5){
+#   system(paste0("cd " ,out.dir.sum,eth[i]," ; ",
+#                       "zip -r pheno_combine.zip ",
+#                       "pheno_combine ;",
+#                 "rm -rf pheno_combine"))
+# }
+
+
+
 #     }
 #   }
 # }
