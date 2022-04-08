@@ -94,14 +94,19 @@ n.rep = 10
 summmary.data.ref = as.data.frame(fread(paste0(out.dir.sum,eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",1,"_GA_",3)))
 snp.ref = summmary.data.ref[,"SNP",drop=F]
 idx <- which(duplicated(snp.ref))
-snp.ref = snp.ref[-idx,,drop=F]
+if(length(idx)!=0){
+  snp.ref = snp.ref[-idx,,drop=F]  
+}
+
 
       effect_mat_list = list()
       names_list = list()
       for(i_rep in 1:n.rep){
         summary.data <- as.data.frame(fread(paste0(out.dir.sum,eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))
         idx <- which(duplicated(summary.data$SNP))
-        summary.data = summary.data[-idx,]
+        if(length(idx)!=0){
+          summary.data = summary.data[-idx,]  
+        }
         summary.data = summary.data %>%
           mutate(SE = BETA/STAT)
         summary.data.select = left_join(snp.ref,summary.data)
@@ -126,12 +131,12 @@ snp.ref = snp.ref[-idx,,drop=F]
 # #compress summary statistics#
 # out.dir.sum <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
 # eth <- c("EUR","AFR","AMR","EAS","SAS")
-# # for(i in 1:5){
-# #   system(paste0("cd " ,out.dir.sum,eth[i]," ; ",
-# #                       "zip -r ",eth[i],"_summary_combine.zip ",
-# #                       "summary_combine ;"))
-# # }
 # for(i in 1:5){
+#   system(paste0("cd " ,out.dir.sum,eth[i]," ; ",
+#                       "zip -r ",eth[i],"_summary_combine.zip ",
+#                       "summary_combine ;"))
+# }
+# # for(i in 1:5){
 #   system(paste0("cd " ,out.dir.sum,eth[i]," ; ",
 #                 "rm -rf summary_combine;"))
 # }
