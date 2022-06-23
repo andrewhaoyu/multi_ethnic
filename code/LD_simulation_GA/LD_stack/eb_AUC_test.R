@@ -143,7 +143,7 @@ y.test = y_test_mat[1:n.test,i_rep]
 y.vad = y_test_mat[(n.test+1):(nrow(y_test_mat)),i_rep]
 sl = SuperLearner(Y = y.test, X = x.test, family = gaussian(),
                   # For a real analysis we would use V = 10.
-                  # V = 3,
+                  V = 3,
                   SL.library = SL.libray)
 sl
 y.pred <- predict(sl, x.vad, onlySL = TRUE)

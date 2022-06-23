@@ -25,7 +25,7 @@
 # sid<-Sys.getenv('SLURM_JOB_ID')
 # dir.create(paste0('/lscratch/',sid,'/test'),showWarnings = FALSE)
 # temp.dir = paste0('/lscratch/',sid,'/test/')
-# cur.dir = "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
+# cur.dir = "q"
 # out.dir <-  paste0(cur.dir,eth[i],"/",eth[i],"_mega/")
 # 
 # system(paste0("cp ",cur.dir,eth[i],"/chr",j,".mega.bed ",temp.dir,eth[i],"chr",j,".mega.bed"))
@@ -129,13 +129,13 @@ if(length(idx)!=0){
       "rm summary_rho_",l,"_size_",m,"_GA_",i1))
 
 # #compress summary statistics#
-# out.dir.sum <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
-# eth <- c("EUR","AFR","AMR","EAS","SAS")
-# for(i in 1:5){
-#   system(paste0("cd " ,out.dir.sum,eth[i]," ; ",
-#                       "zip -r ",eth[i],"_summary_combine.zip ",
-#                       "summary_combine ;"))
-# }
+out.dir.sum <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
+eth <- c("EUR","AFR","AMR","EAS","SAS")
+for(i in 1:5){
+  system(paste0("cd " ,out.dir.sum,eth[i]," ; ",
+                      "zip -r ",eth[i],"_summary_combine.zip ",
+                      "summary_combine ;"))
+}
 # # for(i in 1:5){
 #   system(paste0("cd " ,out.dir.sum,eth[i]," ; ",
 #                 "rm -rf summary_combine;"))
@@ -178,3 +178,40 @@ if(length(idx)!=0){
 #     }
 #   }
 # }
+
+      
+#snp information#
+setwd("/data/zhangh24/multi_ethnic/")
+load("./result/LD_simulation_new/snp.infor.match37_38.rdata")
+snp.infor.match.update = snp.infor.match %>% 
+  rename(SNP=id,A0=a0,A1=a1) %>% 
+  rename(FREQ_A1_AFR = AFR,
+         FREQ_A1_AMR = AMR,
+         FREQ_A1_EAS = EAS,
+         FREQ_A1_EUR = EUR,
+         FREQ_A1_SAS = SAS,
+         FREQ_A1_ALL = ALL) %>% 
+  select(SNP,CHR,position,TYPE,FREQ_A1_AFR,FREQ_A1_AMR,
+         FREQ_A1_EAS,FREQ_A1_EUR,FREQ_A1_SAS,FREQ_A1_ALL,rs_id)
+write.table(snp.infor.match.update,file = paste0("./result/LD_simulation_new/snp_infor"),
+            row.names = F,col.names = T,quote=F)
+snp.infor = fread(paste0("./result/LD_simulation_new/snp_infor"))
+#MEGA and HAPMAP snp list
+cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
+mega.list <- as.data.frame(fread(paste0(cur.dir,"mega-hm3-rsid.txt"),header  =F))
+#mega.infor <- as.data.frame(fread(paste0(cur.dir,"snpBatch_ILLUMINA_1062317")))
+#colnames(mega.infor)[5] <- "rsid"
+colnames(mega.list) = "rs_id"
+snp.infor.mega = inner_join(mega.list,snp.infor,by="rs_id")
+write.table(snp.infor.mega,file = paste0("./result/LD_simulation_new/snp_infor_mega+hm3"),
+            row.names = F,col.names = T,quote=F)
+
+hm3.list =   as.data.frame(fread(paste0(cur.dir,"hm3rsid.txt")))[,1,drop=F]
+colnames(hm3.list) = "rs_id"
+snp.infor.hm3 = inner_join(hm3.list,snp.infor,by="rs_id")
+write.table(snp.infor.hm3,file = paste0("./result/LD_simulation_new/snp_infor_hm3"),
+            row.names = F,col.names = T,quote=F)
+
+
+pheno = fread("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/EUR/pheno_combine/pheno_rho_1_GA_1")
+sum = fread(paste0(out.dir.sum,eth[i],"/summary_combine/summary_rho_",l,"_size_",m,"_GA_",i1))
