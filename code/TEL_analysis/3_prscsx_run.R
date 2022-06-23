@@ -3,9 +3,8 @@ args = commandArgs(trailingOnly = T)
 #j represent chromosome
 #v represent the tuning parameter
 
-i = as.numeric(args[[1]])
-j = as.numeric(args[[2]])
-v = as.numeric(args[[3]])
+j = as.numeric(args[[1]])
+v = as.numeric(args[[2]])
 #j = as.numeric(args[[3]])
 #m = as.numeric(args[[3]])
 #i_rep = as.numeric(args[[4]])
