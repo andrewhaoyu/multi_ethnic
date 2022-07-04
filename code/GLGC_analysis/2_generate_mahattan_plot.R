@@ -44,9 +44,10 @@ library(dplyr)
 x = dat$P
 z = qnorm(x / 2)
 lambda = round(median(z^2) / qchisq(0.5,1), 3)
+idx <- which(sample_size$eth==eth[i1])
 N.effect  <- sample_size[idx,"N_effect"]
 lambda_1000 = round(1+1000*(lambda-1)/N.effect  ,3)
-idx <- which(sample_size$eth==eth[i1])
+
 
 
 convert.qval.pval = function(qvalues) {
