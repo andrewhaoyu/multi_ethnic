@@ -303,5 +303,5 @@ dev.off()
 # text(1,0.8,expression(paste(lambda[1000]," = ",buquote(.(lambda_1000)))),cex = 1.5)
 
 lambda_vec = c(lambda,lambda_1000)
-save(lambda_vec,file = paste0("/data/zhangh24/multi_ethnic/result/cleaned/lambda_value/lambda_vec_",i1,"_",i2,".rdata"))
+save(lambda_vec,file = paste0("/data/zhangh24/multi_ethnic/result/GLGC/lambda_value/lambda_vec_",i1,"_",i2,".rdata"))
 
