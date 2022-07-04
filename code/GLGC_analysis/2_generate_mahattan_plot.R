@@ -3,7 +3,7 @@ com.args = commandArgs(trailingOnly = T)
 #i2 trait
 i1 = as.numeric(com.args[[1]])
 i2 = as.numeric(com.args[[2]])
-eth <- c("EUR","AFR","HIS","EAS","SAS")
+eth <- c("EUR","AFR","AMR","EAS","SAS")
 eth_name = c("EUR","AFR","HIS","EAS","SAS")
 trait <- c("HDL","LDL",
            "logTG",
@@ -34,6 +34,7 @@ dat = data %>%
   rename(SNP = rsid)
 
 sample_size <- as.data.frame(read.csv("/data/zhangh24/multi_ethnic/data/GLGC_samplesize_clean.csv",header=T))
+sample_size[4,1] = "AMR"
 colnames(sample_size) = c("eth","N_effect")
 
 sample_size = sample_size %>% 
