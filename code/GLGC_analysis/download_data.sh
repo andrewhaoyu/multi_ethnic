@@ -1,0 +1,15 @@
+wget http://csg.sph.umich.edu/willer/public/glgc-lipids2021/results/ancestry_specific/without_UKB_HDL_INV_AFR_HRC_1KGP3_others_ALL.meta.singlevar.results.gz
+wget http://csg.sph.umich.edu/willer/public/glgc-lipids2021/results/ancestry_specific/without_UKB_HDL_INV_EUR_HRC_1KGP3_others_ALL.meta.singlevar.results.gz
+wget http://csg.sph.umich.edu/willer/public/glgc-lipids2021/results/ancestry_specific/without_UKB_HDL_INV_SAS_1KGP3_ALL.meta.singlevar.results.gz
+wget http://csg.sph.umich.edu/willer/public/glgc-lipids2021/results/ancestry_specific/without_UKB_LDL_INV_AFR_HRC_1KGP3_others_ALL.meta.singlevar.results.gz
+wget http://csg.sph.umich.edu/willer/public/glgc-lipids2021/results/ancestry_specific/without_UKB_LDL_INV_EUR_HRC_1KGP3_others_ALL.meta.singlevar.results.gz
+wget http://csg.sph.umich.edu/willer/public/glgc-lipids2021/results/ancestry_specific/without_UKB_LDL_INV_SAS_1KGP3_ALL.meta.singlevar.results.gz
+wget http://csg.sph.umich.edu/willer/public/glgc-lipids2021/results/ancestry_specific/without_UKB_TC_INV_AFR_HRC_1KGP3_others_ALL.meta.singlevar.results.gz
+wget http://csg.sph.umich.edu/willer/public/glgc-lipids2021/results/ancestry_specific/without_UKB_TC_INV_EUR_HRC_1KGP3_others_ALL.meta.singlevar.results.gz
+wget http://csg.sph.umich.edu/willer/public/glgc-lipids2021/results/ancestry_specific/without_UKB_TC_INV_SAS_1KGP3_ALL.meta.singlevar.results.gz
+wget http://csg.sph.umich.edu/willer/public/glgc-lipids2021/results/ancestry_specific/without_UKB_logTG_INV_AFR_HRC_1KGP3_others_ALL.meta.singlevar.results.gz
+wget http://csg.sph.umich.edu/willer/public/glgc-lipids2021/results/ancestry_specific/without_UKB_logTG_INV_EUR_HRC_1KGP3_others_ALL.meta.singlevar.results.gz
+wget http://csg.sph.umich.edu/willer/public/glgc-lipids2021/results/ancestry_specific/without_UKB_logTG_INV_SAS_1KGP3_ALL.meta.singlevar.results.gz
+wget http://csg.sph.umich.edu/willer/public/glgc-lipids2021/results/ancestry_specific/without_UKB_nonHDL_INV_AFR_HRC_1KGP3_others_ALL.meta.singlevar.results.gz
+wget http://csg.sph.umich.edu/willer/public/glgc-lipids2021/results/ancestry_specific/without_UKB_nonHDL_INV_EUR_HRC_1KGP3_others_ALL.meta.singlevar.results.gz
+wget http://csg.sph.umich.edu/willer/public/glgc-lipids2021/results/ancestry_specific/without_UKB_nonHDL_INV_SAS_1KGP3_ALL.meta.singlevar.results.gz
