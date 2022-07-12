@@ -1,6 +1,6 @@
 #match 1kg GRCh37 and GRCh38
 #download vcf file for 1kg https://ftp.ncbi.nih.gov/snp/organisms/human_9606_b151_GRCh37p13/VCF/
-#delete teh first 56 document lines sed -e '1,56d' 00-common_all.vcf > 1kg_clean.vcf
+#delete the first 56 document lines sed -e '1,56d' 00-common_all.vcf > 1kg_clean.vcf
 #keep the rsid and chr:pos: " awk '{print $3, $1":"$2}' 1kg_clean.vcf > 1kg_clean_update.vcf"
 #only keep 1kg_clean_update.vcf "mv 1kg_clean_update.vcf 1kg_clean.vcf"
 library(bigsnpr)

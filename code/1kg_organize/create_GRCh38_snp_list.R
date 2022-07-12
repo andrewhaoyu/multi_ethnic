@@ -14,3 +14,4 @@ library(dplyr)
 snp.infor.38 = snp.infor.38 %>% 
   select("rs_id","position_GRCh38")
 save(snp.infor.38,file = "/dcl01/chatterj/data/hzhang1/multi_ethnic/LD_simulation_new/snp.infor.38.rdata")
+
