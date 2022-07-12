@@ -16,7 +16,7 @@ Read LD blocks and write as hdf5
 """
 
 
-
+import sys
 
 
 import scipy as sp
@@ -28,16 +28,18 @@ import h5py
 
 
 
+i = int(sys.argv[1])
+
+eth = ["eur", "afr", "amr", "eas", "sas"]
 
 
 
 
 
 
+OUT_DIR = '/data/zhangh24/software/PRScsx/1KGLD_MEGA/ldblk_1kg_' + eth[i]
 
-OUT_DIR = '/data/zhangh24//software/PRScsx/1KGLD_MEGA/ldblk_1kg_eur'
-
-BLK_DIR = '/data/zhangh24/software/PRScsx/1KGLD_MEGA/ldblk_1kg_eur/block_ld'
+BLK_DIR = '/data/zhangh24/software/PRScsx/1KGLD_MEGA/ldblk_1kg_'+ eth[i] + '/block_ld'
 
 
 
