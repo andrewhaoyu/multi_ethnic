@@ -29,6 +29,8 @@ for(i in 1:5){
   snp_info = bim_file %>% 
     filter(get(eth[i])>=0.01&
              get(eth[i])<=0.99) %>%
+    filter(V5 %in% c("A", "T", "C", "G")&
+             V6 %in% c("A", "T", "C", "G")) %>%
     select(V1, V2, V4, V5, V6, eth[i]) %>% 
     rename(CHR = V1,
            SNP = V2,
@@ -37,8 +39,8 @@ for(i in 1:5){
            A2 = V6,
            MAF = eth[i])
   snp_info_list[[i]]  = snp_info
-  write.table(snp_info, file = paste0(out_dir,"snpinfo_1kg_mega"), row.names = F, col.names = T, quote= F, sep = "\t")
-  
+  #write.table(snp_info, file = paste0(out_dir,"snpinfo_1kg_mega"), row.names = F, col.names = T, quote= F, sep = "\t")
+  write.table(snp_info, file = paste0(out_dir,"snpinfo_1kg_hm3"), row.names = F, col.names = T, quote= F, sep = "\t")
 }
 
 snp_info_combine = rbindlist(snp_info_list)
@@ -91,7 +93,9 @@ snpinfo_mult_1kg = bim_file_com %>%
   select(CHR, SNP, BP, A1, A2, FRQ_AFR, FRQ_AMR, FRQ_EAS, FRQ_EUR, FRQ_SAS,
          FLIP_AFR, FLIP_AMR, FLIP_EAS, FLIP_EUR, FLIP_SAS)
 
+# write.table(snpinfo_mult_1kg, 
+#             file = paste0("/data/zhangh24/software/PRScsx/1KGLD_MEGA/snpinfo_mult_1kg_mega"), 
+#             row.names = F, col.names = T, quote= F, sep = "\t")
 write.table(snpinfo_mult_1kg, 
-            file = paste0("/data/zhangh24/software/PRScsx/1KGLD_MEGA/snpinfo_mult_1kg_mega"), 
+            file = paste0("/data/zhangh24/software/PRScsx/1KGLD_MEGA/snpinfo_mult_1kg_hm3"), 
             row.names = F, col.names = T, quote= F, sep = "\t")
-

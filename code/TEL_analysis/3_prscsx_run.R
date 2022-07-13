@@ -20,6 +20,7 @@ setwd("/data/zhangh24/multi_ethnic/")
 data.dir = "/data/zhangh24/multi_ethnic/data/TEL_dat/"
 
 sid<-Sys.getenv('SLURM_JOB_ID')
+#system(paste0('rm -rf /lscratch/',sid,'/test'))
 dir.create(paste0('/lscratch/',sid,'/test'),showWarnings = FALSE)
 temp.dir = paste0('/lscratch/',sid,'/test/')
 dir.create(paste0('/lscratch/',sid,'/test/1KGLD'),showWarnings = FALSE)
@@ -47,7 +48,7 @@ for(i in 1:4){
   write.table(sum.select,file = paste0(temp.dir,eth[i],"_sumstats.txt"),row.names = F,col.names = T,quote=F)
 }
 
-phi = c(1E+00,1E-02,1E-04,1E-6)
+phi = c(1E+00,1E-02,1E-04,1E-6,1E-08)
 
 path_to_ref = paste0(temp.dir,"1KGLD")
 path_to_bim = paste0(temp.dir,"all_eth")

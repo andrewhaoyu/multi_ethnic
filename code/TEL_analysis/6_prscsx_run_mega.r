@@ -20,6 +20,7 @@ setwd("/data/zhangh24/multi_ethnic/")
 data.dir = "/data/zhangh24/multi_ethnic/data/TEL_dat/"
 
 sid<-Sys.getenv('SLURM_JOB_ID')
+#system(paste0('rm -rf /lscratch/',sid,'/test'))
 dir.create(paste0('/lscratch/',sid,'/test'),showWarnings = FALSE)
 temp.dir = paste0('/lscratch/',sid,'/test/')
 dir.create(paste0('/lscratch/',sid,'/test/1KGLD'),showWarnings = FALSE)
@@ -29,9 +30,10 @@ system(paste0("cp -r /data/zhangh24/software/PRScsx/1KGLD_MEGA/ldblk_1kg_afr ",t
 system(paste0("cp -r /data/zhangh24/software/PRScsx/1KGLD_MEGA/ldblk_1kg_amr ",temp.dir,"1KGLD"))
 system(paste0("cp -r /data/zhangh24/software/PRScsx/1KGLD_MEGA/ldblk_1kg_eas ",temp.dir,"1KGLD"))
 system(paste0("cp /data/zhangh24/software/PRScsx/1KGLD_MEGA/snpinfo_mult_1kg_hm3 ",temp.dir,"1KGLD"))
-system(paste0("cp ",data.dir,"all_eth.bim ",temp.dir,"all_eth.bim"))
+system(paste0("cp ",data.dir,"all_eth_mega.bim ",temp.dir,"all_eth_mega.bim"))
 #out.dir = paste0("/data/zhangh24/multi_ethnic/result/cleaned/clumping_result/",method,"/",eth[i],"/",trait[l],"/")
 
+bim_temp = fread(paste0(data.dir,"all_eth_mega.bim"))
 
 
 
@@ -50,7 +52,7 @@ for(i in 1:4){
 phi = c(1E+00,1E-02,1E-04,1E-6,1E-08)
 
 path_to_ref = paste0(temp.dir,"1KGLD")
-path_to_bim = paste0(temp.dir,"all_eth")
+path_to_bim = paste0(temp.dir,"all_eth_mega")
 path_to_sum = paste0(temp.dir)
 
 out.dir.prs = paste0("/data/zhangh24/multi_ethnic/result/TEL/prscsx_mega")
