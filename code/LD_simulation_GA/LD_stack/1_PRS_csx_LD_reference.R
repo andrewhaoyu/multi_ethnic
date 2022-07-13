@@ -25,8 +25,22 @@ sid <- Sys.getenv("SLURM_JOB_ID")
 dir.create(paste0('/lscratch/',sid,'/test/'),showWarnings = F)
 temp_dir = paste0('/lscratch/',sid,'/test/')
 #generate SNP list for each block
+
+
 pos_table_sub = pos_table %>% 
-  as.data.frame()
+  as.data.frame() %>% 
+  mutate(CHR_clean = as.numeric(gsub("chr","",x = chr)))
+
+#get the start index and end index for each chromosome
+start = rep(0, 22)
+end = rep(0,22)
+for(j in 1:22){
+  idx <- which(pos_table_sub$CHR_clean==j)
+  start[j] = idx[1]
+  end[j] = idx[length(idx)]
+}
+
+
 load("/data/zhangh24/multi_ethnic/result/LD_simulation_new/snp.infor.match37_38.rdata")
 
 
@@ -53,12 +67,15 @@ block_size = data.frame(size = rep(0,nrow(pos_table_sub)))
 
 
 soft_dir = "/data/zhangh24/software/"
+
+
+
 for(k in 1:nrow(pos_table_sub)){
   #if it's first block, increase the block size to include SNPs before start
-  if(k==1){
+  if(k %in% start ==1){
     start =1
     end = pos_table_sub[k,3]
-  }else if(k==nrow(pos_table_sub)){
+  }else if(k %in% end ==1){
     #if it's last block, increase end to include any SNPs
     start = pos_table_sub[k,2]
     end = Inf
@@ -66,30 +83,41 @@ for(k in 1:nrow(pos_table_sub)){
     start = pos_table_sub[k,2]
     end = pos_table_sub[k,3]
   }
+  
+  j = block_chr[k,1]
+  
   snp_list = bim_file %>% 
+    filter(CHR == j) %>% 
     filter(V4>=start&V4<=end) %>% 
     filter(get(eth[i])>=0.01&
              get(eth[i])<=0.99) %>%
     select(V2) %>% 
     rename(SNP=V2)
-  write.table(snp_list,file= paste0(temp_dir,"extract_snp_list"),row.names = F,col.names = T,quote=F)
-  #snp_list is the SNPs in each LD block
-  write.table(snp_list,file= paste0(snp_list_dir,"snplist_blk",k),row.names = F,col.names = F,quote=F)
-  block_size[k,1] = nrow(snp_list)
   
-  j = block_chr[k,1]
-  #write.table(snp_list,file= paste0(out_dir,"snp_list_100"),row.names = F,col.names = T,quote=F)
-  #calculate LD for selected block
-  system(paste0(soft_dir,"plink2 ",
-                "--bfile ",data_dir,"chr",j," ",
-                "--keep-allele-order ",
-                "--extract ",temp_dir,"extract_snp_list ",
-                "--r square ",
-                "--out ", temp_dir,"ldblock_",k))
-  #system(paste0("more /lscratch/42052892/test/ldblock_100.ld"))
-  system(paste0("mv ", temp_dir,"ldblock_",k,".ld ",
-                out_dir))
- 
+  if(nrow(snp_list)!=0){
+    write.table(snp_list,file= paste0(temp_dir,"extract_snp_list"),row.names = F,col.names = T,quote=F)  
+    #snp_list is the SNPs in each LD block
+    write.table(snp_list,file= paste0(snp_list_dir,"snplist_blk",k),row.names = F,col.names = F,quote=F)
+    block_size[k,1] = nrow(snp_list)
+    #write.table(snp_list,file= paste0(out_dir,"snp_list_100"),row.names = F,col.names = T,quote=F)
+    #calculate LD for selected block
+    system(paste0(soft_dir,"plink2 ",
+                  "--bfile ",data_dir,"chr",j," ",
+                  "--keep-allele-order ",
+                  "--extract ",temp_dir,"extract_snp_list ",
+                  "--r square ",
+                  "--out ", temp_dir,"ldblock_",k))
+    #system(paste0("more /lscratch/42052892/test/ldblock_100.ld"))
+    system(paste0("mv ", temp_dir,"ldblock_",k,".ld ",
+                  out_dir))
+    
+  }else{
+    block_size[k,1] = nrow(snp_list)
+  }
+  
+  
+  
+  
 
 }
 write.table(block_size, file= paste0(snp_list_dir,"blk_size"),row.names = F,col.names = F,quote=F)
