@@ -1,5 +1,7 @@
 #goal: snpinfor and snpinfo_mult_1kg_mega for prs_csx
 #load LD blocks table from Berisa, T.  Bioinformatics, 2016.
+library(data.table)
+library(dplyr)
 eth = c("EUR","AFR","AMR","EAS","SAS")
 pos_table = fread(paste0("/data/zhangh24/MR_MA/data/ld_block"))
 
@@ -10,12 +12,14 @@ load("/data/zhangh24/multi_ethnic/result/LD_simulation_new/snp.infor.match37_38.
 snp.infor.match.select = snp.infor.match %>% 
   select(id,rs_id,AFR,AMR,EAS,EUR,SAS,position,CHR)
 
-#snp_list saves the block_chr, block_size and snp_list for write_hdf
-#generate SNP list for each block
+#generate SNP infor file for each ethnic group
+#bim file for all ancestries are the same
+i = 1
+data_dir = paste0("/data/zhangh24/KGref_MEGA/GRCh37/",eth[i],"/")
+bim_file = fread(paste0(data_dir,"all_chr.bim"))
+bim_file = left_join(bim_file,snp.infor.match.select,by=c("V2"="rs_id"))
 snp_info_list = list()
 for(i in 1:5){
-  bim_file = fread(paste0(data_dir,"all_chr.bim"))
-  bim_file = left_join(bim_file,snp.infor.match.select,by=c("V2"="rs_id"))
   
   
   data_dir = paste0("/data/zhangh24/KGref_MEGA/GRCh37/",eth[i],"/")
@@ -33,9 +37,13 @@ for(i in 1:5){
            A2 = V6,
            MAF = eth[i])
   snp_info_list[[i]]  = snp_info
-  write.table(snp_info, file = paste0(out_dir,"snpinfo_1kg_mega"), row.names = F, col.names = T, quote= F)
+  write.table(snp_info, file = paste0(out_dir,"snpinfo_1kg_mega"), row.names = F, col.names = T, quote= F, sep = "\t")
   
 }
+
+snp_info_combine = rbindlist(snp_info_list)
+
+unique_snp = data.frame(SNP = unique(snp_info_combine$SNP))
 
 
 #create snpinfo_mult_1kg_mega
@@ -46,11 +54,18 @@ i = 1
 data_dir = paste0("/data/zhangh24/KGref_MEGA/GRCh37/",eth[i],"/")
 bim_file = fread(paste0(data_dir,"all_chr.bim"))
 head(bim_file)
-bim_file = left_join(bim_file,snp.infor.match.select,by=c("V2"="rs_id"))
+#subset to SNPs with MAF > 0.01 in at least one ancestries
+bim_file = left_join(unique_snp,bim_file,by = c("SNP"="V2"))
+#order file by CHR and pos
+bim_file_update = bim_file[order(bim_file$V1,bim_file$V4),]
+
+
+bim_file = left_join(bim_file_update,snp.infor.match.select,by=c("SNP"="rs_id"))
+
 FLIP_data = data.frame(matrix(0,nrow(bim_file),length(eth)))
 #loop through all ancestries
 for(i in 1:5){
-bim_file_merge = left_join(bim_file,snp_info_list[[i]],by = c("V2" = "SNP"))
+bim_file_merge = left_join(bim_file,snp_info_list[[i]],by = "SNP")
 
 FLIP_temp = bim_file_merge %>% 
   mutate(FLIP = case_when(is.na(A1)==1 ~ 0,
@@ -65,8 +80,7 @@ bim_file_com = cbind(bim_file, FLIP_data)
 
 
 snpinfo_mult_1kg = bim_file_com %>% 
-  rename(SNP = V2,
-         BP = V4,
+  rename(BP = V4,
          A1  = V5,
          A2 = V6,
          FRQ_AFR = AFR,
@@ -77,5 +91,7 @@ snpinfo_mult_1kg = bim_file_com %>%
   select(CHR, SNP, BP, A1, A2, FRQ_AFR, FRQ_AMR, FRQ_EAS, FRQ_EUR, FRQ_SAS,
          FLIP_AFR, FLIP_AMR, FLIP_EAS, FLIP_EUR, FLIP_SAS)
 
-write.table(snpinfo_mult_1kg, file = paste0("/data/zhangh24/software/PRScsx/1KGLD_MEGA/snpinfo_1kg_mega"), row.names = F, col.names = T, quote= F)
+write.table(snpinfo_mult_1kg, 
+            file = paste0("/data/zhangh24/software/PRScsx/1KGLD_MEGA/snpinfo_mult_1kg_mega"), 
+            row.names = F, col.names = T, quote= F, sep = "\t")
 

@@ -86,11 +86,15 @@ for(k in 1:nrow(pos_table_sub)){
   
   j = block_chr[k,1]
   
+  #subset to common SNPs in the population
+  #subset to bi-allelic snps
   snp_list = bim_file %>% 
     filter(CHR == j) %>% 
     filter(V4>=start&V4<=end) %>% 
     filter(get(eth[i])>=0.01&
-             get(eth[i])<=0.99) %>%
+             get(eth[i])<=0.99) %>% 
+    filter(V5 %in% c("A", "T", "C", "G")&
+             V6 %in% c("A", "T", "C", "G")) %>%
     select(V2) %>% 
     rename(SNP=V2)
   
