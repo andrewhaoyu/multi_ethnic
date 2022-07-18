@@ -107,15 +107,15 @@ for(k in 1:nrow(pos_table_sub)){
     block_size[k,1] = nrow(snp_list)
     #write.table(snp_list,file= paste0(out_dir,"snp_list_100"),row.names = F,col.names = T,quote=F)
     #calculate LD for selected block
-    # system(paste0(soft_dir,"plink2 ",
-    #               "--bfile ",data_dir,"chr",j," ",
-    #               "--keep-allele-order ",
-    #               "--extract ",temp_dir,"extract_snp_list ",
-    #               "--r square ",
-    #               "--out ", temp_dir,"ldblock_",k))
-    #system(paste0("more /lscratch/42052892/test/ldblock_100.ld"))
-    # system(paste0("mv ", temp_dir,"ldblock_",k,".ld ",
-    #               out_dir))
+    system(paste0(soft_dir,"plink2 ",
+                  "--bfile ",data_dir,"chr",j," ",
+                  "--keep-allele-order ",
+                  "--extract ",temp_dir,"extract_snp_list ",
+                  "--r square ",
+                  "--out ", temp_dir,"ldblock_",k))
+    system(paste0("more /lscratch/42052892/test/ldblock_100.ld"))
+    system(paste0("mv ", temp_dir,"ldblock_",k,".ld ",
+                  out_dir))
     # 
   }else{
     block_size[k,1] = nrow(snp_list)
