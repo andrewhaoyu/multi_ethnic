@@ -89,7 +89,11 @@ for(r_ind in 1:length(r2_vec)){
     kbpthr = wc_vec[w_ind]
     eth <- c("EUR","AFR","AMR","EAS","SAS")
     
-    res = system(paste0("/data/zhangh24/software/plink2 --threads 2 --bfile ",temp.dir,"AFR_ref_chr22 --clump ",temp.dir,eth[i],"_assoc.out --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out ", temp.dir,eth[i],"_LD_clump_two_dim_rind_",r_ind,"_wcind_",w_ind))
+    res = system(paste0("/data/zhangh24/software/plink2 --threads 2 ",
+    "--bfile ",temp.dir,"AFR_ref_chr22 ",
+    "--clump ",temp.dir,eth[i],"_assoc.out ",
+    "--clump-p1 ",pthr," --clump-r2 ",r2thr,"  ",
+    "--clump-kb ",kbpthr," --out ", temp.dir,eth[i],"_LD_clump_two_dim_rind_",r_ind,"_wcind_",w_ind))
     if(res==2){
       stop()
     }

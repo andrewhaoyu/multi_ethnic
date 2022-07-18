@@ -34,7 +34,7 @@ system(paste0("cp ",data.dir,"all_eth.bim ",temp.dir,"all_eth.bim"))
 #out.dir = paste0("/data/zhangh24/multi_ethnic/result/cleaned/clumping_result/",method,"/",eth[i],"/",trait[l],"/")
 
 
-
+bim_file = fread(paste0(temp.dir,"all_eth.bim"))
 
 n.vec = rep(0,4)
 #prepare summary statistics

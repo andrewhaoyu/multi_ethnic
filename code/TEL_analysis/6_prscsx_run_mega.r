@@ -33,19 +33,24 @@ system(paste0("cp /data/zhangh24/software/PRScsx/1KGLD_MEGA/snpinfo_mult_1kg_hm3
 system(paste0("cp ",data.dir,"all_eth_mega.bim ",temp.dir,"all_eth_mega.bim"))
 #out.dir = paste0("/data/zhangh24/multi_ethnic/result/cleaned/clumping_result/",method,"/",eth[i],"/",trait[l],"/")
 
-bim_temp = fread(paste0(data.dir,"all_eth_mega.bim"))
+
 
 
 
 n.vec = rep(0,4)
 #prepare summary statistics
 for(i in 1:4){
-  load(paste0(data.dir,eth[i],"_sum_data_cleaned.rdata"))
+  load(paste0(data.dir,eth[i],"_sum_data_cleaned_mega.rdata"))
   sum.com.select = sum.com.select %>% 
     filter(CHR==j)
   sum.select = sum.com.select %>% 
     select(SNP, A1, A2, BETA, P) 
   n.vec[i] = median(sum.com.select$N)
+  
+  n.snp = nrow(sum.select)
+  #test the bug
+  sum.select = sum.select[1:as.integer(n.snp/2),]
+  
   write.table(sum.select,file = paste0(temp.dir,eth[i],"_sumstats.txt"),row.names = F,col.names = T,quote=F)
 }
 

@@ -37,13 +37,13 @@ for(i in 1:4){
            A2 = ALT,
            P = PVAL) %>%
     select(CHR,SNP, A1, A2, BETA, P,N,SNP_ID,POS) 
-  save(sum.com.select,file = paste0(data.dir,eth[i],"_sum_data_cleaned.rdata"))
+  save(sum.com.select,file = paste0(data.dir,eth[i],"_sum_data_cleaned_mega.rdata"))
   
 }
 
 snp.list = list()
 for(i in 1:4){
-  load(paste0(data.dir,eth[i],"_sum_data_cleaned.rdata"))
+  load(paste0(data.dir,eth[i],"_sum_data_cleaned_mega.rdata"))
   snp.list[[i]] = sum.com.select %>% 
     mutate(V3 = 0) %>% 
     select(CHR,SNP,V3,POS,A1,A2) %>% 

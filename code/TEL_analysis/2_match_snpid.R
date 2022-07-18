@@ -1,15 +1,4 @@
-args = commandArgs(trailingOnly = T)
-#i represent ethnic group
-#j represent chromosome
-#v represent the tuning parameter
 
-i = as.numeric(args[[1]])
-j = as.numeric(args[[2]])
-v = as.numeric(args[[3]])
-#j = as.numeric(args[[3]])
-#m = as.numeric(args[[3]])
-#i_rep = as.numeric(args[[4]])
-#i1 = as.numeric(args[[5]])
 library(data.table)
 #install.packages("dplyr")
 #install.packages("vctrs")
@@ -64,3 +53,6 @@ for(i in 1:4){
 snp.file = rbindlist(snp.list) %>% 
   distinct(SNP,.keep_all=TRUE)
 write.table(snp.file,file = paste0(data.dir,"all_eth.bim"),row.names = F,col.names = F,quote=F)
+
+
+
