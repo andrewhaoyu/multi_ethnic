@@ -102,13 +102,8 @@ for(k in 1:nrow(pos_table_sub)){
     write.table(snp_list,file= paste0(temp_dir,"extract_snp_list"),row.names = F,col.names = T,quote=F)  
     #snp_list is the SNPs in each LD block
     
-    snp_list_vec = snp_list[l,1]
-    for(l in 2:nrow(snp_list)){
-      
-        snp_list_vec = paste0(snp_list_vec," ",snp_list[l,1])  
-      
-    }
-    write.table(snp_list_vec,file= paste0(snp_list_dir,"snplist_blk",k),row.names = F,col.names = F,quote=F)
+ 
+    write.table(snp_list,file= paste0(snp_list_dir,"snplist_blk",k),row.names = F,col.names = F,quote=F)
     block_size[k,1] = nrow(snp_list)
     #write.table(snp_list,file= paste0(out_dir,"snp_list_100"),row.names = F,col.names = T,quote=F)
     #calculate LD for selected block
