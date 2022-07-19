@@ -49,7 +49,7 @@ for(i in 1:4){
   
   n.snp = nrow(sum.select)
   #test the bug
-  sum.select = sum.select[1:as.integer(n.snp/2),]
+  sum.select = sum.select[1:as.integer(n.snp/5),]
   
   write.table(sum.select,file = paste0(temp.dir,eth[i],"_sumstats.txt"),row.names = F,col.names = T,quote=F)
 }
@@ -71,6 +71,18 @@ system(paste0("python /data/zhangh24/software/PRScsx/PRScsx.py",
               " --sst_file=",path_to_sum,"EUR_sumstats.txt,",path_to_sum,"AFR_sumstats.txt,",path_to_sum,"AMR_sumstats.txt,",path_to_sum,"EAS_sumstats.txt",
               " --n_gwas=",n.vec[1], ",", n.vec[2], ",", n.vec[3], ",", n.vec[4],
               " --pop=EUR,AFR,AMR,EAS",
+              " --chrom=",j,
+              " --phi=",phi[v],  
+              " --out_dir=",out.dir.prs,
+              " --out_name=sum"))
+
+
+system(paste0("python /data/zhangh24/software/PRScsx/PRScsx.py", 
+              " --ref_dir=",path_to_ref,
+              " --bim_prefix=",path_to_bim,
+              " --sst_file=",path_to_sum,"EUR_sumstats.txt,",path_to_sum,"AFR_sumstats.txt",
+              " --n_gwas=",n.vec[1], ",", n.vec[2],
+              " --pop=EUR,AFR",
               " --chrom=",j,
               " --phi=",phi[v],  
               " --out_dir=",out.dir.prs,
