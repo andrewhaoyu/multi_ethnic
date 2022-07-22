@@ -12,7 +12,7 @@ library(dplyr)
 library(rlang)
 #load LD blocks table from Berisa, T.  Bioinformatics, 2016.
 eth = c("EUR","AFR","AMR","EAS","SAS")
-pos_table = fread(paste0("/data/zhangh24/MR_MA/data/ld_block"))
+pos_table = fread(paste0("/data/zhangh24/MR_MA/data/ld_block/ld_block_",eth[i]))
 
 
 #data dir for 1KG reference with MEGA chip
@@ -56,91 +56,72 @@ bim_file = fread(paste0(data_dir,"all_chr.bim"))
 bim_file = left_join(bim_file,snp.infor.match.select,by=c("V2"="rs_id"))
 
 #block_chr is the chromosome number for each block
-# block_chr = pos_table_sub %>% 
-#   mutate(CHR_clean = as.numeric(gsub("chr","",x = chr))) %>% 
-#   select(CHR_clean)
-# write.table(block_chr,file = paste0(snp_list_dir,"blk_chr"),row.names = F,col.names = F,quote = F)
+block_chr = pos_table_sub %>%
+  mutate(CHR_clean = as.numeric(gsub("chr","",x = chr))) %>%
+  select(CHR_clean)
+write.table(block_chr,file = paste0(snp_list_dir,"blk_chr"),row.names = F,col.names = F,quote = F)
 
 #block_size is the number of SNPs in LD block
 
 
 
-# block_size = data.frame(size = rep(0,nrow(pos_table_sub)))
-# 
-# 
-# soft_dir = "/data/zhangh24/software/"
-# 
-# for(k in 1:nrow(pos_table_sub)){
-#   #if it's first block, increase the block size to include SNPs before start
-#   if(k %in% start ==1){
-#     start =1
-#     end = pos_table_sub[k,3]
-#   }else if(k %in% end ==1){
-#     #if it's last block, increase end to include any SNPs
-#     start = pos_table_sub[k,2]
-#     end = Inf
-#   }else{
-#     start = pos_table_sub[k,2]
-#     end = pos_table_sub[k,3]
-#   }
-#   
-#   j = block_chr[k,1]
-#   print(j)
-#   #subset to common SNPs in the population
-#   #subset to bi-allelic snps
-#   snp_list = bim_file %>% 
-#     filter(CHR == j) %>% 
-#     filter(V4>=start&V4<=end) %>% 
-#     filter(get(eth[i])>=0.01&
-#              get(eth[i])<=0.99) %>% 
-#     filter(V5 %in% c("A", "T", "C", "G")&
-#              V6 %in% c("A", "T", "C", "G")) %>%
-#     select(V2) %>% 
-#     rename(SNP=V2)
-#   
-#   if(nrow(snp_list)!=0){
-#     write.table(snp_list,file= paste0(temp_dir,"extract_snp_list"),row.names = F,col.names = T,quote=F)  
-#     #snp_list is the SNPs in each LD block
-#     write.table(snp_list,file= paste0(snp_list_dir,"snplist_blk",k),row.names = F,col.names = F,quote=F,
-#                 fileEncoding = "UTF-8")
-#     block_size[k,1] = nrow(snp_list)
-#     #write.table(snp_list,file= paste0(out_dir,"snp_list_100"),row.names = F,col.names = T,quote=F)
-#     #calculate LD for selected block
-#     system(paste0(soft_dir,"plink2 ",
-#                   "--bfile ",data_dir,"chr",j," ",
-#                   "--keep-allele-order ",
-#                   "--extract ",temp_dir,"extract_snp_list ",
-#                   "--r square ",
-#                   "--out ", temp_dir,"ldblock_",k))
-#     system(paste0("more /lscratch/42052892/test/ldblock_100.ld"))
-#     system(paste0("mv ", temp_dir,"ldblock_",k,".ld ",
-#                   out_dir))
-#     # 
-#   }else{
-#     block_size[k,1] = nrow(snp_list)
-#   }
-#   
-#  
-#   
-#   
-# 
-# }
-# write.table(block_size, file= paste0(snp_list_dir,"blk_size"),row.names = F,col.names = F,quote=F)
+block_size = data.frame(size = rep(0,nrow(pos_table_sub)))
 
 
-snp_infor = bim_file %>% 
-  filter(get(eth[i])>=0.01&
-           get(eth[i])<=0.99) %>% 
-  filter(V5 %in% c("A", "T", "C", "G")&
-           V6 %in% c("A", "T", "C", "G")) %>% 
-  rename(SNP = V2,
-         BP = V4,
-         A1 = V5,
-         A2 = V6,
-         MAF = eth[i]) %>% 
-  select(CHR, SNP, BP, A1, A2, MAF) 
-  
+soft_dir = "/data/zhangh24/software/"
 
-write.table(snp_infor, file = paste0("/data/zhangh24/software/PRScsx/1KGLD_MEGA/ldblk_1kg_",tolower(eth[i]),"/snpinfo_1kg_hm3"),
-            row.names = F, col.names = T, quote = F)
-  
+for(k in 1:nrow(pos_table_sub)){
+  #if it's first block, increase the block size to include SNPs before start
+  if(k %in% start ==1){
+    start =1
+    end = pos_table_sub[k,3]
+  }else if(k %in% end ==1){
+    #if it's last block, increase end to include any SNPs
+    start = pos_table_sub[k,2]
+    end = Inf
+  }else{
+    start = pos_table_sub[k,2]
+    end = pos_table_sub[k,3]
+  }
+
+  j = block_chr[k,1]
+  print(j)
+  #subset to common SNPs in the population
+  #subset to bi-allelic snps
+  snp_list = bim_file %>%
+    filter(CHR == j) %>%
+    filter(V4>=start&V4<=end) %>%
+    filter(get(eth[i])>=0.01&
+             get(eth[i])<=0.99) %>%
+    filter(V5 %in% c("A", "T", "C", "G")&
+             V6 %in% c("A", "T", "C", "G")) %>%
+    select(V2) %>%
+    rename(SNP=V2)
+
+  if(nrow(snp_list)!=0){
+    write.table(snp_list,file= paste0(temp_dir,"extract_snp_list"),row.names = F,col.names = T,quote=F)
+    #snp_list is the SNPs in each LD block
+    write.table(snp_list,file= paste0(snp_list_dir,"snplist_blk",k),row.names = F,col.names = F,quote=F,
+                fileEncoding = "UTF-8")
+    block_size[k,1] = nrow(snp_list)
+    #write.table(snp_list,file= paste0(out_dir,"snp_list_100"),row.names = F,col.names = T,quote=F)
+    #calculate LD for selected block
+    system(paste0(soft_dir,"plink2 ",
+                  "--bfile ",data_dir,"chr",j," ",
+                  "--keep-allele-order ",
+                  "--extract ",temp_dir,"extract_snp_list ",
+                  "--r square ",
+                  "--out ", temp_dir,"ldblock_",k))
+   
+    #
+  }else{
+    block_size[k,1] = nrow(snp_list)
+  }
+
+
+
+
+
+}
+write.table(block_size, file= paste0(snp_list_dir,"blk_size"),row.names = F,col.names = F,quote=F)
+

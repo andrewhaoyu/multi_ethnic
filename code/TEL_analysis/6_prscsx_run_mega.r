@@ -51,7 +51,7 @@ for(i in 1:4){
   #test the bug
   sum.select = sum.select[1:as.integer(n.snp/5),]
   
-  write.table(sum.select,file = paste0(temp.dir,eth[i],"_sumstats.txt"),row.names = F,col.names = T,quote=F)
+  write.table(sum.select,file = paste0(temp.dir,eth[i],"_sumstats.txt"),row.names = F,col.names = T,quote= F)
 }
 
 phi = c(1E+00,1E-02,1E-04,1E-6,1E-08)

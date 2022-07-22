@@ -31,13 +31,13 @@ for(i in 1:5){
              get(eth[i])<=0.99) %>%
     filter(V5 %in% c("A", "T", "C", "G")&
              V6 %in% c("A", "T", "C", "G")) %>%
-    select(V1, V2, V4, V5, V6, eth[i]) %>% 
+    mutate(MAF = ifelse(get(eth[i])<=0.5,get(eth[i]),1-get(eth[i]))) %>% 
+    select(V1, V2, V4, V5, V6, MAF) %>% 
     rename(CHR = V1,
            SNP = V2,
            BP = V4,
            A1  = V5,
-           A2 = V6,
-           MAF = eth[i])
+           A2 = V6)
   snp_info_list[[i]]  = snp_info
   #write.table(snp_info, file = paste0(out_dir,"snpinfo_1kg_mega"), row.names = F, col.names = T, quote= F, sep = "\t")
   write.table(snp_info, file = paste0(out_dir,"snpinfo_1kg_hm3"), row.names = F, col.names = T, quote= F, sep = "\t")
