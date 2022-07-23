@@ -113,7 +113,8 @@ for(k in 1:nrow(pos_table_sub)){
                   "--extract ",temp_dir,"extract_snp_list ",
                   "--r square ",
                   "--out ", temp_dir,"ldblock_",k))
-   
+    system(paste0("mv ", temp_dir,"ldblock_",k,".ld ",
+                                     out_dir))
     #
   }else{
     block_size[k,1] = nrow(snp_list)
