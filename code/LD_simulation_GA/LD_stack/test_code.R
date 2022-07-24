@@ -54,11 +54,15 @@ BiocManager::install("rhdf5")
 library(rhdf5)
 path_to_ref = "/data/zhangh24/software/PRScsx/1KGLD/"
 h5f = H5Fopen(paste0(path_to_ref,"/ldblk_1kg_amr/ldblk_1kg_chr1.hdf5"))
+h5f2 = H5Fopen(paste0(path_to_ref,"/ldblk_1kg_afr/ldblk_1kg_chr1.hdf5"))
+head(h5f$blk_1)
 all_snp_list = list()
 for(i in 1:24){
-  all_snp_list[[i]] = data.frame(SNP = eval(parse(text = paste0("h5f$blk_",1,"$snplist"))))
+  all_snp_list[[i]] = data.frame(SNP = eval(parse(text = paste0("h5f$blk_",i,"$snplist"))))
   
 }
+
+snp_data = data.frame(SNP = eval(parse(text = paste0("h5f$blk_",2,"$snplist"))))
 
 all_snp = rbindlist(all_snp_list)
 idx <- which(all_snp$SNP=="rs174342")

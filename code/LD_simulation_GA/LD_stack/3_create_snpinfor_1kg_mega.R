@@ -2,8 +2,8 @@
 #load LD blocks table from Berisa, T.  Bioinformatics, 2016.
 library(data.table)
 library(dplyr)
-eth = c("EUR","AFR","AMR","EAS","SAS")
-pos_table = fread(paste0("/data/zhangh24/MR_MA/data/ld_block"))
+eth = c("AFR","AMR","EAS","EUR","SAS")
+
 
 #data dir for 1KG reference with MEGA chip
 load("/data/zhangh24/multi_ethnic/result/LD_simulation_new/snp.infor.match37_38.rdata")
@@ -40,7 +40,7 @@ for(i in 1:5){
            A2 = V6)
   snp_info_list[[i]]  = snp_info
   #write.table(snp_info, file = paste0(out_dir,"snpinfo_1kg_mega"), row.names = F, col.names = T, quote= F, sep = "\t")
-  write.table(snp_info, file = paste0(out_dir,"snpinfo_1kg_hm3"), row.names = F, col.names = T, quote= F, sep = "\t")
+  #write.table(snp_info, file = paste0(out_dir,"snpinfo_1kg_hm3"), row.names = F, col.names = T, quote= F, sep = "\t")
 }
 
 snp_info_combine = rbindlist(snp_info_list)
@@ -51,7 +51,7 @@ unique_snp = data.frame(SNP = unique(snp_info_combine$SNP))
 #create snpinfo_mult_1kg_mega
 #bim file for all ancestries are the same
 #for SNPs not exist in a particular ancestry, the values for the SNP will be 0
-#just use EUR to create the reference
+#just use AFR to create the reference
 i = 1
 data_dir = paste0("/data/zhangh24/KGref_MEGA/GRCh37/",eth[i],"/")
 bim_file = fread(paste0(data_dir,"all_chr.bim"))
@@ -64,10 +64,26 @@ bim_file_update = bim_file[order(bim_file$V1,bim_file$V4),]
 
 bim_file = left_join(bim_file_update,snp.infor.match.select,by=c("SNP"="rs_id"))
 
+#if a SNP has MAF <= 0.01, put allele frequency as 0 to align with the code of prscsx
+
+MAF = data.frame(matrix(0,nrow(bim_file),length(eth)))
+
+for(i in 1:5){
+  MAF[,i] = bim_file %>% 
+    mutate( new = ifelse(
+      (get(eth[i]) < 0.01|get(eth[i]) > 0.99),0, get(eth[i])),
+      ) %>% 
+    select(new)
+}
+colnames(MAF) = eth
+bim_file[,eth] = MAF
+
+
 FLIP_data = data.frame(matrix(0,nrow(bim_file),length(eth)))
 #loop through all ancestries
 for(i in 1:5){
 bim_file_merge = left_join(bim_file,snp_info_list[[i]],by = "SNP")
+
 
 FLIP_temp = bim_file_merge %>% 
   mutate(FLIP = case_when(is.na(A1)==1 ~ 0,
