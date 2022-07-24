@@ -13,7 +13,7 @@ library(rlang)
 #load LD blocks table from Berisa, T.  Bioinformatics, 2016.
 eth = c("EUR","AFR","AMR","EAS","SAS")
 pos_table = fread(paste0("/data/zhangh24/MR_MA/data/ld_block/ld_block_",eth[i]))
-colnames(pos_table)[1] = "chr"
+colnames(pos_table) = c("chr", "start", "end")
 
 
 #data dir for 1KG reference with MEGA chip
