@@ -34,7 +34,6 @@ pos_table_sub = pos_table %>%
   mutate(start = as.numeric(start),
          end = as.numeric(end))
 
-idx <- which(is.na(pos_table_sub$start))
 
 #get the start index and end index for each chromosome
 start = rep(0, 22)
@@ -99,13 +98,11 @@ for(k in 1:nrow(pos_table_sub)){
     filter(get(eth[i])>=0.01&
              get(eth[i])<=0.99) %>%
     filter(V5 %in% c("A", "T", "C", "G")&
-             V6 %in% c("A", "T", "C", "G"))
-  
-  
-  %>%
+             V6 %in% c("A", "T", "C", "G")) %>%
     select(V2) %>%
     rename(SNP=V2)
-print(nrow(snp_list))
+    
+
   if(nrow(snp_list)!=0){
     write.table(snp_list,file= paste0(temp_dir,"extract_snp_list"),row.names = F,col.names = T,quote=F)
     #snp_list is the SNPs in each LD block
