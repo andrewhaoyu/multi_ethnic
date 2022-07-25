@@ -59,3 +59,11 @@ for(i in c(1,4)){
   system(paste0("cd /data/zhangh24/software/PRScsx/1KGLD/ldblk_1kg_",tolower(eth[i]),"; ",
                 "cp snpinfo_1kg_hm3 /data/zhangh24/test1/ref1/ldblk_1kg_",tolower(eth[i])))
 }
+
+
+
+eth = c("EUR", "AFR", "AMR", "EAS", "SAS")
+for(i in 1:5){
+  system(paste0("cd /data/zhangh24/multi_ethnic/result/LD_simulation_GA/; ",
+                "mkdir ",eth[i],"/prscsx_mega/"))  
+}

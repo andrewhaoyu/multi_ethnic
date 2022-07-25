@@ -50,3 +50,4 @@ write.table(snpinfor, file = "./ldblk_1kg_eas/snpinfo_1kg_hm3",row.names = F, co
 idx <- which(snpinfor$SNP=="rs174342")
 snpinfor[idx,]
 
+
