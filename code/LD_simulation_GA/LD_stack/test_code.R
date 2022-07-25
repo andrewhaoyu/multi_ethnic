@@ -6,7 +6,7 @@ out_dir = "/data/zhangh24/software/PRScsx/test_data/"
 system(paste0("python /data/zhangh24/software/PRScsx/PRScsx.py", 
               " --ref_dir=",path_to_ref,
               " --bim_prefix=",path_to_bim,
-              " --sst_file=",path_to_sum,"EUR_sumstats.txt,",path_to_sum,eth[i],"_sumstats.txt",
+              " --sst_file=",path_to_sum,"EUR_sumstats.txt,",path_to_sum,"EAS_sumstats.txt",
               " --n_gwas=200000,100000",
               " --pop=EUR,EAS",
               " --chrom=22",
@@ -20,7 +20,7 @@ path_to_bim = "/data/zhangh24/test1/PRScsx/test_data/test"
 path_to_sum = "/data/zhangh24/test1/PRScsx/test_data/"
 out_dir = "/data/zhangh24/test1/PRScsx/test_data/"
 
-system(paste0("python /data/zhangh24/test1/PRScsx/PRScsx.py -h"))
+#system(paste0("python /data/zhangh24/test1/PRScsx/PRScsx.py -h"))
 
 system(paste0("cd /data/zhangh24/test1/; ",
               "python ./PRScsx/PRScsx.py", 
@@ -52,10 +52,25 @@ snp_mult[idx,]
 install.packages("BiocManager")
 BiocManager::install("rhdf5")
 library(rhdf5)
-path_to_ref = "/data/zhangh24/software/PRScsx/1KGLD/"
-h5f = H5Fopen(paste0(path_to_ref,"/ldblk_1kg_amr/ldblk_1kg_chr1.hdf5"))
-h5f2 = H5Fopen(paste0(path_to_ref,"/ldblk_1kg_afr/ldblk_1kg_chr1.hdf5"))
-head(h5f$blk_1)
+path_to_ref = "/data/zhangh24/test1/ref2/"
+h5f = H5Fopen(paste0(path_to_ref,"/ldblk_1kg_eur/ldblk_1kg_chr22.hdf5"))
+
+ data.frame(SNP = h5f$blk_1$snplist)
+
+
+for(i in 1:24){
+  data1  = data.frame(SNP = eval(parse(text = paste0("h5f$blk_",5,"$snplist"))))
+  data2  = data.frame(SNP = eval(parse(text = paste0("h5f$blk_",6,"$snplist"))))
+  idx <- which(data1$SNP%in%"rs5996529")
+  idx2 = which(data2$SNP%in%"rs5996529")
+  
+  if("rs5996529"%in%data$SNP==T){
+    print(i)
+  }
+}
+
+
+
 all_snp_list = list()
 for(i in 1:24){
   all_snp_list[[i]] = data.frame(SNP = eval(parse(text = paste0("h5f$blk_",i,"$snplist"))))

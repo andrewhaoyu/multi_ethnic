@@ -49,7 +49,7 @@ for(i in 1:4){
   
   n.snp = nrow(sum.select)
   #test the bug
-  sum.select = sum.select[1:as.integer(n.snp/5),]
+  sum.select = sum.select[3883,]
   
   write.table(sum.select,file = paste0(temp.dir,eth[i],"_sumstats.txt"),row.names = F,col.names = T,quote= F)
 }
@@ -91,6 +91,25 @@ system(paste0("python /data/zhangh24/software/PRScsx/PRScsx.py",
 
 
 
+
+snp_mult_mega = fread(paste0(path_to_ref,"/snpinfo_mult_1kg_hm3"))
+snp_mult_mega = snp_mult_mega %>% filter(CHR==22)
+snp_mult_hm3 = fread(paste0("/data/zhangh24/test1/ref1","/snpinfo_mult_1kg_hm3"))
+
+
+idx <- which(snp_mult_hm3$SNP=="rs5996529")
+snp_mult_hm3[idx,]
+
+snp.temp = left_join(sum.select[,1,drop=F],snp_mult_mega,by="SNP")
+snp.temp = snp.temp %>% 
+  select(SNP, CHR, BP, A1, A2, FRQ_AFR, FRQ_EUR, FLIP_AFR, FLIP_EUR)
+print(snp.temp)
+
+idx <- which(snp_mult_mega$SNP%in%sum.select$SNP)
+
+head(snp.temp)
+diff(snp.temp$BP)
+snp_mult_mega
 # out.file = paste0("/data/zhangh24/multi_ethnic/result/cleaned/organize_prs/PRSCSx/")
 # for(i in 1:5){
 #   system(paste0("mkdir ",out.file,eth[i],"/"))
