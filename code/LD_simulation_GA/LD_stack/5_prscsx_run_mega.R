@@ -85,45 +85,45 @@ phi = c(1,1E-02,1E-04,1E-06)
                   " --out_name=rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
     
 
-    summary.eur.select = summary.eur.sub %>% 
-      filter(CHR==1) %>% 
-      select(SNP,A1,A2,BETA,P)
-    
-    summary.eur.select = summary.eur.select[50272:50272,]
-    
-    write.table(summary.eur.select,file = paste0(temp.dir,"EUR_sumstats.txt"),row.names = F,col.names = T,quote=F)
-    
-    
-    summary.tar.select = summary.tar.sub %>% 
-      filter(CHR==1) %>% 
-      select(SNP,A1,A2,BETA,P)
-    summary.tar.select = summary.tar.select[50272:50272,]
-    
-    write.table(summary.tar.select,file = paste0(temp.dir,eth[i],"_sumstats.txt"),row.names = F,col.names = T,quote=F)
-    
-    
-    system(paste0("export MKL_NUM_THREADS=2; export NUMEXPR_NUM_THREADS=2; export OMP_NUM_THREADS=2;
-                python /data/zhangh24/software/PRScsx/PRScsx.py", 
-                  " --ref_dir=",path_to_ref,
-                  " --bim_prefix=",path_to_bim,
-                  " --sst_file=",path_to_sum,"EUR_sumstats.txt,",path_to_sum,eth[i],"_sumstats.txt",
-                  " --n_gwas=100000,",size_list[m],
-                  " --pop=EUR,",eth[i],
-                  " --chrom=",j,
-                  " --phi=",phi[k], 
-                  " --out_dir=",out.dir.sum,eth[i],"/prscsx_mega",
-                  " --out_name=rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
-    
-    write.table(summary.eur.select,file = paste0("/data/zhangh24/test1/PRScsx/test_data/","EUR_sumstats.txt"),row.names = F,col.names = T,quote=F)
-    write.table(summary.tar.select,file = paste0("/data/zhangh24/test1/PRScsx/test_data/",eth[i],"_sumstats.txt"),row.names = F,col.names = T,quote=F)
-    
-    bim.update.select = bim.update %>% 
-      filter(V1==1)
-    write.table(bim.update.select,file = paste0("/data/zhangh24/test1/PRScsx/test_data/","test.bim"),row.names = F,col.names = F,quote=F)
-    
-    
-    system(paste0("cd /data/zhangh24/test1/; ",
-                  "python ./PRScsx/PRScsx.py --ref_dir=./ref2 --bim_prefix=./PRScsx/test_data/test --sst_file=./PRScsx/test_data/EUR_sumstats.txt,./PRScsx/test_data/AFR_sumstats.txt --n_gwas=100000,15000 --pop=EUR,AFR --chrom=1 --phi=1e-02 --out_dir=./ --out_name=test2"))
-    
-    
-    
+    # summary.eur.select = summary.eur.sub %>% 
+    #   filter(CHR==1) %>% 
+    #   select(SNP,A1,A2,BETA,P)
+    # 
+    # summary.eur.select = summary.eur.select[50272:50272,]
+    # 
+    # write.table(summary.eur.select,file = paste0(temp.dir,"EUR_sumstats.txt"),row.names = F,col.names = T,quote=F)
+    # 
+    # 
+    # summary.tar.select = summary.tar.sub %>% 
+    #   filter(CHR==1) %>% 
+    #   select(SNP,A1,A2,BETA,P)
+    # summary.tar.select = summary.tar.select[50272:50272,]
+    # 
+    # write.table(summary.tar.select,file = paste0(temp.dir,eth[i],"_sumstats.txt"),row.names = F,col.names = T,quote=F)
+    # 
+    # 
+    # system(paste0("export MKL_NUM_THREADS=2; export NUMEXPR_NUM_THREADS=2; export OMP_NUM_THREADS=2;
+    #             python /data/zhangh24/software/PRScsx/PRScsx.py", 
+    #               " --ref_dir=",path_to_ref,
+    #               " --bim_prefix=",path_to_bim,
+    #               " --sst_file=",path_to_sum,"EUR_sumstats.txt,",path_to_sum,eth[i],"_sumstats.txt",
+    #               " --n_gwas=100000,",size_list[m],
+    #               " --pop=EUR,",eth[i],
+    #               " --chrom=",j,
+    #               " --phi=",phi[k], 
+    #               " --out_dir=",out.dir.sum,eth[i],"/prscsx_mega",
+    #               " --out_name=rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
+    # 
+    # write.table(summary.eur.select,file = paste0("/data/zhangh24/test1/PRScsx/test_data/","EUR_sumstats.txt"),row.names = F,col.names = T,quote=F)
+    # write.table(summary.tar.select,file = paste0("/data/zhangh24/test1/PRScsx/test_data/",eth[i],"_sumstats.txt"),row.names = F,col.names = T,quote=F)
+    # 
+    # bim.update.select = bim.update %>% 
+    #   filter(V1==1)
+    # write.table(bim.update.select,file = paste0("/data/zhangh24/test1/PRScsx/test_data/","test.bim"),row.names = F,col.names = F,quote=F)
+    # 
+    # 
+    # system(paste0("cd /data/zhangh24/test1/; ",
+    #               "python ./PRScsx/PRScsx.py --ref_dir=./ref2 --bim_prefix=./PRScsx/test_data/test --sst_file=./PRScsx/test_data/EUR_sumstats.txt,./PRScsx/test_data/AFR_sumstats.txt --n_gwas=100000,15000 --pop=EUR,AFR --chrom=1 --phi=1e-02 --out_dir=./ --out_name=test2"))
+    # 
+    # 
+    # 
