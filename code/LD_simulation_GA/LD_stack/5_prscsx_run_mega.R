@@ -36,32 +36,48 @@ snp.infor = snp.infor.match %>%
 summary.eur = left_join(summary.eur,snp.infor,by="SNP")
 prs_cs_ref = as.data.frame(fread("/data/zhangh24/software/PRScsx/1KGLD_MEGA/snpinfo_mult_1kg_hm3",header=T))
 prs_cs_ref = prs_cs_ref %>% select(SNP)
+#match the summary stat with prs csx reference
 summary.eur = inner_join(summary.eur,prs_cs_ref,by = c("rs_id"="SNP"))
+#A1 is the effect allele
+#A2 is the non-effect allele; generate A2 for prs-csx
 summary.eur.sub = summary.eur %>% 
-  separate(SNP,into=c("non_im","non_im2","first_allele","second_allele"),
-           remove=F) %>% 
-  mutate(A2 =ifelse(A1==second_allele,first_allele,second_allele)) %>% 
-  select(rs_id,A1,A2,BETA,P,CHR) %>% 
-  #select(rs_id,A1,A2,BETA,P) %>% 
-  rename(SNP=rs_id)
-write.table(summary.eur.sub,file = paste0(temp.dir,"EUR_sumstats.txt"),row.names = F,col.names = T,quote=F)
+  separate(SNP,into = c("non_im","non_im2","first_allele","second_allele"),
+           remove = F) %>% 
+  mutate(A2 =ifelse(A1==second_allele,first_allele,second_allele)) 
+#filter the SNP to CHR j
+summary.eur.select = summary.eur.sub %>% 
+  filter(CHR == j) %>% 
+  #select(rs_id,A1,A2,BETA,P,CHR) %>% 
+  select(rs_id, A1, A2, BETA, P) %>% 
+  rename(SNP = rs_id)
+write.table(summary.eur.select,file = paste0(temp.dir,"EUR_sumstats.txt"),row.names = F,col.names = T,quote=F)
 #merge with prs-csx reference data
 #prepare target summary stat for a specific chr
 summary.tar <- as.data.frame(fread(paste0(out.dir.sum,eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))  
+
 summary.tar = left_join(summary.tar,snp.infor,by="SNP")
 #merge with prs-csx reference data
 summary.tar = inner_join(summary.tar,prs_cs_ref,by = c("rs_id"="SNP"))
+#A1 is the effect allele
+#A2 is the non-effect allele; generate A2 for prs-csx
 summary.tar.sub = summary.tar %>% 
   separate(SNP,into=c("non_im","non_im2","first_allele","second_allele"),
            remove=F) %>% 
-  mutate(A2 =ifelse(A1==second_allele,first_allele,second_allele)) %>% 
-  #select(rs_id,A1,A2,BETA,P,C) %>% 
-  select(rs_id,A1,A2,BETA,P,CHR) %>% 
+  mutate(A2 =ifelse(A1==second_allele,first_allele,second_allele)) 
+
+#filter the SNP to CHR j
+summary.tar.select = summary.tar.sub %>% 
+  filter(CHR == j) %>% 
+  select(rs_id,A1,A2,BETA,P) %>% 
+  #select(rs_id,A1,A2,BETA,P,CHR) %>% 
   rename(SNP=rs_id)
-write.table(summary.tar.sub,file = paste0(temp.dir,eth[i],"_sumstats.txt"),row.names = F,col.names = T,quote=F)
+write.table(summary.tar.select,file = paste0(temp.dir,eth[i],"_sumstats.txt"),row.names = F,col.names = T,quote=F)
 bim = read.table(paste0(cur.dir,eth[i],"/all_chr_test.mega.bim"))
 bim.update =inner_join(summary.tar,bim,by = c("SNP"="V2")) %>% 
   select(V1,rs_id,V3,V4,V5,V6)
+bim.select = bim.update %>% 
+  filter(V1 == j)
+
 write.table(bim.update,file = paste0(temp.dir,"all_chr_test.mega.bim"),row.names = F,col.names = F,quote=F)
 #phi = c(1E-6,1E-4)
 #phi = c(1E-02)
