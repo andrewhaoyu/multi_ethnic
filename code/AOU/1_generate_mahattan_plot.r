@@ -5,22 +5,22 @@ i1 = as.numeric(com.args[[1]])
 i2 = as.numeric(com.args[[2]])
 eth <- c("EUR","AFR","AMR")
 eth_name = c("EUR","AFR","AMR")
-trait <- c("height")
+trait <- c("height","bmi")
 trait_name = trait
-setwd("/data/zhangh24/multi_ethnic/data/AOU/")
+setwd("/data/zhangh24/multi_ethnic/data/AOU_cleaned/")
 source("/data/zhangh24/multi_ethnic/code/stratch/theme_publication.R")
 library(data.table)
 library(qqman)
 library(dplyr)
-data <- fread(paste0(trait[i2],"/sum_stat_afr.txt"),header=T)
-N.effect = median(data$OBS_CT)
-colnames(data)[1] = "CHROM"
+data <- fread(paste0(eth[i1],"/",trait[i2],".txt"),header=T)
+N.effect = median(data$N)
+#colnames(data)[1] = "CHROM"
 data = data %>% 
-  mutate(CHR = as.integer(CHROM),
-         BP = as.integer(POS),
-         FREQ_A1 = as.numeric(A1_FREQ),
+  mutate(CHR = as.integer(CHR),
+         BP = as.integer(POS_b38),
+         FREQ_A1 = as.numeric(A1_FREQ_allofus),
          P = as.numeric(P),
-         rsid = ID) %>% 
+         rsid = rsID) %>% 
   mutate(P = ifelse(P==0,1E-300,P)) %>% 
   select(rsid,CHR,BP,FREQ_A1,P)
 
@@ -293,5 +293,5 @@ dev.off()
 # text(1,0.8,expression(paste(lambda[1000]," = ",buquote(.(lambda_1000)))),cex = 1.5)
 
 lambda_vec = c(lambda,lambda_1000)
-save(lambda_vec,file = paste0("/data/zhangh24/multi_ethnic/result/GLGC/lambda_value/lambda_vec_",i1,"_",i2,".rdata"))
+save(lambda_vec,file = paste0("/data/zhangh24/multi_ethnic/result/AOU/lambda_value/lambda_vec_",i1,"_",i2,".rdata"))
 
