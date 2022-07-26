@@ -53,23 +53,27 @@ install.packages("BiocManager")
 BiocManager::install("rhdf5")
 library(rhdf5)
 path_to_ref = "/data/zhangh24/test1/ref2/"
-h5f = H5Fopen(paste0(path_to_ref,"/ldblk_1kg_eur/ldblk_1kg_chr22.hdf5"))
+snp_mult = fread(paste0(path_to_ref,"snpinfo_mult_1kg_hm3"))
+idx <- which(snp_mult$SNP=="rs1001276")
+h5f = H5Fopen(paste0(path_to_ref,"/ldblk_1kg_eur/ldblk_1kg_chr1.hdf5"))
 
  data.frame(SNP = h5f$blk_1$snplist)
 
 
-for(i in 1:24){
-  data1  = data.frame(SNP = eval(parse(text = paste0("h5f$blk_",5,"$snplist"))))
-  data2  = data.frame(SNP = eval(parse(text = paste0("h5f$blk_",6,"$snplist"))))
-  idx <- which(data1$SNP%in%"rs5996529")
-  idx2 = which(data2$SNP%in%"rs5996529")
+for(i in 1:133){
+  snp_list = eval(parse(text = paste0("h5f$blk_",52)))
+  data  = data.frame(SNP = eval(parse(text = paste0("h5f$blk_",52,"$snplist"))))
+  #data2  = data.frame(SNP = eval(parse(text = paste0("h5f$blk_",6,"$snplist"))))
+  idx <- which(data$SNP%in%"rs1001276")
+  LD = data.frame(SNP = eval(parse(text = paste0("h5f$blk_",52,"[[1]]"))))
+  #idx2 = which(data2$SNP%in%"rs1001276")
   
-  if("rs5996529"%in%data$SNP==T){
+  if("rs1001276"%in%data$SNP==T){
     print(i)
   }
 }
 
-
+ data[846:849,]
 
 all_snp_list = list()
 for(i in 1:24){

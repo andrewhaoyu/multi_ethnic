@@ -67,3 +67,10 @@ for(i in 1:5){
   system(paste0("cd /data/zhangh24/multi_ethnic/result/LD_simulation_GA/; ",
                 "mkdir ",eth[i],"/prscsx_mega/"))  
 }
+
+
+
+for(i in c(1,2)){
+  system(paste0("cd /data/zhangh24/software/PRScsx/1KGLD_MEGA/ldblk_1kg_",tolower(eth[i]),"; ",
+                "cp ldblk_1kg_chr1.hdf5 /data/zhangh24/test1/ref2/ldblk_1kg_",tolower(eth[i]),"/ldblk_1kg_chr1.hdf5"))
+}

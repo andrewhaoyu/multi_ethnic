@@ -35,6 +35,8 @@ pos_table_sub = pos_table %>%
          end = as.numeric(end))
 
 
+
+
 #get the start index and end index for each chromosome
 start = rep(0, 22)
 end = rep(0,22)
@@ -73,7 +75,7 @@ block_size = data.frame(size = rep(0,nrow(pos_table_sub)))
 
 
 soft_dir = "/data/zhangh24/software/"
-
+load("/data/zhangh24/software/PRScsx/snp_id_filter.rdata")
 for(k in 1:nrow(pos_table_sub)){
   #if it's first block, increase the block size to include SNPs before start
   if(k %in% start ==1){
@@ -100,11 +102,13 @@ for(k in 1:nrow(pos_table_sub)){
     filter(V5 %in% c("A", "T", "C", "G")&
              V6 %in% c("A", "T", "C", "G")) %>%
     select(V2) %>%
-    rename(SNP=V2)
-    
+    rename(SNP=V2) %>% 
+    filter(SNP%in%snp_id_filter$SNP==F)
+    #idx <- which("rs1001276"%in%snp_list)
 
   if(nrow(snp_list)!=0){
     write.table(snp_list,file= paste0(temp_dir,"extract_snp_list"),row.names = F,col.names = T,quote=F)
+    write.table(snp_list,file= paste0("/data/zhangh24/extract_snp_list"),row.names = F,col.names = T,quote=F)
     #snp_list is the SNPs in each LD block
     write.table(snp_list,file= paste0(snp_list_dir,"snplist_blk",k),row.names = F,col.names = F,quote=F,
                 fileEncoding = "UTF-8")
@@ -117,6 +121,7 @@ for(k in 1:nrow(pos_table_sub)){
                   "--extract ",temp_dir,"extract_snp_list ",
                   "--r square ",
                   "--out ", temp_dir,"ldblock_",k))
+  
     system(paste0("mv ", temp_dir,"ldblock_",k,".ld ",
                                      out_dir))
     #
@@ -130,4 +135,10 @@ for(k in 1:nrow(pos_table_sub)){
 
 }
 write.table(block_size, file= paste0(snp_list_dir,"blk_size"),row.names = F,col.names = F,quote=F)
+
+
+
+
+
+
 

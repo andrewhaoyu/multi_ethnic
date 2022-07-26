@@ -19,6 +19,8 @@ data_dir = paste0("/data/zhangh24/KGref_MEGA/GRCh37/",eth[i],"/")
 bim_file = fread(paste0(data_dir,"all_chr.bim"))
 bim_file = left_join(bim_file,snp.infor.match.select,by=c("V2"="rs_id"))
 snp_info_list = list()
+#filter the snps with LD as NAN
+load("/data/zhangh24/software/PRScsx/snp_id_filter.rdata")
 for(i in 1:5){
   
   
@@ -37,7 +39,8 @@ for(i in 1:5){
            SNP = V2,
            BP = V4,
            A1  = V5,
-           A2 = V6)
+           A2 = V6) %>% 
+    filter(SNP%in%snp_id_filter$SNP==F)
   snp_info_list[[i]]  = snp_info
   #write.table(snp_info, file = paste0(out_dir,"snpinfo_1kg_mega"), row.names = F, col.names = T, quote= F, sep = "\t")
   #write.table(snp_info, file = paste0(out_dir,"snpinfo_1kg_hm3"), row.names = F, col.names = T, quote= F, sep = "\t")

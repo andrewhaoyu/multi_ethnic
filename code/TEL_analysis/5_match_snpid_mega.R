@@ -15,7 +15,7 @@ mega.snp = fread("/data/zhangh24/software/PRScsx/1KGLD_MEGA/snpinfo_mult_1kg_hm3
 mega.snp = mega.snp %>% 
   select(SNP) %>% 
   rename(rsid = SNP)
-#combine snp_infor file with hm3.snp to get GRCh38 position number
+#combine snp_infor file with mega.snp to get GRCh38 position number
 snp.infor = inner_join(snp.infor.match,mega.snp,by=c("rs_id"="rsid")) %>% 
   mutate(chr.pos = paste0(CHR,":",position_GRCh38)) %>% 
   select(rs_id,chr.pos) %>% 
