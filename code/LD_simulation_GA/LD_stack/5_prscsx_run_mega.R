@@ -15,9 +15,12 @@ sid<-Sys.getenv('SLURM_JOB_ID')
 dir.create(paste0('/lscratch/',sid,'/test'),showWarnings = FALSE)
 temp.dir = paste0('/lscratch/',sid,'/test/')
 dir.create(paste0('/lscratch/',sid,'/test/1KGLD'),showWarnings = FALSE)
+dir.create(paste0('/lscratch/',sid,'/test/1KGLD/ldblk_1kg_eur'),showWarnings = FALSE)
+dir.create(paste0('/lscratch/',sid,'/test/1KGLD/ldblk_1kg_',tolower(eth[i])),showWarnings = FALSE)
+
 #copy the LD reference data to lscratch
-system(paste0("cp -r /data/zhangh24/software/PRScsx/1KGLD_MEGA/ldblk_1kg_eur ",temp.dir,"1KGLD"))
-system(paste0("cp -r /data/zhangh24/software/PRScsx/1KGLD_MEGA/ldblk_1kg_",tolower(eth[i])," ",temp.dir,"1KGLD"))
+system(paste0("cp -r /data/zhangh24/software/PRScsx/1KGLD_MEGA/ldblk_1kg_eur/ldblk_1kg_chr",j,".hdf5 ",temp.dir,"1KGLD/ldblk_1kg_eur/"))
+system(paste0("cp -r /data/zhangh24/software/PRScsx/1KGLD_MEGA/ldblk_1kg_",tolower(eth[i]),"/ldblk_1kg_chr",j,".hdf5 ",temp.dir,"1KGLD/ldblk_1kg_eur/"))
 system(paste0("cp /data/zhangh24/software/PRScsx/1KGLD_MEGA/snpinfo_mult_1kg_hm3 ",temp.dir,"1KGLD"))
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
 out.dir.sum <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
