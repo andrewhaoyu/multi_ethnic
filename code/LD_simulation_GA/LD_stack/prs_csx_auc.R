@@ -37,7 +37,7 @@ ga_vc <- rep(0,total)
 method_vec <- rep("PRS-CSx",total)
 temp= 1
 phi = c("1e-02","1e-04","1e-06")
-
+phi = c("1e+00","1e-02","1e-04","1e-06")
 for(i in 2:5){
   for(i1 in 1:5){
     for(l in 1:3){
