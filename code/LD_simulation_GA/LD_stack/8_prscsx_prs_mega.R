@@ -33,7 +33,7 @@ system(paste0("ls ",temp.dir))
 setwd("/data/zhangh24/multi_ethnic/")
 load("./result/LD_simulation_new/snp.infor.match37_38.rdata")
 setwd(paste0(out.dir.sum,eth[i],"/prscsx_mega/"))
-phi = c("1","1e-02","1e-04","1e-06")
+phi = c("1e+00","1e-02","1e-04","1e-06")
 for(v in 1:4){
   i_rep = 1
   #load target population posterior
