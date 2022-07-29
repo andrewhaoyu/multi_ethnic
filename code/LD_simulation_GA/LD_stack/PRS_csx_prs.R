@@ -96,7 +96,7 @@ for(v in 2:4){
   colSums(is.na(prs.file))
   write.table(prs.file,file = paste0(temp.dir.prs,"prs_file"),col.names = T,row.names = F,quote=F)
   
-  res = system(paste0("/data/zhangh24/software/plink2_alpha --score-col-nums 3,4,5,6,7,8,9,10,11,12 --threads 2 --score ",temp.dir.prs,"prs_file  header no-mean-imputation --bfile ",temp.dir,"all_chr_test.mega  --out ",temp.dir.prs,"prs_csx_EUR_rho_",l,"_size_",m,"_GA_",i1,"_phi",phi[v]))
+  res = system(paste0("/data/zhangh24/software/plink2_alpha --score-col-nums 3,4,5,6,7,8,9,10,11,12 --threads 2 --score ",temp.dir.prs,"prs_file  cols=+scoresums,-scoreavgs header no-mean-imputation --bfile ",temp.dir,"all_chr_test.mega  --out ",temp.dir.prs,"prs_csx_EUR_rho_",l,"_size_",m,"_GA_",i1,"_phi",phi[v]))
   system(paste0("mv ",temp.dir.prs,"/prs_csx_EUR_rho_",l,"_size_",m,"_GA_",i1,"_phi",phi[v],".sscore ",out.dir.sum,eth[i],"/prscsx/"))
   
 }

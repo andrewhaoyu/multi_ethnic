@@ -55,9 +55,9 @@ for(i in 2:5){
           
            for(i_rep in 1:n.rep){
             r2.test.rep <- rep(0,3)
-            coef.mat = matrix(NA,3,2)
+            coef.mat = matrix(NA,4,2)
              #find the best phi
-            for(v in 1:3){
+            for(v in 2:4){
        
               #load target prs
               filename <- paste0(out.dir.sum,eth[i],"/prscsx/prs_csx_",eth[i],"_rho_",l,"_size_",m,"_GA_",i1,"_phi",phi[v],".sscore")
