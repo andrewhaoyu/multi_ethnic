@@ -19,7 +19,7 @@ library(data.table)
 #install.packages("vctrs")
 library(dplyr)
 
-eth_vec <- c("EUR","AFR","AMR","EAS")
+eth_vec <- c("EUR","AFR","AMR","EAS","SAS")
 trait_vec <- c("HDL","LDL",
            "logTG",
            "TC")
@@ -58,8 +58,7 @@ write.table(sum.data.assoc,file = paste0(temp.dir,"all_chr_assoc.txt"),col.names
 # head(summary)
 pthr = 1
 r2thr = 0.1
-kbpthr = 500
-#cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
+kbpthr = 500#cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
 #code <- rep("c",5*3*3)
 #system(paste0("/data/zhangh24/software/plink2 --bfile /data/zhangh24/KG.plink/",eth[i],"/chr_all --clump ",cur.dir,eth[i],"/summary_out_MAF_rho_",l,"_size_",m,"_rep_",i_rep,".out --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out ",cur.dir,eth[i],"/LD_clump_rho_",l,"_size_",m,"_rep_",i_rep))
 res = system(paste0("/data/zhangh24/software/plink2 --bfile ",temp.dir,eth,"all_chr --clump ",temp.dir,"all_chr_assoc.txt --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out ",temp.dir,"LD_clump"))
