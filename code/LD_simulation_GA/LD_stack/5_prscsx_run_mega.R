@@ -10,16 +10,6 @@ library(tidyverse)
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 sid<-Sys.getenv('SLURM_JOB_ID')
 #system(paste0("rm -rf /lscratch/",sid,'/test'))
-dir.create(paste0('/lscratch/',sid,'/test'),showWarnings = FALSE)
-temp.dir = paste0('/lscratch/',sid,'/test/')
-dir.create(paste0('/lscratch/',sid,'/test/1KGLD'),showWarnings = FALSE)
-dir.create(paste0('/lscratch/',sid,'/test/1KGLD/ldblk_1kg_eur'),showWarnings = FALSE)
-dir.create(paste0('/lscratch/',sid,'/test/1KGLD/ldblk_1kg_',tolower(eth[i])),showWarnings = FALSE)
-
-#copy the LD reference data to lscratch
-system(paste0("cp -r /data/zhangh24/software/PRScsx/1KGLD_MEGA/ldblk_1kg_eur/ldblk_1kg_chr",j,".hdf5 ",temp.dir,"1KGLD/ldblk_1kg_eur/"))
-system(paste0("cp -r /data/zhangh24/software/PRScsx/1KGLD_MEGA/ldblk_1kg_",tolower(eth[i]),"/ldblk_1kg_chr",j,".hdf5 ",temp.dir,"1KGLD/ldblk_1kg_",tolower(eth[i]),"/"))
-system(paste0("cp /data/zhangh24/software/PRScsx/1KGLD_MEGA/snpinfo_mult_1kg_hm3 ",temp.dir,"1KGLD"))
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
 out.dir.sum <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
 out.dir <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/LD_stack/"
@@ -32,6 +22,7 @@ snp.infor = snp.infor.match %>%
   rename(SNP=id) %>% 
   select(SNP,rs_id)
 summary.eur = left_join(summary.eur,snp.infor,by="SNP")
+#although the name is 1kg_hm3, but it's actually mega chip
 prs_cs_ref = as.data.frame(fread("/data/zhangh24/software/PRScsx/1KGLD_MEGA/snpinfo_mult_1kg_hm3",header=T))
 prs_cs_ref = prs_cs_ref %>% select(SNP)
 #match the summary stat with prs csx reference
@@ -42,15 +33,6 @@ summary.eur.sub = summary.eur %>%
   separate(SNP,into = c("non_im","non_im2","first_allele","second_allele"),
            remove = F) %>% 
   mutate(A2 =ifelse(A1==second_allele,first_allele,second_allele)) 
-#filter the SNP to CHR j
-summary.eur.select = summary.eur.sub %>% 
-  filter(CHR == j) %>% 
-  #select(rs_id,A1,A2,BETA,P,CHR) %>% 
-  select(rs_id, A1, A2, BETA, P) %>% 
-  rename(SNP = rs_id)
-write.table(summary.eur.select,file = paste0(temp.dir,"EUR_sumstats.txt"),row.names = F,col.names = T,quote=F)
-#merge with prs-csx reference data
-#prepare target summary stat for a specific chr
 summary.tar <- as.data.frame(fread(paste0(out.dir.sum,eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))  
 
 summary.tar = left_join(summary.tar,snp.infor,by="SNP")
@@ -63,27 +45,46 @@ summary.tar.sub = summary.tar %>%
            remove=F) %>% 
   mutate(A2 =ifelse(A1==second_allele,first_allele,second_allele)) 
 
-#filter the SNP to CHR j
-summary.tar.select = summary.tar.sub %>% 
-  filter(CHR == j) %>% 
-  select(rs_id,A1,A2,BETA,P) %>% 
-  #select(rs_id,A1,A2,BETA,P,CHR) %>% 
-  rename(SNP=rs_id)
-write.table(summary.tar.select,file = paste0(temp.dir,eth[i],"_sumstats.txt"),row.names = F,col.names = T,quote=F)
-bim = read.table(paste0(cur.dir,eth[i],"/all_chr_test.mega.bim"))
-bim.update =inner_join(summary.tar,bim,by = c("SNP"="V2")) %>% 
-  select(V1,rs_id,V3,V4,V5,V6)
-bim.select = bim.update %>% 
-  filter(V1 == j)
 
-write.table(bim.update,file = paste0(temp.dir,"all_chr_test.mega.bim"),row.names = F,col.names = F,quote=F)
-#phi = c(1E-6,1E-4)
-#phi = c(1E-02)
 phi = c(1,1E-02,1E-04,1E-06)
-for(k in 1:length(phi)){
-  for(j in 1:22){
-    print(j)
-    #create bim file for prscsx
+for(j in 1:22){
+  dir.create(paste0('/lscratch/',sid,'/test'),showWarnings = FALSE)
+  temp.dir = paste0('/lscratch/',sid,'/test/')
+  dir.create(paste0('/lscratch/',sid,'/test/1KGLD'),showWarnings = FALSE)
+  dir.create(paste0('/lscratch/',sid,'/test/1KGLD/ldblk_1kg_eur'),showWarnings = FALSE)
+  dir.create(paste0('/lscratch/',sid,'/test/1KGLD/ldblk_1kg_',tolower(eth[i])),showWarnings = FALSE)
+  system(paste0("cp -r /data/zhangh24/software/PRScsx/1KGLD_MEGA/ldblk_1kg_eur/ldblk_1kg_chr",j,".hdf5 ",temp.dir,"1KGLD/ldblk_1kg_eur/"))
+  system(paste0("cp -r /data/zhangh24/software/PRScsx/1KGLD_MEGA/ldblk_1kg_",tolower(eth[i]),"/ldblk_1kg_chr",j,".hdf5 ",temp.dir,"1KGLD/ldblk_1kg_",tolower(eth[i]),"/"))
+  system(paste0("cp /data/zhangh24/software/PRScsx/1KGLD_MEGA/snpinfo_mult_1kg_hm3 ",temp.dir,"1KGLD"))  
+  #copy the LD reference data to lscratch
+  #filter the SNP to CHR j
+  summary.eur.select = summary.eur.sub %>% 
+    filter(CHR == j) %>% 
+    #select(rs_id,A1,A2,BETA,P,CHR) %>% 
+    select(rs_id, A1, A2, BETA, P) %>% 
+    rename(SNP = rs_id)
+  write.table(summary.eur.select,file = paste0(temp.dir,"EUR_sumstats.txt"),row.names = F,col.names = T,quote=F)
+  #merge with prs-csx reference data
+  #prepare target summary stat for a specific chr
+  #filter the SNP to CHR j
+  summary.tar.select = summary.tar.sub %>% 
+    filter(CHR == j) %>% 
+    select(rs_id,A1,A2,BETA,P) %>% 
+    #select(rs_id,A1,A2,BETA,P,CHR) %>% 
+    rename(SNP=rs_id)
+  write.table(summary.tar.select,file = paste0(temp.dir,eth[i],"_sumstats.txt"),row.names = F,col.names = T,quote=F)
+  #create bim file for prscsx
+  bim = read.table(paste0(cur.dir,eth[i],"/all_chr_test.mega.bim"))
+  bim.update =inner_join(summary.tar,bim,by = c("SNP"="V2")) %>% 
+    select(V1,rs_id,V3,V4,V5,V6)
+  bim.select = bim.update %>% 
+    filter(V1 == j)
+  
+  write.table(bim.update,file = paste0(temp.dir,"all_chr_test.mega.bim"),row.names = F,col.names = F,quote=F)
+  for(k in 1:length(phi)){
+
+    print(c(j,k))
+
     #run prs-csx
     path_to_ref = paste0(temp.dir,"1KGLD")
     path_to_bim = paste0(temp.dir,"all_chr_test.mega")
@@ -102,7 +103,7 @@ for(k in 1:length(phi)){
                   " --out_name=rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
     
   }
-  
+  system(paste0("rm -rf ",'/lscratch/',sid,'/test/'))
 }
 
     # summary.eur.select = summary.eur.sub %>% 
