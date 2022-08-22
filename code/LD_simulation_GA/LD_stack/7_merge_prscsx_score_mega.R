@@ -1,3 +1,4 @@
+#Goal: merge different CHRs into one single file
 args = commandArgs(trailingOnly = T)
 # v = as.numeric(args[[1]])
 # i = as.numeric(args[[2]])

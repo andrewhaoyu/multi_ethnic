@@ -101,7 +101,8 @@ save(prediction.result,file = "prediction.result.summary.rdata")
 uvals = unique(prediction.result$method_vec)
 
 n.single = 9
-
+prediction.result %>% filter(eth.vec=="AFR"&l_vec==1&
+                               m_vec==1&ga_vec==1)
 
 single.color =  brewer.pal(n.single, "Blues")[c(4,7)]
 n.EUR = 9

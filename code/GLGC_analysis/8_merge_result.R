@@ -1,4 +1,4 @@
-eth_vec <- c("EUR","AFR","AMR","EAS")
+eth_vec <- c("EUR","AFR","AMR","EAS","SAS")
 trait_vec <- c("HDL","LDL",
                "logTG",
                "TC")
@@ -6,7 +6,7 @@ trait_vec <- c("HDL","LDL",
 result = list()
 temp = 1
   for(l in 1:4){
-    for(i in 1:4){
+    for(i in 1:5){
       eth = eth_vec[i]
       trait = trait_vec[l]
       out.dir = paste0("/data/zhangh24/multi_ethnic/result/GLGC/clumping_result/PT/",eth,"/",trait,"/")

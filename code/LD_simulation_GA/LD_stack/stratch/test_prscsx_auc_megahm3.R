@@ -46,7 +46,7 @@ for(i in 2:2){
   for(i1 in 1:1){
     for(l in 1:1){
       
-    
+      
       #load the phenotype file
       y <- as.data.frame(fread(paste0(out.dir.sum,eth[i],"/phenotypes_rho",l,"_",i1,".phen")))
       y <- y[,2+(1:n.rep)]
@@ -67,14 +67,16 @@ for(i in 2:2){
           for(v in 1:4){
             
             #load target prs
-            filename <- paste0(out.dir.sum,eth[i],"/prscsx_mega/prs_csx_",eth[i],"_rho_",l,"_size_",m,"_GA_",i1,"_phi",phi[v],".sscore")
+            filename <- paste0(out.dir.sum,eth[i],"/prscsx_megahm3/prs_csx_",eth[i],"_rho_",l,"_size_",m,"_GA_",i1,"_phi",phi[v],".sscore")
             prs.temp.tar <- as.data.frame(fread(filename))
             #load eur prs
-            filename <- paste0(out.dir.sum,eth[i],"/prscsx_mega/prs_csx_EUR_rho_",l,"_size_",m,"_GA_",i1,"_phi",phi[v],".sscore")
+            filename <- paste0(out.dir.sum,eth[i],"/prscsx_megahm3/prs_csx_EUR_rho_",l,"_size_",m,"_GA_",i1,"_phi",phi[v],".sscore")
             prs.temp.eur <- as.data.frame(fread(filename))
             prs.score.tar.test <- prs.temp.tar[1:10000,4+i_rep]
             prs.score.eur.test <- prs.temp.eur[1:10000,4+i_rep]
             y.test = y_test_mat[1:10000,i_rep]
+            
+            
             
             model1 <- lm(y.test~prs.score.tar.test+prs.score.eur.test)
             coef.mat[v,] = coefficients(model1)[2:3]
@@ -82,10 +84,10 @@ for(i in 2:2){
             summary(model1)
           }
           idx <- which.max(r2.test.rep)
-          filename <- paste0(out.dir.sum,eth[i],"/prscsx_mega/prs_csx_",eth[i],"_rho_",l,"_size_",m,"_GA_",i1,"_phi",phi[idx],".sscore")
+          filename <- paste0(out.dir.sum,eth[i],"/prscsx_megahm3/prs_csx_",eth[i],"_rho_",l,"_size_",m,"_GA_",i1,"_phi",phi[idx],".sscore")
           prs.temp.tar <- as.data.frame(fread(filename))
           #load eur prs
-          filename <- paste0(out.dir.sum,eth[i],"/prscsx_mega/prs_csx_EUR_rho_",l,"_size_",m,"_GA_",i1,"_phi",phi[idx],".sscore")
+          filename <- paste0(out.dir.sum,eth[i],"/prscsx_megahm3/prs_csx_EUR_rho_",l,"_size_",m,"_GA_",i1,"_phi",phi[idx],".sscore")
           prs.temp.eur <- as.data.frame(fread(filename))
           prs.score.tar.vad <- prs.temp.tar[10001:20000,4+i_rep]
           prs.score.eur.vad <- prs.temp.eur[10001:20000,4+i_rep]
@@ -133,3 +135,10 @@ save(prscsx.result,file = paste0(out.dir,
 
 
 
+filename <- paste0(out.dir.sum,eth[i],"/prscsx/prs_csx_EUR_rho_",l,"_size_",m,"_GA_",i1,"_phi",phi[v],".sscore")
+prs.temp.eur <- as.data.frame(fread(filename))
+prs.score.tar.test <- prs.temp.tar[1:10000,4+i_rep]
+prs.score.eur.test <- prs.temp.eur[1:10000,4+i_rep]
+mean(prs.score.eur.test)
+range(prs.score.eur.test)
+var(prs.score.eur.test)

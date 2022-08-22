@@ -1,12 +1,10 @@
 #use PRS-csx on simulation
 args = commandArgs(trailingOnly = T)
-i = 2
-l = 1
-m = 1
-i_rep = as.numeric(args[[1]])
+i = as.numeric(args[[1]])
+l = as.numeric(args[[2]])
+m = as.numeric(args[[3]])
+i_rep = as.numeric(args[[4]])
 i1 = 1
-j = as.numeric(args[[2]])
-k = as.numeric(args[[3]])
 library(data.table)
 library(tidyverse)
 eth <- c("EUR","AFR","AMR","EAS","SAS")
@@ -82,8 +80,8 @@ write.table(bim.update,file = paste0(temp.dir,"all_chr_test.mega.bim"),row.names
 #phi = c(1E-6,1E-4)
 #phi = c(1E-02)
 phi = c(1,1E-02,1E-04,1E-06)
-# for(k in 1:length(phi)){
-#   for(j in 1:22){
+for(k in 1:length(phi)){
+  for(j in 1:22){
     print(j)
     #create bim file for prscsx
     #run prs-csx
@@ -103,6 +101,9 @@ phi = c(1,1E-02,1E-04,1E-06)
                   " --out_dir=",out.dir.sum,eth[i],"/prscsx_mega",
                   " --out_name=rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
     
+  }
+  
+}
 
     # summary.eur.select = summary.eur.sub %>% 
     #   filter(CHR==1) %>% 
