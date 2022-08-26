@@ -10,32 +10,37 @@
 
 ## clear workspace
 rm(list = ls())
-
-#####
-# Install packages
-if (!require("XPASS")) {
-  if (!require("devtools")) {
-    install.packages("devtools")
-  }
-  library(devtools)
-  devtools::install_github("YangLabHKUST/XPASS")
-}
-packages <- c("data.table", "RhpcBLASctl", "getopt")
-to_be_installed <- setdiff(packages, rownames(installed.packages()))
-if (length(to_be_installed)) {
-  install.packages(to_be_installed)
-}
+args = commandArgs(trailingOnly = T)
+i = as.numeric(args[[1]])
+l = as.numeric(args[[2]])
+m = as.numeric(args[[3]])
+i_rep = as.numeric(args[[4]])
+i1 = 1
+library(data.table)
+library(tidyverse)
+eth <- c("EUR","AFR","AMR","EAS","SAS")
+cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
+out.dir.sum <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
+out.dir <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/LD_stack/"
+sid<-Sys.getenv('SLURM_JOB_ID')
+dir.create(paste0('/lscratch/',sid,'/test'),showWarnings = FALSE)
+temp.dir = paste0('/lscratch/',sid,'/test/')
+dir.create(paste0('/lscratch/',sid,'/test/LD/'),showWarnings = FALSE)
+temp.dir.LD <- paste0('/lscratch/',sid,'/test/LD/')
+system(paste0("cp ",cur.dir,eth[1],"/clump_ref_all_chr.bed ",temp.dir,eth[1],"clump_ref_all_chr.bed"))
+system(paste0("cp ",cur.dir,eth[1],"/clump_ref_all_chr.bim ",temp.dir,eth[1],"clump_ref_all_chr.bim"))
+system(paste0("cp ",cur.dir,eth[1],"/clump_ref_all_chr.fam ",temp.dir,eth[1],"clump_ref_all_chr.fam"))
 
 #####
 # Load library
 library(XPASS)
 library(data.table)
 library(RhpcBLASctl)
-blas_set_num_threads(8)
+#blas_set_num_threads(8)
 
 #####
 # parse the command line argument
-eval(parse(text=paste(commandArgs(trailingOnly = TRUE), collapse=";")))
+#eval(parse(text=paste(commandArgs(trailingOnly = TRUE), collapse=";")))
 
 ### if not using command line, then please specify the parameters below.
 # race = "AFR" # target population
@@ -46,7 +51,8 @@ eval(parse(text=paste(commandArgs(trailingOnly = TRUE), collapse=";")))
 
 #####
 # input files
-summary_EUR = paste0("/dcs04/nilanjan/data/wlu/XPASS/data/sumdata/EUR/sumdata-rho",rho,'-size4-rep',rep,'-GA',GA,'.txt') # auxilliary
+summary_EUR <- as.data.frame(fread(paste0(out.dir.sum,eth[1],"/summary_out_rho_",l,"_size_",4,"_rep_",i_rep,"_GA_",i1)))
+#summary_EUR = paste0("/dcs04/nilanjan/data/wlu/XPASS/data/sumdata/EUR/sumdata-rho",rho,'-size4-rep',rep,'-GA',GA,'.txt') # auxilliary
 summary_target = paste0("/dcs04/nilanjan/data/wlu/XPASS/data/sumdata/",race,'/sumdata-rho',rho,'-size',size,'-rep',rep,'-GA',GA,'.txt') # target
 # auxilliary
 ref_gene_EUR = "/dcs04/nilanjan/data/wlu/XPASS/data/ref_genotype/EUR/clump_ref_all_chr"

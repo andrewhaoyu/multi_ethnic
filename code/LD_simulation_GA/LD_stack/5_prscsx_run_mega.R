@@ -10,6 +10,7 @@ library(tidyverse)
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 sid<-Sys.getenv('SLURM_JOB_ID')
 #system(paste0("rm -rf /lscratch/",sid,'/test'))
+
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
 out.dir.sum <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
 out.dir <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/LD_stack/"
