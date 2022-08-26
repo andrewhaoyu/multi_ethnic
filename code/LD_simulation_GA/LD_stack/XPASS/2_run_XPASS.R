@@ -83,7 +83,9 @@ fit_bbj <- XPASS(file_z1 = path_to_summary_tar, file_z2 = path_to_summary_eur,
                  # file_predGeno = ref_gene_pred, compPRS = T,
                  pop = "EUR", sd_method="LD_block", compPosMean = T,
                  file_out = file_out)
+save(fit_bbj, file=paste0(file_out, "_param.RData"))
 print("XPASS finished run")
+
 system(paste0("cp ",cur.dir,eth[i],"/all_chr_test.mega.* ",temp.dir))
 
 # predict
