@@ -30,6 +30,9 @@ temp.dir.LD <- paste0('/lscratch/',sid,'/test/LD/')
 system(paste0("cp ",cur.dir,eth[1],"/clump_ref_all_chr.bed ",temp.dir,eth[1],"clump_ref_all_chr.bed"))
 system(paste0("cp ",cur.dir,eth[1],"/clump_ref_all_chr.bim ",temp.dir,eth[1],"clump_ref_all_chr.bim"))
 system(paste0("cp ",cur.dir,eth[1],"/clump_ref_all_chr.fam ",temp.dir,eth[1],"clump_ref_all_chr.fam"))
+system(paste0("cp ",cur.dir,eth[i],"/clump_ref_all_chr.bed ",temp.dir,eth[i],"clump_ref_all_chr.bed"))
+system(paste0("cp ",cur.dir,eth[i],"/clump_ref_all_chr.bim ",temp.dir,eth[i],"clump_ref_all_chr.bim"))
+system(paste0("cp ",cur.dir,eth[i],"/clump_ref_all_chr.fam ",temp.dir,eth[i],"clump_ref_all_chr.fam"))
 
 #####
 # Load library
@@ -48,20 +51,22 @@ library(RhpcBLASctl)
 # GA = 1
 # rho = 1
 # rep = 1
-
+i = 1
+l = 1
+m = 4
+i_rep =1 
+i1 = 1
 #####
 # input files
-summary_EUR <- as.data.frame(fread(paste0(out.dir.sum,eth[1],"/summary_out_rho_",l,"_size_",4,"_rep_",i_rep,"_GA_",i1)))
+summary_EUR <- as.data.frame(fread(paste0(out.dir.sum,eth[1],"/summary_mega_rho_",l,"_size_",4,"_rep_",i_rep,"_GA_",i1)))
 #summary_EUR = paste0("/dcs04/nilanjan/data/wlu/XPASS/data/sumdata/EUR/sumdata-rho",rho,'-size4-rep',rep,'-GA',GA,'.txt') # auxilliary
-summary_target = paste0("/dcs04/nilanjan/data/wlu/XPASS/data/sumdata/",race,'/sumdata-rho',rho,'-size',size,'-rep',rep,'-GA',GA,'.txt') # target
+summary_target = as.data.frame(fread(paste0(out.dir.sum,eth[i],"/summary_mega_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))) 
+#summary_target = paste0("/dcs04/nilanjan/data/wlu/XPASS/data/sumdata/",race,'/sumdata-rho',rho,'-size',size,'-rep',rep,'-GA',GA,'.txt') # target
 # auxilliary
-ref_gene_EUR = "/dcs04/nilanjan/data/wlu/XPASS/data/ref_genotype/EUR/clump_ref_all_chr"
+ref_gene_EUR = paste0(temp.dir,eth[1],"clump_ref_all_chr")
 # target
-ref_gene_target = paste0("/dcs04/nilanjan/data/wlu/XPASS/data/ref_genotype/", race, "/clump_ref_all_chr")
-# predict
-ref_gene_pred = paste0("/dcs04/nilanjan/data/wlu/XPASS/data/ref_genotype/", race, "/all_chr_test.mega")
-# output file prefix
-file_out = paste0("/dcs04/nilanjan/data/wlu/XPASS/XPASS_result/", race, "/XPASS-rho",rho,'-size',size,'-rep',rep,'-GA',GA)
+ref_gene_target = paste0(temp.dir,eth[i],"clump_ref_all_chr")
+file_out = paste0("data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/xpass/rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)
 
 #####
 # XPASS
@@ -70,6 +75,13 @@ fit_bbj <- XPASS(file_z1 = summary_target, file_z2 = summary_EUR,
                  # file_predGeno = ref_gene_pred, compPRS = T,
                  pop = "EUR", sd_method="LD_block", compPosMean = T,
                  file_out = file_out)
+
+# predict
+ref_gene_pred = paste0("/dcs04/nilanjan/data/wlu/XPASS/data/ref_genotype/", race, "/all_chr_test.mega")
+# output file prefix
+
+
+
 
 # separate in two steps due to huge REM needed
 save(fit_bbj, file=paste0(file_out, "_param.RData"))

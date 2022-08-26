@@ -2,6 +2,8 @@
 args = commandArgs(trailingOnly = T)
 i = as.numeric(args[[1]])
 i1 = as.numeric(args[[2]])
+l = as.numeric(args[[3]])
+m = as.numeric(args[[4]])
 library(data.table)
 library(tidyverse)
 cur.dir = "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
@@ -19,8 +21,8 @@ colnames(mega.list) = "rs_id"
 
 #for(i in 1:5){
   #for(i1 in 1:5){
-    for(l in 1:3){
-      for(m in 1:4){
+   # for(l in 1:3){
+      #for(m in 1:4){
         for(i_rep in 1:10){
           summary = as.data.frame(fread(paste0(out.dir.sum,eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))) 
           summary = left_join(summary,snp.infor,by="SNP")
@@ -42,8 +44,8 @@ colnames(mega.list) = "rs_id"
           write.table(summary_match_update, file = paste0(out.dir.sum,eth[i],"/summary_mega_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1),
                       row.names = F, col.names = T, quote = F)    
         }
-      }
-    }
+      #}
+  #  }
   #}  
  # }
   
