@@ -153,7 +153,7 @@ for (fold in 1:n_fold){
   ids2 = setdiff(1:nrow(pheno_all), ids1)
   
   pheno_tuning = pheno_all[ids1,]
-  pheno_validation = pheno_all[ids1,]
+  pheno_validation = pheno_all[ids2,]
   r2_tun_vec = rep(0,length(pthres))
   #calculate R2 for each of the tuning dataset
   model.null <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=pheno_tuning)
