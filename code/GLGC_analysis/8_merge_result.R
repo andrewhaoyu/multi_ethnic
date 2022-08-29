@@ -18,3 +18,5 @@ temp = 1
 
 final_result = rbindlist(result)
 write.csv(final_result, file = "/data/zhangh24/multi_ethnic/result/GLGC/clumping_result/PT/PT.csv")
+
+final_result = read.csv("/data/zhangh24/multi_ethnic/result/GLGC/clumping_result/PT/PT.csv")

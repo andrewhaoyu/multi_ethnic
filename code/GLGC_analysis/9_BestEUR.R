@@ -48,6 +48,7 @@ data.dir = "/data/zhangh24/multi_ethnic/data/GLGC_cleaned/"
 #load eur summary statistics
 sum.data = as.data.frame(fread(paste0(data.dir,"EUR/",trait,".txt"),header=T))
 sum.data.assoc = sum.data %>% 
+  mutate(P = as.numeric(P)) %>% 
   rename(SNP = rsID,
          BP = POS_b37) %>% 
   select(CHR,SNP,BP,A1,BETA,P) 
@@ -78,28 +79,10 @@ res <- system(paste0("/data/zhangh24/software/plink2_alpha ",
                     "--threads 2 --score ",temp.dir,"prs_coeff cols=+scoresums,-scoreavgs header no-mean-imputation ",
                     "--bfile ",temp.dir,"ukb/all_chr --out ",temp.dir,"prs"))
 system(paste0("ls ",temp.dir,""))
-if(res==2){
-  stop()
-}
-print("PRS calculation ended")
-
-
-
-prs_list = list()
-temp = 1
-for(k in 1:length(pthres)){
-  
-  prs_temp = fread(paste0(temp.dir,"prs.p_value_",k,".sscore"))
-  # times (2*number of SNPs)
-  prs_list[[temp]] = prs_temp[,5:ncol(prs_temp)]
-  
-  colnames(prs_list[[temp]]) = paste0("p_value_",k)
-  temp = temp + 1
-  
-}
-prs_mat = as.data.frame(cbind(prs_temp[,1:2],bind_cols(prs_list)))
-colnames(prs_mat)[2] = "id"
-#########PRS calculation################# 
+#load prs
+prs = fread(paste0(temp.dir,"prs.sscore"))
+colnames(prs)[2] = "id"
+#########R2 calculation################# 
 pheno.dir = "/data/zhangh24/multi_ethnic/data/UKBB/phenotype/"
 pheno = as.data.frame(fread(paste0(pheno.dir,trait,"/tuning+validation/",eth,"_all_data.txt")))
 pheno = pheno[,1:2]
@@ -109,31 +92,11 @@ colnames(pheno) = c('id','y','sex','age',paste0('pc',1:10))
 pheno_com = pheno[complete.cases(pheno$y),]
 
 #combine prs with pheno_all
-pheno_all = left_join(pheno_com,prs_mat,by = "id")
+pheno_all = left_join(pheno_com,prs,by = "id")
 
-n_fold = 20
-r2_vec = rep(0,n_fold)
-for (fold in 1:n_fold){
-  set.seed(123*fold)
-  ids1 = sample(1:nrow(pheno_all), ceiling(nrow(pheno_all)/2), replace = F)
-  ids2 = setdiff(1:nrow(pheno_all), ids1)
-  
-  pheno_tuning = pheno_all[ids1,]
-  pheno_validation = pheno_all[ids1,]
-  r2_tun_vec = rep(0,length(pthres))
-  #calculate R2 for each of the tuning dataset
-  model.null <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=pheno_tuning)
-  for(k in 1:length(pthres)){
-    prs = pheno_tuning[,paste0("p_value_",k)]
-    model.prs <- lm(model.null$residual~prs,data=pheno_tuning)
-    r2_tun_vec[k] = summary(model.prs)$r.square
-  }
-  #find best idx
-  idx = which.max(r2_tun_vec)
-  #evaluate on validation
-  model.vad.null  =  lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=pheno_validation)
-  prs = pheno_validation[,paste0("p_value_",idx)]
-  model.vad.prs <- lm(model.null$residual~prs,data=pheno_validation)
+model.null  =  lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=pheno_all)
+  prs = pheno_all[,paste0("SCORE1_SUM")]
+  model.vad.prs <- lm(model.null$residual~prs,data=pheno_all)
   r2_vec[fold] = summary(model.vad.prs)$r.square
   
 }

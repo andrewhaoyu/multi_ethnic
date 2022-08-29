@@ -133,7 +133,7 @@ for(k in 1:length(pthres)){
 }
 prs_mat = as.data.frame(cbind(prs_temp[,1:2],bind_cols(prs_list)))
 colnames(prs_mat)[2] = "id"
-#########PRS calculation################# 
+#########R2 calculation################# 
 pheno.dir = "/data/zhangh24/multi_ethnic/data/UKBB/phenotype/"
 pheno = as.data.frame(fread(paste0(pheno.dir,trait,"/tuning+validation/",eth,"_all_data.txt")))
 pheno = pheno[,1:2]
@@ -167,7 +167,7 @@ for (fold in 1:n_fold){
   #evaluate on validation
   model.vad.null  =  lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=pheno_validation)
   prs = pheno_validation[,paste0("p_value_",idx)]
-  model.vad.prs <- lm(model.null$residual~prs,data=pheno_validation)
+  model.vad.prs <- lm(model.vad.null$residual~prs,data=pheno_validation)
   r2_vec[fold] = summary(model.vad.prs)$r.square
   
 }
