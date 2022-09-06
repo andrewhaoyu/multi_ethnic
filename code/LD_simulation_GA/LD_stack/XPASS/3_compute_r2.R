@@ -167,3 +167,15 @@ for(i in 2:5){
   }
 }
 mis_vec = rbindlist(mis_vec_list)
+
+run_code = rep("c",nrow(mis_vec))
+
+for(k in 1:nrow(mis_vec)){
+  run_code[k] = paste0("Rscript /gpfs/gsfs11/users/zhangh24/multi_ethnic/code/LD_simulation_GA/LD_stack/XPASS/2.5_XPASS_PRS_rerun.R ",
+                       mis_vec[k,1]," ",
+                       mis_vec[k,2]," ",
+                       mis_vec[k,3]," ",
+                       mis_vec[k,4]," ",
+                       mis_vec[k,5])
+}
+write.table(run_code, file = "/data/zhangh24/multi_ethnic/code/LD_simulation_GA/LD_stack/XPASS/2.5_XPASS_PRS_rerun.sh",row.names = F, col.names = F, quote=F)
