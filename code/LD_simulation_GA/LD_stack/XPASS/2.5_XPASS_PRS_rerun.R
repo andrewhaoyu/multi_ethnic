@@ -25,7 +25,11 @@ out.dir <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/LD_stack/"
 sid<-Sys.getenv('SLURM_JOB_ID')
 dir.create(paste0('/lscratch/',sid,'/test'),showWarnings = FALSE)
 temp.dir = paste0('/lscratch/',sid,'/test/')
+system(paste0("cp ",cur.dir,eth[i],"/all_chr_test.mega.* ",temp.dir))
 
+
+
+ref_gene_pred = paste0(temp.dir,"/all_chr_test.mega")
 file_out = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/xpass/rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)
 # output file prefix
 load(paste0(file_out, "_param.RData"))
