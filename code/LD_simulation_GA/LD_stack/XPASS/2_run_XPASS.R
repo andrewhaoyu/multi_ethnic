@@ -91,6 +91,7 @@ system(paste0("cp ",cur.dir,eth[i],"/all_chr_test.mega.* ",temp.dir))
 # predict
 ref_gene_pred = paste0(temp.dir,"/all_chr_test.mega")
 # output file prefix
+load(paste0(file_out, "_param.RData"))
 mu = fit_bbj$mu
 # calculate PRS using plink (optional, comment the following out if not needed)
 mu = mu[, c("SNP", "A1", "mu1", "mu2", "mu_XPASS1", "mu_XPASS2")]

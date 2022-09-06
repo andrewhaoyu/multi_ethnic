@@ -28,16 +28,19 @@ LD.clump.result <- LD.result.list[[1]] %>%
 
 weightedprs.result = weightedprs.result %>% 
   mutate(method_vec = "Weighted PRS")
+load("xpass.result.rdata")
 prediction.result <- rbind(LD.clump.result,
                            SCT.clump.result,
                            LDpred2.result,
                            eursnp.result,
                            LDpredEUR.result,
                            weightedprs.result,
+                           xpass.result,
                            prscsx.result,
                            TDLD.result,
                            EB.result,
-                           alleth.EB.result)
+                           alleth.EB.result
+                           )
 prediction.result = prediction.result %>% 
   filter(method_vec%in%c("SCT","Best EUR SNP + target coefficients (C+T)",
                          "Best EUR SNP + EB coefficients (C+T)",
@@ -73,6 +76,7 @@ prediction.result = prediction.result %>%
                                        #"Best EUR SNP + EB coefficients (C+T)",
                                        "Best EUR PRS (LDpred2)",
                                        "Weighted PRS",
+                                       "XPASS",
                                        "PRS-CSx",
                                       # "TDLD",
                                       # "TDLD-EB",
@@ -93,6 +97,7 @@ prediction.result = prediction.result %>%
              "Best EUR SNP (CT)",
              "Best EUR PRS (LDpred2)",
              "Weighted PRS",
+             "XPASS",
              "PRS-CSx",
              "CT-SLEB (two ancestries)",
              "CT-SLEB (five ancestries)"
@@ -101,8 +106,8 @@ save(prediction.result,file = "prediction.result.summary.rdata")
 uvals = unique(prediction.result$method_vec)
 
 n.single = 9
-prediction.result %>% filter(eth.vec=="AFR"&l_vec==1&
-                               m_vec==1&ga_vec==1)
+# prediction.result %>% filter(eth.vec=="AFR"&l_vec==1&
+#                                m_vec==1&ga_vec==1)
 
 single.color =  brewer.pal(n.single, "Blues")[c(4,7)]
 n.EUR = 9
@@ -112,7 +117,7 @@ EUR.color = brewer.pal(n.EUR, "Greens")[c(4,7)]
 
  
 n.multi = 9
-multi.color = brewer.pal(n.multi, "Oranges")[c(3,5,7,9)]
+multi.color = brewer.pal(n.multi, "Oranges")[c(3,4,5,7,9)]
 colour = c(single.color,EUR.color,multi.color)
 col_df = tibble(
   colour = c(single.color,EUR.color,multi.color),
@@ -123,6 +128,7 @@ col_df = tibble(
                                        "Best EUR PRS (LDpred2)"
                                        ) ~ "EUR PRS based method",
                        method_vec%in%c("Weighted PRS",
+                                       "XPASS",
                                        "PRS-CSx",
                                        "CT-SLEB (two ancestries)",
                                        "CT-SLEB (five ancestries)") ~ "Multi-ancestry method")

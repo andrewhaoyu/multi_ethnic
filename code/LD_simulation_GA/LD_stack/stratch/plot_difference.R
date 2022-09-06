@@ -1,6 +1,11 @@
 load("/Users/zhangh24/GoogleDrive/multi_ethnic/result/LD_simulation_GA/LD_stack/temp.rdata")
 library(ggplot2)
-plot(prs_com$effect_hm3,prs_com$effect_mega)
+
+source("/Users/zhangh24/GoogleDrive/multi_ethnic/code/LD_simulation_large/theme_Publication.R")
+idx_sample = seq(1,nrow(prs_com),10)
+data = prs_com[idx_sample,]
+
+plot(data$effect_hm3,data$effect_mega)
 abline(a = 0, b = 1, col = "red")
 abline(h = 0, col = "red", lty = 2)
 abline(v = 0, col = "red", lty = 2)
