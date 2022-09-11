@@ -34,11 +34,11 @@ for(i_rep in 1:10){
     )
   summary_update = summary_update %>% 
     select(c(colnames(summary),"FQR_effect_allele"))
-  # write.table(summary_update, file =   paste0(out.dir.sum,eth[i],"/summary_mega_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1),
-  #             row.names = F, col.names = T, quote = F)
-  write.table(summary_update, file =   paste0(out.dir.sum,eth[i],"/test"),
+  write.table(summary_update, file =   paste0(out.dir.sum,eth[i],"/summary_mega_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1),
               row.names = F, col.names = T, quote = F)
-  
+  # write.table(summary_update, file =   paste0(out.dir.sum,eth[i],"/test"),
+  #             row.names = F, col.names = T, quote = F)
+  # 
 }
               
           
