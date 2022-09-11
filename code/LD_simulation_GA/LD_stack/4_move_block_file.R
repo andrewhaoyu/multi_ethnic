@@ -81,3 +81,9 @@ for(i in 1:5){
   system(paste0("cd /data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/; ",
                 "mkdir xpass"))
 }
+
+for(i in 1:5){
+  system(paste0("cd /data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/; ",
+                "mkdir polypred"))
+  
+}
