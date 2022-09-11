@@ -5,6 +5,7 @@ i = as.numeric(args[[1]])
 l = as.numeric(args[[2]])
 m = as.numeric(args[[3]])
 i1 =as.numeric(args[[4]])
+eth = c("EUR", "AFR", "AMR", "EAS", "SAS")
 out.dir.sum <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
 out.dir <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/LD_stack/"
 #load 1kg snp list
