@@ -36,7 +36,7 @@ for(i in 2:5){
   file_dir = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/xpass")
   files = dir(file_dir, pattern = paste0(".sscore"),
               full.names = T)
-  for(i1 in 1:1){
+  for(i1 in 1:5){
     for(l in 1:3){
 # for(i in 2:2){
 #   for(i1 in 1:1){
@@ -64,18 +64,18 @@ for(i in 2:5){
             
             #load target prs
             file_name = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/xpass/rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_PRS.sscore")
-            if(file_name%in%files){
+           # if(file_name%in%files){
               PRS <- as.data.frame(fread(paste0(file_name)))
               prs.tar = PRS$SCORE3_SUM[10001:20000]
               y.vad = y_test_mat[10001:20000,i_rep]
               model = lm(y.vad~prs.tar)
               r2.vad.rep[i_rep] <- summary(model)$r.square
               
-            }else{
-              mis_vec_list[[mis_temp]] = data.frame(i, l, m, i_rep, i1)
-              mis_temp = mis_temp + 1
-              r2.vad.rep[i_rep] = NA
-            }
+            # }else{
+            #   mis_vec_list[[mis_temp]] = data.frame(i, l, m, i_rep, i1)
+            #   mis_temp = mis_temp + 1
+            #   r2.vad.rep[i_rep] = NA
+            # }
           #for(k in 1:length(pthres)){
           
           #get the number of
@@ -117,65 +117,69 @@ save(xpass.result,file = paste0(out.dir,
 
 
 
-
-
-
-
-
-
-
-
-
-
-for(i in 2:5){
-  file_dir = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/xpass")
-  files = dir(file_dir, pattern = paste0(".sscore"),
-              full.names = T)
-  for(i1 in 1:5){
-    for(l in 1:3){
-      for(m in 1:4){
-        #for(q in 1:3){
-    
-        
-        for(i_rep in 1:n.rep){
-          
-          
-          #load target prs
-          file_name = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/xpass/rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_PRS.sscore")
-          if(file_name%in%files){
-            
-          }else{
-            mis_vec_list[[mis_temp]] = data.frame(i, l, m, i_rep, i1)
-            mis_temp = mis_temp + 1
-          }
-          #for(k in 1:length(pthres)){
-          
-          #get the number of
-          
-          
-          
-          
-          
-        }
-        
-    
-      }
-      # }
-    }
-    
-    
-  }
-}
-mis_vec = rbindlist(mis_vec_list)
-
-run_code = rep("c",nrow(mis_vec))
-
-for(k in 1:nrow(mis_vec)){
-  run_code[k] = paste0("Rscript /gpfs/gsfs11/users/zhangh24/multi_ethnic/code/LD_simulation_GA/LD_stack/XPASS/2.5_XPASS_PRS_rerun.R ",
-                       mis_vec[k,1]," ",
-                       mis_vec[k,2]," ",
-                       mis_vec[k,3]," ",
-                       mis_vec[k,4]," ",
-                       mis_vec[k,5])
-}
-write.table(run_code, file = "/data/zhangh24/multi_ethnic/code/LD_simulation_GA/LD_stack/XPASS/2.5_XPASS_PRS_rerun.sh",row.names = F, col.names = F, quote=F)
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# mis_vec_list = NULL 
+# mis_temp = 1
+# 
+# 
+# for(i in 2:5){
+#   file_dir = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/xpass")
+#   files = dir(file_dir, pattern = paste0(".sscore"),
+#               full.names = T)
+#   for(i1 in 1:5){
+#     for(l in 1:3){
+#       for(m in 1:4){
+#         #for(q in 1:3){
+#     
+#         
+#         for(i_rep in 1:n.rep){
+#           
+#           
+#           #load target prs
+#           #file_out = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/xpass/rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)
+#           #file_name = paste0(file_out, "_param.RData")
+#           file_name = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/xpass/rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_PRS.sscore")
+#           if(file_name%in%files){
+#             
+#           }else{
+#             mis_vec_list[[mis_temp]] = data.frame(i, l, m, i_rep, i1)
+#             mis_temp = mis_temp + 1
+#           }
+#           #for(k in 1:length(pthres)){
+#           
+#           #get the number of
+#           
+#           
+#           
+#           
+#           
+#         }
+#         
+#     
+#       }
+#       # }
+#     }
+#     
+#     
+#   }
+# }
+# mis_vec = rbindlist(mis_vec_list)
+# 
+# run_code = rep("c",nrow(mis_vec))
+# 
+# for(k in 1:nrow(mis_vec)){
+#   run_code[k] = paste0("Rscript /gpfs/gsfs11/users/zhangh24/multi_ethnic/code/LD_simulation_GA/LD_stack/XPASS/2.5_XPASS_PRS_rerun.R ",
+#                        mis_vec[k,1]," ",
+#                        mis_vec[k,2]," ",
+#                        mis_vec[k,3]," ",
+#                        mis_vec[k,4]," ",
+#                        mis_vec[k,5])
+# }
+# write.table(run_code, file = "/data/zhangh24/multi_ethnic/code/LD_simulation_GA/LD_stack/XPASS/2.5_XPASS_PRS_rerun.sh",row.names = F, col.names = F, quote=F)

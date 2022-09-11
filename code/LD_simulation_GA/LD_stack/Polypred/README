@@ -1,0 +1,34 @@
+####################
+
+Data Sources:
+1. PolyFun souce code: https://github.com/omerwe/polyfun
+2. GCTB software: https://cnsgenomics.com/software/gctb/#Download - gctb_2.03beta_Linux.zip (Lastest version)
+3. GCTB LD matrix for HapMap 3 variants: https://zenodo.org/record/3350914#.YwVdRS7MLEZ 
+   Also available on JHPCE at /dcs04/nilanjan/data/wlu/PolyPred/SBayesR/ukbEURu_hm3_shrunk_sparse or /dcs04/nilanjan/data/wlu/PolyPred/SBayesR/ukbEURu_hm3_sparse.zip.
+4. plink 1.9: https://www.cog-genomics.org/plink2/ (Though JHPCE has plink 1.9, it is downloaded because polyfun would check for the existence of the executable file)
+
+####################
+
+Intro
+The PolyPred algorithm combines the posterior effect sizes of three models: 1. PolyFun model on EUR population; 2. SBayesR model on EUR population; 3. SBayesR model on the target population.
+Note that if data from both EUR and the target population are used in the codes, then the target race and target size arguments refer to the target population. For the EUR population, race = "EUR" and size = 4 are assumed and are fixed. See run_Python.sh file for two examples.
+
+Environment setup:
+1. Run the following commands listed on the polyfun GitHub page.
+   git clone https://github.com/omerwe/polyfun
+   cd polyfun
+   mamba env create -f polyfun.yml
+   mamba activate polyfun
+2. Test the installation. <python3.exe> is the command used to run python. Ex. python or python3.
+   python polyfun/test_polyfun.py --python3 <python3_exe>
+2. Run install_packages.py to check and install additional packages in the polyfun environment. Remember to install additional R packages noted in the comments of the python file.
+3. **Activate polyfun environment every time before going into the following steps.**
+
+Part I - SBayesR part:
+Run run_SBayesR.py for EUR and target population.
+
+Part II - PolyFun part:
+Set the cwd to polyfun github directory and run_polyfun.py.
+
+Part III - final result
+Run get_weights_and_pred.py to obtain the mixture weights, PRS, and R square value.
