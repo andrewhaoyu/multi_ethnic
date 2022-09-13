@@ -1,10 +1,13 @@
 #A summary statistics file with the following columns: SNP, CHR, BP, A1, A2, Z (Z-score), and (optionally) SNPVAR (per-SNP heritability, 
 #which is proportional to prior causal probability). A1 is the effect allele (i.e. the sign of Z should match the A1 allele). 
 #If the SNPVAR column is missing, you cannot perform functionally-informed fine-mapping.
-
+#install.packages("data.table", lib = "/home/zhangh24/R/4.1/library/")
 #install.packages("rlang", lib = "/home/zhangh24/R/4.1/library/")
 #install.packages("dplyr", lib = "/home/zhangh24/R/4.1/library/")
 #install.packages("vctrs", lib = "/home/zhangh24/R/4.1/library/")
+#install.packages("doParallel", lib = "/home/zhangh24/R/4.1/library/")
+#install.packages("foreach", lib = "/home/zhangh24/R/4.1/library/")
+#install.packages("iterators", lib = "/home/zhangh24/R/4.1/library/")
 #set up the environment of polyfun
 #"source /data/$USER/conda/etc/profile.d/conda.sh && source /data/$USER/conda/etc/profile.d/mamba.sh; ",
 #"mamba activate polyfun; ",
@@ -14,8 +17,13 @@ i_rep = 1
 l = 1
 m = 4
 i1 = 1
-library(data.table)
-library(dplyr) 
+library(data.table, lib = "/home/zhangh24/R/4.1/library/")
+library(dplyr, lib = "/home/zhangh24/R/4.1/library/") 
+library(foreach, lib = "/home/zhangh24/R/4.1/library/")
+library(iterators, lib = "/home/zhangh24/R/4.1/library/")
+library(doParallel, lib = "/home/zhangh24/R/4.1/library/")
+
+
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
 out.dir.sum <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
@@ -138,9 +146,7 @@ system(paste0(
 system(paste0(
     "cd ",temp.dir,"; ",
     "split -l ",as.integer(num/2), " -d job.sh job_split"))
-    
-library(doParallel)
-library(foreach)
+
 #run the polyfun file in parallel
 no.cores <- 2
 inner.size <- 2
