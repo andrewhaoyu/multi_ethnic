@@ -92,6 +92,24 @@ summary_update = summary_update %>%
                 "--out-freq 10 ",
                 "--thin 10 ",
                 "--out ",out_name))
+  #if SBayesR doesn't converge, change the gamma last to gamma_last/2 until convergence
+  file_dir = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/polypred")
+  files = dir(file_dir, pattern = paste0("rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".snpRes"),full.names = T)
+  out_file = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/polypred/rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".snpRes")
+  while(out_file%in%files==F){
+    gamma_last = gamma_last/2
+    system(paste0(gctb_path," --sbayes R ",
+                  "--mldm ", mldm_list_filename," ",
+                  "--pi 0.95,0.02,0.02,0.01 ",
+                  "--gamma 0.0,0.01,0.1, ",gamma_last," ",
+                  "--gwas-summary ",summary_path," ",
+                  "--chain-length 10000 ",
+                  "--burn-in 4000 ",
+                  "--out-freq 10 ",
+                  "--thin 10 ",
+                  "--out ",out_name))
+    files = dir(file_dir, pattern = paste0("rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1),full.names = T)
+  }
   
 #}           
       
