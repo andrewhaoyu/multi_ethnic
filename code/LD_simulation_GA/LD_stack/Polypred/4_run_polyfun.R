@@ -91,7 +91,7 @@ system(
     paste0(
         "cd /data/zhangh24/software/polyfun;",
         "python extract_snpvar.py ",
-        "--sumstats ",out_name_align," ",
+        "--sumstats ",summary_path," ",
         "--out ",temp.dir,"sumstats_align_snpvar ",
         "--allow-missing ")
 )
