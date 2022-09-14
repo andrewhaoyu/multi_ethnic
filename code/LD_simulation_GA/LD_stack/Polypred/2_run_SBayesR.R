@@ -96,6 +96,7 @@ summary_update = summary_update %>%
   file_dir = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/polypred")
   files = dir(file_dir, pattern = paste0("rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".snpRes"),full.names = T)
   out_file = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/polypred/rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".snpRes")
+  gamma_last = 1
   while(out_file%in%files==F){
     gamma_last = gamma_last/2
     system(paste0(gctb_path," --sbayes R ",
