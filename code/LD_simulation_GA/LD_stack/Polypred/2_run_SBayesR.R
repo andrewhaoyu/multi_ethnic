@@ -102,7 +102,7 @@ summary_update = summary_update %>%
     system(paste0(gctb_path," --sbayes R ",
                   "--mldm ", mldm_list_filename," ",
                   "--pi 0.95,0.02,0.02,0.01 ",
-                  "--gamma 0.0,0.01,0.1, ",gamma_last," ",
+                  "--gamma 0.0,0.01,0.1,",gamma_last," ",
                   "--gwas-summary ",summary_path," ",
                   "--chain-length 10000 ",
                   "--burn-in 4000 ",
@@ -110,6 +110,9 @@ summary_update = summary_update %>%
                   "--thin 10 ",
                   "--out ",out_name))
     files = dir(file_dir, pattern = paste0("rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1),full.names = T)
+    if(gamma_last<=1E-06){
+      break
+    }
   }
   
 #}           
