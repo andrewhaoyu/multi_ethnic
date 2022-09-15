@@ -13,11 +13,11 @@
 #"mamba activate polyfun; ",
 rm(list = ls())
 args = commandArgs(trailingOnly = T)
-i = as.numeric(args[[1]])
-l = as.numeric(args[[2]])
-m = as.numeric(args[[3]])
-i_rep = as.numeric(args[[4]])
-i1 =as.numeric(args[[5]])
+i =1
+l = as.numeric(args[[1]])
+m = 4
+i_rep = as.numeric(args[[2]])
+i1 =as.numeric(args[[3]])
 library(data.table, lib = "/home/zhangh24/R/4.1/library/")
 library(dplyr, lib = "/home/zhangh24/R/4.1/library/") 
 library(foreach, lib = "/home/zhangh24/R/4.1/library/")
@@ -149,8 +149,8 @@ system(paste0(
     "split -l ",as.integer(num/2), " -d job.sh job_split"))
 
 #run the polyfun file in parallel
-no.cores <- 2
-inner.size <- 2
+no.cores <- 8
+inner.size <- 8
 registerDoParallel(no.cores)
 result.list <- foreach(job.i = 1:inner.size)%dopar%{
     ID = c("00","01")
