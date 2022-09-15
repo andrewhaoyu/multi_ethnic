@@ -26,7 +26,10 @@ trait <- c("any_cvd","depression",
            "iqb.sing_back_musical_note",
            "migraine_diagnosis",
            "morning_person")
-
+sample_size <- as.data.frame(fread("/data/zhangh24/multi_ethnic/data/23_sample_size.csv",header=T))
+setwd("/data/zhangh24/multi_ethnic/")
+#temp.dir = paste0("/fastscratch/myscratch/hzhang1/ARIC/",trait[l],"/",eth[i],"/")
+data.dir = "/data/zhangh24/multi_ethnic/data/cleaned/"
 sid<-Sys.getenv('SLURM_JOB_ID')
 dir.create(paste0('/lscratch/',sid,'/test'),showWarnings = FALSE)
 temp.dir = paste0('/lscratch/',sid,'/test/')
@@ -39,10 +42,7 @@ system(paste0("cp -r /data/zhangh24/software/PRScsx/1KGLD/ldblk_1kg_eas ",temp.d
 system(paste0("cp -r /data/zhangh24/software/PRScsx/1KGLD/ldblk_1kg_sas ",temp.dir,"1KGLD"))
 system(paste0("cp /data/zhangh24/software/PRScsx/1KGLD/snpinfo_mult_1kg_hm3 ",temp.dir,"1KGLD"))
 system(paste0("cp ",data.dir,"all_eth.bim ",temp.dir,"all_eth.bim"))
-sample_size <- as.data.frame(fread("/data/zhangh24/multi_ethnic/data/23_sample_size.csv",header=T))
-setwd("/data/zhangh24/multi_ethnic/")
-#temp.dir = paste0("/fastscratch/myscratch/hzhang1/ARIC/",trait[l],"/",eth[i],"/")
-data.dir = "/data/zhangh24/multi_ethnic/data/cleaned/"
+
 #out.dir = paste0("/data/zhangh24/multi_ethnic/result/cleaned/clumping_result/",method,"/",eth[i],"/",trait[l],"/")
 
 #prepare summary statistics
