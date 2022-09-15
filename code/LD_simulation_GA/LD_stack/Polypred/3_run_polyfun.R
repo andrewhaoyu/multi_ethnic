@@ -11,12 +11,13 @@
 #set up the environment of polyfun
 #"source /data/$USER/conda/etc/profile.d/conda.sh && source /data/$USER/conda/etc/profile.d/mamba.sh; ",
 #"mamba activate polyfun; ",
-i = 1
-l = 1
-i_rep = 1
-l = 1
-m = 4
-i1 = 1
+rm(list = ls())
+args = commandArgs(trailingOnly = T)
+i = as.numeric(args[[1]])
+l = as.numeric(args[[2]])
+m = as.numeric(args[[3]])
+i_rep = as.numeric(args[[4]])
+i1 =as.numeric(args[[5]])
 library(data.table, lib = "/home/zhangh24/R/4.1/library/")
 library(dplyr, lib = "/home/zhangh24/R/4.1/library/") 
 library(foreach, lib = "/home/zhangh24/R/4.1/library/")
