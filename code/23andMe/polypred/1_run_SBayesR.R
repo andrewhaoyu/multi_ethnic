@@ -103,7 +103,7 @@ write.table(ma, file = paste0(temp.dir, "sumstats.ma"), row.names = F, col.names
 gctb_path = "/data/zhangh24/software/SBayesR/gctb_2.03beta_Linux/gctb"
 #ref_path = paste0(LD.dir, "ukbEURu_hm3_chr",j,"_v3_50k.ldm.sparse")
 summary_path = paste0(temp.dir, "sumstats.ma")
-out_name =  paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/PRSCSx/",eth[i],"/",trait[l],"/SBayesR")
+out_name =  paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/Polypred/",eth[i],"/",trait[l],"/SBayesR")
 
 system(paste0(gctb_path," --sbayes R ",
               "--mldm ", mldm_list_filename," ",
@@ -117,9 +117,9 @@ system(paste0(gctb_path," --sbayes R ",
               "--out ",out_name))
 #if SBayesR doesn't converge, change the gamma last to gamma_last/2 until convergence
 
-file_dir = paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/PRSCSx/",eth[i],"/",trait[l])
+file_dir = paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/Polypred/",eth[i],"/",trait[l])
 files = dir(file_dir, pattern = paste0("SBayesR.snpRes"),full.names = T)
-out_file = paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/PRSCSx/",eth[i],"/",trait[l],"/SBayesR.snpRes")
+out_file = paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/Polypred/",eth[i],"/",trait[l],"/SBayesR.snpRes")
 gamma_last = 1
 while(out_file%in%files==F){
   gamma_last = gamma_last/2
@@ -135,6 +135,10 @@ while(out_file%in%files==F){
                 "--out ",out_name))
   files = dir(file_dir, pattern = paste0("SBayesR.snpRes"),full.names = T)
   if(gamma_last<=1E-06){
+    #model is not converged
+    #out_file = paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/Polypred/",eth[i],"/",trait[l],"/SBayesR.snpRes")
+    result = NULL
+    write.table(result, file = out_file,row.names = F, col.names = F, )
     break
   }
 }

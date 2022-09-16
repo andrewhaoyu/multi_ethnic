@@ -87,3 +87,11 @@ for(i in 1:5){
                 "mkdir polypred"))
   
 }
+
+
+
+temp = fread("/data/zhangh24/multi_ethnic/code/LD_simulation_GA/LD_stack/Polypred/2_run_SBayesR.sh")
+
+
+idx <- which(temp$V3==2&temp$V4==3&temp$V5==4&temp$V6==1&temp$V7==4)
+
