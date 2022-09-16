@@ -278,3 +278,51 @@ for(k in 1:length(method)){
     }
   }
 }
+
+
+
+
+
+
+
+
+
+
+method = c("polypred")
+eth <- c("AFR","AMR","EAS","SAS")
+trait <- c("any_cvd","depression",
+           "heart_metabolic_disease_burden",
+           "height",
+           "iqb.sing_back_musical_note",
+           "migraine_diagnosis",
+           "morning_person")
+#create method subfolder
+for(k in 1:length(method)){
+  system(paste0("cd /data/zhangh24/multi_ethnic/result/cleaned/prs; mkdir ",method[k]))
+  
+}
+#create method/eth/ subfolder
+
+for(k in 1:length(method)){
+  
+  
+  #system(paste0("cd /data/zhangh24/multi_ethnic/result/cleaned/clumping_result/",method[k]))
+  for(i in 1:length(eth)){
+    system(paste0("cd /data/zhangh24/multi_ethnic/result/cleaned/prs/",method[k],"; mkdir ",eth[i]))
+    # for(l in 1:length(trait)){
+    # 
+    # }
+  }
+}
+
+#create method/eth/trait subfolder
+for(k in 1:length(method)){
+  
+  
+  #system(paste0("cd /data/zhangh24/multi_ethnic/result/cleaned/clumping_result/",method[k]))
+  for(i in 1:length(eth)){
+    for(l in 1:length(trait)){
+      system(paste0("cd /data/zhangh24/multi_ethnic/result/cleaned/prs/",method[k],"/",eth[i],"; mkdir ",trait[l]))
+    }
+  }
+}

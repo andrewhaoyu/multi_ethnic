@@ -8,6 +8,8 @@
 #install.packages("doParallel", lib = "/home/zhangh24/R/4.1/library/")
 #install.packages("foreach", lib = "/home/zhangh24/R/4.1/library/")
 #install.packages("iterators", lib = "/home/zhangh24/R/4.1/library/")
+#install.packages("Rfast", lib="/home/zhangh24/R/4.1/library/")
+#install.packages("RcppZiggurat", lib="/home/zhangh24/R/4.1/library/")
 #set up the environment of polyfun
 #"source /data/$USER/conda/etc/profile.d/conda.sh && source /data/$USER/conda/etc/profile.d/mamba.sh; ",
 #"mamba activate polyfun; ",
@@ -23,6 +25,8 @@ library(dplyr, lib = "/home/zhangh24/R/4.1/library/")
 library(foreach, lib = "/home/zhangh24/R/4.1/library/")
 library(iterators, lib = "/home/zhangh24/R/4.1/library/")
 library(doParallel, lib = "/home/zhangh24/R/4.1/library/")
+library(RcppZiggurat, lib = "/home/zhangh24/R/4.1/library/")
+library(Rfast, lib = "/home/zhangh24/R/4.1/library/")
 
 
 eth <- c("EUR","AFR","AMR","EAS","SAS")
@@ -121,7 +125,8 @@ system(paste0( "cd /data/zhangh24/software/polyfun; ",
 #####################################################################
 
 
-
+#run the polyfun file in parallel
+no.cores <- 8
 #count the number of files
 
 
@@ -133,6 +138,7 @@ num <- as.integer(
         )
 )
 
+system(paste0("more ",temp.dir,"job.sh"))
 # system(paste0("rm ",temp.dir,"job_split*"))
 # system(paste0("ls ",temp.dir))
 # system(paste0("wc -l ",temp.dir,"job_split00"))
@@ -142,18 +148,16 @@ num <- as.integer(
 
 system(paste0(
     "cd ",temp.dir,"; ",
-    "split -l ",ceiling(num/2), " -d job.sh job_split"))
+    "split -l ",ceiling(num/no.cores), " -d job.sh job_split"))
 #split the job file into half
 system(paste0(
     "cd ",temp.dir,"; ",
-    "split -l ",as.integer(num/2), " -d job.sh job_split"))
+    "split -l ",as.integer(num/no.cores), " -d job.sh job_split"))
 
-#run the polyfun file in parallel
-no.cores <- 8
-inner.size <- 8
+
 registerDoParallel(no.cores)
-result.list <- foreach(job.i = 1:inner.size)%dopar%{
-    ID = c("00","01")
+result.list <- foreach(job.i = 1:no.cores)%dopar%{
+    ID = paste0("0",c(0:(no.cores-1)))
 system(paste0("cd ",temp.dir,"; ",
               "sh ","job_split",ID[job.i]))
 }
