@@ -23,12 +23,14 @@ system(paste0("cp ",cur.dir,eth[i],"/all_chr_test.mega.* ",temp.dir))
 ref_gene_pred = paste0(temp.dir,"/all_chr_test.mega")
 #calculate the PRS for SBayesR based on EUR 
 file_dir = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[1],"/polypred")
+#coefs are based on EUR population
 files = dir(file_dir, pattern = ".snpRes", full.names = T)
-file_out = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[1],"/polypred/rho_",l,"_size_",4,"_rep_",i_rep,"_GA_",i1)
+eur_coef = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[1],"/polypred/rho_",l,"_size_",4,"_rep_",i_rep,"_GA_",i1,".snpRes")
 
-file_coef = paste0(file_out,".snpRes")
+#output file needs to be the target population
+file_out = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/polypred/rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)
 
-if(file_coef%in%files==T){
+if(eur_coef%in%files==T){
   #load result
   sbayes_result = fread(paste0(file_out,".snpRes"),header = T)
   #if the job converges, then nrow(file_coef) > 0

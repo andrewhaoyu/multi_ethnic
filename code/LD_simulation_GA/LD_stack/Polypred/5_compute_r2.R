@@ -29,12 +29,9 @@ temp= 1
 
 mis_vec_list = NULL 
 mis_temp = 1
-for(i in 2:2){
-  file_dir = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/xpass")
-  files = dir(file_dir, pattern = paste0(".sscore"),
-              full.names = T)
-  for(i1 in 1:1){
-    for(l in 1:1){
+for(i in 2:5){
+  for(i1 in 1:5){
+    for(l in 1:3){
       # for(i in 2:2){
       #   for(i1 in 1:1){
       #     for(l in 1:1){
@@ -54,39 +51,57 @@ for(i in 2:2){
         r2.vad.rep <- rep(0,n.rep)
         
         for(i_rep in 1:n.rep){
-          r2.test.rep <- rep(0,3)
-          coef.mat = matrix(NA,4,2)
-          #find the best phi
+          
+          
           
           
           #load target prs
           SBayesR_tar = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/polypred/rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_PRS_SBayesR_tar.sscore")
-          # if(file_name%in%files){
-          PRS <- as.data.frame(fread(paste0(SBayesR_tar)))
-          sbayes_tar = PRS$SCORE1_SUM
-          sbayes_tar_tun = sbayes_tar[1:10000]
-          sbayes_tar_vad = sbayes_tar[10001:20000]
-          #
-          SBayesR_EUR = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[1],"/polypred/rho_",l,"_size_",4,"_rep_",i_rep,"_GA_",i1,"_PRS_SBayesR_EUR.sscore")
+          file_dir = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/polypred")
+          files = dir(file_dir, pattern = paste0("rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_PRS_SBayesR_tar"), full.names = T)
+          if(SBayesR_tar%in%files==T){
+            PRS <- as.data.frame(fread(paste0(SBayesR_tar)))
+            sbayes_tar = PRS$SCORE1_SUM
+            sbayes_tar_tun = sbayes_tar[1:10000]
+            sbayes_tar_vad = sbayes_tar[10001:20000]
+          }else{
+            sbayes_tar = NULL
+          }
+          
+          SBayesR_EUR = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/polypred/rho_",l,"_size_",4,"_rep_",i_rep,"_GA_",i1,"_PRS_SBayesR_EUR.sscore")
           PRS <- as.data.frame(fread(paste0(SBayesR_EUR)))
           sbayes_eur = PRS$SCORE1_SUM
           sbayes_eur_tun = sbayes_eur[1:10000]
           sbayes_eur_vad = sbayes_eur[10001:20000]
           #
-          polyfun_EUR = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[1],"/polypred/rho_",l,"_size_",4,"_rep_",i_rep,"_GA_",i1,"_PRS_polyfun.sscore")
+          polyfun_EUR = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/polypred/rho_",l,"_size_",4,"_rep_",i_rep,"_GA_",i1,"_PRS_polyfun.sscore")
           PRS <- as.data.frame(fread(paste0(polyfun_EUR)))
           polyfun_eur = PRS$SCORE1_SUM
           polyfun_eur_tun = polyfun_eur[1:10000]
           polyfun_eur_vad = polyfun_eur[10001:20000]
-          
-          y.tun = y_test_mat[1:10000,i_rep]
-          model = lm(y.tun~sbayes_tar_tun+sbayes_eur_tun+polyfun_eur_tun)
-          summary(model)
-          coef = coefficients(model)[2:4]
-          y.vad = y_test_mat[10001:20000,i_rep]
-          prs.tar = cbind(sbayes_tar_vad, sbayes_eur_vad, polyfun_eur_vad)%*%coef
-          model = lm(y.vad~prs.tar)
-          r2.vad.rep[i_rep] <- summary(model)$r.square
+          #SbayesR on the target population converges
+          if(is.null(sbayes_tar)==F){
+            y.tun = y_test_mat[1:10000,i_rep]
+            model = lm(y.tun~sbayes_tar_tun+sbayes_eur_tun+polyfun_eur_tun)
+            summary(model)
+            coef = coefficients(model)[2:4]
+            y.vad = y_test_mat[10001:20000,i_rep]
+            prs.tar = cbind(sbayes_tar_vad, sbayes_eur_vad, polyfun_eur_vad)%*%coef
+            model = lm(y.vad~prs.tar)
+            r2.vad.rep[i_rep] <- summary(model)$r.square
+            
+          }else{
+            #SbayesR on the target population converges not converges
+            #just use EUR results
+            y.tun = y_test_mat[1:10000,i_rep]
+            model = lm(y.tun~sbayes_eur_tun+polyfun_eur_tun)
+            summary(model)
+            coef = coefficients(model)[2:3]
+            y.vad = y_test_mat[10001:20000,i_rep]
+            prs.tar = cbind(sbayes_eur_vad, polyfun_eur_vad)%*%coef
+            model = lm(y.vad~prs.tar)
+            r2.vad.rep[i_rep] <- summary(model)$r.square
+          }
           
           summary(model)
           # }else{
@@ -120,13 +135,13 @@ for(i in 2:2){
     
   }
 }
-mis_vec = rbindlist(mis_vec_list)
-xpass.result <- data.frame(eth.vec,
+#mis_vec = rbindlist(mis_vec_list)
+polypred.result <- data.frame(eth.vec,
                            r2.vec = r2.result,
                            l_vec,
                            m_vec,
                            ga_vec=ga_vc,
                            method_vec = method_vec)
 
-save(xpass.result,file = paste0(out.dir,
-                                "xpass.result.rdata"))
+save(polypred.result,file = paste0(out.dir,
+                                "polypred.result.rdata"))
