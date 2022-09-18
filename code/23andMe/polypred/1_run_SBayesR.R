@@ -8,7 +8,7 @@ args = commandArgs(trailingOnly = T)
 
 i = as.numeric(args[[1]])
 l = as.numeric(args[[2]])
-v = as.numeric(args[[3]])
+#v = as.numeric(args[[3]])
 #j = as.numeric(args[[3]])
 #m = as.numeric(args[[3]])
 #i_rep = as.numeric(args[[4]])
@@ -79,7 +79,9 @@ contriat = c("heart_metabolic_disease_burden",
 if(trait[l]%in%bintrait){
   
   ma = summary_update %>% 
-    select(rsid, A1, A2,FREQ_A1,  BETA, SD, P, N_control, N_case) %>% 
+    mutate(N = N_control + N_case) %>% 
+    select(rsid, A1, A2,FREQ_A1,  BETA, SD, P, N) %>% 
+    
     rename(SNP = rsid,
            freq = FREQ_A1,
            b = BETA, 
@@ -103,7 +105,7 @@ write.table(ma, file = paste0(temp.dir, "sumstats.ma"), row.names = F, col.names
 gctb_path = "/data/zhangh24/software/SBayesR/gctb_2.03beta_Linux/gctb"
 #ref_path = paste0(LD.dir, "ukbEURu_hm3_chr",j,"_v3_50k.ldm.sparse")
 summary_path = paste0(temp.dir, "sumstats.ma")
-out_name =  paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/Polypred/",eth[i],"/",trait[l],"/SBayesR")
+out_name =  paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/polypred/",eth[i],"/",trait[l],"/SBayesR")
 
 system(paste0(gctb_path," --sbayes R ",
               "--mldm ", mldm_list_filename," ",
@@ -117,9 +119,9 @@ system(paste0(gctb_path," --sbayes R ",
               "--out ",out_name))
 #if SBayesR doesn't converge, change the gamma last to gamma_last/2 until convergence
 
-file_dir = paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/Polypred/",eth[i],"/",trait[l])
+file_dir = paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/polypred/",eth[i],"/",trait[l])
 files = dir(file_dir, pattern = paste0("SBayesR.snpRes"),full.names = T)
-out_file = paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/Polypred/",eth[i],"/",trait[l],"/SBayesR.snpRes")
+out_file = paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/polypred/",eth[i],"/",trait[l],"/SBayesR.snpRes")
 gamma_last = 1
 while(out_file%in%files==F){
   gamma_last = gamma_last/2
