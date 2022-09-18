@@ -28,7 +28,7 @@ files = dir(file_dir, pattern = ".snpRes", full.names = T)
 eur_coef = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[1],"/polypred/rho_",l,"_size_",4,"_rep_",i_rep,"_GA_",i1,".snpRes")
 
 #output file needs to be the target population
-file_out = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/polypred/rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)
+file_out = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/polypred/rho_",l,"_size_",4,"_rep_",i_rep,"_GA_",i1)
 
 if(eur_coef%in%files==T){
   #load result
