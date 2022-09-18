@@ -27,33 +27,37 @@ files = dir(file_dir, pattern = ".snpRes", full.names = T)
 file_out = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[1],"/polypred/rho_",l,"_size_",4,"_rep_",i_rep,"_GA_",i1)
 
 file_coef = paste0(file_out,".snpRes")
-#if the job converges, then nrow(file_coef) > 0
-if((file_coef%in%files==T)&nrow(file_coef)>0){
+
+if(file_coef%in%files==T){
   #load result
   sbayes_result = fread(paste0(file_out,".snpRes"),header = T)
-  sbayes_result = sbayes_result %>% 
-    mutate(chr.pos = paste0(Chrom,":",Position))
-
-
-#load the original summary statistics to find 1KG ID
-  summary <- as.data.frame(fread(paste0(out.dir.sum,eth[i],"/summary_mega_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))
-summary = summary %>% 
-  mutate(chr.pos = paste0(CHR, ":", BP)) %>% 
-  select(SNP,chr.pos)
-
-#match sbayes R ID to 1KG ID
-sbayes_result = left_join(sbayes_result, summary, by = "chr.pos")
-
-assoc = sbayes_result %>% 
-  rename(BETA = A1Effect) %>% 
-  select(SNP, A1, BETA)
-write.table(assoc,file = paste0(temp.dir,"prs_prep"),col.names = T,row.names = F,quote=F)
-#calculate the PRS for SBayesR 
-res = system(paste0("/data/zhangh24/software/plink2_alpha ",
-                    "--score-col-nums 3 --threads 2 ",
-                    "--score ",temp.dir,"prs_prep cols=+scoresums,-scoreavgs header no-mean-imputation ",
-                    "--bfile ",ref_gene_pred,
-                    " --out ",file_out,"_PRS_SBayesR_EUR"))
+  #if the job converges, then nrow(file_coef) > 0
+  if(nrow(sbayes_result)>0){
+    sbayes_result = sbayes_result %>% 
+      mutate(chr.pos = paste0(Chrom,":",Position))
+    
+    
+    #load the original summary statistics to find 1KG ID
+    summary <- as.data.frame(fread(paste0(out.dir.sum,eth[i],"/summary_mega_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))
+    summary = summary %>% 
+      mutate(chr.pos = paste0(CHR, ":", BP)) %>% 
+      select(SNP,chr.pos)
+    
+    #match sbayes R ID to 1KG ID
+    sbayes_result = left_join(sbayes_result, summary, by = "chr.pos")
+    
+    assoc = sbayes_result %>% 
+      rename(BETA = A1Effect) %>% 
+      select(SNP, A1, BETA)
+    write.table(assoc,file = paste0(temp.dir,"prs_prep"),col.names = T,row.names = F,quote=F)
+    #calculate the PRS for SBayesR 
+    res = system(paste0("/data/zhangh24/software/plink2_alpha ",
+                        "--score-col-nums 3 --threads 2 ",
+                        "--score ",temp.dir,"prs_prep cols=+scoresums,-scoreavgs header no-mean-imputation ",
+                        "--bfile ",ref_gene_pred,
+                        " --out ",file_out,"_PRS_SBayesR_EUR"))
+  }
+  
 }
 
 
@@ -69,25 +73,29 @@ file_out = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],
 
 file_coef = paste0(file_out,".snpRes")
 #load result
-if((file_coef%in%files==T)&nrow(file_coef)>0){
+if(file_coef%in%files==T){
+  
 sbayes_result = fread(paste0(file_out,".snpRes"),header = T)
-sbayes_result = sbayes_result %>% 
-  mutate(chr.pos = paste0(Chrom,":",Position))
-
-
-#match sbayes R ID to 1KG ID
-sbayes_result = left_join(sbayes_result, summary, by = "chr.pos")
-
-assoc = sbayes_result %>% 
-  rename(BETA = A1Effect) %>% 
-  select(SNP, A1, BETA)
-write.table(assoc,file = paste0(temp.dir,"prs_prep"),col.names = T,row.names = F,quote=F)
-#calculate the PRS for SBayesR 
-res = system(paste0("/data/zhangh24/software/plink2_alpha ",
-                    "--score-col-nums 3 --threads 2 ",
-                    "--score ",temp.dir,"prs_prep cols=+scoresums,-scoreavgs header no-mean-imputation ",
-                    "--bfile ",ref_gene_pred,
-                    " --out ",file_out,"_PRS_SBayesR_tar"))
+if(nrow(sbayes_result)>0){
+  sbayes_result = sbayes_result %>% 
+    mutate(chr.pos = paste0(Chrom,":",Position))
+  
+  
+  #match sbayes R ID to 1KG ID
+  sbayes_result = left_join(sbayes_result, summary, by = "chr.pos")
+  
+  assoc = sbayes_result %>% 
+    rename(BETA = A1Effect) %>% 
+    select(SNP, A1, BETA)
+  write.table(assoc,file = paste0(temp.dir,"prs_prep"),col.names = T,row.names = F,quote=F)
+  #calculate the PRS for SBayesR 
+  res = system(paste0("/data/zhangh24/software/plink2_alpha ",
+                      "--score-col-nums 3 --threads 2 ",
+                      "--score ",temp.dir,"prs_prep cols=+scoresums,-scoreavgs header no-mean-imputation ",
+                      "--bfile ",ref_gene_pred,
+                      " --out ",file_out,"_PRS_SBayesR_tar"))
+  
+}
 }
 
 #calculate the PRS for Polyfun
