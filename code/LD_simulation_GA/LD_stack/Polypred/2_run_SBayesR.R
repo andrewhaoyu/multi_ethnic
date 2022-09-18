@@ -118,56 +118,55 @@ summary_update = summary_update %>%
   }
 #   
 # #}     
-#   mis_vec_list = list()   
-#   
-#   mis_temp =  1
-#   
-#   for(i in 1:1){
-#     file_dir = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/polypred")
-#     
-#     for(l in 1:3){
-#       for(m in 4:4){
-#         for(i_rep in 1:10){
-#           for(i1 in 1:5){
-#             files = dir(file_dir, pattern = paste0("rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".snpRes"),full.names = T)      
-#             out_file = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/polypred/rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".snpRes")
-#             if(out_file%in%files==F){
-#               mis_vec_list[[mis_temp]] = data.frame(i, l, m, i_rep, i1)
-#               mis_temp = mis_temp + 1
-#             }
-#             
-#           }
-#         }
-#       }
-#     }
-#   }
-#   
-#   for(i in 2:5){
-#     file_dir = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/polypred")
-#     
-#     for(l in 1:3){
-#       for(m in 1:4){
-#         for(i_rep in 1:10){
-#           for(i1 in 1:5){
-#             files = dir(file_dir, pattern = paste0("rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".snpRes"),full.names = T)      
-#             out_file = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/polypred/rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".snpRes")
-#             if(out_file%in%files==F){
-#               mis_vec_list[[mis_temp]] = data.frame(i, l, m, i_rep, i1)
-#               mis_temp = mis_temp + 1
-#             }
-#             
-#           }
-#         }
-#       }
-#     }
-#   }
-#   
-#   mis_vec = rbindlist(mis_vec_list)
-#   run_job = rep("c", nrow(mis_vec))
-#   for(k in 1:nrow(mis_vec)){
-#     run_job[k] = paste0("Rscript /gpfs/gsfs11/users/zhangh24/multi_ethnic/code/LD_simulation_GA/LD_stack/Polypred/2_run_SBayesR.R ",
-#                          mis_vec[k,1]," ",mis_vec[k,2]," ",mis_vec[k,3]," ",mis_vec[k,4]," ",mis_vec[k,5])
-#   }
-#   write.table(run_job, file = paste0("/data/zhangh24/multi_ethnic/code/LD_simulation_GA/LD_stack/Polypred/rerun_SBayesR.sh"),
-#               row.names = F, col.names = F, quote = F)
-#       
+  mis_vec_list = list()
+
+  mis_temp =  1
+
+  for(i in 1:1){
+    file_dir = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/polypred")
+
+    for(l in 1:3){
+      for(m in 4:4){
+        for(i_rep in 1:10){
+          for(i1 in 1:5){
+            files = dir(file_dir, pattern = paste0("rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".snpRes"),full.names = T)
+            out_file = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/polypred/rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".snpRes")
+            if(out_file%in%files==F){
+              mis_vec_list[[mis_temp]] = data.frame(i, l, m, i_rep, i1)
+              mis_temp = mis_temp + 1
+            }
+
+          }
+        }
+      }
+    }
+  }
+
+  for(i in 2:5){
+    file_dir = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/polypred")
+
+    for(l in 1:3){
+      for(m in 1:4){
+        for(i_rep in 1:10){
+          for(i1 in 1:5){
+            files = dir(file_dir, pattern = paste0("rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".snpRes"),full.names = T)
+            out_file = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/polypred/rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".snpRes")
+            if(out_file%in%files==F){
+              mis_vec_list[[mis_temp]] = data.frame(i, l, m, i_rep, i1)
+              mis_temp = mis_temp + 1
+            }
+
+          }
+        }
+      }
+    }
+  }
+
+  mis_vec = rbindlist(mis_vec_list)
+  run_job = rep("c", nrow(mis_vec))
+  for(k in 1:nrow(mis_vec)){
+    run_job[k] = paste0("Rscript /gpfs/gsfs11/users/zhangh24/multi_ethnic/code/LD_simulation_GA/LD_stack/Polypred/2_run_SBayesR.R ",
+                         mis_vec[k,1]," ",mis_vec[k,2]," ",mis_vec[k,3]," ",mis_vec[k,4]," ",mis_vec[k,5])
+  }
+  write.table(run_job, file = paste0("/data/zhangh24/multi_ethnic/code/LD_simulation_GA/LD_stack/Polypred/rerun_SBayesR.sh"),
+              row.names = F, col.names = F, quote = F)
