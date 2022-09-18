@@ -32,7 +32,7 @@ file_out = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],
 
 if(eur_coef%in%files==T){
   #load result
-  sbayes_result = fread(paste0(file_out,".snpRes"),header = T)
+  sbayes_result = fread(paste0(eur_coef),header = T)
   #if the job converges, then nrow(file_coef) > 0
   if(nrow(sbayes_result)>0){
     sbayes_result = sbayes_result %>% 
