@@ -105,7 +105,7 @@ system(
 #####################################################################
 
 #################step 3:Prepare the job file for polyfun##############
-out_prefix_temp = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/polypred/rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)
+
 
 sum_file_align_snpvar = paste0(temp.dir,"sumstats_align_snpvar")
 

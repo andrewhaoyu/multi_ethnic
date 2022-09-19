@@ -6,8 +6,8 @@ args = commandArgs(trailingOnly = T)
 #i_rep represent simulation replication
 #i1 represent the genetic architecture
 
-i = as.numeric(args[[1]])
-l = as.numeric(args[[2]])
+i = 1
+l = as.numeric(args[[1]])
 #v = as.numeric(args[[3]])
 #j = as.numeric(args[[3]])
 #m = as.numeric(args[[3]])
@@ -37,9 +37,11 @@ data.dir = "/data/zhangh24/multi_ethnic/data/cleaned/"
 sid<-Sys.getenv('SLURM_JOB_ID')
 dir.create(paste0('/lscratch/',sid,'/test'),showWarnings = FALSE)
 temp.dir = paste0('/lscratch/',sid,'/test/')
-system(paste0("cp ",cur.dir,eth[i],"/clump_ref_all_chr.bed ",temp.dir,eth[i],"clump_ref_all_chr.bed"))
-system(paste0("cp ",cur.dir,eth[i],"/clump_ref_all_chr.bim ",temp.dir,eth[i],"clump_ref_all_chr.bim"))
-system(paste0("cp ",cur.dir,eth[i],"/clump_ref_all_chr.fam ",temp.dir,eth[i],"clump_ref_all_chr.fam"))
+kg.dir = "/data/zhangh24/KGref_MEGA/GRCh37/"
+system(paste0("cp ",kg.dir,eth[1],"/all_chr.bed ",temp.dir,eth[1],"all_chr.bed"))
+system(paste0("cp ",kg.dir,eth[1],"/all_chr.bim ",temp.dir,eth[1],"all_chr.bim"))
+system(paste0("cp ",kg.dir,eth[1],"/all_chr.fam ",temp.dir,eth[1],"all_chr.fam"))
+
 #prepare summary statistics
 #use the same preprocessing way as SBayesR
 setwd("/data/zhangh24/multi_ethnic/")
@@ -105,7 +107,7 @@ system(
 )
 
 #####################################################################
-ref_gene_target = paste0(temp.dir,eth[i],"clump_ref_all_chr")
+ref_gene_target = paste0(temp.dir,eth[i],"all_chr")
 
 summary_path = paste0(temp.dir, "sumstats_align")
 
@@ -121,11 +123,11 @@ system(
 #####################################################################
 
 #################step 3:Prepare the job file for polyfun##############
-out_prefix_temp = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/polypred/rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)
+
 
 sum_file_align_snpvar = paste0(temp.dir,"sumstats_align_snpvar")
 
-out_prefix_temp = paste0(temp.dir,"rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)
+out_prefix_temp = paste0(temp.dir,"poly_fun_",trait[l])
 
 system(paste0( "cd /data/zhangh24/software/polyfun; ",
                "python create_finemapper_jobs.py ",
@@ -156,7 +158,7 @@ num <- as.integer(
   )
 )
 
-system(paste0("more ",temp.dir,"job.sh"))
+#system(paste0("more ",temp.dir,"job.sh"))
 # system(paste0("rm ",temp.dir,"job_split*"))
 # system(paste0("ls ",temp.dir))
 # system(paste0("wc -l ",temp.dir,"job_split00"))
@@ -184,7 +186,7 @@ stopImplicitCluster()
 
 
 #############step four: aggregate all the polyfun results into one
-paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/polypred/",eth[i],"/",trait[l],"/poly_fun")
+out_prefix = paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/polypred/",eth[i],"/",trait[l],"/poly_fun")
 system(
   paste0(
     "cd /data/zhangh24/software/polyfun; ",
