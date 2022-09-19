@@ -289,7 +289,7 @@ for(k in 1:length(method)){
 
 
 method = c("polypred")
-eth <- c("AFR","AMR","EAS","SAS")
+eth <- c("EUR","AFR","AMR","EAS","SAS")
 trait <- c("any_cvd","depression",
            "heart_metabolic_disease_burden",
            "height",
@@ -307,7 +307,7 @@ for(k in 1:length(method)){
   
   
   #system(paste0("cd /data/zhangh24/multi_ethnic/result/cleaned/clumping_result/",method[k]))
-  for(i in 1:length(eth)){
+  for(i in 1:1){
     system(paste0("cd /data/zhangh24/multi_ethnic/result/cleaned/prs/",method[k],"; mkdir ",eth[i]))
     # for(l in 1:length(trait)){
     # 
@@ -320,7 +320,7 @@ for(k in 1:length(method)){
   
   
   #system(paste0("cd /data/zhangh24/multi_ethnic/result/cleaned/clumping_result/",method[k]))
-  for(i in 1:length(eth)){
+  for(i in 1:1){
     for(l in 1:length(trait)){
       system(paste0("cd /data/zhangh24/multi_ethnic/result/cleaned/prs/",method[k],"/",eth[i],"; mkdir ",trait[l]))
     }

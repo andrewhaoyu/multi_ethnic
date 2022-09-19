@@ -38,7 +38,7 @@ system(paste0("mkdir ",temp.dir,"LD/"))
 LD.dir = paste0(temp.dir,"LD/")
 system(paste0("cp /data/zhangh24/software/SBayesR/ukbEURu_hm3_shrunk_sparse/*.bin ",LD.dir))
 system(paste0("cp /data/zhangh24/software/SBayesR/ukbEURu_hm3_shrunk_sparse/*.info ",LD.dir))
-system(paste0("ls ",LD.dir))
+#system(paste0("ls ",LD.dir))
 #create reference file list
 file_name  = rep("c", 22)
 for(j in 1:22){
@@ -94,7 +94,7 @@ if(trait[l]%in%bintrait){
     select(rsid, A1, A2,FREQ_A1,  BETA, SD, P, N) %>% 
     rename(SNP = rsid,
            freq = FREQ_A1,
-           b = BETA_align, 
+           b = BETA, 
            se = SD,
            p = P)
 }

@@ -39,6 +39,7 @@ temp.dir = paste0('/lscratch/',sid,'/test/')
 system(paste0("cp ",cur.dir,eth[i],"/clump_ref_all_chr.bed ",temp.dir,eth[i],"clump_ref_all_chr.bed"))
 system(paste0("cp ",cur.dir,eth[i],"/clump_ref_all_chr.bim ",temp.dir,eth[i],"clump_ref_all_chr.bim"))
 system(paste0("cp ",cur.dir,eth[i],"/clump_ref_all_chr.fam ",temp.dir,eth[i],"clump_ref_all_chr.fam"))
+temp = fread(paste0(temp.dir,eth[i],"clump_ref_all_chr.bim"))
 #prepare summary statistics
 #use the same preprocessing way as SBayesR
 setwd("/data/zhangh24/multi_ethnic/")
@@ -89,6 +90,7 @@ system(
 #####################################################################
 ref_gene_target = paste0(temp.dir,eth[i],"clump_ref_all_chr")
 
+temp = fread(paste0(ref_gene_target,".bim"))
 summary_path = paste0(temp.dir, "sumstats_align")
 
 ##################step 2:extract snp var from the database to the summary stats##############
@@ -134,7 +136,7 @@ num <- as.integer(
     gsub(
         paste0(" ",temp.dir,"job.sh"),
         "", 
-        system(paste0("wc -l ",temp.dir,"job.sh"),intern = T)
+        system(paste0("wc -l ",temp.dir,"job.sh"), intern = T)
         )
 )
 
