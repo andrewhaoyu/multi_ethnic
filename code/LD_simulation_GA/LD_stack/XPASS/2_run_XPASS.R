@@ -31,6 +31,7 @@ system(paste0("cp ",cur.dir,eth[1],"/clump_ref_all_chr.fam ",temp.dir,eth[1],"cl
 system(paste0("cp ",cur.dir,eth[1],"/clump_ref_all_chr_pca.eigenvec ",temp.dir,eth[1],"clump_ref_all_chr_pca.eigenvec"))
 system(paste0("cp ",cur.dir,eth[i],"/clump_ref_all_chr.bed ",temp.dir,eth[i],"clump_ref_all_chr.bed"))
 system(paste0("cp ",cur.dir,eth[i],"/clump_ref_all_chr.bim ",temp.dir,eth[i],"clump_ref_all_chr.bim"))
+system(paste0("cp ",cur.dir,eth[i],"/clump_ref_all_chr.fam ",temp.dir,eth[i],"clump_ref_all_chr.fam"))
 system(paste0("cp ",cur.dir,eth[i],"/clump_ref_all_chr_pca.eigenvec ",temp.dir,eth[i],"clump_ref_all_chr_pca.eigenvec"))
 
 #####
@@ -86,6 +87,7 @@ path_to_summary_eur = paste0(temp.dir,eth[1],"summary_eur")
 path_to_summary_tar = paste0(temp.dir,eth[i],"summary_tar")
 #summary_target = paste0("/dcs04/nilanjan/data/wlu/XPASS/data/sumdata/",race,'/sumdata-rho',rho,'-size',size,'-rep',rep,'-GA',GA,'.txt') # target
 # auxilliary
+system(paste0("ls /lscratch/48053954/test/"))
 ref_gene_EUR = paste0(temp.dir,eth[1],"clump_ref_all_chr")
 # target
 ref_gene_target = paste0(temp.dir,eth[i],"clump_ref_all_chr")

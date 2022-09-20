@@ -55,4 +55,5 @@ snp.file = rbindlist(snp.list) %>%
 write.table(snp.file,file = paste0(data.dir,"all_eth.bim"),row.names = F,col.names = F,quote=F)
 
 
-
+idx_order = order(data_clean1$p.acat)
+data_clean1_update = data_clean1[idx_order,]

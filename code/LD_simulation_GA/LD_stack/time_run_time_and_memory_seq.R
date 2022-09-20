@@ -90,10 +90,10 @@ for(r_ind in 1:length(r2_vec)){
     eth <- c("EUR","AFR","AMR","EAS","SAS")
     
     res = system(paste0("/data/zhangh24/software/plink2 --threads 2 ",
-    "--bfile ",temp.dir,"AFR_ref_chr22 ",
-    "--clump ",temp.dir,eth[i],"_assoc.out ",
-    "--clump-p1 ",pthr," --clump-r2 ",r2thr,"  ",
-    "--clump-kb ",kbpthr," --out ", temp.dir,eth[i],"_LD_clump_two_dim_rind_",r_ind,"_wcind_",w_ind))
+                        "--bfile ",temp.dir,"AFR_ref_chr22 ",
+                        "--clump ",temp.dir,eth[i],"_assoc.out ",
+                        "--clump-p1 ",pthr," --clump-r2 ",r2thr,"  ",
+                        "--clump-kb ",kbpthr," --out ", temp.dir,eth[i],"_LD_clump_two_dim_rind_",r_ind,"_wcind_",w_ind))
     if(res==2){
       stop()
     }
@@ -120,12 +120,12 @@ q_range = data.frame(rep("p_value",n_pthres),rep(0,n_pthres),rep(0.5,n_pthres))
 temp = 1
 
 for(k2 in 1:length(pthres)){
- 
- 
-    q_range[temp,1] = paste0("p_value_",k2)
-    q_range[temp,3] = pthres[k2]
-    temp = temp+1
- 
+  
+  
+  q_range[temp,1] = paste0("p_value_",k2)
+  q_range[temp,3] = pthres[k2]
+  temp = temp+1
+  
 }
 q_range = q_range[1:(temp-1),]
 write.table(q_range,file = paste0(temp.dir.prs,"q_range_file"),row.names = F,col.names = F,quote=F)
@@ -145,7 +145,7 @@ for(r_ind in 1:length(r2_vec)){
     #combine the statistics with SNPs after clumping
     prs.all <- left_join(LD,summary.com,by="SNP") 
     colSums(is.na(prs.all))
-
+    
     for(k1 in 1:length(pthres)){
       #keep al the SNPs with peur pass the threshold
       prs.file = prs.all %>% 
@@ -157,18 +157,18 @@ for(r_ind in 1:length(r2_vec)){
       p.value.file <- prs.file %>% 
         select(SNP,P)
       write.table(p.value.file,file = paste0(temp.dir.prs,"p_value_file"),col.names = T,row.names = F,quote=F)
-     
+      
       old.out.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
       res = system(paste0("/data/zhangh24/software/plink2 --q-score-range ",temp.dir.prs,"q_range_file ",temp.dir.prs,"p_value_file header --threads 2 --score ",temp.dir.prs,"prs_file header no-sum no-mean-imputation --bfile ",temp.dir,"AFR_test_mega_chr22 --exclude ",old.out.dir,eth[i],"/duplicated.id --out ",temp.dir.prs,"prs_2DLD_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1))
       print("step2 finished")
-     
+      
       
       #system(paste0("/data/zhangh24/software/plink2 --score ",cur.dir,eth[i],"/prs/prs_file_pvalue_",k,"_rho_",l,"_size_",m,,"_rep_",i_rep," no-sum no-mean-imputation --bfile ",cur.dir,eth[i],"/all_chr.tag --exclude /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/duplicated.id  --out ",cur.dir,eth[i],"/prs/prs_",k,"_rho_",l,"_size_",m))
     }
     
   }
   
-    
+  
 }
 
 #find the optimal r2 performance based on testing data
@@ -186,7 +186,7 @@ for(r_ind in 1:length(r2_vec)){
   for(w_ind in 1:length(wc_vec)){
     for(k1 in 1:length(pthres)){
       for(k2 in 1:length(pthres)){
-
+        
         filename <- paste0(temp.dir.prs,"prs_2DLD_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1,".p_value_",k2,".profile")
         prs.temp <- fread(filename)  
         prs.score <- prs.temp$SCORE
