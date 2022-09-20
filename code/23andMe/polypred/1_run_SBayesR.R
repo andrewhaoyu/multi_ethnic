@@ -32,7 +32,6 @@ data.dir = "/data/zhangh24/multi_ethnic/data/cleaned/"
 sid<-Sys.getenv('SLURM_JOB_ID')
 dir.create(paste0('/lscratch/',sid,'/test'),showWarnings = FALSE)
 temp.dir = paste0('/lscratch/',sid,'/test/')
-dir.create(paste0('/lscratch/',sid,'/test/1KGLD'),showWarnings = FALSE)
 #copy the LD reference data to lscratch
 system(paste0("mkdir ",temp.dir,"LD/"))
 LD.dir = paste0(temp.dir,"LD/")

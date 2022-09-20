@@ -101,6 +101,7 @@ for(i in 2:5){
             prs.tar = cbind(sbayes_eur_vad, polyfun_eur_vad)%*%coef
             model = lm(y.vad~prs.tar)
             r2.vad.rep[i_rep] <- summary(model)$r.square
+            #r2.vad.rep[i_rep] <- NA
           }
           
           summary(model)
@@ -145,3 +146,4 @@ polypred.result <- data.frame(eth.vec,
 
 save(polypred.result,file = paste0(out.dir,
                                 "polypred.result.rdata"))
+
