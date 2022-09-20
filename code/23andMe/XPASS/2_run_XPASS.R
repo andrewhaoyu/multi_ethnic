@@ -61,57 +61,82 @@ library(RhpcBLASctl)
 #####
 # input files
 summary_EUR = as.data.frame(fread(paste0(data.dir,eth[1],"/sumdat/",trait[l],"_passQC_noNA_matchinfo_matchMAFnoNA_common_mega+hapmap3_cleaned.txt"),header=T))
+summary_target = as.data.frame(fread(paste0(data.dir,eth[i],"/sumdat/",trait[l],"_passQC_noNA_matchinfo_matchMAFnoNA_common_mega+hapmap3_cleaned.txt"),header=T))
+
+bintrait <- c("any_cvd","depression",
+              "iqb.sing_back_musical_note",
+              "migraine_diagnosis",
+              "morning_person")
+contriat = c("heart_metabolic_disease_burden",
+             "height")
+
+if(trait[l]%in%bintrait){
+  summary_EUR = summary_EUR %>% 
+    mutate(N = N_control + N_case)
+  summary_target = summary_target %>% 
+    mutate(N = N_control + N_case)
+}else{
+  summary_EUR = summary_EUR %>% 
+    mutate(N = N_control )
+  summary_target = summary_target %>% 
+    mutate(N = N_control )
+}
+
+
 
 #prepare the EUR data for XPASS format
 summary_EUR_XPASS = summary_EUR %>% 
-  select(SNP, N, Z, effect_allele, non_effect_allele) %>% 
-  rename(A1 = effect_allele,
-         A2 = non_effect_allele)
+  mutate(Z = BETA/SD,
+         SNP = rsid) %>% 
+  select(SNP, N, Z, A1, A2) 
 write.table(summary_EUR_XPASS, file = paste0(temp.dir,eth[1],"summary_eur"),
             row.names = F, col.names = T, quote = T)
 #summary_EUR = paste0("/dcs04/nilanjan/data/wlu/XPASS/data/sumdata/EUR/sumdata-rho",rho,'-size4-rep',rep,'-GA',GA,'.txt') # auxilliary
-summary_target = as.data.frame(fread(paste0(out.dir.sum,eth[i],"/summary_mega_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))) 
+
 summary_target_XPASS = summary_target %>% 
-  select(SNP, N, Z, effect_allele, non_effect_allele) %>% 
-  rename(A1 = effect_allele,
-         A2 = non_effect_allele)
+  mutate(Z = BETA/SD,
+         SNP = rsid) %>% 
+  select(SNP, N, Z, A1, A2) 
 write.table(summary_target_XPASS, file = paste0(temp.dir,eth[i],"summary_tar"),
             row.names = F, col.names = T, quote = T)
 path_to_summary_eur = paste0(temp.dir,eth[1],"summary_eur")
 path_to_summary_tar = paste0(temp.dir,eth[i],"summary_tar")
 #summary_target = paste0("/dcs04/nilanjan/data/wlu/XPASS/data/sumdata/",race,'/sumdata-rho',rho,'-size',size,'-rep',rep,'-GA',GA,'.txt') # target
 # auxilliary
-ref_gene_EUR = paste0(temp.dir,eth[1],"clump_ref_all_chr")
+ref_gene_EUR = paste0(temp.dir,eth[1],"all_chr")
 # target
-ref_gene_target = paste0(temp.dir,eth[i],"clump_ref_all_chr")
-file_out = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/xpass/rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)
+ref_gene_target = paste0(temp.dir,eth[i],"all_chr")
+file_out = paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/XPASS/",eth[i],"/",trait[l],"/")
+path_to_cov_EUR = paste0(temp.dir,eth[1],"eur_ref_cov")
+path_to_cov_tar = paste0(temp.dir,eth[i],"tar_ref_cov")
 
 #####
 # XPASS
 fit_bbj <- XPASS(file_z1 = path_to_summary_tar, file_z2 = path_to_summary_eur,
                  file_ref1 = ref_gene_target, file_ref2 = ref_gene_EUR,
+                 file_cov1 = path_to_cov_tar,file_cov2 = path_to_cov_EUR,
                  # file_predGeno = ref_gene_pred, compPRS = T,
                  pop = "EUR", sd_method="LD_block", compPosMean = T,
                  file_out = file_out)
 save(fit_bbj, file=paste0(file_out, "_param.RData"))
 print("XPASS finished run")
 
-system(paste0("cp ",cur.dir,eth[i],"/all_chr_test.mega.* ",temp.dir))
-
-# predict
-ref_gene_pred = paste0(temp.dir,"/all_chr_test.mega")
-# output file prefix
-load(paste0(file_out, "_param.RData"))
-mu = fit_bbj$mu
-# calculate PRS using plink (optional, comment the following out if not needed)
-mu = mu[, c("SNP", "A1", "mu1", "mu2", "mu_XPASS1", "mu_XPASS2")]
-write.table(mu,file = paste0(temp.dir,"prs_prep"),col.names = T,row.names = F,quote=F)
-res = system(paste0("/data/zhangh24/software/plink2_alpha ",
-                    "--score-col-nums 3,4,5,6 --threads 2 ",
-                    "--score ",temp.dir,"prs_prep cols=+scoresums,-scoreavgs header no-mean-imputation ",
-                    "--bfile ",ref_gene_pred,
-                    " --out ",file_out,"_PRS"))
-
+# system(paste0("cp ",cur.dir,eth[i],"/all_chr_test.mega.* ",temp.dir))
+# 
+# # predict
+# ref_gene_pred = paste0(temp.dir,"/all_chr_test.mega")
+# # output file prefix
+# load(paste0(file_out, "_param.RData"))
+# mu = fit_bbj$mu
+# # calculate PRS using plink (optional, comment the following out if not needed)
+# mu = mu[, c("SNP", "A1", "mu1", "mu2", "mu_XPASS1", "mu_XPASS2")]
+# write.table(mu,file = paste0(temp.dir,"prs_prep"),col.names = T,row.names = F,quote=F)
+# res = system(paste0("/data/zhangh24/software/plink2_alpha ",
+#                     "--score-col-nums 3,4,5,6 --threads 2 ",
+#                     "--score ",temp.dir,"prs_prep cols=+scoresums,-scoreavgs header no-mean-imputation ",
+#                     "--bfile ",ref_gene_pred,
+#                     " --out ",file_out,"_PRS"))
+# 
 
 
 
