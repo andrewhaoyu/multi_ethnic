@@ -1,4 +1,5 @@
 #goal: calculate the top 20PCs for the 
+args = commandArgs(trailingOnly = T)
 i = as.numeric(args[[1]])
 library(data.table)
 library(tidyverse)
