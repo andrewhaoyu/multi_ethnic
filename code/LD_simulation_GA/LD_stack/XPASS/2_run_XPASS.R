@@ -52,7 +52,10 @@ library(RhpcBLASctl)
 # rep = 1
 #####
 # input files
+
+
 summary_EUR <- as.data.frame(fread(paste0(out.dir.sum,eth[1],"/summary_mega_rho_",l,"_size_",4,"_rep_",i_rep,"_GA_",i1)))
+
 #prepare the EUR data for XPASS format
 summary_EUR_XPASS = summary_EUR %>% 
   select(SNP, N, Z, effect_allele, non_effect_allele) %>% 

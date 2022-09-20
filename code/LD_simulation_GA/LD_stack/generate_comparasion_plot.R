@@ -20,6 +20,7 @@ load(paste0("LD.clump.result.allethtest.EB.rdata"))
 load("LDpred2.result.021622")
 
 
+
 load(paste0("LDpredEUR.result.rdata"))
 load(paste0("prscsx.result.rdata"))
 LD.clump.result <- LD.result.list[[1]] %>% 
@@ -29,6 +30,7 @@ LD.clump.result <- LD.result.list[[1]] %>%
 weightedprs.result = weightedprs.result %>% 
   mutate(method_vec = "Weighted PRS")
 load("xpass.result.rdata")
+load("polypred.result.rdata")
 prediction.result <- rbind(LD.clump.result,
                            SCT.clump.result,
                            LDpred2.result,
@@ -36,6 +38,7 @@ prediction.result <- rbind(LD.clump.result,
                            LDpredEUR.result,
                            weightedprs.result,
                            xpass.result,
+                           polypred.result,
                            prscsx.result,
                            TDLD.result,
                            EB.result,
@@ -77,6 +80,7 @@ prediction.result = prediction.result %>%
                                        "Best EUR PRS (LDpred2)",
                                        "Weighted PRS",
                                        "XPASS",
+                                       "PolyPred",
                                        "PRS-CSx",
                                       # "TDLD",
                                       # "TDLD-EB",
@@ -98,6 +102,7 @@ prediction.result = prediction.result %>%
              "Best EUR PRS (LDpred2)",
              "Weighted PRS",
              "XPASS",
+             "PolyPred",
              "PRS-CSx",
              "CT-SLEB (two ancestries)",
              "CT-SLEB (five ancestries)"
@@ -117,7 +122,7 @@ EUR.color = brewer.pal(n.EUR, "Greens")[c(4,7)]
 
  
 n.multi = 9
-multi.color = brewer.pal(n.multi, "Oranges")[c(3,4,5,7,9)]
+multi.color = brewer.pal(n.multi, "Oranges")[c(3,4,5,6,7,9)]
 colour = c(single.color,EUR.color,multi.color)
 col_df = tibble(
   colour = c(single.color,EUR.color,multi.color),
@@ -129,6 +134,7 @@ col_df = tibble(
                                        ) ~ "EUR PRS based method",
                        method_vec%in%c("Weighted PRS",
                                        "XPASS",
+                                       "PolyPred",
                                        "PRS-CSx",
                                        "CT-SLEB (two ancestries)",
                                        "CT-SLEB (five ancestries)") ~ "Multi-ancestry method")

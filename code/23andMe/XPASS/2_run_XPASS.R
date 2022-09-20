@@ -36,10 +36,11 @@ temp.dir = paste0('/lscratch/',sid,'/test/')
 system(paste0("cp ",kg.dir,eth[1],"/all_chr.bed ",temp.dir,eth[1],"all_chr.bed"))
 system(paste0("cp ",kg.dir,eth[1],"/all_chr.bim ",temp.dir,eth[1],"all_chr.bim"))
 system(paste0("cp ",kg.dir,eth[1],"/all_chr.fam ",temp.dir,eth[1],"all_chr.fam"))
+system(paste0("cp ",kg.dir,eth[1],"/all_chr_pca.eigenvec ",temp.dir,eth[1],"all_chr_pca.eigenvec"))
 system(paste0("cp ",kg.dir,eth[i],"/all_chr.bed ",temp.dir,eth[i],"all_chr.bed"))
 system(paste0("cp ",kg.dir,eth[i],"/all_chr.bim ",temp.dir,eth[i],"all_chr.bim"))
 system(paste0("cp ",kg.dir,eth[i],"/all_chr.fam ",temp.dir,eth[i],"all_chr.fam"))
-
+system(paste0("cp ",kg.dir,eth[i],"/all_chr_pca.eigenvec ",temp.dir,eth[i],"all_chr_pca.eigenvec"))
 #####
 # Load library
 library(XPASS)
