@@ -28,9 +28,10 @@ temp.dir = paste0('/lscratch/',sid,'/test/')
 system(paste0("cp ",cur.dir,eth[1],"/clump_ref_all_chr.bed ",temp.dir,eth[1],"clump_ref_all_chr.bed"))
 system(paste0("cp ",cur.dir,eth[1],"/clump_ref_all_chr.bim ",temp.dir,eth[1],"clump_ref_all_chr.bim"))
 system(paste0("cp ",cur.dir,eth[1],"/clump_ref_all_chr.fam ",temp.dir,eth[1],"clump_ref_all_chr.fam"))
+system(paste0("cp ",cur.dir,eth[1],"/clump_ref_all_chr_pca.eigenvec ",temp.dir,eth[1],"clump_ref_all_chr_pca.eigenvec"))
 system(paste0("cp ",cur.dir,eth[i],"/clump_ref_all_chr.bed ",temp.dir,eth[i],"clump_ref_all_chr.bed"))
 system(paste0("cp ",cur.dir,eth[i],"/clump_ref_all_chr.bim ",temp.dir,eth[i],"clump_ref_all_chr.bim"))
-system(paste0("cp ",cur.dir,eth[i],"/clump_ref_all_chr.fam ",temp.dir,eth[i],"clump_ref_all_chr.fam"))
+system(paste0("cp ",cur.dir,eth[i],"/clump_ref_all_chr_pca.eigenvec ",temp.dir,eth[i],"clump_ref_all_chr_pca.eigenvec"))
 
 #####
 # Load library
@@ -58,7 +59,13 @@ summary_EUR_XPASS = summary_EUR %>%
   rename(A1 = effect_allele,
          A2 = non_effect_allele)
 write.table(summary_EUR_XPASS, file = paste0(temp.dir,eth[1],"summary_eur"),
-            row.names = F, col.names = T, quote = T)
+            row.names = F, col.names = T, quote = F)
+#prepare the pca of reference data for XPASS format
+eur_ref_cov = as.data.frame(fread(paste0(temp.dir,eth[1],"clump_ref_all_chr_pca.eigenvec")))
+eur_ref_cov = eur_ref_cov[,3:22]
+write.table(eur_ref_cov, file = paste0(temp.dir,eth[1],"eur_ref_cov"),
+            row.names = F, col.names = F, quote = F)
+
 #summary_EUR = paste0("/dcs04/nilanjan/data/wlu/XPASS/data/sumdata/EUR/sumdata-rho",rho,'-size4-rep',rep,'-GA',GA,'.txt') # auxilliary
 summary_target = as.data.frame(fread(paste0(out.dir.sum,eth[i],"/summary_mega_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))) 
 summary_target_XPASS = summary_target %>% 
@@ -66,7 +73,12 @@ summary_target_XPASS = summary_target %>%
   rename(A1 = effect_allele,
          A2 = non_effect_allele)
 write.table(summary_target_XPASS, file = paste0(temp.dir,eth[i],"summary_tar"),
-            row.names = F, col.names = T, quote = T)
+            row.names = F, col.names = T, quote = F)
+tar_ref_cov = as.data.frame(fread(paste0(temp.dir,eth[i],"clump_ref_all_chr_pca.eigenvec")))
+tar_ref_cov = tar_ref_cov[,3:22]
+write.table(tar_ref_cov, file = paste0(temp.dir,eth[i],"tar_ref_cov"),
+            row.names = F, col.names = F, quote = F)
+
 path_to_summary_eur = paste0(temp.dir,eth[1],"summary_eur")
 path_to_summary_tar = paste0(temp.dir,eth[i],"summary_tar")
 #summary_target = paste0("/dcs04/nilanjan/data/wlu/XPASS/data/sumdata/",race,'/sumdata-rho',rho,'-size',size,'-rep',rep,'-GA',GA,'.txt') # target
@@ -74,12 +86,17 @@ path_to_summary_tar = paste0(temp.dir,eth[i],"summary_tar")
 ref_gene_EUR = paste0(temp.dir,eth[1],"clump_ref_all_chr")
 # target
 ref_gene_target = paste0(temp.dir,eth[i],"clump_ref_all_chr")
-file_out = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/xpass/rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)
+
+path_to_cov_EUR = paste0(temp.dir,eth[1],"eur_ref_cov")
+path_to_cov_tar = paste0(temp.dir,eth[i],"tar_ref_cov")
+
+file_out = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/xpass/cov_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)
 
 #####
 # XPASS
 fit_bbj <- XPASS(file_z1 = path_to_summary_tar, file_z2 = path_to_summary_eur,
                  file_ref1 = ref_gene_target, file_ref2 = ref_gene_EUR,
+                 file_cov1 = path_to_cov_tar,file_cov2 = path_to_cov_EUR,
                  # file_predGeno = ref_gene_pred, compPRS = T,
                  pop = "EUR", sd_method="LD_block", compPosMean = T,
                  file_out = file_out)
