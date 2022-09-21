@@ -107,6 +107,17 @@ ref_gene_EUR = paste0(temp.dir,eth[1],"all_chr")
 # target
 ref_gene_target = paste0(temp.dir,eth[i],"all_chr")
 file_out = paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/XPASS/",eth[i],"/",trait[l],"/")
+
+eur_ref_cov = as.data.frame(fread(paste0(temp.dir,eth[1],"all_chr_pca.eigenvec")))
+eur_ref_cov = eur_ref_cov[,3:22]
+tar_ref_cov = as.data.frame(fread(paste0(temp.dir,eth[i],"all_chr_pca.eigenvec")))
+tar_ref_cov = tar_ref_cov[,3:22]
+write.table(eur_ref_cov, file = paste0(temp.dir,eth[1],"eur_ref_cov"),
+            row.names = F, col.names = F, quote = F)
+
+write.table(tar_ref_cov, file = paste0(temp.dir,eth[i],"tar_ref_cov"),
+            row.names = F, col.names = F, quote = F)
+
 path_to_cov_EUR = paste0(temp.dir,eth[1],"eur_ref_cov")
 path_to_cov_tar = paste0(temp.dir,eth[i],"tar_ref_cov")
 
