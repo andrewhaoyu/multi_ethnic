@@ -60,6 +60,7 @@ phi = c("1e+00","1e-02","1e-04","1e-06")
     prs.snp = data[,-1]
     out.dir.organize.prs <- paste0("/data/zhangh24/multi_ethnic/result/cleaned/organize_prs/PRSCSx/",eth[i],"/",trait[l],"/")
     write.table(prs.snp,file = paste0(out.dir.organize.prs,"prs.file"),row.names = F,col.names = F,quote=F)
+    temp = fread(paste0(out.dir.organize.prs,"prs.file"))
 #   }
 # }
 

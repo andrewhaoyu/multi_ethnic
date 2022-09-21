@@ -63,7 +63,7 @@ for(i in 2:5){
           
             
             #load target prs
-            file_name = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/xpass/rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_PRS.sscore")
+            file_name = paste0("/data/zhangh24/multi_ethnic/result/LD_simulation_GA/",eth[i],"/xpass/cov_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_PRS.sscore")
            # if(file_name%in%files){
               PRS <- as.data.frame(fread(paste0(file_name)))
               prs.tar = PRS$SCORE3_SUM[10001:20000]
