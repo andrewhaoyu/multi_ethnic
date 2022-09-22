@@ -81,7 +81,8 @@ if(trait[l]%in%bintrait){
   ma = summary_update %>% 
     mutate(Z = BETA/SD,
            MAF = ifelse(FREQ_A1<=0.5, FREQ_A1, 1 - FREQ_A1),
-           N = N_control) %>% 
+           N = N_control,
+           RSID = rsid) %>% 
     select(RSID, CHR, BP, A1, A2,Z,N, MAF)
   
 }
