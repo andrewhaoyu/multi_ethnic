@@ -165,3 +165,20 @@ write.table(prs.snp,file = paste0(out.dir.organize.prs,"prs.file"),row.names = F
 # # }
 # 
 
+
+
+
+
+
+
+for(i in 1:5){
+  for(l in 1:7){
+    file_dir = paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/polypred/",eth[i],"/",trait[l],"/")
+    files = dir(file_dir, pattern = "SBayesR.snpRes")
+    if(length(files)==0){
+      print(c(i,l))
+    }
+    
+  }
+}
+result = fread(paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/polypred/",eth[i],"/",trait[l],"/SBayesR.snpRes"))
