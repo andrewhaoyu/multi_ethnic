@@ -29,14 +29,18 @@ snpinfo_mega_filter = snpinfo_mega %>%
   filter(!is.na(im.data.id)) %>% 
   select(im.data.id,assay.name)
 #######load all the methods and find the unique SNP ID
-
+sum = as.data.frame(fread(paste0(data.dir,eth[i],"/sumdat/",trait[l],"_passQC_noNA_matchinfo_matchMAFnoNA_common_mega+hapmap3_cleaned.txt"),header=T))
+#use orignal summary stat A1 as our effect allele
+sum_infor = sum %>% 
+  select(rsid, A1, A2) %>% 
+  rename(SNP = rsid)
 #load xpass results
 
 method = "XPASS"
 out.dir.prs = paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/",method,"/",eth[i],"/",trait[l],"/")
 file_out = paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/XPASS/",eth[i],"/",trait[l],"/")
 load(paste0(file_out, "_param.RData"))
-SNP_XPASS = fit_bbj$SNP
+SNP_XPASS = fit_bbj$mu[,"SNP"]
 
 #load Polypred results: SBAYESR EUR, SBAYESR target, Polyfun EUR
 
@@ -49,50 +53,115 @@ result = fread(paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/polypred/"
 SNP_polyfun = result$SNP
 
 #load prs-csx five ancestries results
+out.dir.prs = paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/PRSCSx/EUR/",trait[l],"/")
+#   for(l in 1:7){
+phi = c("1e+00","1e-02","1e-04","1e-06")
+v = 1
+snp.id.list = list()
+for(k in 1:5){
+  load(paste0(out.dir.prs,"sum_five_",eth[k],"_pst_eff_a1_b0.5_phi",phi[v],".rdata"))
+  snp.id.list[[i]] = data.frame(SNP = data$V2)
+  
+}
+
+SNP_PRS_csx = rbindlist(snp.id.list)
 
 
+#combine all SNPs together
+SNP = data.frame(SNP = unique(c(SNP_XPASS,
+               SNP_SBAYES_EUR,
+               SNP_SBAYES_tar,
+               SNP_polyfun,
+               SNP_PRS_csx$SNP)))
+#only keep SNPs that exist in the target population
+SNP_infor = inner_join(SNP, sum_infor, by = "SNP")
+snp_id = left_join(SNP_infor,
+                   snpinfo_mega_filter,
+                   by=c("SNP"="assay.name"))
+#flip the allele to be the right order as the original summary statistics
+
+#load xpass results
+
+method = "XPASS"
+out.dir.prs = paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/",method,"/",eth[i],"/",trait[l],"/")
 file_out = paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/XPASS/",eth[i],"/",trait[l],"/")
 load(paste0(file_out, "_param.RData"))
-SNP_XPASS = fit_bbj$SNP
+BETA = fit_bbj$mu[,c("SNP","A1","mu_XPASS1")]
+colnames(BETA) = c("SNP", "effect_allele", "beta")
+# idx <- which(temp_data$effect_allele!=A1)
+# jdx = which(temp_data$effect_allele[idx]!=temp_data$A2[idx])
+# temp_data[idx[jdx[1:10]],]
+AlignSNP = function(snp_id,BETA){
+  temp_data = left_join(snp_id, BETA, by = c("SNP" = "SNP"))
+  temp_data = temp_data %>% 
+    mutate(beta_update = case_when(
+      is.na(effect_allele) == T ~ 0,
+      effect_allele == A2 ~ -beta,
+      effect_allele == A1 ~ beta,
+      effect_allele != A1 & effect_allele != A2 ~ 0 #insertation and deletion, not match with reference 
+    ))
+return(temp_data)  
+}
+
+temp_data = AlignSNP(snp_id, BETA)
+beta_xpass = temp_data$beta_update
 
 
-#connect chr data into one
-phi = c("1e+00","1e-02","1e-04","1e-06")
+#load Polypred results: SBAYESR EUR, SBAYESR target, Polyfun EUR
 
-#for(i in 2:5){
-out.dir.prs = paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/PRSCSx/",eth[i],"/",trait[l],"/")
+method = "Polypred"
+result = fread(paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/polypred/",eth[1],"/",trait[l],"/SBayesR.snpRes"))
+BETA = result[,c("Name", "A1", "A1Effect")]
+colnames(BETA) = c("SNP", "effect_allele", "beta")
+temp_data = AlignSNP(snp_id,BETA)
+beta_sbayes_eur = temp_data$beta_update
+result = fread(paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/polypred/",eth[i],"/",trait[l],"/SBayesR.snpRes"))
+BETA = result[,c("Name", "A1", "A1Effect")]
+colnames(BETA) = c("SNP", "effect_allele", "beta")
+temp_data = AlignSNP(snp_id,BETA)
+beta_sbayes_tar = temp_data$beta_update
+result = fread(paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/polypred/",eth[1],"/",trait[l],"/poly_fun"))
+SNP_polyfun = result[,c("SNP", "A1", "BETA_MEAN")]
+colnames(BETA) = c("SNP", "effect_allele", "beta")
+temp_data = AlignSNP(snp_id,BETA)
+beta_sbayes_polyfun = temp_data$beta_update
+
+beta_polypred = cbind(beta_sbayes_eur,
+                      beta_sbayes_tar,
+                      beta_sbayes_polyfun)
+
+
+
+out.dir.prs = paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/PRSCSx/EUR/",trait[l],"/")
+BETA_mat = matrix(0, nrow = nrow(snp_id),ncol = length(eth)*length(phi))
 #   for(l in 1:7){
-v = 1
-load(paste0(out.dir.prs,"sum_",eth[i],"_pst_eff_a1_b0.5_phi",phi[v],".rdata"))
-snp.id = data$V2
-load(paste0(out.dir.prs,"sum_EUR_pst_eff_a1_b0.5_phi",phi[v],".rdata"))
-snp.id = data.frame(SNP = unique(c(snp.id,data$V2)))
-snp.id = left_join(snp.id,snpinfo_mega_filter,by=c("SNP"="assay.name"))
-BETA = data.frame(matrix(0,nrow=nrow(snp.id),ncol=4))
-#load effect for target population
-for(v in 1:4){
-  load(paste0(out.dir.prs,"sum_",eth[i],"_pst_eff_a1_b0.5_phi",phi[v],".rdata"))
-  temp.data = left_join(snp.id,data,by=c("SNP"="V2")) %>% 
-    mutate(BETA = ifelse(is.na(V6),0,V6))
-  BETA[,v] = temp.data %>% select(BETA)
+temp = 1
+for(v in 1:length(phi))
+for(k in 1:length(eth)){
+  
+  load(paste0(out.dir.prs,"sum_five_",eth[k],"_pst_eff_a1_b0.5_phi",phi[v],".rdata"))
+  BETA = data[,c("V2", "V4", "V6")]
+  colnames(BETA) = c("SNP", "effect_allele", "beta")
+  temp_data = AlignSNP(snp_id,BETA)
+  BETA_mat[,temp] = temp_data$beta_update
+  temp = temp + 1
+  
+  
+  
 }
-BETA_tar = BETA
-#load effect for EUR population
-for(v in 1:4){
-  load(paste0(out.dir.prs,"sum_",eth[1],"_pst_eff_a1_b0.5_phi",phi[v],".rdata"))
-  temp.data = left_join(snp.id,data,by=c("SNP"="V2")) %>% 
-    mutate(BETA = ifelse(is.na(V6),0,V6))
-  BETA[,v] = temp.data %>% select(BETA)
-}
-BETA_EUR = BETA
-data = cbind(snp.id,BETA_tar,BETA_EUR)
-prs.snp = data[,-1]
-out.dir.organize.prs <- paste0("/data/zhangh24/multi_ethnic/result/cleaned/organize_prs/PRSCSx/",eth[i],"/",trait[l],"/")
+
+
+
+data = cbind(snp_id,beta_xpass,beta_polypred,BETA_mat)
+
+prs.snp = data[,c(4,5:ncol(data))]
+out.dir.organize.prs <- paste0("/data/zhangh24/multi_ethnic/result/cleaned/organize_prs/three_method/",eth[i],"/",trait[l],"/")
 write.table(prs.snp,file = paste0(out.dir.organize.prs,"prs.file"),row.names = F,col.names = F,quote=F)
 #   }
 
 
-
-temp = fread( paste0(out.dir.organize.prs,"prs.file"))
-# }
+# 
+# temp = fread( paste0(out.dir.organize.prs,"prs.file"))
+# # }
+# 
 
