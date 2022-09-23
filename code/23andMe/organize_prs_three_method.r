@@ -116,10 +116,15 @@ colnames(BETA) = c("SNP", "effect_allele", "beta")
 temp_data = AlignSNP(snp_id,BETA)
 beta_sbayes_eur = temp_data$beta_update
 result = fread(paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/polypred/",eth[i],"/",trait[l],"/SBayesR.snpRes"))
-BETA = result[,c("Name", "A1", "A1Effect")]
-colnames(BETA) = c("SNP", "effect_allele", "beta")
-temp_data = AlignSNP(snp_id,BETA)
-beta_sbayes_tar = temp_data$beta_update
+if(nrow(result)!=0){
+  BETA = result[,c("Name", "A1", "A1Effect")]
+  colnames(BETA) = c("SNP", "effect_allele", "beta")
+  temp_data = AlignSNP(snp_id,BETA)
+  beta_sbayes_tar = temp_data$beta_update
+  
+}else{
+  beta_sbayes_tar = rep(0,nrow(snp_id)
+}
 result = fread(paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/polypred/",eth[1],"/",trait[l],"/poly_fun"))
 SNP_polyfun = result[,c("SNP", "A1", "BETA_MEAN")]
 colnames(BETA) = c("SNP", "effect_allele", "beta")
