@@ -123,7 +123,7 @@ if(nrow(result)!=0){
   beta_sbayes_tar = temp_data$beta_update
   
 }else{
-  beta_sbayes_tar = rep(0,nrow(snp_id)
+  beta_sbayes_tar = rep(0,nrow(snp_id))
 }
 result = fread(paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/polypred/",eth[1],"/",trait[l],"/poly_fun"))
 SNP_polyfun = result[,c("SNP", "A1", "BETA_MEAN")]
