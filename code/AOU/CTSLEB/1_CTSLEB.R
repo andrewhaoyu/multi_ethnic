@@ -198,8 +198,9 @@ for(p_ind in 1:n.total.prs){
   prs_r2_vec_test[p_ind] = summary(model)$r.square
 }
 #+2 is due to the first two columns are family id and individual id
-print(colnames(prs_mat)[max_ind+2])
 max_ind = which.max(prs_r2_vec_test)
+print(colnames(prs_mat)[max_ind+2])
+
 ######################PRS step finished#############
 
 
