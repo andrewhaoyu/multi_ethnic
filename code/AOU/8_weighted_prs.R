@@ -44,7 +44,7 @@ pthres <- c(5E-08,5E-07,5E-06,5E-05,5E-04,5E-03,5E-02,5E-01,1.0)
 data.dir = "/data/zhangh24/multi_ethnic/data/AOU_cleaned/"
 #########prepare summary statistics#################
 #load eur summary statistics
-sum.data = as.data.frame(fread(paste0(data.dir,"EUR/",trait,"_update.txt"),header=T))
+sum.data = as.data.frame(fread(paste0(data.dir,eth,"/",trait,"_update.txt"),header=T))
 sum.data.assoc = sum.data %>% 
   mutate(P = as.numeric(P)) %>% 
   rename(SNP = rsID,
@@ -58,6 +58,38 @@ clump.snp <- LD[,3,drop=F]
 prs.all <- left_join(clump.snp,sum.data.assoc) %>% 
   filter(P <= pthres[idx])
 n_pthres <- length(pthres)
+
+#load target population results
+load(paste0("/data/zhangh24/multi_ethnic/result/AOU/clumping_result/PT/",eth_vec[i],"/",trait,"/CT.result"))
+#find best index
+idx <- which.max(ct.result[[2]])
+pthres <- c(5E-08,5E-07,5E-06,5E-05,5E-04,5E-03,5E-02,5E-01,1.0)
+data.dir = "/data/zhangh24/multi_ethnic/data/AOU_cleaned/"
+#########prepare summary statistics#################
+#load eur summary statistics
+sum.data = as.data.frame(fread(paste0(data.dir,eth,"/",trait,"_update.txt"),header=T))
+sum.data.assoc = sum.data %>% 
+  mutate(P = as.numeric(P)) %>% 
+  rename(SNP = rsID,
+         BP = pos37) %>% 
+  select(CHR,SNP,BP,A1,BETA,P) 
+
+pthres <- c(5E-08,5E-07,5E-06,5E-05,5E-04,5E-03,5E-02,5E-01,1.0)
+LD <- as.data.frame(fread(paste0("/data/zhangh24/multi_ethnic/result/AOU/clumping_result/PT/EUR/",trait,"/LD_clump.clumped")))
+clump.snp <- LD[,3,drop=F]
+#prepare the prs files with best EUR SNP and coefficients
+prs.all <- left_join(clump.snp,sum.data.assoc) %>% 
+  filter(P <= pthres[idx])
+n_pthres <- length(pthres)
+
+
+
+
+
+
+
+
+
 #q_range = data.frame(rep("p_value",n_pthres),rep(0,n_pthres),rep(0.5,n_pthres),stringsAsFactors = F)
 prs.file = prs.all[,c("SNP","A1","BETA")]
 write.table(prs.file,file = paste0(temp.dir,"prs_coeff"),col.names = T,row.names = F,quote=F)

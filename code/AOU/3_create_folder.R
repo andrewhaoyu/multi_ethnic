@@ -37,8 +37,8 @@ for(i in 2:3){
 }
 
 
-for(i in 2:5){
-  for(l in 1:4){
+for(i in 2:3){
+  for(l in 1:2){
     system(paste0("cd /data/zhangh24/multi_ethnic/result/AOU/BestEUR/" ,eth[i],"/; ",
                   "mkdir ",trait[l]))
   }
