@@ -49,23 +49,23 @@ method_vec = c("weighted_prs", "CTSLEB", "XPASS", "PRSCSX", "polypred")
 
 for(k in 1:length(method_vec)){
   method = method_vec[k]
-  system(paste0("cd /data/zhangh24/multi_ethnic/result/AOU/; mkdir ",method))
-  for(i in 2:3){
-    system(paste0("cd /data/zhangh24/multi_ethnic/result/AOU/",method,"/; mkdir ",eth[i]))
-  }
-
-  
-  for(i in 2:3){
-    for(l in 1:2){
-      system(paste0("cd /data/zhangh24/multi_ethnic/result/AOU/",method,"/" ,eth[i],"/; ",
-                    "mkdir ",trait[l]))
-    }
-  }
-  
-  system(paste0("cd /data/zhangh24/multi_ethnic/result/AOU/prs/; mkdir ",method))
-  for(i in 2:3){
-    system(paste0("cd /data/zhangh24/multi_ethnic/result/AOU/prs/",method,"/; mkdir ",eth[i]))
-  }
+  # system(paste0("cd /data/zhangh24/multi_ethnic/result/AOU/; mkdir ",method))
+  # for(i in 2:3){
+  #   system(paste0("cd /data/zhangh24/multi_ethnic/result/AOU/",method,"/; mkdir ",eth[i]))
+  # }
+  # 
+  # 
+  # for(i in 2:3){
+  #   for(l in 1:2){
+  #     system(paste0("cd /data/zhangh24/multi_ethnic/result/AOU/",method,"/" ,eth[i],"/; ",
+  #                   "mkdir ",trait[l]))
+  #   }
+  # }
+  # 
+  # system(paste0("cd /data/zhangh24/multi_ethnic/result/AOU/prs/; mkdir ",method))
+  # for(i in 2:3){
+  #   system(paste0("cd /data/zhangh24/multi_ethnic/result/AOU/prs/",method,"/; mkdir ",eth[i]))
+  # }
 
   for(i in 2:3){
     for(l in 1:2){

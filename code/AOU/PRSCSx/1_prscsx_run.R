@@ -21,7 +21,7 @@ library(dplyr)
 
 eth <- c("EUR","AFR","AMR")
 trait_vec <-c("height","bmi")
-
+trait = trait_vec[l]
 sid<-Sys.getenv('SLURM_JOB_ID')
 dir.create(paste0('/lscratch/',sid,'/test'),showWarnings = FALSE)
 temp.dir = paste0('/lscratch/',sid,'/test/')
