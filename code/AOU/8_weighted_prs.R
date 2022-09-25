@@ -151,3 +151,4 @@ result = data.frame(eth = eth,
 )
 
 save(result, file = paste0(out.dir, "weighted_prs_ct.result"))
+
