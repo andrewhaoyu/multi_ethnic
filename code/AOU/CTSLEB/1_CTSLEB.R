@@ -271,7 +271,7 @@ for(k1 in 1:length(pthres)){
 }
 prs_mat = as.data.frame(cbind(prs_temp[,1:2],bind_cols(prs_list)))
 colnames(prs_mat)[2] = "id"
-
+prs_score = prs_mat[,-c(1:2)]
 
 #############EB step finish############################
 
@@ -303,7 +303,7 @@ model.null <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=pheno_v
 y_vad = model.null$residual
 prs_vad = pheno_vad[,colnames(prs_score)]
 library(caret)
-prs_score = prs_mat[,-c(1:2)]
+
 mtx = cor(prs_tun)
 drop = findCorrelation(mtx,cutoff=0.98)
 drop = names(prs_tun)[drop]
