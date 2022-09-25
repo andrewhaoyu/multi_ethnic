@@ -63,7 +63,7 @@ path_to_ref = paste0(temp.dir,"1KGLD")
 path_to_bim = paste0(temp.dir,eth,"all_chr")
 path_to_sum = paste0(temp.dir)
 
-out.dir.prs = paste0("/data/zhangh24/multi_ethnic/result/AOU/prs/PRSCSX/",eth[i],"/",trait,"/")
+out.dir.prs = paste0("/data/zhangh24/multi_ethnic/result/AOU/prs/PRSCSX/",eth[i],"/",trait,"")
 
 
 
