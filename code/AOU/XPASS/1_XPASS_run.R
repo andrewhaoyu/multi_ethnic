@@ -110,9 +110,9 @@ print("XPASS finished run")
 
 system(paste0("mkdir ",temp.dir,"ukb"))
 geno.data = paste0("/data/zhangh24/multi_ethnic/data/UKBB/genotype/all_data/")
-system(paste0("cp ",geno.data,eth,"/all_chr.bed ",temp.dir,"ukb/all_chr.bed"))
-system(paste0("cp ",geno.data,eth,"/all_chr.bim ",temp.dir,"ukb/all_chr.bim"))
-system(paste0("cp ",geno.data,eth,"/all_chr.fam ",temp.dir,"ukb/all_chr.fam"))
+system(paste0("cp ",geno.data,eth[i],"/all_chr.bed ",temp.dir,"ukb/all_chr.bed"))
+system(paste0("cp ",geno.data,eth[i],"/all_chr.bim ",temp.dir,"ukb/all_chr.bim"))
+system(paste0("cp ",geno.data,eth[i],"/all_chr.fam ",temp.dir,"ukb/all_chr.fam"))
 
 
 
