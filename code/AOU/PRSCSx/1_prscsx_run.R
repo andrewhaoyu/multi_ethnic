@@ -52,15 +52,22 @@ sum.tar.select = sum.tar %>%
   rename(SNP=rsID) %>% 
   select(SNP,A1,A2,BETA,P) 
 write.table(sum.tar.select,file = paste0(temp.dir,eth[i],"_sumstats.txt"),row.names = F,col.names = T,quote=F)
+bim = sum.tar %>% 
+  mutate(V3=0) %>% 
+  rename(SNP=rsID,
+         BP = pos37) %>% 
+  select(CHR,SNP,V3,BP,A1,A2)
+write.table(bim,file = paste0(temp.dir,eth[i],"_genotype.bim"),row.names = F,col.names = F,quote=F)
+
+
 kg.dir = "/data/zhangh24/KGref_MEGA/GRCh37/"
 system(paste0("cp ",kg.dir,eth,"/all_chr.bim ",temp.dir,eth,"all_chr.bim"))
 phi = c(1E+00,1E-02,1E-04,1E-6)
 n_eur = median(sum.eur$N)
 n_tar = median(sum.tar$N)
 
-
 path_to_ref = paste0(temp.dir,"1KGLD")
-path_to_bim = paste0(temp.dir,eth,"all_chr")
+path_to_bim = paste0(temp.dir,eth[i],"_genotype")
 path_to_sum = paste0(temp.dir)
 
 out.dir.prs = paste0("/data/zhangh24/multi_ethnic/result/AOU/prs/PRSCSX/",eth[i],"/",trait,"")
