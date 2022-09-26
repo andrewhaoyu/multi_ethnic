@@ -56,7 +56,7 @@ library(RhpcBLASctl)
 #####
 # input files
 summary_EUR = as.data.frame(fread(paste0(data.dir,"EUR/",trait,"_update.txt"),header=T))
-summary_target = as.data.frame(fread(paste0(data.dir,eth_vec[i],"/",trait,"_update.txt"),header=T))
+summary_target = as.data.frame(fread(paste0(data.dir,eth[i],"/",trait,"_update.txt"),header=T))
 
 
 
