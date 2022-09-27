@@ -21,6 +21,6 @@ for(l in 1:2){
 }
 
 final_result = rbindlist(result_list)
-save(final_result, file = "/data/zhangh24/multi_ethnic/result/AOU/weighted_prs/weighted_prs.rdata")
+save(final_result, file = "/data/zhangh24/multi_ethnic/result/AOU/CTSLEB/ct_sleb.rdata")
 
 #final_result = read.csv("/data/zhangh24/multi_ethnic/result/GLGC/clumping_result/PT/PT.csv")

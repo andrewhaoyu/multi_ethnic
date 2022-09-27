@@ -25,7 +25,7 @@ geno.data = paste0("/data/zhangh24/multi_ethnic/data/UKBB/genotype/all_data/")
 system(paste0("cp ",geno.data,eth[i],"/all_chr.bed ",temp.dir,"ukb/all_chr.bed"))
 system(paste0("cp ",geno.data,eth[i],"/all_chr.bim ",temp.dir,"ukb/all_chr.bim"))
 system(paste0("cp ",geno.data,eth[i],"/all_chr.fam ",temp.dir,"ukb/all_chr.fam"))
-
+v = 1
 #find unique snp set
 #load target prs
 load(paste0(out.dir.prs,"sum_",eth[i],"_pst_eff_a1_b0.5_phi",phi[v],".rdata"))
