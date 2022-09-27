@@ -115,9 +115,10 @@ prs_vad = cbind(score1, score2)%*%coef
 
 model = lm(y_vad~ prs_vad)
 r2 = summary(model)$r.square
-r2.result = data.frame(eth = eth_vec[i],
+r2.result = data.frame(eth = eth[i],
                        trait = trait_vec[l],
                        method = "PRS-CSx",
                        r2 = r2
 )
-save(r2.result, file = )
+out.dir = paste0("/data/zhangh24/multi_ethnic/result/AOU/PRSCSX/",eth[i],"/",trait,"/")
+save(r2.result, file = paste0(out.dir, "prscsx.result"))
