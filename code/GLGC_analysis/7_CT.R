@@ -42,6 +42,8 @@ out.dir = paste0("/data/zhangh24/multi_ethnic/result/GLGC/clumping_result/PT/",e
 #########LD clumping#################
 #load gwas summary statistics
 sum.data = as.data.frame(fread(paste0(data.dir,eth,"/",trait,".txt"),header=T))
+sum.data2 = as.data.frame(fread("/data/zhangh24/multi_ethnic/data/GLGC_cleaned/hugeh2_locus/HDL.txt"))
+idx <- which(sum.data2$rsID%in%sum.data$rsID)
 # write.table(sum.data.MAF,file = paste0("/lscratch/",sid,"/test/",eth[i],"_summary_out_MAF_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".out")
 #             ,col.names = T,row.names = F,quote=F) 
 #prepare association file for plink
