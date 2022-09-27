@@ -12,6 +12,7 @@ library(dplyr)
 
 eth <- c("EUR","AFR","AMR")
 trait_vec <-c("height","bmi")
+trait = trait_vec[l]
 out.dir.prs = paste0("/data/zhangh24/multi_ethnic/result/AOU/prs/PRSCSX/",eth[i],"/",trait,"/")
 phi = c("1e+00","1e-02","1e-04","1e-06")
 
