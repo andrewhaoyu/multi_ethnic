@@ -25,15 +25,8 @@ library(Rfast, lib = "/home/zhangh24/R/4.1/library/")
 
 
 
-eth <- c("EUR","AFR","AMR","EAS","SAS")
-trait <- c("any_cvd","depression",
-           "heart_metabolic_disease_burden",
-           "height",
-           "iqb.sing_back_musical_note",
-           "migraine_diagnosis",
-           "morning_person")
-cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
-data.dir = "/data/zhangh24/multi_ethnic/data/cleaned/"
+eth <- c("EUR","AFR","AMR")
+trait <- c("height","bmi")
 sid<-Sys.getenv('SLURM_JOB_ID')
 dir.create(paste0('/lscratch/',sid,'/test'),showWarnings = FALSE)
 temp.dir = paste0('/lscratch/',sid,'/test/')
@@ -41,54 +34,31 @@ kg.dir = "/data/zhangh24/KGref_MEGA/GRCh37/"
 system(paste0("cp ",kg.dir,eth[1],"/all_chr.bed ",temp.dir,eth[1],"all_chr.bed"))
 system(paste0("cp ",kg.dir,eth[1],"/all_chr.bim ",temp.dir,eth[1],"all_chr.bim"))
 system(paste0("cp ",kg.dir,eth[1],"/all_chr.fam ",temp.dir,eth[1],"all_chr.fam"))
-
+data.dir = "/data/zhangh24/multi_ethnic/data/AOU_cleaned/"
 #prepare summary statistics
 #use the same preprocessing way as SBayesR
 setwd("/data/zhangh24/multi_ethnic/")
 # input files
-sum = as.data.frame(fread(paste0(data.dir,eth[i],"/sumdat/",trait[l],"_passQC_noNA_matchinfo_matchMAFnoNA_common_mega+hapmap3_cleaned.txt"),header=T))
+#load sum data
+sum = as.data.frame(fread(paste0(data.dir,eth[i],"/",trait[l],"_update.txt"),header=T))
+colnames(sum)[1] = "rsid"
+#match summary data with the reference data of SBayesR
 LD_info = fread("/data/zhangh24/software/SBayesR/ukbEURu_hm3_shrunk_sparse/ukbEURu_hm3_all_v3_50k.ldm.sparse.info", header = F)
 colnames(LD_info)[1:6] = c("CHR", "rsid", "no1", "BP", "A1", "A2")
 
 LD_info = LD_info %>% select(rsid) 
-
-#combine summary data with SBayesR
-#prepare the summary data format to be required format as SBayesR
 summary_update = inner_join(sum, LD_info, by = "rsid")
+ma = summary_update %>% 
+  rename(SNP = rsid,
+         freq = A1_FREQ_allofus,
+         b = BETA, 
+         se = SE,
+         p = P,
+         BP  = pos37) %>% 
+  mutate(Z = b/se,
+         MAF = ifelse(freq<=0.5,freq, 1- freq)) %>% 
+  select(SNP, CHR, BP, A1, A2,Z, N, MAF) 
 
-#"CHR", "BP", "SNP", "A1", "A2", "MAF", "N", "Z", "SNPVAR"
-
-
-bintrait <- c("any_cvd","depression",
-              "iqb.sing_back_musical_note",
-              "migraine_diagnosis",
-              "morning_person")
-contriat = c("heart_metabolic_disease_burden",
-             "height")
-
-
-if(trait[l]%in%bintrait){
-  
-  ma = summary_update %>% 
-    mutate(Z = BETA/SD,
-           MAF = ifelse(FREQ_A1<=0.5, FREQ_A1, 1 - FREQ_A1)) %>% 
-    rename(N_controls = N_control,
-           N_cases = N_case,
-           RSID = rsid) %>% 
-    select(RSID, CHR, BP, A1, A2,Z,N_controls, N_cases, MAF)
-  
-  N = median(ma$N_control + ma$N_case)
-  
-}else{
-  ma = summary_update %>% 
-    mutate(Z = BETA/SD,
-           MAF = ifelse(FREQ_A1<=0.5, FREQ_A1, 1 - FREQ_A1),
-           N = N_control,
-           RSID = rsid) %>% 
-    select(RSID, CHR, BP, A1, A2,Z,N, MAF)
-  N = median(ma$N)
-  
-}
 
 
 write.table(ma, paste0(temp.dir, "sumstats"), row.names = F, col.names = T, quote = F)
@@ -132,7 +102,7 @@ system(
 sum_file_align_snpvar = paste0(temp.dir,"sumstats_align_snpvar")
 
 out_prefix_temp = paste0(temp.dir,"poly_fun_",trait[l])
-
+N = median(ma$N)
 system(paste0( "cd /data/zhangh24/software/polyfun; ",
                "python create_finemapper_jobs.py ",
                "--method susie ",
@@ -190,7 +160,7 @@ stopImplicitCluster()
 
 
 #############step four: aggregate all the polyfun results into one
-out_prefix = paste0("/data/zhangh24/multi_ethnic/result/cleaned/prs/polypred/",eth[i],"/",trait[l],"/poly_fun")
+out_prefix = paste0("/data/zhangh24/multi_ethnic/result/AOU/prs/polypred/",eth[i],"/",trait[l],"/poly_fun")
 system(
   paste0(
     "cd /data/zhangh24/software/polyfun; ",
