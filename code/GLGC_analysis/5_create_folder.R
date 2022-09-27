@@ -48,25 +48,25 @@ method_vec = c("weighted_prs", "CTSLEB", "XPASS", "PRSCSX", "polypred")
 for(k in 1:length(method_vec)){
   method = method_vec[k]
   system(paste0("cd /data/zhangh24/multi_ethnic/result/GLGC/; mkdir ",method))
-  for(i in 2:3){
+  for(i in 1:5){
     system(paste0("cd /data/zhangh24/multi_ethnic/result/GLGC/",method,"/; mkdir ",eth[i]))
   }
 
 
-  for(i in 2:3){
-    for(l in 1:2){
+  for(i in 1:5){
+    for(l in 1:4){
       system(paste0("cd /data/zhangh24/multi_ethnic/result/GLGC/",method,"/" ,eth[i],"/; ",
                     "mkdir ",trait[l]))
     }
   }
 
   system(paste0("cd /data/zhangh24/multi_ethnic/result/GLGC/prs/; mkdir ",method))
-  for(i in 2:3){
+  for(i in 1:5){
     system(paste0("cd /data/zhangh24/multi_ethnic/result/GLGC/prs/",method,"/; mkdir ",eth[i]))
   }
 
-  for(i in 2:3){
-    for(l in 1:2){
+  for(i in 1:5){
+    for(l in 1:4){
       system(paste0("cd /data/zhangh24/multi_ethnic/result/GLGC/prs/",method,"/" ,eth[i],"/; ",
                     "mkdir ",trait[l]))
     }
