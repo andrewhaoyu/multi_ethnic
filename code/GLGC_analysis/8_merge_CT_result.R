@@ -17,6 +17,6 @@ temp = 1
   }
 
 final_result = rbindlist(result)
-write.csv(final_result, file = "/data/zhangh24/multi_ethnic/result/GLGC/clumping_result/PT/PT.csv")
+save(final_result, file = "/data/zhangh24/multi_ethnic/result/GLGC/clumping_result/PT/PT.rdata")
 
 #final_result = read.csv("/data/zhangh24/multi_ethnic/result/GLGC/clumping_result/PT/PT.csv")
