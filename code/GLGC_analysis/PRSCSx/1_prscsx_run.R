@@ -20,7 +20,7 @@ library(data.table)
 library(dplyr)
 
 eth <- c("EUR","AFR","AMR","EAS","SAS")
-trait_vec <-c("HDL","LDL",
+trait_vec <- c("HDL","LDL",
               "logTG",
               "TC")
 trait = trait_vec[l]

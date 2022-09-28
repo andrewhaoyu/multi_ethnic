@@ -13,8 +13,10 @@ l = as.numeric(args[[2]])
 #   for(l in 1:2){
 library(dplyr)
 
-eth <- c("EUR","AFR","AMR")
-trait_vec <-c("height","bmi")
+eth <- c("EUR","AFR","AMR","EAS","SAS")
+trait_vec <- c("HDL","LDL",
+               "logTG",
+               "TC")
 trait = trait_vec[l]
 out.dir.prs = paste0("/data/zhangh24/multi_ethnic/result/GLGC/prs/PRSCSX/",eth[i],"/",trait,"/")
 phi = c("1e+00","1e-02","1e-04","1e-06")
