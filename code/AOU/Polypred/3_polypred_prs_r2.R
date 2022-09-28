@@ -28,7 +28,7 @@ geno.data = paste0("/data/zhangh24/multi_ethnic/data/UKBB/genotype/all_data/")
 system(paste0("cp ",geno.data,eth[i],"/all_chr.bed ",temp.dir,"ukb/all_chr.bed"))
 system(paste0("cp ",geno.data,eth[i],"/all_chr.bim ",temp.dir,"ukb/all_chr.bim"))
 system(paste0("cp ",geno.data,eth[i],"/all_chr.fam ",temp.dir,"ukb/all_chr.fam"))
-
+ref_gene_pred = paste0(temp.dir,"ukb/all_chr")
 #calculate the PRS for SBayesR based on EUR 
 file_dir = paste0("/data/zhangh24/multi_ethnic/result/AOU/prs/polypred/",eth[1],"/",trait[l])
 #coefs are based on EUR population
@@ -51,7 +51,7 @@ if(eur_coef%in%files==T){
       select(SNP, A1, BETA)
     write.table(assoc,file = paste0(temp.dir,"prs_prep"),col.names = T,row.names = F,quote=F)
     #calculate the PRS for SBayesR 
-    ref_gene_pred = paste0(temp.dir,"ukb/all_chr")
+    
     res = system(paste0("/data/zhangh24/software/plink2_alpha ",
                         "--score-col-nums 3 --threads 2 ",
                         "--score ",temp.dir,"prs_prep cols=+scoresums,-scoreavgs header no-mean-imputation ",
