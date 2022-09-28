@@ -101,7 +101,7 @@ if(tar_coef%in%files==T){
 #calculate the PRS for Polyfun
 #if(i ==1){
 
-poly_fun_file_out = paste0("/data/zhangh24/multi_ethnic/result/AOU/prs/polypred/",eth[1],"/",trait[l],"/poly_fun")
+poly_fun_file_out = paste0("/data/zhangh24/multi_ethnic/result/AOU/prs/polypred/",eth[1],"/",trait,"/poly_fun")
 polyfun_result = fread(poly_fun_file_out)  
 
 assoc = polyfun_result %>% 
