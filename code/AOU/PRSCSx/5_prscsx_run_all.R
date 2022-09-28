@@ -33,8 +33,9 @@ system(paste0("cp -r /data/zhangh24/software/PRScsx/1KGLD/ldblk_1kg_amr ",temp.d
 #system(paste0("cp -r /data/zhangh24/software/PRScsx/1KGLD/ldblk_1kg_eas ",temp.dir,"1KGLD"))
 #system(paste0("cp -r /data/zhangh24/software/PRScsx/1KGLD/ldblk_1kg_sas ",temp.dir,"1KGLD"))
 system(paste0("cp /data/zhangh24/software/PRScsx/1KGLD/snpinfo_mult_1kg_hm3 ",temp.dir,"1KGLD"))
-system(paste0("cp ",data.dir,"all_eth.bim ",temp.dir,"all_eth.bim"))
 data.dir = "/data/zhangh24/multi_ethnic/data/AOU_cleaned/"
+system(paste0("cp ",data.dir,"all_eth.bim ",temp.dir,"all_eth.bim"))
+
 
 n_vec = rep(0, length(eth))
 

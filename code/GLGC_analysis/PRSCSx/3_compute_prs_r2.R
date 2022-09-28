@@ -12,7 +12,7 @@ l = as.numeric(args[[2]])
 # for(i in 2:3){
 #   for(l in 1:2){
 library(dplyr)
-
+library(data.table)
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 trait_vec <- c("HDL","LDL",
                "logTG",
