@@ -41,7 +41,7 @@ data.dir = "/data/zhangh24/multi_ethnic/data/GLGC_cleaned/"
 n_vec = rep(0, length(eth))
 
 for(i in 1:5){
-  sum = as.data.frame(fread(paste0(data.dir,eth[i],"/",trait,"_update.txt"),header=T))
+  sum = as.data.frame(fread(paste0(data.dir,eth[i],"/",trait,".txt"),header=T))
   n_vec[i] = median(sum$N)
   sum.select = sum %>% 
     rename(SNP=rsID) %>% 
@@ -66,8 +66,8 @@ out.dir.prs = paste0("/data/zhangh24/multi_ethnic/result/GLGC/prs/PRSCSX/",eth[1
 system(paste0("python /data/zhangh24/software/PRScsx/PRScsx.py", 
               " --ref_dir=",path_to_ref,
               " --bim_prefix=",path_to_bim,
-              " --sst_file=",path_to_sum,"EUR_sumstats.txt,",path_to_sum,"AFR_sumstats.txt,",path_to_sum,"AMR_sumstats.txt",path_to_sum,"EAS_sumstats.txt",path_to_sum,"SAS_sumstats.txt",
-              " --n_gwas=",n_vec[1],",",n_vec[2],",",n_vec[3],n_vec[4],",",n_vec[5],
+              " --sst_file=",path_to_sum,"EUR_sumstats.txt,",path_to_sum,"AFR_sumstats.txt,",path_to_sum,"AMR_sumstats.txt,",path_to_sum,"EAS_sumstats.txt,",path_to_sum,"SAS_sumstats.txt",
+              " --n_gwas=",n_vec[1],",",n_vec[2],",",n_vec[3],",",n_vec[4],",",n_vec[5],
               " --pop=EUR,AFR,AMR,EAS,SAS",
               " --chrom=",j,
               " --phi=",phi[v],  
