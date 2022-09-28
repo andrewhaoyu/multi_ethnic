@@ -19,8 +19,10 @@ library(data.table)
 #install.packages("vctrs")
 library(dplyr)
 
-eth <- c("EUR","AFR","AMR")
-trait_vec <-c("height","bmi")
+eth <- c("EUR","AFR","AMR","EAS","SAS")
+trait_vec <- c("HDL","LDL",
+               "logTG",
+               "TC")
 trait = trait_vec[l]
 sid<-Sys.getenv('SLURM_JOB_ID')
 dir.create(paste0('/lscratch/',sid,'/test'),showWarnings = FALSE)
@@ -30,15 +32,15 @@ dir.create(paste0('/lscratch/',sid,'/test/1KGLD'),showWarnings = FALSE)
 system(paste0("cp -r /data/zhangh24/software/PRScsx/1KGLD/ldblk_1kg_eur ",temp.dir,"1KGLD"))
 system(paste0("cp -r /data/zhangh24/software/PRScsx/1KGLD/ldblk_1kg_afr ",temp.dir,"1KGLD"))
 system(paste0("cp -r /data/zhangh24/software/PRScsx/1KGLD/ldblk_1kg_amr ",temp.dir,"1KGLD"))
-#system(paste0("cp -r /data/zhangh24/software/PRScsx/1KGLD/ldblk_1kg_eas ",temp.dir,"1KGLD"))
-#system(paste0("cp -r /data/zhangh24/software/PRScsx/1KGLD/ldblk_1kg_sas ",temp.dir,"1KGLD"))
+system(paste0("cp -r /data/zhangh24/software/PRScsx/1KGLD/ldblk_1kg_eas ",temp.dir,"1KGLD"))
+system(paste0("cp -r /data/zhangh24/software/PRScsx/1KGLD/ldblk_1kg_sas ",temp.dir,"1KGLD"))
 system(paste0("cp /data/zhangh24/software/PRScsx/1KGLD/snpinfo_mult_1kg_hm3 ",temp.dir,"1KGLD"))
 system(paste0("cp ",data.dir,"all_eth.bim ",temp.dir,"all_eth.bim"))
-data.dir = "/data/zhangh24/multi_ethnic/data/AOU_cleaned/"
+data.dir = "/data/zhangh24/multi_ethnic/data/GLGC_cleaned/"
 
 n_vec = rep(0, length(eth))
 
-for(i in 1:3){
+for(i in 1:5){
   sum = as.data.frame(fread(paste0(data.dir,eth[i],"/",trait,"_update.txt"),header=T))
   n_vec[i] = median(sum$N)
   sum.select = sum %>% 
@@ -56,7 +58,7 @@ path_to_ref = paste0(temp.dir,"1KGLD")
 path_to_bim = paste0(temp.dir,"all_eth")
 path_to_sum = paste0(temp.dir)
 
-out.dir.prs = paste0("/data/zhangh24/multi_ethnic/result/AOU/prs/PRSCSX/",eth[1],"/",trait,"")
+out.dir.prs = paste0("/data/zhangh24/multi_ethnic/result/GLGC/prs/PRSCSX/",eth[1],"/",trait,"")
 
 
 
@@ -64,9 +66,9 @@ out.dir.prs = paste0("/data/zhangh24/multi_ethnic/result/AOU/prs/PRSCSX/",eth[1]
 system(paste0("python /data/zhangh24/software/PRScsx/PRScsx.py", 
               " --ref_dir=",path_to_ref,
               " --bim_prefix=",path_to_bim,
-              " --sst_file=",path_to_sum,"EUR_sumstats.txt,",path_to_sum,"AFR_sumstats.txt,",path_to_sum,"AMR_sumstats.txt",
-              " --n_gwas=",n_vec[1],",",n_vec[2],",",n_vec[3],
-              " --pop=EUR,AFR,AMR",
+              " --sst_file=",path_to_sum,"EUR_sumstats.txt,",path_to_sum,"AFR_sumstats.txt,",path_to_sum,"AMR_sumstats.txt",path_to_sum,"EAS_sumstats.txt",path_to_sum,"SAS_sumstats.txt",
+              " --n_gwas=",n_vec[1],",",n_vec[2],",",n_vec[3],n_vec[4],",",n_vec[5],
+              " --pop=EUR,AFR,AMR,EAS,SAS",
               " --chrom=",j,
               " --phi=",phi[v],  
               " --out_dir=",out.dir.prs,
