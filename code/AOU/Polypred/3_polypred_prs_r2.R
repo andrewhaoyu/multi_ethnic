@@ -14,8 +14,8 @@ l = as.numeric(args[[2]])
 library(dplyr)
 library(data.table)
 eth <- c("EUR","AFR","AMR")
-trait_vec <-c("height","bmi")
-trait = trait_vec[l]
+trait <- c("height","bmi")
+
 out.dir.prs = paste0("/data/zhangh24/multi_ethnic/result/AOU/prs/PRSCSX/",eth[i],"/",trait,"/")
 phi = c("1e+00","1e-02","1e-04","1e-06")
 
@@ -87,7 +87,7 @@ if(tar_coef%in%files==T){
                         "--score-col-nums 3 --threads 2 ",
                         "--score ",temp.dir,"prs_prep cols=+scoresums,-scoreavgs header no-mean-imputation ",
                         "--bfile ",ref_gene_pred,
-                        " --out ",file_out,"_PRS_SBayesR_tar"))
+                        " --out ",temp.dir,"PRS_SBayesR_tar"))
     
   }else{
     tar_con = 0
@@ -101,7 +101,7 @@ if(tar_coef%in%files==T){
 #calculate the PRS for Polyfun
 #if(i ==1){
 
-poly_fun_file_out = paste0("/data/zhangh24/multi_ethnic/result/AOU/prs/polypred/",eth[1],"/",trait,"/poly_fun")
+poly_fun_file_out = paste0("/data/zhangh24/multi_ethnic/result/AOU/prs/polypred/",eth[1],"/",trait[l],"/poly_fun")
 polyfun_result = fread(poly_fun_file_out)  
 
 assoc = polyfun_result %>% 
@@ -133,7 +133,7 @@ if(tar_con==1){
 prs_score = prs_mat[,5:ncol(prs_mat)]
 colnames(prs_mat)[2] = "id"
 pheno.dir = "/data/zhangh24/multi_ethnic/data/UKBB/phenotype/"
-pheno_tuning = as.data.frame(fread(paste0(pheno.dir,trait,"/tuning+validation/",eth[i],"_tuning.txt")))
+pheno_tuning = as.data.frame(fread(paste0(pheno.dir,trait[l],"/tuning+validation/",eth[i],"_tuning.txt")))
 pheno_tuning = pheno_tuning[,1:2]
 covar <- as.data.frame(fread(paste0(pheno.dir,"/covariates/tuning+validation/",eth[i],"_all_data.txt")))
 pheno_tuning <- left_join(pheno_tuning, covar)
@@ -144,7 +144,7 @@ model.null <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=pheno_t
 y_tun = model.null$residual
 prs_tun = pheno_tuning[,colnames(prs_score)]
 
-pheno_vad = as.data.frame(fread(paste0(pheno.dir,trait,"/tuning+validation/",eth[i],"_validation.txt")))
+pheno_vad = as.data.frame(fread(paste0(pheno.dir,trait[l],"/tuning+validation/",eth[i],"_validation.txt")))
 pheno_vad = pheno_vad[,1:2]
 pheno_vad <- left_join(pheno_vad, covar)
 colnames(pheno_vad) = c('id','y','sex','age',paste0('pc',1:10))
@@ -156,18 +156,18 @@ prs_vad = pheno_vad[,colnames(prs_score)]
 
 
   model = lm(y_tun~as.matrix(prs_tun))
-  coef = coefficients(model)[2:3]
+  coef = coefficients(model)[-1] #take out intercept
 
 prs = as.matrix(prs_vad)%*%coef
 
 model = lm(y_vad~ prs)
 r2 = summary(model)$r.square
 r2.result = data.frame(eth = eth[i],
-                       trait = trait_vec[l],
+                       trait = trait[l],
                        method = "PolyPred",
                        r2 = r2
 )
-out.dir = paste0("/data/zhangh24/multi_ethnic/result/AOU/polypred/",eth[i],"/",trait,"/")
+out.dir = paste0("/data/zhangh24/multi_ethnic/result/AOU/polypred/",eth[i],"/",trait[l],"/")
 save(r2.result, file = paste0(out.dir, "polypred.result"))
 #     system(paste0("rm -rf ", temp.dir))
 #   }

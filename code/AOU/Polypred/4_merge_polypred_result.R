@@ -7,8 +7,8 @@ for(l in 1:2){
   for(i in 2:3){
     eth = eth_vec[i]
     trait = trait_vec[l]
-    out.dir = paste0("/data/zhangh24/multi_ethnic/result/AOU/Polypred/",eth_vec[i],"/",trait_vec[l],"/")
-    load(paste0(out.dir, "prscsx.result"))
+    out.dir = paste0("/data/zhangh24/multi_ethnic/result/AOU/polypred/",eth_vec[i],"/",trait_vec[l],"/")
+    load(paste0(out.dir, "polypred.result"))
     
     result_list[[temp]] = r2.result
     temp = temp+ 1
