@@ -14,26 +14,30 @@ trait <- c("height","bmi")
 
 #the SNP ID for different traits are consistent
 #only need to create a single bim for all data analyses
-for(i in 1:5){
-  sum = as.data.frame(fread(paste0(data.dir,eth[i],"/",trait[1],"_update.txt"),header=T))
-  bim1 = sum  %>% 
-    mutate(V3=0) %>% 
-    select(CHR,rsid,V3,BP,A1,A2)
-  
-  sum = as.data.frame(fread(paste0(data.dir,eth[i],"/",trait[2],"_update.txt"),header=T))
-  bim2 = sum  %>% 
-    mutate(V3=0) %>% 
-    select(CHR,rsid,V3,BP,A1,A2)
-  print(all.equal(bim1,bim2))
-  
-}
+# for(i in 1:3){
+#   sum = as.data.frame(fread(paste0(data.dir,eth[i],"/",trait[1],"_update.txt"),header=T))
+#   bim1 = sum  %>%
+#     mutate(V3=0) %>%
+#     rename(rsid = rsID, BP = pos37) %>%
+#     select(CHR,rsid,V3,BP,A1,A2)
+# 
+#   sum = as.data.frame(fread(paste0(data.dir,eth[i],"/",trait[2],"_update.txt"),header=T))
+#   bim2 = sum  %>%
+#     mutate(V3=0) %>%
+#     rename(rsid = rsID, BP = pos37) %>%
+#     select(CHR,rsid,V3,BP,A1,A2)
+# 
+#   print(all.equal(bim1,bim2))
+# 
+# }
 
 
-for(i in 1:5){
+for(i in 1:3){
   sum = as.data.frame(fread(paste0(data.dir,eth[i],"/",trait[1],"_update.txt"),header=T))
   
   snp.list[[i]] = sum  %>% 
-    mutate(V3=0) %>% 
+    mutate(V3=0) %>%
+    rename(rsid = rsID, BP = pos37) %>%
     select(CHR,rsid,V3,BP,A1,A2)
   
 }
