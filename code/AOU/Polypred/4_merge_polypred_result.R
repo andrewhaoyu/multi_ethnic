@@ -16,4 +16,4 @@ for(l in 1:2){
 }
 
 final_result = rbindlist(result_list)
-save(final_result, file = "/data/zhangh24/multi_ethnic/result/AOU/XPASS/xpass.rdata")
+save(final_result, file = "/data/zhangh24/multi_ethnic/result/AOU/polypred/polypred.rdata")
