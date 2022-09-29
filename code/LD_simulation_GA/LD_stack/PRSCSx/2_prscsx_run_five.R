@@ -58,9 +58,10 @@ phi = c(1,1E-02,1E-04,1E-06)
     #create bim file for prscsx
     #run prs-csx
     path_to_ref = paste0(temp.dir,"1KGLD")
-    path_to_bim = paste0(temp.dir,"all_chr_test.mega")
+    path_to_bim = paste0(temp.dir,"all_eth")
     path_to_sum = paste0(temp.dir)
     size_list = c("15000","45000","80000","100000")
+    
     system(paste0("export MKL_NUM_THREADS=2; export NUMEXPR_NUM_THREADS=2; export OMP_NUM_THREADS=2;
                 python /data/zhangh24/software/PRScsx/PRScsx.py", 
                   " --ref_dir=",path_to_ref,
