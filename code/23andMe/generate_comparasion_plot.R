@@ -357,7 +357,7 @@ p.null <- ggplot(prediction.result.sub)+
         axis.ticks.x=element_blank())+
   scale_fill_manual(values = colour) +
   theme(legend.position = "none")+
-  geom_hline(data = prediction.result.European.CT, aes(yintercept = result), linetype = "dashed",color = "red")
+  geom_hline(data = prediction.result.European, aes(yintercept = newresult), linetype = "dashed",color = "red")
 
 print(p.null)
 p = plot_grid(p.null,p.leg,nrow=1,rel_widths = c(3,1))

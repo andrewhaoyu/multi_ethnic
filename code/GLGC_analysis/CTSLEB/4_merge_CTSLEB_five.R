@@ -23,6 +23,6 @@ for(l in 1:4){
 }
 
 final_result = rbindlist(result_list)
-save(final_result, file = "/data/zhangh24/multi_ethnic/result/GLGC/CTSLEB/ct_sleb_five.rdata")
+save(final_result, file = "/data/zhangh24/multi_ethnic/result/GLGC/CTSLEB/ct_sleb_all.rdata")
 
 #final_result = read.csv("/data/zhangh24/multi_ethnic/result/GLGC/clumping_result/PT/PT.csv")

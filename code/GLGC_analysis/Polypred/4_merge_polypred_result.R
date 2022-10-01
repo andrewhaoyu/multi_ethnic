@@ -5,8 +5,8 @@ trait_vec <- c("HDL","LDL",
 library(data.table)
 result_list = list()
 temp = 1
-for(l in 1:2){
-  for(i in 2:3){
+for(l in 1:4){
+  for(i in 2:5){
     eth = eth_vec[i]
     trait = trait_vec[l]
     out.dir = paste0("/data/zhangh24/multi_ethnic/result/GLGC/polypred/",eth_vec[i],"/",trait_vec[l],"/")

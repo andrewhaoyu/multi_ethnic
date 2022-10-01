@@ -17,4 +17,4 @@ for(l in 1:4){
 }
 
 final_result = rbindlist(result)
-write.csv(final_result, file = "/data/zhangh24/multi_ethnic/result/GLGC/BestEUR/best_eur.rdata")
+save(final_result, file = "/data/zhangh24/multi_ethnic/result/GLGC/BestEUR/best_eur.rdata")
