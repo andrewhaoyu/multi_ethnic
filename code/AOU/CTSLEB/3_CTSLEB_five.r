@@ -216,7 +216,7 @@ SNP_set = GetSNPSet(snp_set_ind,
 
 
 
-
+save(SNP_set, file = paste0(out.dir, "all_SNP_set.rdata"))
 
 
 
