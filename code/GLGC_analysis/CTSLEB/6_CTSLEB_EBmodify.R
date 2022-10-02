@@ -263,12 +263,13 @@ EBpostMultiUpdate <- function(snp_list,
       }
       beta_mat_post = z_mat_post*se_mat
       colnames(beta_mat_post) = c("BETA_EB_target",paste0("BETA_EB_",other_ans_names))
+      beta_mat_post[is.na(beta_mat_post)] = 0 
       beta_mat_post_list[[i_list]] = beta_mat_post
       
     }
   }
   
-  return(unique_infor_EB)
+  return(beta_mat_post_list)
 }
 
 
@@ -292,7 +293,7 @@ PreparePlinkFileEBUpdate = function(snp_list,
                                     unique_infor,
                                     beta_post_list){
   #create unique SNP list by combind LD clumping results under different parameters
-  unique_id = unique_infor_post$SNP
+  unique_id = unique_infor$SNP
   names(unique_id) = "SNP"
   
   #create a coefficient matrix
@@ -301,24 +302,27 @@ PreparePlinkFileEBUpdate = function(snp_list,
   #the third to the last columns contains the EB coefficients of both the target and EUR population for SNPs after LD-clumping under a specific combination of r2-cutoff and base_window_size
   #the coefficients is put as 0 if a SNP doesn't exist in the clumping results under a specific combination of r2-cutoff and base_window_size
   n_col = length(snp_list)
-  n_row = nrow(unique_infor_post)
-  beta_post_list
+  n_row = nrow(unique_infor)
+  
   #number of ancestry
   n_ans = ncol(beta_post_list[[1]])
-  beta_mat = matrix(0,length(unique_id),n_ans)
+  beta_mat = matrix(0,length(unique_id),n_ans*n_col)
   names = rep("c",n_col*n_ans)
   temp = 0
   for(ldx in 1:n_col){
     LD = snp_list[[ldx]]
     names(LD) = "SNP"
-    idx <- which(unique_infor$SNP%in%LD$SNP==F)
+    idx_fil <- which(unique_infor$SNP%in%LD$SNP==T)
+    idx_match = match(LD$SNP,unique_infor$SNP[idx_fil])
+    jdx <- which(is.na(idx_match))
+    idx = idx_match[idx_fil]
     beta_mat[idx,(1:n_ans)+temp] = beta_post_list[[ldx]]
-    names[(1:n_ans)+temp] = paste0(names(snp_list[[ldx]]),"_",colnames(post_beta_mat))
+    names[(1:n_ans)+temp] = paste0(names(snp_list[[ldx]]),"_",colnames(beta_post_list[[ldx]]))
     temp = temp + n_ans
   }
   colnames(beta_mat) = names
-  score_file = data.frame(SNP = unique_id,A1 = unique_infor_post$A1,beta_mat)
-  p_value_file = data.frame(SNP = unique_id,P = unique_infor_post$P)
+  score_file = data.frame(SNP = unique_id,A1 = unique_infor$A1,beta_mat)
+  p_value_file = data.frame(SNP = unique_id,P = unique_infor$P)
   result = list(score_file,
                 p_value_file)
   return(result)
@@ -326,9 +330,9 @@ PreparePlinkFileEBUpdate = function(snp_list,
 
 
 
-plink_file_eb = PreparePlinkFileEB(snp_list,
-                                   unique_infor_post,
-                                   post_beta_mat)
+plink_file_eb = PreparePlinkFileEBUpdate(snp_list,
+                                         unique_infor,
+                                         beta_post_list)
 score_file = plink_file_eb[[1]]
 write.table(score_file,file = paste0(temp.dir,"score_file_eb"),row.names = F,col.names = F,quote=F)
 #p_value_file description
