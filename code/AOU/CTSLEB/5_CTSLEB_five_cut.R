@@ -37,7 +37,6 @@ out.dir = paste0("/data/zhangh24/multi_ethnic/result/AOU/clumping_result/PT/",et
 #load EUR data
 sum_eur = as.data.frame(fread(paste0(data.dir,"EUR/",trait,"_update.txt"),header=T))
 
-
 sum_eur = sum_eur %>% 
   select(rsID, CHR, pos37, BETA, SE, A1, P) %>% 
   rename(SNP = rsID, BP = pos37)
@@ -221,27 +220,6 @@ SNP_set = GetSNPSet(snp_set_ind,
 
 
 
-
-
-
-
-AlignSumMulti = function(sum_tar,sum_other_list,
-                         other_ans_names){
-  coeff_other_list = list()
-  for(i in 1:length(other_ans_names)){
-    sum_other_temp  = sum_other_list[[i]]
-    sum_com_temp <- AlignSum(sum_tar = sum_tar,
-                             sum_other = sum_other_temp)
-    #a temporary matrix to save the aligned cofficients for the target population
-    coeff_other = sum_com_temp[,c("BETA_other","SE_other","P_other")]
-    colnames(coeff_other) = paste0(c("BETA_","SE_","P_"),other_ans_names[i])
-    coeff_other_list[[i]] = coeff_other
-  }
-  coeff_mat = bind_cols(coeff_other_list)
-  
-  sum_com = cbind(sum_tar,coeff_mat)
-  return(sum_com)
-}
 
 
 ##########five ancestries analyses###############

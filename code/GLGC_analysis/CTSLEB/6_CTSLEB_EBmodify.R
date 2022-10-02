@@ -6,9 +6,12 @@ args = commandArgs(trailingOnly = T)
 
 i = as.numeric(args[[1]])
 l = as.numeric(args[[2]])
+z_ind = 3
 library(data.table)
 library(dplyr)
 library(CTSLEB)
+pthres <- c(Inf,1E-10,5E-08,5E-05,1.0)
+z_cut = -qnorm(pthres[z_ind]/2)
 eth_vec <- c("EUR","AFR","AMR","EAS","SAS")
 trait_vec <- c("HDL","LDL",
                "logTG",
@@ -120,108 +123,32 @@ system(paste0("cp ",geno.data,eth,"/all_chr.bed ",temp.dir,"ukb/all_chr.bed"))
 system(paste0("cp ",geno.data,eth,"/all_chr.bim ",temp.dir,"ukb/all_chr.bim"))
 system(paste0("cp ",geno.data,eth,"/all_chr.fam ",temp.dir,"ukb/all_chr.fam"))
 
-plink_file = PreparePlinkFile(snp_list,sum_com)
-
-score_file = plink_file[[1]]
-write.table(score_file,file = paste0(temp.dir,"score_file"),row.names = F,col.names = F,quote=F)
-p_value_file = plink_file[[2]]
-unique_infor = plink_file[[3]]
-pthres <- c(5E-08,5E-07,5E-06,5E-05,5E-04,5E-03,5E-02,5E-01,1.0)
-#create q-range file
-q_range = CreateQRange(pthres)
-head(q_range)
-write.table(q_range,file = paste0(temp.dir,"q_range_file"),row.names = F,col.names = F,quote=F)
-
-p_value_file_temp = p_value_file
-for(k1 in 1:length(pthres)){
-  #keep al the SNPs with P_EUR less than pthres[k1] in the analyses
-  idx <- which(unique_infor$P_other<=pthres[k1])
-  p_value_file_temp$P[idx] = 0
-  write.table(p_value_file_temp,file = paste0(temp.dir,"p_value_file"),col.names = F,row.names = F,quote=F)
-  n_col = ncol(score_file)
-  #the output of plink2 create 9 different files named as prs_p_other_k1.p_tar_k2.sscore
-  #this output file contains 16 columns
-  #the column 1-4 are: family ID, individual ID, 2*total number of SNPs in the PRS, the sum of allele count
-  #column 5-16 are the PRS scores with SNP of p_target<p_thres[k2]|p_eur<p_thres[k1] for different combinations of r2-cutoff and base_window_size
-  #AFR_test_chr22 contains 20,000 subjects
-  #we use the first 10,000 subjects as tuning dataset
-  #we use the second 10,000 subjects as validation dataset      
-  res = system(paste0(soft.dir,"plink2_alpha ",
-                      "--q-score-range ",temp.dir,"q_range_file ",temp.dir,"p_value_file ",
-                      "--score-col-nums 3-",n_col," ",
-                      "--score ",temp.dir,"score_file cols=+scoresums,-scoreavgs ",
-                      "--bfile ",temp.dir,"ukb/all_chr ",
-                      "--out ",temp.dir,"prs_p_other_",k1))
-  
-}
-prs_list = list()
-temp = 1
-#take the column name of different clumping parameters
-names = colnames(score_file)[3:ncol(score_file)]
-for(k1 in 1:length(pthres)){
-  for(k2 in 1:length(pthres)){
-    #the --score file cols=+scoresums,-scoreavgs command in plink2 computes PRS as G*beta
-    #If you compute PRS by chromosome, you need to sum the PRS scores for all chromosomes. 
-    #load PRS for SNPs with p_target<p_thres[k2]|p_eur<p_thres[k1] 
-    prs_temp = fread(paste0(temp.dir,"prs_p_other_",k1,".p_tar_",k2,".sscore"))
-    # times (2*number of SNPs)
-    prs_list[[temp]] = prs_temp[,5:ncol(prs_temp)]
-    
-    colnames(prs_list[[temp]]) = paste0(names,"_","p_other_",pthres[k1],"_p_tar_",pthres[k2])
-    temp = temp + 1
-  }
-}
-prs_mat = as.data.frame(cbind(prs_temp[,1:2],bind_cols(prs_list)))
-colnames(prs_mat)[2] = "id"
-
-
-
-#find the best R-square among the all the PRSs to find candidate set
-#we use this candidate for estimating covariance matrix for the prior distribution
-#create prediction r2 vector to store r2 for different prs
-n.total.prs = length(pthres)^2*length(r2_vec)*length(wc_base_vec)
-prs_r2_vec_test = rep(0,n.total.prs)
-#load the phenotype data for the tuning set
-pheno.dir = "/data/zhangh24/multi_ethnic/data/UKBB/phenotype/"
-pheno_tuning = as.data.frame(fread(paste0(pheno.dir,trait,"/tuning+validation/",eth,"_tuning.txt")))
-pheno_tuning = pheno_tuning[,1:2]
-covar <- as.data.frame(fread(paste0(pheno.dir,"/covariates/tuning+validation/",eth,"_all_data.txt")))
-pheno_tuning <- left_join(pheno_tuning, covar)
-colnames(pheno_tuning) = c('id','y','sex','age',paste0('pc',1:10))
-pheno_tuning_com = pheno_tuning[complete.cases(pheno_tuning$y),]
-pheno_tuning = left_join(pheno_tuning_com,prs_mat,by = "id")
-model.null <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=pheno_tuning)
-y_tun = model.null$residual
-prs_tun = pheno_tuning[, colnames(prs_mat)]
-for(p_ind in 1:n.total.prs){
-  #the first two columns of prs_tun are family id and individual id
-  #prs starts from the third column
-  model = lm(y_tun~prs_tun[,(2+p_ind)])
-  prs_r2_vec_test[p_ind] = summary(model)$r.square
-}
-#+2 is due to the first two columns are family id and individual id
-max_ind = which.max(prs_r2_vec_test)
-print(colnames(prs_mat)[max_ind+2])
-
-######################PRS step finished#############
-
-
-
-
-#############EB step start############################
-
-#Get the SNP set with the best performance in the CT step
-snp_set_ind = colnames(prs_mat)[max_ind+2]
-SNP_set = GetSNPSet(snp_set_ind,
-                    score_file,
-                    unique_infor)
-save(SNP_set, file = paste0(out.dir, "SNP_set.rdata"))
-
 ##########five ancestries analyses###############
 #########EB step###################
 eth_vec <- c("EUR","AFR","AMR","EAS", "SAS")
 
 eth_other = setdiff(eth_vec, eth_vec[i])
+
+AlignSumMulti = function(sum_tar,sum_other_list,
+                         other_ans_names){
+  coeff_other_list = list()
+  for(i in 1:length(other_ans_names)){
+    sum_other_temp  = sum_other_list[[i]]
+    sum_com_temp <- AlignSum(sum_tar = sum_tar,
+                             sum_other = sum_other_temp)
+    #a temporary matrix to save the aligned cofficients for the target population
+    coeff_other = sum_com_temp[,c("BETA_other","SE_other","P_other")]
+    colnames(coeff_other) = paste0(c("BETA_","SE_","P_"),other_ans_names[i])
+    coeff_other_list[[i]] = coeff_other
+  }
+  coeff_mat = bind_cols(coeff_other_list)
+  
+  sum_com = cbind(sum_tar,coeff_mat) %>%
+    mutate(P = as.numeric(P),
+           BETA = as.numeric(BETA),
+           SE = as.numeric(SE))
+  return(sum_com)
+}
 
 sum_other_list = list()
 for(i_eth in 1:length(eth_other)){
@@ -238,16 +165,165 @@ sum_com <- AlignSumMulti(sum_tar = sum_tar,
                          sum_other_list = sum_other_list,
                          other_ans_names = other_ans_names)
 
+EstimatePriorMultiUpdate <- function(SNP_set,other_ans_names,
+                                     sum_com, z_cut = z_cut){
+  if(is.nan(z_cut)){
+    z_cut = -qnorm(5E-08/2) #keep geno-wide significant SNPs out of prior estimate
+  }
+  SNP_set_select = SNP_set %>%
+    select(SNP)
+  #align the summary statistics with the SNP_set from CT
+  SNP_set_align = left_join(SNP_set_select,sum_com,
+                            by="SNP")
+  n_ans = length(other_ans_names)
+  
+  #create column names to select the BETA_ and SE_ columns
+  col_names_beta = c("BETA",paste0("BETA_",other_ans_names))
+  col_names_se = c("SE",paste0("SE_",other_ans_names))
+  beta_mat = SNP_set_align %>%
+    select(all_of(col_names_beta))
+  se_mat = SNP_set_align %>%
+    select(all_of(col_names_se))
+  #\hat_{u}_kl|u_kl ~ N(u_kl,1/N_l)
+  #where u_kl is the underlying effect size for the kth SNP of lth population
+  #N_l is the sample size
+  #since the Bayesian algorithm is applied on the standardized effect-size scale
+  #it's equivalent to applying the Bayes rule on z-statistics scale
+  #the advantage of z-statistics scale is the covariance matrix is identity
+  #it can make the computation faster.
+  z_mat = beta_mat/se_mat
+  
+  eb_idx = which(apply(z_mat, 1, function(r) any(abs(r)>=z_cut, na.rm = T))==F)
+  
+  #only use SNPs without large effects to estimate prior
+  z_mat_clean = z_mat[eb_idx,]
+  
+  z_mat_clean <-na.omit(z_mat_clean)
+  p = ncol(z_mat_clean)
+  
+  prior_mat <- cov(z_mat_clean, use='pairwise')-diag(p)
+  colnames(prior_mat) = c("Z_tar",paste0("Z_",other_ans_names))
+  return(prior_mat)
+}
+
+EBpostMultiUpdate <- function(snp_list,
+                              sum_com,other_ans_names,z_cut){
+  beta_mat_post_list = list()
+  for(i_list in 1:length(snp_list)){
+    SNP_set = data.frame(SNP = snp_list[[i_list]])
+    colnames(SNP_set) = "SNP"
+    prior_sigma = EstimatePriorMultiUpdate(SNP_set,other_ans_names,
+                                           sum_com,z_cut) 
+    #align the summary statistics with the SNP_set from CT
+    SNP_set_align = left_join(SNP_set,sum_com,
+                              by="SNP")
+    
+    
+    #create column names to select the BETA_ and SE_ columns
+    col_names_beta = c("BETA",paste0("BETA_",other_ans_names))
+    col_names_se = c("SE",paste0("SE_",other_ans_names))
+    beta_mat = SNP_set_align %>%
+      select(all_of(col_names_beta))
+    se_mat = SNP_set_align %>%
+      select(all_of(col_names_se))
+    
+    z_mat = as.matrix(beta_mat/se_mat)
+    #filter out the SNPs with large effects out of EB step
+    eb_idx = which(apply(z_mat, 1, function(r) any(abs(r)>=z_cut, na.rm = T))==F)
+    non_eb_idx = which(apply(z_mat, 1, function(r) any(abs(r)>=z_cut, na.rm = T))==T)
+    z_mat_post = as.matrix(z_mat)
+    col_names_beta = c("Z",paste0("Z_",other_ans_names))
+    p <- ncol(z_mat)
+    
+    post_sigma = solve(solve(prior_sigma)+diag(p))
+    
+    #if you don't want to use EB procedure, you can set z_cut to be 0, then eb_idx will be NULL
+    if(length(eb_idx)==0){
+      colnames(beta_mat_post) = c("BETA_EB_target",paste0("BETA_EB_",other_ans_names))
+      eb_beta_names = colnames(beta_mat_post)
+      beta_mat_post_list[[i_list]] = beta_mat_post
+    }else{
+      for(k in 1:length(eb_idx)){
+        if(k%%10000==0){print(paste0(k," SNPs completed"))}
+        z_temp =z_mat[eb_idx[k],]
+        
+        #find out nonmissing component
+        
+        idx <- which(!is.na(z_temp))
+        if(length(idx)<p){
+          z_temp <- z_temp[idx]
+          
+          post_sigma_temp = post_sigma[idx,idx,drop=F]
+          z_post = post_sigma_temp%*%z_temp
+        }else{
+          z_post =post_sigma%*%z_temp
+        }
+        
+        z_mat_post[eb_idx[k],idx] = z_post
+      }
+      beta_mat_post = z_mat_post*se_mat
+      colnames(beta_mat_post) = c("BETA_EB_target",paste0("BETA_EB_",other_ans_names))
+      beta_mat_post_list[[i_list]] = beta_mat_post
+      
+    }
+  }
+  
+  return(unique_infor_EB)
+}
 
 
+FindUniqueSNP = function(snp_list,
+                         sum_com){
+  unique_id = unique(rbindlist(snp_list,use.name =FALSE))
+  names(unique_id) = "SNP"
+  #align the regression coefficients for these SNPs from the sum stat
+  unique_infor = left_join(unique_id,sum_com,by="SNP")
+  return(unique_infor)
+}
+
+unique_infor = FindUniqueSNP(snp_list,sum_com)
 
 
-unique_infor_post = EBpostMulti(unique_infor,SNP_set,
-                                sum_com,other_ans_names)
+beta_post_list = EBpostMultiUpdate(snp_list,
+                                      sum_com,other_ans_names,z_cut)
 
-eb_post_col_names = c("BETA_EB_target",paste0("BETA_EB_",other_ans_names[1]))
-post_beta_mat = unique_infor_post %>% 
-  select(all_of(eb_post_col_names))
+
+PreparePlinkFileEBUpdate = function(snp_list,
+                                    unique_infor,
+                                    beta_post_list){
+  #create unique SNP list by combind LD clumping results under different parameters
+  unique_id = unique_infor_post$SNP
+  names(unique_id) = "SNP"
+  
+  #create a coefficient matrix
+  #the first column contains the unique SNPs after clumping results under all combinations of r2-cutoff and window_size
+  #the second column is the effect allele
+  #the third to the last columns contains the EB coefficients of both the target and EUR population for SNPs after LD-clumping under a specific combination of r2-cutoff and base_window_size
+  #the coefficients is put as 0 if a SNP doesn't exist in the clumping results under a specific combination of r2-cutoff and base_window_size
+  n_col = length(snp_list)
+  n_row = nrow(unique_infor_post)
+  beta_post_list
+  #number of ancestry
+  n_ans = ncol(beta_post_list[[1]])
+  beta_mat = matrix(0,length(unique_id),n_ans)
+  names = rep("c",n_col*n_ans)
+  temp = 0
+  for(ldx in 1:n_col){
+    LD = snp_list[[ldx]]
+    names(LD) = "SNP"
+    idx <- which(unique_infor$SNP%in%LD$SNP==F)
+    beta_mat[idx,(1:n_ans)+temp] = beta_post_list[[ldx]]
+    names[(1:n_ans)+temp] = paste0(names(snp_list[[ldx]]),"_",colnames(post_beta_mat))
+    temp = temp + n_ans
+  }
+  colnames(beta_mat) = names
+  score_file = data.frame(SNP = unique_id,A1 = unique_infor_post$A1,beta_mat)
+  p_value_file = data.frame(SNP = unique_id,P = unique_infor_post$P)
+  result = list(score_file,
+                p_value_file)
+  return(result)
+}
+
 
 
 plink_file_eb = PreparePlinkFileEB(snp_list,
@@ -374,6 +450,6 @@ r2_ctsleb <- summary(model)$r.square
 
 
 
-save(r2_ctsleb, file = paste0(out.dir, "CTSLEB_all.result"))
+save(r2_ctsleb, file = paste0(out.dir, "CTSLEB_all_test_",z_ind,".result"))
 
 
