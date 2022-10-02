@@ -1,4 +1,4 @@
-#CT-SLEB for GLGC data
+#CT-SLEB for AOU data
 #load the p-value results
 args = commandArgs(trailingOnly = T)
 #i represent ethnic group
@@ -7,11 +7,12 @@ args = commandArgs(trailingOnly = T)
 i = as.numeric(args[[1]])
 l = as.numeric(args[[2]])
 z_ind = as.numeric(args[[3]])
+pthres <- c(Inf,1E-10,5E-08,5E-05,1.0)
+z_cut = -qnorm(pthres[z_ind]/2)
+
 library(data.table)
 library(dplyr)
 library(CTSLEB)
-pthres <- c(Inf,1E-10,5E-08,5E-05,1.0)
-z_cut = -qnorm(pthres[z_ind]/2)
 eth_vec <- c("EUR","AFR","AMR")
 trait_vec <-c("height","bmi")
 eth_EUR = "EUR"
@@ -34,17 +35,17 @@ data.dir = "/data/zhangh24/multi_ethnic/data/AOU_cleaned/"
 out.dir = paste0("/data/zhangh24/multi_ethnic/result/AOU/clumping_result/PT/",eth,"/",trait,"/")
 
 #load EUR data
-sum_eur = as.data.frame(fread(paste0(data.dir,"EUR/",trait,".txt"),header=T))
+sum_eur = as.data.frame(fread(paste0(data.dir,"EUR/",trait,"_update.txt"),header=T))
 
 
 sum_eur = sum_eur %>% 
-  select(rsID, CHR, POS_b37, BETA, SE, A1, P) %>% 
-  rename(SNP = rsID, BP = POS_b37)
+  select(rsID, CHR, pos37, BETA, SE, A1, P) %>% 
+  rename(SNP = rsID, BP = pos37)
 #load target population data
-sum_tar = as.data.frame(fread(paste0(data.dir,eth,"/",trait,".txt"),header=T))
+sum_tar = as.data.frame(fread(paste0(data.dir,eth,"/",trait,"_update.txt"),header=T))
 sum_tar = sum_tar %>% 
-  select(rsID, CHR, POS_b37, BETA, SE, A1, P) %>% 
-  rename(SNP = rsID, BP = POS_b37)
+  select(rsID, CHR, pos37, BETA, SE, A1, P) %>% 
+  rename(SNP = rsID, BP = pos37)
 #align allels
 sum_com <- AlignSum(sum_tar = sum_tar,
                     sum_other = sum_eur)
@@ -217,7 +218,12 @@ SNP_set = GetSNPSet(snp_set_ind,
                     score_file,
                     unique_infor)
 
-save(SNP_set, file = paste0(out.dir, "SNP_set.rdata"))
+
+
+
+
+
+
 
 AlignSumMulti = function(sum_tar,sum_other_list,
                          other_ans_names){
@@ -237,9 +243,10 @@ AlignSumMulti = function(sum_tar,sum_other_list,
   return(sum_com)
 }
 
+
 ##########five ancestries analyses###############
 #########EB step###################
-eth_vec <- c("EUR","AFR","AMR","EAS", "SAS")
+eth_vec <- c("EUR","AFR","AMR")
 
 eth_other = setdiff(eth_vec, eth_vec[i])
 
@@ -247,16 +254,19 @@ sum_other_list = list()
 for(i_eth in 1:length(eth_other)){
   
   
-  sum_temp = as.data.frame(fread(paste0(data.dir,eth_other[i_eth],"/",trait,".txt"),header=T))
+  sum_temp = as.data.frame(fread(paste0(data.dir,eth_other[i_eth],"/",trait,"_update.txt"),header=T))
   sum_other_list[[i_eth]] = sum_temp %>% 
-    select(rsID, CHR, POS_b37, BETA, SE, A1, P) %>% 
-    rename(SNP = rsID, BP = POS_b37)
+    select(rsID, CHR, pos37, BETA, SE, A1, P) %>% 
+    rename(SNP = rsID, BP = pos37)
   
 }
 other_ans_names = eth_other
 sum_com <- AlignSumMulti(sum_tar = sum_tar,
                          sum_other_list = sum_other_list,
                          other_ans_names = other_ans_names)
+
+
+
 
 EstimatePriorMultiUpdate <- function(SNP_set,other_ans_names,
                                      sum_com, z_cut = z_cut){
@@ -370,6 +380,7 @@ EBpostMultiUpdate <- function(unique_infor,SNP_set,
 
 unique_infor_post = EBpostMultiUpdate(unique_infor,SNP_set,
                                       sum_com,other_ans_names,z_cut)
+
 
 eb_post_col_names = c("BETA_EB_target",paste0("BETA_EB_",other_ans_names[1]))
 post_beta_mat = unique_infor_post %>% 
