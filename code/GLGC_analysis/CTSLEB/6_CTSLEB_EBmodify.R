@@ -314,9 +314,11 @@ PreparePlinkFileEBUpdate = function(snp_list,
     names(LD) = "SNP"
     idx_fil <- which(unique_infor$SNP%in%LD$SNP==T)
     idx_match = match(LD$SNP,unique_infor$SNP[idx_fil])
-    jdx <- which(is.na(idx_match))
-    idx = idx_match[idx_fil]
-    beta_mat[idx,(1:n_ans)+temp] = beta_post_list[[ldx]]
+    
+    idx = idx_fil[idx_match]
+    jdx <- which(is.na(idx))
+    length(jdx)
+    beta_mat[idx,(1:n_ans)+temp] = as.matrix(beta_post_list[[ldx]])
     names[(1:n_ans)+temp] = paste0(names(snp_list[[ldx]]),"_",colnames(beta_post_list[[ldx]]))
     temp = temp + n_ans
   }
@@ -454,6 +456,6 @@ r2_ctsleb <- summary(model)$r.square
 
 
 
-save(r2_ctsleb, file = paste0(out.dir, "CTSLEB_all_test_",z_ind,".result"))
+save(r2_ctsleb, file = paste0(out.dir, "CTSLEB_all_ebfirst.result"))
 
 
