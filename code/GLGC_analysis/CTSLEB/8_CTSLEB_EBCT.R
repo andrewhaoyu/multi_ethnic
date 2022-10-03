@@ -210,9 +210,10 @@ EBpostMultiUpdate <- function(snp_list,
                               sum_com,other_ans_names,z_cut){
   beta_mat_post_list = list()
   for(i_list in 1:length(snp_list)){
-    SNP_set = data.frame(SNP = sum_com$SNP)
+    SNP_set = data.frame(SNP = snp_list[[i_list]])
     colnames(SNP_set) = "SNP"
-    prior_sigma = EstimatePriorMultiUpdate(SNP_set,other_ans_names,
+    SNP_set_prior  = data.frame(SNP = sum_com$SNP)
+    prior_sigma = EstimatePriorMultiUpdate(SNP_set_prior,other_ans_names,
                                            sum_com,z_cut) 
     #align the summary statistics with the SNP_set from CT
     SNP_set_align = left_join(SNP_set,sum_com,
