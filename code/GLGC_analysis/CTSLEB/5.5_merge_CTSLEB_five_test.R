@@ -17,7 +17,7 @@ for(l in 1:4){
       eth = eth_vec[i]
       trait = trait_vec[l]
       file_name = paste0(out.dir, "/CTSLEB_all_test_",z_ind,".result")
-      if(file_name%in%files){
+      if(file_name%in%files){o
         load(file_name)
         r2.result = data.frame(eth = eth_vec[i],
                                trait = trait_vec[l],

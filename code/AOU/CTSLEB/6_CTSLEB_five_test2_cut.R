@@ -1,4 +1,4 @@
-#CT-SLEB for GLGC data
+#CT-SLEB for AOU data
 #load the p-value results
 args = commandArgs(trailingOnly = T)
 #i represent ethnic group
@@ -7,17 +7,14 @@ args = commandArgs(trailingOnly = T)
 i = as.numeric(args[[1]])
 l = as.numeric(args[[2]])
 z_ind = as.numeric(args[[3]])
+pthres <- c(Inf,1E-10,5E-08,5E-05,1.0)
+z_cut = -qnorm(pthres[z_ind]/2)
+
 library(data.table)
 library(dplyr)
 library(CTSLEB)
-pthres <- c(Inf,1E-10,5E-08,5E-05,1.0)
-#when pthres is Inf; all SNPs will be included in the EB step
-#when ptres is 1; no SNP will be included in EB step; just use target populatoin coeff
-z_cut = -qnorm(pthres[z_ind]/2)
-eth_vec <- c("EUR","AFR","AMR","EAS","SAS")
-trait_vec <- c("HDL","LDL",
-               "logTG",
-               "TC")
+eth_vec <- c("EUR","AFR","AMR")
+trait_vec <-c("height","bmi")
 eth_EUR = "EUR"
 eth = eth_vec[i]
 trait = trait_vec[l]
@@ -34,21 +31,20 @@ system(paste0("cp ",kg.dir,eth,"/all_chr.bim ",temp.dir,eth,"all_chr.bim"))
 system(paste0("cp ",kg.dir,eth,"/all_chr.fam ",temp.dir,eth,"all_chr.fam"))
 setwd("/data/zhangh24/multi_ethnic/")
 #temp.dir = paste0("/fastscratch/myscratch/hzhang1/ARIC/",trait[l],"/",eth[i],"/")
-data.dir = "/data/zhangh24/multi_ethnic/data/GLGC_cleaned/"
-out.dir = paste0("/data/zhangh24/multi_ethnic/result/GLGC/clumping_result/PT/",eth,"/",trait,"/")
+data.dir = "/data/zhangh24/multi_ethnic/data/AOU_cleaned/"
+out.dir = paste0("/data/zhangh24/multi_ethnic/result/AOU/clumping_result/PT/",eth,"/",trait,"/")
 
 #load EUR data
-sum_eur = as.data.frame(fread(paste0(data.dir,"EUR/",trait,".txt"),header=T))
-
+sum_eur = as.data.frame(fread(paste0(data.dir,"EUR/",trait,"_update.txt"),header=T))
 
 sum_eur = sum_eur %>% 
-  select(rsID, CHR, POS_b37, BETA, SE, A1, P) %>% 
-  rename(SNP = rsID, BP = POS_b37)
+  select(rsID, CHR, pos37, BETA, SE, A1, P) %>% 
+  rename(SNP = rsID, BP = pos37)
 #load target population data
-sum_tar = as.data.frame(fread(paste0(data.dir,eth,"/",trait,".txt"),header=T))
+sum_tar = as.data.frame(fread(paste0(data.dir,eth,"/",trait,"_update.txt"),header=T))
 sum_tar = sum_tar %>% 
-  select(rsID, CHR, POS_b37, BETA, SE, A1, P) %>% 
-  rename(SNP = rsID, BP = POS_b37)
+  select(rsID, CHR, pos37, BETA, SE, A1, P) %>% 
+  rename(SNP = rsID, BP = pos37)
 #align allels
 sum_com <- AlignSum(sum_tar = sum_tar,
                     sum_other = sum_eur)
@@ -210,28 +206,6 @@ print(colnames(prs_mat)[max_ind+2])
 
 ######################PRS step finished#############
 
-GetSNPSet = function(snp_set_ind,
-                     score_file,
-                     unique_infor){
-  str_temp = strsplit(snp_set_ind,"_")
-  r2 = str_temp[[1]][3]
-  ws = str_temp[[1]][5]
-  p_other_cutoff = as.numeric(str_temp[[1]][[8]])
-  p_tar_cutoff = as.numeric(str_temp[[1]][[11]])
-  
-  score_file_name = paste0("clump_r2_",r2,"_ws_",ws)
-  idx = which(colnames(score_file)==score_file_name)
-  
-  #take the post-clupmping SNPs with particular r2-cutoff and window size by removing SNPs with coefficients 0
-  LD = score_file[score_file[,idx]!=0,"SNP",drop=F]
-  #take the p_value cutoff
-  LD_infor = left_join(LD,unique_infor,by="SNP")
-  #take the SNP with p_eur < p_other_cutoff | p_tar < p_tar_cutoff
-  snp_ind = which(LD_infor$P_other<=p_other_cutoff|
-                    LD_infor$P<=p_tar_cutoff)
-  SNP = LD_infor[snp_ind,]
-  return(SNP)
-}
 
 
 
@@ -243,29 +217,14 @@ SNP_set = GetSNPSet(snp_set_ind,
                     score_file,
                     unique_infor)
 
-#save(SNP_set, file = paste0(out.dir, "SNP_set.rdata"))
 
-AlignSumMulti = function(sum_tar,sum_other_list,
-                         other_ans_names){
-  coeff_other_list = list()
-  for(i in 1:length(other_ans_names)){
-    sum_other_temp  = sum_other_list[[i]]
-    sum_com_temp <- AlignSum(sum_tar = sum_tar,
-                             sum_other = sum_other_temp)
-    #a temporary matrix to save the aligned cofficients for the target population
-    coeff_other = sum_com_temp[,c("BETA_other","SE_other","P_other")]
-    colnames(coeff_other) = paste0(c("BETA_","SE_","P_"),other_ans_names[i])
-    coeff_other_list[[i]] = coeff_other
-  }
-  coeff_mat = bind_cols(coeff_other_list)
-  
-  sum_com = cbind(sum_tar,coeff_mat)
-  return(sum_com)
-}
+
+
+
 
 ##########five ancestries analyses###############
 #########EB step###################
-eth_vec <- c("EUR","AFR","AMR","EAS", "SAS")
+eth_vec <- c("EUR","AFR","AMR")
 
 eth_other = setdiff(eth_vec, eth_vec[i])
 
@@ -273,10 +232,10 @@ sum_other_list = list()
 for(i_eth in 1:length(eth_other)){
   
   
-  sum_temp = as.data.frame(fread(paste0(data.dir,eth_other[i_eth],"/",trait,".txt"),header=T))
+  sum_temp = as.data.frame(fread(paste0(data.dir,eth_other[i_eth],"/",trait,"_update.txt"),header=T))
   sum_other_list[[i_eth]] = sum_temp %>% 
-    select(rsID, CHR, POS_b37, BETA, SE, A1, P) %>% 
-    rename(SNP = rsID, BP = POS_b37)
+    select(rsID, CHR, pos37, BETA, SE, A1, P) %>% 
+    rename(SNP = rsID, BP = pos37)
   
 }
 other_ans_names = eth_other
@@ -284,11 +243,12 @@ sum_com <- AlignSumMulti(sum_tar = sum_tar,
                          sum_other_list = sum_other_list,
                          other_ans_names = other_ans_names)
 
+
 EstimatePriorMultiUpdate <- function(SNP_set,other_ans_names,
-                               sum_com, z_cut = z_cut){
+                                     sum_com, z_cut = z_cut){
   if(is.nan(z_cut)){
     z_cut = -qnorm(5E-08/2) #keep geno-wide significant snps out of analyse
-    }
+  }
   SNP_set_select = SNP_set %>%
     select(SNP)
   #align the summary statistics with the SNP_set from CT
@@ -311,7 +271,7 @@ EstimatePriorMultiUpdate <- function(SNP_set,other_ans_names,
   #the advantage of z-statistics scale is the covariance matrix is identity
   #it can make the computation faster.
   z_mat = beta_mat/se_mat
- 
+  
   eb_idx = which(apply(z_mat, 1, function(r) any(abs(r)>=z_cut, na.rm = T))==F)
   if(length(eb_idx)>0){
     #only use SNPs without large effects to estimate prior
@@ -330,7 +290,7 @@ EstimatePriorMultiUpdate <- function(SNP_set,other_ans_names,
 }
 
 EBpostMultiUpdate <- function(unique_infor,SNP_set,
-                        sum_com,other_ans_names,z_cut){
+                              sum_com,other_ans_names,z_cut){
   
   #prior_sigma = prior_result[[1]]
   #eb_idx = prior_result[[2]]
@@ -352,19 +312,17 @@ EBpostMultiUpdate <- function(unique_infor,SNP_set,
   z_mat = as.matrix(beta_mat/se_mat)
   
   prior_sigma = EstimatePriorMultiUpdate(SNP_set,other_ans_names,
-                                          sum_com,z_cut) 
+                                         sum_com,z_cut) 
   if(is.null(prior_sigma)){
-
+    
     colnames(beta_mat) = c("BETA_EB_target",paste0("BETA_EB_",other_ans_names))
     eb_beta_names = colnames(beta_mat)
     unique_infor_EB =cbind(unique_infor,beta_mat) %>%
       select(SNP,A1,all_of(eb_beta_names),P,P_other)
     return(unique_infor_EB)
   }else{
-
+    
     #filter out the SNPs with large effects out of EB step
-    eb_idx = which(apply(z_mat, 1, function(r) any(abs(r)>=z_cut, na.rm = T))==F)
-    non_eb_idx = which(apply(z_mat, 1, function(r) any(abs(r)>=z_cut, na.rm = T))==T)
     z_mat_post = as.matrix(z_mat)
     col_names_beta = c("Z",paste0("Z_",other_ans_names))
     p <- ncol(z_mat)
@@ -373,15 +331,10 @@ EBpostMultiUpdate <- function(unique_infor,SNP_set,
     
     #if you don't want to use EB procedure, you can set z_cut to be 0, then eb_idx will be NULL
     #under this specicial scenaior, we will just use the original beta from the target population
-    if(length(eb_idx)==0){
-      colnames(beta_mat) = c("BETA_EB_target",paste0("BETA_EB_",other_ans_names))
-      eb_beta_names = colnames(beta_mat)
-      unique_infor_EB =cbind(unique_infor,beta_mat) %>%
-        select(SNP,A1,all_of(eb_beta_names),P,P_other)
-    }else{
-      for(k in 1:length(eb_idx)){
+
+      for(k in 1:nrow(z_mat){
         if(k%%10000==0){print(paste0(k," SNPs completed"))}
-        z_temp =z_mat[eb_idx[k],]
+        z_temp =z_mat[k,]
         
         #find out nonmissing component
         
@@ -395,7 +348,7 @@ EBpostMultiUpdate <- function(unique_infor,SNP_set,
           z_post =post_sigma%*%z_temp
         }
         
-        z_mat_post[eb_idx[k],idx] = z_post
+        z_mat_post[k,idx] = z_post
       }
       beta_mat_post = z_mat_post*se_mat
       colnames(beta_mat_post) = c("BETA_EB_target",paste0("BETA_EB_",other_ans_names))
@@ -403,10 +356,10 @@ EBpostMultiUpdate <- function(unique_infor,SNP_set,
       unique_infor_EB =cbind(unique_infor,beta_mat_post) %>%
         select(SNP,A1,all_of(eb_beta_names),P,P_other)
       
-    }
+    
     return(unique_infor_EB)
   }
- 
+  
   
 }
 
@@ -414,7 +367,8 @@ EBpostMultiUpdate <- function(unique_infor,SNP_set,
 
 
 unique_infor_post = EBpostMultiUpdate(unique_infor,SNP_set,
-                                sum_com,other_ans_names,z_cut)
+                                      sum_com,other_ans_names,z_cut)
+
 
 eb_post_col_names = c("BETA_EB_target",paste0("BETA_EB_",other_ans_names[1]))
 post_beta_mat = unique_infor_post %>% 

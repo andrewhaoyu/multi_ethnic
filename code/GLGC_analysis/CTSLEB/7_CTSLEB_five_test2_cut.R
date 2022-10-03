@@ -285,10 +285,10 @@ sum_com <- AlignSumMulti(sum_tar = sum_tar,
                          other_ans_names = other_ans_names)
 
 EstimatePriorMultiUpdate <- function(SNP_set,other_ans_names,
-                               sum_com, z_cut = z_cut){
+                                     sum_com, z_cut = z_cut){
   if(is.nan(z_cut)){
     z_cut = -qnorm(5E-08/2) #keep geno-wide significant snps out of analyse
-    }
+  }
   SNP_set_select = SNP_set %>%
     select(SNP)
   #align the summary statistics with the SNP_set from CT
@@ -311,7 +311,7 @@ EstimatePriorMultiUpdate <- function(SNP_set,other_ans_names,
   #the advantage of z-statistics scale is the covariance matrix is identity
   #it can make the computation faster.
   z_mat = beta_mat/se_mat
- 
+  
   eb_idx = which(apply(z_mat, 1, function(r) any(abs(r)>=z_cut, na.rm = T))==F)
   if(length(eb_idx)>0){
     #only use SNPs without large effects to estimate prior
@@ -330,7 +330,7 @@ EstimatePriorMultiUpdate <- function(SNP_set,other_ans_names,
 }
 
 EBpostMultiUpdate <- function(unique_infor,SNP_set,
-                        sum_com,other_ans_names,z_cut){
+                              sum_com,other_ans_names,z_cut){
   
   #prior_sigma = prior_result[[1]]
   #eb_idx = prior_result[[2]]
@@ -352,61 +352,53 @@ EBpostMultiUpdate <- function(unique_infor,SNP_set,
   z_mat = as.matrix(beta_mat/se_mat)
   
   prior_sigma = EstimatePriorMultiUpdate(SNP_set,other_ans_names,
-                                          sum_com,z_cut) 
+                                         sum_com,z_cut) 
   if(is.null(prior_sigma)){
-
+    
     colnames(beta_mat) = c("BETA_EB_target",paste0("BETA_EB_",other_ans_names))
     eb_beta_names = colnames(beta_mat)
     unique_infor_EB =cbind(unique_infor,beta_mat) %>%
       select(SNP,A1,all_of(eb_beta_names),P,P_other)
     return(unique_infor_EB)
   }else{
-
+    
     #filter out the SNPs with large effects out of EB step
-    eb_idx = which(apply(z_mat, 1, function(r) any(abs(r)>=z_cut, na.rm = T))==F)
-    non_eb_idx = which(apply(z_mat, 1, function(r) any(abs(r)>=z_cut, na.rm = T))==T)
+    #eb_idx = which(apply(z_mat, 1, function(r) any(abs(r) >= z_cut, na.rm = T)) == F)
+    
     z_mat_post = as.matrix(z_mat)
     col_names_beta = c("Z",paste0("Z_",other_ans_names))
     p <- ncol(z_mat)
     
-    post_sigma = solve(solve(prior_sigma)+diag(p))
+    post_sigma = solve(solve(prior_sigma) + diag(p))
     
     #if you don't want to use EB procedure, you can set z_cut to be 0, then eb_idx will be NULL
     #under this specicial scenaior, we will just use the original beta from the target population
-    if(length(eb_idx)==0){
-      colnames(beta_mat) = c("BETA_EB_target",paste0("BETA_EB_",other_ans_names))
-      eb_beta_names = colnames(beta_mat)
-      unique_infor_EB =cbind(unique_infor,beta_mat) %>%
-        select(SNP,A1,all_of(eb_beta_names),P,P_other)
-    }else{
-      for(k in 1:length(eb_idx)){
-        if(k%%10000==0){print(paste0(k," SNPs completed"))}
-        z_temp =z_mat[eb_idx[k],]
-        
-        #find out nonmissing component
-        
-        idx <- which(!is.na(z_temp))
-        if(length(idx)<p){
-          z_temp <- z_temp[idx]
-          
-          post_sigma_temp = post_sigma[idx,idx,drop=F]
-          z_post = post_sigma_temp%*%z_temp
-        }else{
-          z_post =post_sigma%*%z_temp
-        }
-        
-        z_mat_post[eb_idx[k],idx] = z_post
-      }
-      beta_mat_post = z_mat_post*se_mat
-      colnames(beta_mat_post) = c("BETA_EB_target",paste0("BETA_EB_",other_ans_names))
-      eb_beta_names = colnames(beta_mat_post)
-      unique_infor_EB =cbind(unique_infor,beta_mat_post) %>%
-        select(SNP,A1,all_of(eb_beta_names),P,P_other)
+    for(k in 1:nrow(z_mat)){
+      if(k%%10000==0){print(paste0(k," SNPs completed"))}
+      z_temp =z_mat[k,]
       
+      #find out nonmissing component
+      
+      idx <- which(!is.na(z_temp))
+      if(length(idx) < p){
+        z_temp = z_temp[idx]
+        
+        post_sigma_temp = post_sigma[idx,idx,drop=F]
+        z_post = post_sigma_temp%*%z_temp
+      }else{
+        z_post = post_sigma%*%z_temp
+      }
+      
+      z_mat_post[k,idx] = z_post
     }
+    beta_mat_post = z_mat_post*se_mat
+    colnames(beta_mat_post) = c("BETA_EB_target",paste0("BETA_EB_",other_ans_names))
+    eb_beta_names = colnames(beta_mat_post)
+    unique_infor_EB =cbind(unique_infor,beta_mat_post) %>%
+      select(SNP,A1,all_of(eb_beta_names),P,P_other)
     return(unique_infor_EB)
   }
- 
+  
   
 }
 
@@ -414,7 +406,7 @@ EBpostMultiUpdate <- function(unique_infor,SNP_set,
 
 
 unique_infor_post = EBpostMultiUpdate(unique_infor,SNP_set,
-                                sum_com,other_ans_names,z_cut)
+                                      sum_com,other_ans_names,z_cut)
 
 eb_post_col_names = c("BETA_EB_target",paste0("BETA_EB_",other_ans_names[1]))
 post_beta_mat = unique_infor_post %>% 
@@ -545,6 +537,6 @@ r2_ctsleb <- summary(model)$r.square
 
 
 
-save(r2_ctsleb, file = paste0(out.dir, "CTSLEB_all_test_",z_ind,".result"))
+save(r2_ctsleb, file = paste0(out.dir, "CTSLEB_all_test2_",z_ind,".result"))
 
 
