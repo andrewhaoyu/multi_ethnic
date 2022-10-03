@@ -1,4 +1,4 @@
-setwd("/Users/zhangh24/GoogleDrive/multi_ethnic/result/GLGC/analysis_result/")
+setwd("/Users/zhangh24/GoogleDrive/multi_ethnic/result/AOU/analysis_result/")
 source("/Users/zhangh24/GoogleDrive/multi_ethnic//code/LD_simulation_large/theme_Publication.R")
 library(ggplot2)
 library(ggsci)
@@ -7,125 +7,49 @@ library(RColorBrewer)
 library(grid)
 library(gridExtra)
 library(data.table)
-#library(RColorBrewer)
-load("PT.rdata")
-LD.clump.result = final_result
-load("best_eur.rdata")
-eursnp.result = final_result
-eursnp.result = eursnp.result %>% 
-  mutate(method = "Best EUR SNP (CT)")
-load("weighted_prs.rdata")
-weightedprs.result = final_result %>% 
-  mutate(method = "Weighted PRS (CT)")
-load("polypred.rdata")
-polypred.result = final_result %>% 
-  mutate(method = "PolyPred+")
-load("xpass.rdata")
-xpass.result = final_result
 
-
-load("prscsx_all.rdata")
-prscsx.all.result = final_result %>% mutate(method = "PRS-CSx")
-
-load("ct_sleb_five_cut_test.rdata")
+load("ct_sleb_all.rdata")
 ct.sleb.all = final_result %>% mutate(method = "CT-SLEB")
-load("glgc.jin.Rdata")
-ldpred2.result = res %>% 
-  filter(Method%in% c("LDpred2", "EUR LDpred2", "Weighted LDpred2","MEBayes SL")) %>% 
-  mutate(method = case_when(
-    Method == "EUR LDpred2" ~ "Best EUR PRS (LDpred2)",
-    Method == "Weighted LDpred2" ~ "Weighted PRS (LDpred2)",
-    Method == "LDpred2" ~ "LDpred2",
-    Method == "MEBayes SL" ~ "MEBayes"
-  )) %>% 
-  rename(trait = Trait,
-         eth = Race,
-         r2 = R2) %>% 
-  filter(trait!= "nonHDL") %>% 
-  mutate(trait = as.character(trait)) %>% 
-  select(eth, trait, method, r2) 
+load("ct_sleb_five_cut_test.rdata")
+ct.sleb.all.test = final_result
 
-lasso = fread("glgc_jingning.txt")
-lasso.result = lasso %>% 
-  filter(method_vec%in% c("multi-ethnic lasso (super learning)")) %>% 
-  mutate(method = case_when(
-    method_vec == "multi-ethnic lasso (super learning)" ~ "MELasso"
-  )) %>% 
-  rename(trait = t_vec,
-         eth = eth.vec,
-         r2 = r2.vec) %>% 
-  filter(trait!= "nonHDL"  ) %>% 
-  select(eth, trait, method, r2) 
-
-
-
-
-
-prediction.result <- rbind(LD.clump.result,
-                           eursnp.result,
-                           ldpred2.result,
-                           weightedprs.result,
-                           polypred.result,
-                           xpass.result,
-                           prscsx.all.result,
-                           ct.sleb.all,
-                           lasso.result) %>% 
+prediction.result <- rbind(ct.sleb.all,
+                           ct.sleb.all.test) %>% 
   rename(result = r2)
-
-prediction.result = prediction.result %>% 
-  mutate(method_vec = method) %>% 
-  mutate(
-    method_vec = factor(method_vec,
-                        levels = c("CT",
-                                   "LDpred2",
-                                   "Best EUR SNP (CT)",
-                                   "Best EUR PRS (LDpred2)",
-                                   "Weighted PRS (CT)",
-                                   "Weighted PRS (LDpred2)",
-                                   "PolyPred+", 
-                                   "XPASS", 
-                                   "PRS-CSx",
-                                   "CT-SLEB",
-                                   "MEBayes",
-                                   "MELasso"
-                        )))
-
-
-uvals = factor(c("CT",
-                 "LDpred2",
-                 "Best EUR SNP (CT)",
-                 "Best EUR PRS (LDpred2)",
-                 "Weighted PRS (CT)",
-                 "Weighted PRS (LDpred2)",
-                 "PolyPred+", 
-                 "XPASS", 
-                 "PRS-CSx",
-                 "CT-SLEB",
-                 "MEBayes",
-                 "MELasso"
-)
-,levels = c("CT",
-            "LDpred2",
-            "Best EUR SNP (CT)",
-            "Best EUR PRS (LDpred2)",
-            "Weighted PRS (CT)",
-            "Weighted PRS (LDpred2)",
-            "PolyPred+", 
-            "XPASS", 
-            "PRS-CSx",
-            "CT-SLEB",
-            "MEBayes",
-            "MELasso"
-))
 
 prediction.result$index = rep("1",nrow(prediction.result))
 prediction.result = prediction.result %>% 
   mutate(trait = 
-           case_when(trait == "HDL" ~ "HDL",
-                     trait == "LDL" ~ "LDL",
-                     trait == "logTG" ~ "logTG",
-                     trait == "TC" ~ "TC"))
-save(prediction.result,file = "glgc.prediction.result.summary.all.rdata")
+           case_when(trait == "height" ~ "Height",
+                     trait == "bmi" ~ "BMI"))
+
+prediction.result.sub = prediction.result %>% 
+  filter(eth%in%c("EUR","AMR") == F) 
+
+p.null <- ggplot(prediction.result.sub)+
+  geom_bar(aes(x = index,y = result,fill=method),
+           position = position_dodge(),
+           stat = "identity")+
+  theme_Publication()+
+  ylab(expression(bold(R^2)))+
+  facet_grid(vars(trait),vars(eth),scales = "free")+
+  theme_Publication()+
+  #coord_cartesian(ylim = c(0.47, 0.67)) +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+print(p.null)
+  #scale_fill_manual(values = colour) +
+  # theme(legend.position = "none") +
+  # geom_hline(data = prediction.result.European, aes(yintercept = newresult), linetype = "dashed",color = "red")
+
+
+
+
+
+
+
+
 prediction.result.sub = prediction.result %>% 
   filter(eth%in%c("EUR","AMR") == F) 
 n.single = 9
@@ -238,6 +162,6 @@ p.null <- ggplot(prediction.result.sub)+
 
 print(p.null)
 p = plot_grid(p.null,p.leg,nrow=1,rel_widths = c(3,1))
-png(filename = "./GLGC_result_all.png",width=17,height = 12,units = "in",res = 300)
+png(filename = "./aou_result_all.png",width=17,height = 12,units = "in",res = 300)
 print(p)
 dev.off()

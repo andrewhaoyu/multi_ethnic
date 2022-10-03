@@ -331,6 +331,9 @@ PreparePlinkFileEBUpdate = function(snp_list,
 }
 
 
+q_range = CreateQRange(pthres)
+head(q_range)
+write.table(q_range,file = paste0(temp.dir,"q_range_file"),row.names = F,col.names = F,quote=F)
 
 plink_file_eb = PreparePlinkFileEBUpdate(snp_list,
                                          unique_infor,
