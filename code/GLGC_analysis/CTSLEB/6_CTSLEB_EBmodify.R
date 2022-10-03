@@ -6,7 +6,7 @@ args = commandArgs(trailingOnly = T)
 
 i = as.numeric(args[[1]])
 l = as.numeric(args[[2]])
-z_ind = 3
+z_ind = 2
 library(data.table)
 library(dplyr)
 library(CTSLEB)
@@ -288,6 +288,15 @@ unique_infor = FindUniqueSNP(snp_list,sum_com)
 beta_post_list = EBpostMultiUpdate(snp_list,
                                       sum_com,other_ans_names,z_cut)
 
+for(i_list in 1:length(beta_post_list)){
+  eb_post_col_names = c("BETA_EB_target",paste0("BETA_EB_",other_ans_names[1]))
+  temp_beta_mat = beta_post_list[[i_list]] %>% 
+    select(all_of(eb_post_col_names))
+  beta_post_list[[i_list]] = temp_beta_mat
+}
+
+
+
 
 PreparePlinkFileEBUpdate = function(snp_list,
                                     unique_infor,
@@ -329,11 +338,13 @@ PreparePlinkFileEBUpdate = function(snp_list,
                 p_value_file)
   return(result)
 }
-
+pthres <- c(5E-08,5E-07,5E-06,5E-05,5E-04,5E-03,5E-02,5E-01,1.0)
 
 q_range = CreateQRange(pthres)
 head(q_range)
 write.table(q_range,file = paste0(temp.dir,"q_range_file"),row.names = F,col.names = F,quote=F)
+
+
 
 plink_file_eb = PreparePlinkFileEBUpdate(snp_list,
                                          unique_infor,
