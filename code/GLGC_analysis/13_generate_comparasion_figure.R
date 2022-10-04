@@ -115,7 +115,7 @@ prediction.result = prediction.result %>%
                      trait == "TC" ~ "TC"))
 save(prediction.result,file = "glgc.prediction.result.summary.rdata")
 prediction.result.sub = prediction.result %>% 
-  filter(eth!="EUR") 
+  filter(eth!="EUR"&eth!="AMR") 
 n.single = 9
 n.EUR = 9
 

@@ -240,8 +240,6 @@ sum_com <- AlignSumMulti(sum_tar = sum_tar,
 
 
 
-
-
 unique_infor_post = EBpostMulti(unique_infor,SNP_set,
                                 sum_com,other_ans_names)
 

@@ -138,12 +138,24 @@ single.color =  brewer.pal(n.single, "Blues")[c(4,7)]
 
 EUR.color = brewer.pal(n.EUR, "RdPu")[c(4,7)]
 
+
 weighted.color = brewer.pal(n.multi, "Greens")[c(3,5,7)]
 
 bayes.color = brewer.pal(n.multi, "Oranges")[c(4,7)]
 
 propose.method = brewer.pal(n.multi, "Purples")[c(3,5,7)]
 
+# 
+# single.color =  brewer.pal(n.single, "Blues")[c(4,7)]
+# 
+# EUR.color = brewer.pal(n.EUR, "RdPu")[c(4,7)]
+# 
+# 
+# weighted.color = brewer.pal(n.multi, "Greens")[c(3,5,7)]
+# 
+# bayes.color = brewer.pal(n.multi, "Oranges")[c(4,7)]
+# 
+# propose.method = brewer.pal(n.multi, "Purples")[c(3,5,7)]
 
 
 colour = c(single.color,EUR.color,weighted.color,
@@ -236,8 +248,10 @@ p.null <- ggplot(prediction.result.sub)+
   theme(legend.position = "none") +
   geom_hline(data = prediction.result.European, aes(yintercept = newresult), linetype = "dashed",color = "red")
 
-print(p.null)
+#print(p.null)
 p = plot_grid(p.null,p.leg,nrow=1,rel_widths = c(3,1))
+# print(p)
+
 png(filename = "./GLGC_result_all.png",width=17,height = 12,units = "in",res = 300)
 print(p)
 dev.off()

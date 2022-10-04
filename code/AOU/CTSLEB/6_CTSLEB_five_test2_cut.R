@@ -323,46 +323,44 @@ EBpostMultiUpdate <- function(unique_infor,SNP_set,
   }else{
     
     #filter out the SNPs with large effects out of EB step
+    #eb_idx = which(apply(z_mat, 1, function(r) any(abs(r) >= z_cut, na.rm = T)) == F)
+    
     z_mat_post = as.matrix(z_mat)
     col_names_beta = c("Z",paste0("Z_",other_ans_names))
     p <- ncol(z_mat)
     
-    post_sigma = solve(solve(prior_sigma)+diag(p))
+    post_sigma = solve(solve(prior_sigma) + diag(p))
     
     #if you don't want to use EB procedure, you can set z_cut to be 0, then eb_idx will be NULL
     #under this specicial scenaior, we will just use the original beta from the target population
-
-      for(k in 1:nrow(z_mat){
-        if(k%%10000==0){print(paste0(k," SNPs completed"))}
-        z_temp =z_mat[k,]
-        
-        #find out nonmissing component
-        
-        idx <- which(!is.na(z_temp))
-        if(length(idx)<p){
-          z_temp <- z_temp[idx]
-          
-          post_sigma_temp = post_sigma[idx,idx,drop=F]
-          z_post = post_sigma_temp%*%z_temp
-        }else{
-          z_post =post_sigma%*%z_temp
-        }
-        
-        z_mat_post[k,idx] = z_post
-      }
-      beta_mat_post = z_mat_post*se_mat
-      colnames(beta_mat_post) = c("BETA_EB_target",paste0("BETA_EB_",other_ans_names))
-      eb_beta_names = colnames(beta_mat_post)
-      unique_infor_EB =cbind(unique_infor,beta_mat_post) %>%
-        select(SNP,A1,all_of(eb_beta_names),P,P_other)
+    for(k in 1:nrow(z_mat)){
+      if(k%%10000==0){print(paste0(k," SNPs completed"))}
+      z_temp =z_mat[k,]
       
-    
+      #find out nonmissing component
+      
+      idx <- which(!is.na(z_temp))
+      if(length(idx) < p){
+        z_temp = z_temp[idx]
+        
+        post_sigma_temp = post_sigma[idx,idx,drop=F]
+        z_post = post_sigma_temp%*%z_temp
+      }else{
+        z_post = post_sigma%*%z_temp
+      }
+      
+      z_mat_post[k,idx] = z_post
+    }
+    beta_mat_post = z_mat_post*se_mat
+    colnames(beta_mat_post) = c("BETA_EB_target",paste0("BETA_EB_",other_ans_names))
+    eb_beta_names = colnames(beta_mat_post)
+    unique_infor_EB =cbind(unique_infor,beta_mat_post) %>%
+      select(SNP,A1,all_of(eb_beta_names),P,P_other)
     return(unique_infor_EB)
   }
   
   
 }
-
 
 
 
@@ -500,5 +498,8 @@ r2_ctsleb <- summary(model)$r.square
 
 
 save(r2_ctsleb, file = paste0(out.dir, "CTSLEB_all_test_",z_ind,".result"))
+
+
+
 
 

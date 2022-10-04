@@ -412,6 +412,15 @@ EBpostMultiUpdate <- function(unique_infor,SNP_set,
 
 
 
+FindUniqueSNP = function(snp,
+                         sum_com){
+  unique_id = unique(rbindlist(snp_list,use.name =FALSE))
+  names(unique_id) = "SNP"
+  #align the regression coefficients for these SNPs from the sum stat
+  unique_infor = left_join(unique_id,sum_com,by="SNP")
+  return(unique_infor)
+}
+unique_infor = FindUniqueSNP(snp_list,sum_com)
 
 unique_infor_post = EBpostMultiUpdate(unique_infor,SNP_set,
                                 sum_com,other_ans_names,z_cut)
