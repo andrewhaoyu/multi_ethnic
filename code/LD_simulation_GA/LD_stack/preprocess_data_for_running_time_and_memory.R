@@ -25,6 +25,20 @@ summary.eur = summary.eur %>% filter(CHR==22)
 #load target snps summary stat
 summary <- as.data.frame(fread(paste0(out.dir.sum,eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))  
 summary.tar = summary %>% filter(CHR==22)
+
+summary.amr <- as.data.frame(fread(paste0(out.dir.sum,eth[3],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))  
+summary.amr = summary.amr %>% filter(CHR==22)
+summary.eas <- as.data.frame(fread(paste0(out.dir.sum,eth[4],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))  
+summary.eas = summary.eas %>% filter(CHR==22)
+summary.sas <- as.data.frame(fread(paste0(out.dir.sum,eth[5],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))  
+summary.sas = summary.sas %>% filter(CHR==22)
+
+
+
+
+
+
+
 #load 1kg snp list
 setwd("/data/zhangh24/multi_ethnic/")
 load("./result/LD_simulation_new/snp.infor.match37_38.rdata")
@@ -33,6 +47,9 @@ snp.infor = snp.infor.match %>%
   select(SNP,rs_id)
 summary.eur = left_join(summary.eur,snp.infor,by="SNP")
 summary.tar = left_join(summary.tar,snp.infor,by="SNP")
+summary.amr = left_join(summary.amr,snp.infor,by="SNP")
+summary.eas = left_join(summary.eas,snp.infor,by="SNP")
+summary.sas = left_join(summary.sas,snp.infor,by="SNP")
 mega.list <- as.data.frame(fread(paste0(cur.dir,"mega-hm3-rsid.txt"),header  =F))
 #mega.infor <- as.data.frame(fread(paste0(cur.dir,"snpBatch_ILLUMINA_1062317")))
 #colnames(mega.infor)[5] <- "rsid"
@@ -47,7 +64,9 @@ summary.eur = summary.eur.match
 summary.tar = summary.tar.match
 save(summary.eur,file = paste0(out.dir.sum,"time_mem/eur_sumdata.rdata"))
 save(summary.tar,file = paste0(out.dir.sum,"time_mem/tar_sumdata.rdata"))
-
+save(summary.amr,file = paste0(out.dir.sum,"time_mem/amr_sumdata.rdata"))
+save(summary.eas,file = paste0(out.dir.sum,"time_mem/eas_sumdata.rdata"))
+save(summary.sas,file = paste0(out.dir.sum,"time_mem/sas_sumdata.rdata"))
 #prepare SNPs for other ethnic groups
 summary.eur.select = summary.eur %>% 
   rename(beta_eur = BETA) %>% 
@@ -138,6 +157,44 @@ summary.tar.sub = summary.tar %>%
   select(rs_id,A1,A2,BETA,P) %>% 
   rename(SNP=rs_id)
 write.table(summary.tar.sub,file = paste0(out.dir,eth[i],"_sumstats.txt"),row.names = F,col.names = T,quote=F)
+#prepare amr summary stat for a specific chr
+load(paste0(out.dir.sum,"time_mem/amr_sumdata.rdata"))
+#merge with prs-csx reference data
+summary.amr = inner_join(summary.amr,prs_cs_ref,by = c("rs_id"="SNP"))
+summary.amr.sub = summary.amr %>% 
+  separate(SNP,into=c("non_im","non_im2","first_allele","second_allele"),
+           remove=F) %>% 
+  mutate(A2 =ifelse(A1==second_allele,first_allele,second_allele)) %>% 
+  select(rs_id,A1,A2,BETA,P) %>% 
+  rename(SNP=rs_id)
+write.table(summary.amr.sub,file = paste0(out.dir,"AMR_sumstats.txt"),row.names = F,col.names = T,quote=F)
+
+#prepare EAS summary stat for a specific chr
+load(paste0(out.dir.sum,"time_mem/eas_sumdata.rdata"))
+#merge with prs-csx reference data
+summary.eas = inner_join(summary.eas,prs_cs_ref,by = c("rs_id"="SNP"))
+summary.eas.sub = summary.eas %>% 
+  separate(SNP,into=c("non_im","non_im2","first_allele","second_allele"),
+           remove=F) %>% 
+  mutate(A2 =ifelse(A1==second_allele,first_allele,second_allele)) %>% 
+  select(rs_id,A1,A2,BETA,P) %>% 
+  rename(SNP=rs_id)
+write.table(summary.eas.sub,file = paste0(out.dir,"EAS_sumstats.txt"),row.names = F,col.names = T,quote=F)
+
+#prepare SAS summary stat for a specific chr
+load(paste0(out.dir.sum,"time_mem/sas_sumdata.rdata"))
+#merge with prs-csx reference data
+summary.sas = inner_join(summary.sas,prs_cs_ref,by = c("rs_id"="SNP"))
+summary.sas.sub = summary.sas %>% 
+  separate(SNP,into=c("non_im","non_im2","first_allele","second_allele"),
+           remove=F) %>% 
+  mutate(A2 =ifelse(A1==second_allele,first_allele,second_allele)) %>% 
+  select(rs_id,A1,A2,BETA,P) %>% 
+  rename(SNP=rs_id)
+write.table(summary.eas.sub,file = paste0(out.dir,"SAS_sumstats.txt"),row.names = F,col.names = T,quote=F)
+
+
+
 bim = read.table(paste0(out.dir,"AFR_ref_chr22.bim"))
 bim.update =inner_join(summary.tar,bim,by = c("SNP"="V2")) %>% 
   select(V1,rs_id,V3,V4,V5,V6)

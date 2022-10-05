@@ -111,9 +111,11 @@ prediction.result = prediction.result %>%
   mutate(trait = 
            case_when(trait == "height" ~ "Height",
                      trait == "bmi" ~ "BMI",))
+prediction.result.sub = prediction.result %>% 
+  filter(eth!="AMR") 
 save(prediction.result,file = "aou.prediction.result.summary.rdata")
 prediction.result.sub = prediction.result %>% 
-  filter(eth!="EUR") 
+  filter(eth!="EUR"&eth!="AMR") 
 n.single = 9
 n.EUR = 9
 

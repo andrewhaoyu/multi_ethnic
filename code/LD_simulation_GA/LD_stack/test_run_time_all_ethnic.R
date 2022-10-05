@@ -86,9 +86,9 @@ for(r_ind in 1:length(r2_vec)){
 #combine the LD clumping results
 #calculate prs
 #create q-value file for prs analysis
-system(paste0("cp ",out.dir,"AFR_test_mega_chr22.bed ",temp.dir,"AFR_test_chr22.bed"))
-system(paste0("cp ",out.dir,"AFR_test_mega_chr22.bim ",temp.dir,"AFR_test_chr22.bim"))
-system(paste0("cp ",out.dir,"AFR_test_mega_chr22.fam ",temp.dir,"AFR_test_chr22.fam"))
+system(paste0("cp ",out.dir,"AFR_test_mega_chr22.bed ",temp.dir,"AFR_test_mega_chr22.bed"))
+system(paste0("cp ",out.dir,"AFR_test_mega_chr22.bim ",temp.dir,"AFR_test_mega_chr22.bim"))
+system(paste0("cp ",out.dir,"AFR_test_mega_chr22.fam ",temp.dir,"AFR_test_mega_chr22.fam"))
 
 
 plink_file = PreparePlinkFile(snp_list,sum_com)

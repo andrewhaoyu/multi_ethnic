@@ -7,6 +7,7 @@ library(RColorBrewer)
 library(grid)
 library(gridExtra)
 library(data.table)
+library(cowplot)
 #library(RColorBrewer)
 load("PT.rdata")
 LD.clump.result = final_result
@@ -111,8 +112,11 @@ prediction.result = prediction.result %>%
   mutate(trait = 
            case_when(trait == "HDL" ~ "HDL",
                      trait == "LDL" ~ "LDL",
-                      "logTG" ~ "logTG",
+                      trait == "logTG" ~ "logTG",
                      trait == "TC" ~ "TC"))
+prediction.result.sub = prediction.result %>% 
+  filter(eth!="AMR") 
+
 save(prediction.result,file = "glgc.prediction.result.summary.rdata")
 prediction.result.sub = prediction.result %>% 
   filter(eth!="EUR"&eth!="AMR") 

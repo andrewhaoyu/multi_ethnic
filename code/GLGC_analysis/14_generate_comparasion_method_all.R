@@ -125,6 +125,8 @@ prediction.result = prediction.result %>%
                      trait == "LDL" ~ "LDL",
                      trait == "logTG" ~ "logTG",
                      trait == "TC" ~ "TC"))
+
+prediction.result = prediction.result %>% filter(eth!="AMR")
 save(prediction.result,file = "glgc.prediction.result.summary.all.rdata")
 prediction.result.sub = prediction.result %>% 
   filter(eth%in%c("EUR","AMR") == F) 
