@@ -32,12 +32,19 @@ ct.sleb = final_result
 ct.sleb = ct.sleb %>% mutate(method = "CT-SLEB (two ancestries)")
 load("ct_sleb_all.rdata")
 ct.sleb.all = final_result
+load("glgc-weighted-ldpred2-2grps.rdata")
+R2 = as.data.frame(R2)
+R2$trait = row.names(R2)
+weighted.ldpred2.result = as.data.frame(R2) %>% gather("eth","r2",1:5) %>% 
+  filter(eth!="EUR"&trait !="nonHDL") %>% 
+  mutate(method = "Weighted PRS (LDpred2)") %>% 
+  select(eth,trait,method,r2)
+
 
 ldpred2.result = fread("glgc-jin.txt") %>% 
-  filter(Method%in% c("LDpred2", "EUR LDpred2", "Weighted LDpred2")) %>% 
+  filter(Method%in% c("LDpred2", "EUR LDpred2")) %>% 
   mutate(method = case_when(
     Method == "EUR LDpred2" ~ "Best EUR PRS (LDpred2)",
-    Method == "Weighted LDpred2" ~ "Weighted PRS (LDpred2)",
     Method == "LDpred2" ~ "LDpred2"
   )) %>% 
   rename(trait = Trait,
@@ -53,6 +60,7 @@ prediction.result <- rbind(LD.clump.result,
                            eursnp.result,
                            ldpred2.result,
                            weightedprs.result,
+                           weighted.ldpred2.result,
                            polypred.result,
                            xpass.result,
                            prscsx.result,
