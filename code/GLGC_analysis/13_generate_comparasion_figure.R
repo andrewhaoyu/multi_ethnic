@@ -8,6 +8,7 @@ library(grid)
 library(gridExtra)
 library(data.table)
 library(cowplot)
+library(tidyverse)
 #library(RColorBrewer)
 load("PT.rdata")
 LD.clump.result = final_result
@@ -241,5 +242,10 @@ facet_grid(vars(trait),vars(eth),scales = "free")+
 print(p.null)
 p = plot_grid(p.null,p.leg,nrow=1,rel_widths = c(3,1))
 png(filename = "./GLGC_result.png",width=17,height = 12,units = "in",res = 300)
+print(p)
+dev.off()
+
+
+png(filename = "./GLGC_result_poster.png",width=20,height = 12,units = "in",res = 300)
 print(p)
 dev.off()

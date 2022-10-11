@@ -62,7 +62,7 @@ for(i_eth in 1:5){
 }
 snp_set = rbindlist(data_list) %>% distinct()
 colnames(snp_set) = c("SNP", "A1")
-BETA_mat = matrix(0,nrow(snp_set),2)
+BETA_mat = matrix(0,nrow(snp_set),5)
 temp = 1
 for(i_eth in 1:5){
   data = fread(paste0(out.dir,"test_five_",eth[i_eth],
@@ -80,7 +80,7 @@ prs_file = cbind(snp_set,BETA_mat)
 colnames(prs_file)[1] = "rs_id"
 prs.match = left_join(prs_file,summary.tar.select,by="rs_id")
 #replace the rs_id with SNP ID in 1KG genomes
-prs_file[,1] = prs.match[,5]
+prs_file[,1] = prs.match[,"SNP"]
 colnames(prs_file)[1] = "SNP"
 
 n_col = ncol(prs_file)
