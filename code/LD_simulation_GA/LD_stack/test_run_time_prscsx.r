@@ -23,6 +23,7 @@ path_to_ref = paste0(temp.dir,"1KGLD")
 path_to_bim = paste0(out.dir,"AFR_ref_chr22_rs_id")
 path_to_sum = paste0(out.dir)
 size_list = c("15000","45000","80000","100000")
+temp = fread(paste0(path_to_sum,eth[1],"_sumstats.txt"))
 system(paste0("export MKL_NUM_THREADS=2; export NUMEXPR_NUM_THREADS=2; export OMP_NUM_THREADS=2;
                 python /data/zhangh24/software/PRScsx/PRScsx.py", 
               " --ref_dir=",path_to_ref,
@@ -89,6 +90,6 @@ res = system(paste0("/data/zhangh24/software/plink2_alpha ",
 time = proc.time()-time1
 time_prs = proc.time()-time2
 time_list = c(time, time_prs)
-save(time_list,file = paste0(out.dir,"prscsx_trep_",t_rep,"_phi_",k,".rdata"))
+save(time_list,file = paste0(out.dir,"prscsx_new_trep_",t_rep,"_phi_",k,".rdata"))
 #system(paste0("mv ",temp.dir.prs,"/prs_csx_",eth[i],"_rho_",l,"_size_",m,"_GA_",i1,"_phi",phi[v],".sscore ",out.dir.sum,eth[i],"/prscsx/"))
 

@@ -123,7 +123,7 @@ prediction.result = prediction.result %>%
                             ga_vec==5 ~"Fixed common SNP heritability with mild negative selection",
   ))
 
-#save(prediction.result,file = "prediction.result.summary.rdata")
+save(prediction.result,file = "prediction.result.summary.rdata")
 
 uvals = factor(c("CT",
                  "LDpred2",
