@@ -41,7 +41,7 @@ system(paste0("export MKL_NUM_THREADS=2; export NUMEXPR_NUM_THREADS=2; export OM
 #calculate prs for the two coefficients
 phi_ch = c("1e+00","1e-02","1e-04","1e-06")
 #calcualte prs for all
-prs = fread(paste0(out.dir,"test_five",eth[i],
+prs = fread(paste0(out.dir,"test_five_",eth[i],
                    "_pst_eff_a1_b0.5_phi",phi_ch[k],"_chr22.txt"))
 prs = prs %>% select(V1,V2,V6)
 #load AFR summary data
