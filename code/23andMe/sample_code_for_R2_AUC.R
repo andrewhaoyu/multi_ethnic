@@ -264,7 +264,7 @@ summary(model2)$r.square
 
 SL.libray <- c(
   "SL.glmnet",
- # "SL.ridge",
+  # "SL.ridge",
   "SL.nnet"
 )
 

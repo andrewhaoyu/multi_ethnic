@@ -1,8 +1,3 @@
-args = commandArgs(trailingOnly = T)
-k = as.numeric(args[[1]])
-i = 1
-l = as.numeric(args[[3]])
-m = as.numeric(args[[4]])
 
 #merge the by chr prscsx_score
 out.dir.sum <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
@@ -14,14 +9,9 @@ library(data.table)
 
 
 phi = c("1e+00","1e-02","1e-04","1e-06")
-l = as.numeric(args[[1]])
-m = as.numeric(args[[2]])
-i_rep = as.numeric(args[[3]])
-i1 = as.numeric(args[[4]])
-k = as.numeric(args[[5]])
 # for(v in 1:3){
 #   for(i in 2:5){
-setwd(paste0(out.dir.sum,eth[i],"/prscsx/"))
+
 files = dir(path = out.dir, pattern = paste0("rho"))
 resubmit_code = rep("c",264000)
 temp = 1

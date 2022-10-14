@@ -1,4 +1,4 @@
-setwd("/Users/zhangh24/GoogleDrive/multi_ethnic/result/GLGC/analysis_result/")
+setwd("/Users/zhangh24/GoogleDrive/multi_ethnic/result/AOU/analysis_result/")
 source("/Users/zhangh24/GoogleDrive/multi_ethnic//code/LD_simulation_large/theme_Publication.R")
 library(ggplot2)
 library(ggsci)
@@ -7,8 +7,9 @@ library(RColorBrewer)
 library(grid)
 library(gridExtra)
 library(data.table)
-library(cowplot)
-library(tidyverse)
+eth <- c("EUR","AFR","AMR")
+trait <-c("height","bmi")
+trait_name = c("Height","BMI")
 #library(RColorBrewer)
 load("PT.rdata")
 LD.clump.result = final_result
@@ -25,24 +26,22 @@ polypred.result = final_result %>%
 load("xpass.rdata")
 xpass.result = final_result
 load("prscsx.rdata")
-prscsx.result = final_result %>% mutate(method = "PRS-CSx (two ancestries)")
+prscsx.result = final_result %>% mutate(method = "PRS-CSx")
 load("prscsx_all.rdata")
-prscsx.all.result = final_result %>% mutate(method = "PRS-CSx (five ancestries)")
+prscsx.all.result = final_result %>% mutate(method = "PRS-CSx (three ancestries)")
 load("ct_sleb.rdata")
 ct.sleb = final_result
-ct.sleb = ct.sleb %>% mutate(method = "CT-SLEB (two ancestries)")
+ct.sleb = ct.sleb %>% mutate(method = "CT-SLEB")
 load("ct_sleb_all.rdata")
 ct.sleb.all = final_result
-load("glgc-weighted-ldpred2-2grps.rdata")
+load("aou-weighted-ldpred2-2grps.rdata")
 R2 = as.data.frame(R2)
 R2$trait = row.names(R2)
-weighted.ldpred2.result = as.data.frame(R2) %>% gather("eth","r2",1:5) %>% 
-  filter(eth!="EUR"&trait !="nonHDL") %>% 
+weighted.ldpred2.result = R2 %>% gather("eth", "r2", 1:3) %>% 
+  filter(eth!="EUR"&eth!="AMR") %>% 
   mutate(method = "Weighted PRS (LDpred2)") %>% 
-  select(eth,trait,method,r2)
-
-
-ldpred2.result = fread("glgc-jin.txt") %>% 
+  select(eth, trait, method, r2)
+ldpred2.result = fread("allofus-jin.txt") %>% 
   filter(Method%in% c("LDpred2", "EUR LDpred2")) %>% 
   mutate(method = case_when(
     Method == "EUR LDpred2" ~ "Best EUR PRS (LDpred2)",
@@ -51,11 +50,8 @@ ldpred2.result = fread("glgc-jin.txt") %>%
   rename(trait = Trait,
          eth = Race,
          r2 = R2) %>% 
-  filter(trait!= "nonHDL" ) %>% 
   select(eth, trait, method, r2) 
 
-
-  
 
 prediction.result <- rbind(LD.clump.result,
                            eursnp.result,
@@ -73,60 +69,57 @@ prediction.result <- rbind(LD.clump.result,
 prediction.result = prediction.result %>% 
   mutate(method_vec = method) %>% 
   mutate(
-         method_vec = factor(method_vec,
-                             levels = c("CT",
-                                        "LDpred2",
-                                        "Best EUR SNP (CT)",
-                                        "Best EUR PRS (LDpred2)",
-                                        "Weighted PRS (CT)",
-                                        "Weighted PRS (LDpred2)",
-                                        "PolyPred+", 
-                                        "XPASS", 
-                                        "PRS-CSx (two ancestries)",
-                                        "PRS-CSx (five ancestries)",
-                                        "CT-SLEB (two ancestries)",
-                                        "CT-SLEB (five ancestries)"
-                             )))
+    method_vec = factor(method_vec,
+                        levels = c("CT",
+                                   "LDpred2",
+                                   "Best EUR SNP (CT)",
+                                   "Best EUR PRS (LDpred2)",
+                                   "Weighted PRS (CT)",
+                                   "Weighted PRS (LDpred2)",
+                                   "PolyPred+", 
+                                   "XPASS", 
+                                   "PRS-CSx",
+                                   "PRS-CSx (three ancestries)",
+                                   "CT-SLEB",
+                                   "CT-SLEB (three ancestries)"
+                        )))
 
 #save(prediction.result,file = "prediction.result.summary.rdata")
 uvals = factor(c("CT",
-                  "LDpred2",
-                  "Best EUR SNP (CT)",
-                  "Best EUR PRS (LDpred2)",
-                  "Weighted PRS (CT)",
-                  "Weighted PRS (LDpred2)",
-                  "PolyPred+", 
-                  "XPASS", 
-                  "PRS-CSx (two ancestries)",
-                  "PRS-CSx (five ancestries)",
-                  "CT-SLEB (two ancestries)",
-                  "CT-SLEB (five ancestries)"
+                 "LDpred2",
+                 "Best EUR SNP (CT)",
+                 "Best EUR PRS (LDpred2)",
+                 "Weighted PRS (CT)",
+                 "Weighted PRS (LDpred2)",
+                 "PolyPred+", 
+                 "XPASS", 
+                 "PRS-CSx",
+                 "PRS-CSx (three ancestries)",
+                 "CT-SLEB",
+                 "CT-SLEB (three ancestries)"
 )
-  ,levels = c("CT",
-                   "LDpred2",
-                   "Best EUR SNP (CT)",
-                   "Best EUR PRS (LDpred2)",
-                   "Weighted PRS (CT)",
-                   "Weighted PRS (LDpred2)",
-                   "PolyPred+", 
-                   "XPASS", 
-                   "PRS-CSx (two ancestries)",
-                   "PRS-CSx (five ancestries)",
-                   "CT-SLEB (two ancestries)",
-                   "CT-SLEB (five ancestries)"
+,levels = c("CT",
+            "LDpred2",
+            "Best EUR SNP (CT)",
+            "Best EUR PRS (LDpred2)",
+            "Weighted PRS (CT)",
+            "Weighted PRS (LDpred2)",
+            "PolyPred+", 
+            "XPASS", 
+            "PRS-CSx",
+            "PRS-CSx (three ancestries)",
+            "CT-SLEB",
+            "CT-SLEB (three ancestries)"
 ))
 
 prediction.result$index = rep("1",nrow(prediction.result))
 prediction.result = prediction.result %>% 
   mutate(trait = 
-           case_when(trait == "HDL" ~ "HDL",
-                     trait == "LDL" ~ "LDL",
-                      trait == "logTG" ~ "logTG",
-                     trait == "TC" ~ "TC"))
+           case_when(trait == "height" ~ "Height",
+                     trait == "bmi" ~ "BMI",))
 prediction.result.sub = prediction.result %>% 
   filter(eth!="AMR") 
-
-save(prediction.result,file = "glgc.prediction.result.summary.rdata")
+#save(prediction.result,file = "aou.prediction.result.summary.rdata")
 prediction.result.sub = prediction.result %>% 
   filter(eth!="EUR"&eth!="AMR") 
 n.single = 9
@@ -164,10 +157,10 @@ col_df = tibble(
                                        "PolyPred+"
                        ) ~ "Weighted PRS method",
                        method_vec%in%c("XPASS",
-                                       "PRS-CSx (two ancestries)",
-                                       "PRS-CSx (five ancestries)") ~"Bayesian method",
-                       method_vec%in%c("CT-SLEB (two ancestries)",
-                                       "CT-SLEB (five ancestries)") ~ "Proposed method")
+                                       "PRS-CSx",
+                                       "PRS-CSx (three ancestries)") ~"Bayesian method",
+                       method_vec%in%c("CT-SLEB",
+                                       "CT-SLEB (three ancestries)") ~ "Proposed method")
 ) %>% 
   mutate(category = factor(category,levels = c("Single ancestry method",
                                                "EUR PRS based method",
@@ -229,23 +222,18 @@ p.null <- ggplot(prediction.result.sub)+
            stat = "identity")+
   theme_Publication()+
   ylab(expression(bold(R^2)))+
-facet_grid(vars(trait),vars(eth),scales = "free")+
+  facet_grid(vars(trait),vars(eth),scales = "free")+
   theme_Publication()+
   #coord_cartesian(ylim = c(0.47, 0.67)) +
   theme(axis.title.x=element_blank(),
         axis.text.x=element_blank(),
         axis.ticks.x=element_blank())+
-   scale_fill_manual(values = colour) +
-   theme(legend.position = "none") +
-   geom_hline(data = prediction.result.European, aes(yintercept = newresult), linetype = "dashed",color = "red")
+  scale_fill_manual(values = colour) +
+  theme(legend.position = "none") +
+  geom_hline(data = prediction.result.European, aes(yintercept = newresult), linetype = "dashed",color = "red")
 
 print(p.null)
 p = plot_grid(p.null,p.leg,nrow=1,rel_widths = c(3,1))
-png(filename = "./GLGC_result.png",width=17,height = 12,units = "in",res = 300)
-print(p)
-dev.off()
-
-
-png(filename = "./GLGC_result_poster.png",width=20,height = 12,units = "in",res = 300)
+png(filename = "../../presentation_plot/AOU_result.png",width=20,height = 12,units = "in",res = 300)
 print(p)
 dev.off()

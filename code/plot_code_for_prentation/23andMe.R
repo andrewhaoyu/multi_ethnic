@@ -38,7 +38,12 @@ library(grid)
 library(gridExtra)
 library(cowplot)
 load("/Users/zhangh24/GoogleDrive/multi_ethnic/result/23andme/prediction_summary.rdata")
-
+prediction.result$method_vec = as.character(prediction.result$method_vec)
+prediction.result = prediction.result %>% 
+  mutate(method_vec = ifelse(method_vec == "CT-SLEB (two ancestries)",
+                             "CT-SLEB",method_vec)) %>% 
+  mutate(method_vec = ifelse(method_vec == "Weighted PRS",
+                             "Weighted PRS (CT)",method_vec)) 
 # prediction.result.table = prediction.result %>% 
 #   mutate(sigma2 = ifelse(result<0.5,0,qnorm(result)^2*2)) %>% 
 #   mutate(sigma2 = ifelse(trait%in%
@@ -50,47 +55,58 @@ uvals = factor(c("CT",
                  "LDpred2",
                  "Best EUR SNP (CT)",
                  "Best EUR SNP (LDpred2)",
-                 "Weighted PRS",
+                 "Weighted PRS (CT)",
                  "PRS-CSx",
-                 "CT-SLEB (two ancestries)",
+                 "CT-SLEB",
                  "CT-SLEB (five ancestries)"),
                levels= c("CT",
                          "LDpred2",
                          "Best EUR SNP (CT)",
                          "Best EUR SNP (LDpred2)",
-                         "Weighted PRS",
+                         "Weighted PRS (CT)",
                          "PRS-CSx",
-                         "CT-SLEB (two ancestries)",
+                         "CT-SLEB",
                          "CT-SLEB (five ancestries)"))
 
 n.single = 9
-
-
-single.color =  brewer.pal(n.single, "Blues")[c(5,7)]
 n.EUR = 9
 
-
-EUR.color = brewer.pal(n.EUR, "Greens")[c(5,7)]
-
-
 n.multi = 9
-multi.color = brewer.pal(n.multi, "Oranges")[c(3,5,7,9)]
-colour = c(single.color,EUR.color,multi.color)
+
+
+single.color =  brewer.pal(n.single, "Blues")[c(4,7)]
+
+EUR.color = brewer.pal(n.EUR, "RdPu")[c(4,7)]
+
+weighted.color = brewer.pal(n.multi, "Greens")[c(3)]
+
+bayes.color = brewer.pal(n.multi, "Oranges")[c(5)]
+
+propose.method = brewer.pal(n.multi, "Purples")[c(4,7)]
+
+
+colour = c(single.color,EUR.color,weighted.color,
+           bayes.color,propose.method)
+
 col_df = tibble(
-  colour = c(single.color,EUR.color,multi.color),
+  colour = c(single.color,EUR.color,weighted.color,
+             bayes.color,propose.method),
   method_vec = uvals,
   category = case_when(method_vec%in%c("CT",
                                        "LDpred2") ~ "Single ancestry method",
                        method_vec%in%c("Best EUR SNP (CT)",
                                        "Best EUR SNP (LDpred2)"
                        ) ~ "EUR PRS based method",
-                       method_vec%in%c("Weighted PRS",
-                                       "PRS-CSx",
-                                       "CT-SLEB (two ancestries)",
-                                       "CT-SLEB (five ancestries)") ~ "Multi-ancestry method")
-) %>%   mutate(category = factor(category,levels = c("Single ancestry method",
+                       method_vec%in%c("Weighted PRS (CT)") ~ "Weighted PRS method",
+                                       
+                       method_vec%in%c("PRS-CSx") ~ "Bayesian method",
+                       method_vec%in%c("CT-SLEB",
+                         "CT-SLEB (five ancestries)") ~ "Proposed method")) %>%   
+  mutate(category = factor(category,levels = c("Single ancestry method",
                                                      "EUR PRS based method",
-                                                     "Multi-ancestry method")))
+                                                     "Weighted PRS method",
+                                                     "Bayesian method",
+                                                     "Proposed method")))
 prediction.result = prediction.result %>% 
   left_join(col_df)
 getLegend <- function(p) {
@@ -111,7 +127,7 @@ run_plot = function(filler, values) {
       filter(category %in% filler),
     aes(x= index,y=result,
         group=method_vec))+
-    geom_bar(aes(fill = Method),
+    geom_bar(aes(fill = method_vec),
              stat="identity",
              position = position_dodge())+
     #geom_point(aes(color=method_vec))+
@@ -126,7 +142,7 @@ run_plot = function(filler, values) {
 legs = lapply(sort(unique(col_df$category)), run_plot)
 
 legs = lapply(legs, getLegend)
-p.leg = plot_grid(NULL,NULL,legs[[1]],legs[[2]], legs[[3]],NULL,align="v",ncol=1,rel_heights=c(1,1,0.7,1,1.2,1))
+p.leg = plot_grid(NULL,legs[[1]],legs[[2]], legs[[3]],legs[[4]],legs[[5]], NULL,align="v",ncol=1,rel_heights=c(1.2,1,1,1,0.8,0.8,0.8,1.2))
 print(p.leg)
 
 
