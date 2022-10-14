@@ -44,7 +44,7 @@ for(v in 1:4){
     Beta = matrix(0,nrow(prs),n_rep)
     for(i_rep in 1:n_rep){
       print(i_rep)
-      prs = fread(paste0("rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_",eth[i],
+      prs = fread(paste0("rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_",eth[i_eth],
                          "_pst_eff_a1_b0.5_phi",phi[v],".txt"))
       Beta[,i_rep] = prs$V6
       
