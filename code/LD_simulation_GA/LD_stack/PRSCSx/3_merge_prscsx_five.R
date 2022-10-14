@@ -5,8 +5,9 @@ m = as.numeric(args[[3]])
 i_rep = as.numeric(args[[4]])
 
 #merge the by chr prscsx_score
-out.dir = paste0(out.dir.sum,eth[1],"/prscsx")
 eth <- c("EUR","AFR","AMR","EAS","SAS")
+out.dir.sum <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
+out.dir = paste0(out.dir.sum,eth[1],"/prscsx")
 
 library(data.table)
 
