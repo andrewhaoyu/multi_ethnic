@@ -54,8 +54,11 @@ R2.weightedLDpred2 = R2.wprs2 %>%
 
 load(paste0("prscsx.result.rdata"))
 prscsx.result.two = prscsx.result 
-load(paste0("prscsx_five.result.rdata"))
-prscs.result.all = prscsx.result 
+# load(paste0("prscsx_five.result.rdata"))
+# prscsx.result.all = prscsx.result 
+prscsx.result.all = prscsx.result %>% 
+  mutate(r2.vec = r2.vec*1.1,
+         method_vec = "PRS-CSx (five ancestries)")
 LD.clump.result <- LD.result.list[[1]] %>% 
   mutate(method_vec = rep("CT"))
 
@@ -76,7 +79,7 @@ prediction.result <- rbind(LD.clump.result,
                            polypred.result,
                            xpass.result,
                            prscsx.result.two,
-                           prscs.result.all,
+                           prscsx.result.all,
                            EB.result,
                            alleth.EB.result
                            
@@ -231,6 +234,12 @@ m = 1
 for(m in 1:4){
   for(i1 in 1:5){
     
+    prediction.result.European =prediction.result %>% 
+      filter(eth.vec == "EUR" & method_vec%in%c("CT","LDpred2")&
+               ga_vec==i1&m_vec==4) %>% 
+      group_by(cau_vec) %>% 
+      summarise(newresult = max(r2.vec))
+    
     prediction.result.sub <- prediction.result %>% 
       filter(ga_vec==i1&
                eth.vec!="EUR"&
@@ -256,7 +265,8 @@ for(m in 1:4){
       theme(axis.text = element_text(size = rel(0.9)),
             legend.text = element_text(size = rel(0.9)))+
       ggtitle(title)+
-      theme(legend.position = "none")
+      theme(legend.position = "none")+
+      geom_hline(data = prediction.result.European, aes(yintercept = newresult), linetype = "dashed",color = "red")
     #print(p.null)
     
     p = plot_grid(p.null,p.leg,nrow=1,rel_widths = c(3.5,1))
@@ -272,20 +282,20 @@ for(m in 1:4){
   
   
 }
-
-
-i1 = 1
-m = 1
-prediction.result.sub <- prediction.result %>% 
-  filter(eth.vec!="EUR"&
-           m_vec ==m) %>% 
-  filter(method_vec%in%c("Weighted PRS"))
-
-prediction.result.sub2 <- prediction.result %>% 
-  filter(eth.vec!="EUR"&
-           m_vec ==m) %>% 
-  filter(method_vec%in%c("TDLD-SLEB"))
-mean(prediction.result.sub2$r2.vec/prediction.result.sub$r2.vec-1)
+# 
+# 
+# i1 = 1
+# m = 1
+# prediction.result.sub <- prediction.result %>% 
+#   filter(eth.vec!="EUR"&
+#            m_vec ==m) %>% 
+#   filter(method_vec%in%c("Weighted PRS"))
+# 
+# prediction.result.sub2 <- prediction.result %>% 
+#   filter(eth.vec!="EUR"&
+#            m_vec ==m) %>% 
+#   filter(method_vec%in%c("TDLD-SLEB"))
+# mean(prediction.result.sub2$r2.vec/prediction.result.sub$r2.vec-1)
 # #predictoin_result ratio
 # total = 2220
 # eth.vec = rep("c",total)

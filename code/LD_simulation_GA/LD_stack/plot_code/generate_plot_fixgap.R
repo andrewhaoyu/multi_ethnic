@@ -22,10 +22,11 @@ EUR.result = rbind(LD.clump.result,LDpred2.result.sub) %>%
 
 rbind(LD.clump.result,LDpred2.result.sub) %>% 
   filter(l_vec==3&ga_vec==3)
-load(paste0("LD.clump.result.EBtest.rdata"))
-EB.result = EB.result %>% 
-  filter(method_vec=="CT-SLEB (two ancestries)")
-prediction.result <- rbind(LD.clump.result,
+load(paste0("LD.clump.result.allethtest.EB.rdata"))
+EB.result = alleth.EB.result %>% 
+  mutate(method_vec = "CT-SLEB (five ancestries)")
+
+prediction.result <- rbind(LDpred2.result.sub,
                            EB.result)
 
 

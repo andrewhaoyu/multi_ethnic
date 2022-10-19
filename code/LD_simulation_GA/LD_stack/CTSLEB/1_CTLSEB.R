@@ -1,4 +1,3 @@
-#CT-SLEB for GLGC data
 #load the p-value results
 args = commandArgs(trailingOnly = T)
 #i represent ethnic group
