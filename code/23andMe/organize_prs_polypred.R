@@ -69,10 +69,10 @@ SNP_PRS_csx = rbindlist(snp.id.list)
 
 #combine all SNPs together
 SNP = data.frame(SNP = unique(c(SNP_XPASS,
-               SNP_SBAYES_EUR,
-               SNP_SBAYES_tar,
-               SNP_polyfun,
-               SNP_PRS_csx$SNP)))
+                                SNP_SBAYES_EUR,
+                                SNP_SBAYES_tar,
+                                SNP_polyfun,
+                                SNP_PRS_csx$SNP)))
 #only keep SNPs that exist in the target population
 SNP_infor = inner_join(SNP, sum_infor, by = "SNP")
 snp_id = left_join(SNP_infor,
@@ -100,7 +100,7 @@ AlignSNP = function(snp_id,BETA){
       effect_allele == A1 ~ beta,
       effect_allele != A1 & effect_allele != A2 ~ 0 #insertation and deletion, not match with reference 
     ))
-return(temp_data)  
+  return(temp_data)  
 }
 
 temp_data = AlignSNP(snp_id, BETA)
@@ -142,18 +142,18 @@ BETA_mat = matrix(0, nrow = nrow(snp_id),ncol = length(eth)*length(phi))
 #   for(l in 1:7){
 temp = 1
 for(v in 1:length(phi))
-for(k in 1:length(eth)){
-  
-  load(paste0(out.dir.prs,"sum_five_",eth[k],"_pst_eff_a1_b0.5_phi",phi[v],".rdata"))
-  BETA = data[,c("V2", "V4", "V6")]
-  colnames(BETA) = c("SNP", "effect_allele", "beta")
-  temp_data = AlignSNP(snp_id,BETA)
-  BETA_mat[,temp] = temp_data$beta_update
-  temp = temp + 1
-  
-  
-  
-}
+  for(k in 1:length(eth)){
+    
+    load(paste0(out.dir.prs,"sum_five_",eth[k],"_pst_eff_a1_b0.5_phi",phi[v],".rdata"))
+    BETA = data[,c("V2", "V4", "V6")]
+    colnames(BETA) = c("SNP", "effect_allele", "beta")
+    temp_data = AlignSNP(snp_id,BETA)
+    BETA_mat[,temp] = temp_data$beta_update
+    temp = temp + 1
+    
+    
+    
+  }
 
 
 

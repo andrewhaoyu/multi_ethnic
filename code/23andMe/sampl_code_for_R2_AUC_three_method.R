@@ -90,7 +90,7 @@ PRS1 = PRS_all1[,c(2:4),drop=F]
 #if a PRS doesn't converge, I put all the coefficients as 0 for formating
 col_sum = colSums(PRS1)
 #find the columns that converges
-idx <- which(col_sum)!=0
+idx <- which(col_sum!=0)
 PRS1 = PRS1[, idx, drop = F]
 
 data1 = data.frame(Y = Y1,PRS1,X_covar1)
