@@ -53,9 +53,9 @@ R2.weightedLDpred2 = R2.wprs2 %>%
   select(eth.vec,r2.vec,l_vec,m_vec,method_vec,ga_vec)
 
 load(paste0("prscsx.result.rdata"))
-prscsx.result = prscsx.result 
-prscs.result.all = prscsx.result %>% 
-  mutate(method_vec = "PRS-CSx (five ancestries)")
+prscsx.result.two = prscsx.result 
+load(paste0("prscsx_five.result.rdata"))
+prscs.result.all = prscsx.result 
 LD.clump.result <- LD.result.list[[1]] %>% 
   mutate(method_vec = rep("CT"))
 
@@ -75,7 +75,7 @@ prediction.result <- rbind(LD.clump.result,
                            R2.weightedLDpred2,
                            polypred.result,
                            xpass.result,
-                           prscsx.result,
+                           prscsx.result.two,
                            prscs.result.all,
                            EB.result,
                            alleth.EB.result
