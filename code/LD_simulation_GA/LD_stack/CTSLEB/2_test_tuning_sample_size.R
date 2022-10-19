@@ -10,6 +10,9 @@ i1 = 1
 i_rep = as.numeric(args[[3]])
 k = as.numeric(args[[4]])
 #i_rep = 2
+cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
+setwd("/data/zhangh24/multi_ethnic/")
+out.dir <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/LD_stack/"
 
 n_vec = c(1000,2500,5000,10000)
 library(dplyr)
@@ -37,9 +40,6 @@ summary.com <- left_join(sum.data,summary.eur.select,by="SNP")
   #r2 mat represent the r2 matrix for the testing dataset
   #column represent the ethnic groups
   #row represent different p-value threshold
-  cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
-  setwd("/data/zhangh24/multi_ethnic/")
-  out.dir <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/LD_stack/"
   y <- as.data.frame(fread(paste0(cur.dir,eth[i],"/phenotypes_rho",l,"_",i1,".phen")))
   y <- y[,2+(1:n.rep),drop=F]
   n <- nrow(y)
