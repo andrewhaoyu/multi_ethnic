@@ -77,7 +77,7 @@ phi = c(1,1E-02,1E-04,1E-06)
                   " --chrom=",j,
                   " --phi=",phi[k], 
                   " --out_dir=",out.dir.sum,eth[1],"/prscsx",
-                  " --out_name=rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
+                  " --out_name=update_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
     
     
     
