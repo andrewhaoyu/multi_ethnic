@@ -221,7 +221,7 @@ p.null <- ggplot(prediction.result.sub)+
            position = position_dodge(),
            stat = "identity")+
   theme_Publication()+
-  ylab(expression(bold(R^2)))+
+  ylab(expression(bold(paste("Adjusted ",R^2))))+
 facet_grid(vars(trait),vars(eth),scales = "free")+
   theme_Publication()+
   #coord_cartesian(ylim = c(0.47, 0.67)) +
