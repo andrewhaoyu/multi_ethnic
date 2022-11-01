@@ -13,7 +13,7 @@ library(data.table)
 
 
 phi = c("1e+00","1e-02","1e-04","1e-06")
-
+files = dir(path = out.dir, pattern = paste0("rho"))
 # for(v in 1:3){
 #   for(i in 2:5){
 setwd(out.dir)
@@ -33,8 +33,12 @@ setwd(out.dir)
         }else{
           file = paste0("update_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_",eth[i],
                         "_pst_eff_a1_b0.5_phi",phi[k],"_chr",j,".txt")
-          data = fread(file)
-          result.list.tar[[j]] = data
+          if(file%in%files){
+            data = fread(file)
+            result.list.tar[[j]] = data
+          }
+          
+          
           
         }
         
