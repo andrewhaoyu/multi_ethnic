@@ -30,12 +30,16 @@ out.dir.sum <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
 out.dir = paste0(out.dir.sum,eth[1],"/prscsx")
 setwd(out.dir)
 phi = c("1e+00","1e-02","1e-04","1e-06")
+files = dir(out.dir, pattern = "update_rho")
 for(v in 1:4){
   for(i_eth in 1:5){
     i_rep = 1
     #load target population posterior
-    prs = fread(paste0("rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_",eth[i_eth],
-                       "_pst_eff_a1_b0.5_phi",phi[v],".txt"))
+   
+      prs = fread(paste0("rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_",eth[i_eth],
+                         "_pst_eff_a1_b0.5_phi",phi[v],".txt"))
+      
+    
     
     prs_infor = prs %>% 
       select(V2,V4)
@@ -44,8 +48,18 @@ for(v in 1:4){
     Beta = matrix(0,nrow(prs),n_rep)
     for(i_rep in 1:n_rep){
       print(i_rep)
+      if(m==4){
       prs = fread(paste0("rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_",eth[i_eth],
                          "_pst_eff_a1_b0.5_phi",phi[v],".txt"))
+      }else{
+      file =   paste0("update_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_",eth[i_eth],
+                      "_pst_eff_a1_b0.5_phi",phi[v],".txt")
+      if(file %in% files==T){
+        prs = fread(file)
+      }else{
+        prs = rep(0,nrow(prs))
+      }
+      }
       Beta[,i_rep] = prs$V6
       
     }
