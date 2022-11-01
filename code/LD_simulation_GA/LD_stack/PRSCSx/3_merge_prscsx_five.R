@@ -41,8 +41,15 @@ setwd(out.dir)
         
       }
       result = rbindlist(result.list.tar)
-      fwrite(result,file = paste0("rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_",eth[i],
-                                  "_pst_eff_a1_b0.5_phi",phi[k],".txt"),row.names = F,col.names = T,sep = " ")
+      if(m==4){
+        fwrite(result,file = paste0("rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_",eth[i],
+                                    "_pst_eff_a1_b0.5_phi",phi[k],".txt"),row.names = F,col.names = T,sep = " ")
+        
+      }else{
+        fwrite(result,file = paste0("update_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_",eth[i],
+                                    "_pst_eff_a1_b0.5_phi",phi[k],".txt"),row.names = F,col.names = T,sep = " ")
+        
+      }
       
     
   }

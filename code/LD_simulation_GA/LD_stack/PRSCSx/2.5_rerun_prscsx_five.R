@@ -36,7 +36,11 @@ prs_cs_ref = prs_cs_ref %>% select(SNP)
 
 #prepare summary statistics
 for(i in 1:5){
-  sum = as.data.frame(fread(paste0(out.dir.sum,eth[i],"/summary_out_rho_",l,"_size_",4,"_rep_",i_rep,"_GA_",i1)))  
+  if(i==1){
+    sum = as.data.frame(fread(paste0(out.dir.sum,eth[i],"/summary_out_rho_",l,"_size_",4,"_rep_",i_rep,"_GA_",i1)))    
+  }else{
+    sum = as.data.frame(fread(paste0(out.dir.sum,eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))  
+  }
   sum.update = left_join(sum,snp.infor,by="SNP")
   sum.update = inner_join(sum.update,prs_cs_ref,by = c("rs_id"="SNP"))
   sum.update = sum.update %>% 
@@ -73,7 +77,7 @@ phi = c(1,1E-02,1E-04,1E-06)
                 " --chrom=",j,
                 " --phi=",phi[k], 
                 " --out_dir=",out.dir.sum,eth[1],"/prscsx",
-                " --out_name=rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
+                " --out_name=update_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
   
   
   
