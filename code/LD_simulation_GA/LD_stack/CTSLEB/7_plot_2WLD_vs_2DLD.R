@@ -79,3 +79,7 @@ for(m in 1:4){
   dev.off()
   
 }
+
+
+prs_val = as.matrix(merged_df_val[,c((ncol(merged_df_val)-1):ncol(merged_df_val))])
+prs_testing = as.matrix(merged_df_testing[,c((ncol(merged_df_testing)-1):ncol(merged_df_testing))])

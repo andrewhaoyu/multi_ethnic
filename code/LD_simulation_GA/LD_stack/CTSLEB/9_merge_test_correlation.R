@@ -32,7 +32,7 @@ for(i in 2:5){
           
           
           for(i_rep in 1:n.rep){
-            filename = paste0(out.dir,eth[i],"/r2_test_tun_",k,"_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)
+            filename = paste0(out.dir,eth[i],"/r2_cor_cut_",k,"_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)
             
             load(filename)
             r2.stack.temp[i_rep] = r2.stack
@@ -57,7 +57,7 @@ for(i in 2:5){
   
 }  
 EB.result <- data.frame(eth.vec,r2.vec,l_vec,m_vec,method_vec,ga_vec,k_vec)
-save(EB.result,file = paste0(out.dir,"CTSLEB_tuning_sample_size.rdata"))
+save(EB.result,file = paste0(out.dir,"CTSLEB_test_correlation.rdata"))
 
 # #r2 result for different p-value threshold
 # r2.vec <- rep(0,length(pthres)^2*total)

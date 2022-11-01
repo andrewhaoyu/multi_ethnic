@@ -32,17 +32,21 @@ trait_name = c("Any CVD","Depression",
 #                 "TDLD-EB",
 #                 "CT-SLEB (two ethnics)",
 #                 "CT-SLEB (five ethnics)")
-method_vec = c("PT","BESTEUR","BESTEURLDPred2","weighted_PRS","PRSCSx","TDLD_EBeur_SL","TDLD_EBalleur_SL")
-method_name = c("C+T","Best EUR SNP (C+T)",
-                "Best EUR SNP (LDpred2)",
-                "Weighted PRS",
+method_vec = c("PT","BESTEUR","BESTEURLDPred2","weighted_PRS","PRSCSx","TDLD_EBeur_SL","TDLD_EBalleur_SL","three_methods","Weigted PRS (LDpred2)")
+method_name = c("CT","Best EUR PRS (CT)",
+                "Best EUR PRS (LDpred2)",
+                "Weighted PRS (CT)",
                 "PRS-CSx",
-                "CT-SLEB (two ancestries)",
-                "CT-SLEB (five ancestries)")
+                "CT-SLEB",
+                "CT-SLEB (five ancestries)",
+                "XPASS", 
+                "PolyPred+",
+                "PRS-CSx (five ancestries)",
+                "Weighted PRS (LDpred2)")
 
-besteur_methodname = c("Best EUR SNP (C+T)",
-                       "Best EUR SNP + target coefficients (C+T)",
-                       "Best EUR SNP + EB coefficients (C+T)")
+besteur_methodname = c("Best EUR PRS (CT)",
+                       "Best EUR PRS + target coefficients (CT)",
+                       "Best EUR PRS + EB coefficients (CT)")
 source("/Users/zhangh24/GoogleDrive/multi_ethnic/code/stratch/theme_publication.R")
 pthres <- c(5E-08,5E-07,5E-06,5E-05,5E-04,5E-03,5E-02,5E-01,1.0)
 #load all results
@@ -111,8 +115,27 @@ temp = 1
         colnames(plot.data)[1] = "result"
         plot.data.list[[temp]] = plot.data
         temp = temp+1
-      }
-      else{
+      }else if(method_vec[i1]=="three_methods"){
+        result = read.table(paste0("./summary_three_methods/",eth_group[i],"_",trait[l]),header=T)
+        plot.data = data.frame(result = result,
+                               eth = rep(eth_name[i],3),
+                               trait = rep(trait_name[l],3),
+                               method_vec = c("XPASS", 
+                               "PolyPred+",
+                               "PRS-CSx (five ancestries)"))
+        colnames(plot.data)[1] = "result"
+        plot.data.list[[temp]] = plot.data
+        temp = temp+1
+      }else if(method_vec[i1]=="Weigted PRS (LDpred2)"){
+        result = read.table(paste0("./summary_weighted_ldpred2/",eth_group[i],"_",trait[l]),header=T)
+        plot.data = data.frame(result = result,
+                               eth = eth_name[i],
+                               trait = trait_name[l],
+                               method_vec = "Weighted PRS (LDpred2)")
+        colnames(plot.data)[1] = "result"
+        plot.data.list[[temp]] = plot.data
+        temp = temp+1
+      }else{
         #the other methods need to separate tuning and validation dataset
         result = read.csv(paste0("./validation_summary/",eth_group[i],"_",trait[l],"_",method_vec[i1]))
         idx.max = which.max(result)
@@ -177,19 +200,23 @@ prediction.result = rbind(prediction.result,LDpred2)
 #prediction.result = rbind(prediction.result,tdld)
 
 prediction.result = prediction.result %>% 
-  filter(method_vec%in%c("TDLD-EB","TDLD","Best EUR SNP + EB coefficients (C+T)",
-                         "Best EUR SNP + target coefficients (C+T)")==F) %>% 
+  filter(method_vec%in%c("TDLD-EB","TDLD","Best EUR PRS + EB coefficients (CT)",
+                         "Best EUR PRS + target coefficients (CT)")==F) %>% 
   mutate(method_vec=ifelse(method_vec=="C+T","CT",method_vec)) %>% 
-  mutate(method_vec=ifelse(method_vec=="Best EUR SNP (C+T)","Best EUR SNP (CT)",method_vec))
+  mutate(method_vec=ifelse(method_vec=="Best EUR PRS (CT)","Best EUR PRS (CT)",method_vec))
 
 prediction.result$method_vec = factor(prediction.result$method_vec,
                                       levels = c("CT",
                                                  "LDpred2",
-                                                 "Best EUR SNP (CT)",
-                                                 "Best EUR SNP (LDpred2)",
-                                                 "Weighted PRS",
-                                                "PRS-CSx",
-                                                 "CT-SLEB (two ancestries)",
+                                                 "Best EUR PRS (CT)",
+                                                 "Best EUR PRS (LDpred2)",
+                                                 "Weighted PRS (CT)",
+                                                 "Weighted PRS (LDpred2)",
+                                                 "PolyPred+",
+                                                 "XPASS",
+                                                 "PRS-CSx",
+                                                 "PRS-CSx (five ancestries)",
+                                                 "CT-SLEB",
                                                  "CT-SLEB (five ancestries)"))
 prediction.result$Method = prediction.result$method_vec
 prediction.result$index = rep("1",nrow(prediction.result))
@@ -197,8 +224,8 @@ prediction.result$eth = factor(prediction.result$eth,
                        levels = c("European","African American",
                                   "Latino","East Asian","South Asian"))
 
-save(prediction.result,file = "/Users/zhangh24/GoogleDrive/multi_ethnic/result/23andme/prediction_summary.rdata")
-write.csv(prediction.result, file = "/Users/zhangh24/GoogleDrive/multi_ethnic/result/23andme/prediction_summary.csv")
+#save(prediction.result,file = "/Users/zhangh24/GoogleDrive/multi_ethnic/result/23andme/prediction_summary.rdata")
+#write.csv(prediction.result, file = "/Users/zhangh24/GoogleDrive/multi_ethnic/result/23andme/prediction_summary.csv")
 sigma2toauc = function(x){
   ifelse(x==0,0.50,round(pnorm(0.5*sqrt(x)),2))
 }
@@ -210,51 +237,76 @@ prediction.result.table = prediction.result %>%
 # write.csv(prediction.result.table,file = "/Users/zhangh24/GoogleDrive/multi_ethnic/result/23andme/prediction_summary.csv",row.names = F)
 
 uvals = factor(c("CT",
-                          "LDpred2",
-                          "Best EUR SNP (CT)",
-                          "Best EUR SNP (LDpred2)",
-                          "Weighted PRS",
-                     "PRS-CSx",
-                 "CT-SLEB (two ancestries)",
-                 "CT-SLEB (five ancestries)"),
-               levels= c("CT",
-                         "LDpred2",
-                         "Best EUR SNP (CT)",
-                         "Best EUR SNP (LDpred2)",
-                         "Weighted PRS",
-                         "PRS-CSx",
-                         "CT-SLEB (two ancestries)",
-                         "CT-SLEB (five ancestries)"))
+                 "LDpred2",
+                 "Best EUR PRS (CT)",
+                 "Best EUR PRS (LDpred2)",
+                 "Weighted PRS (CT)",
+                 "Weighted PRS (LDpred2)",
+                 "PolyPred+", 
+                 "XPASS", 
+                 "PRS-CSx",
+                 "PRS-CSx (five ancestries)",
+                 "CT-SLEB",
+                 "CT-SLEB (five ancestries)"
+)
+,levels = c("CT",
+            "LDpred2",
+            "Best EUR PRS (CT)",
+            "Best EUR PRS (LDpred2)",
+            "Weighted PRS (CT)",
+            "Weighted PRS (LDpred2)",
+            "PolyPred+", 
+            "XPASS", 
+            "PRS-CSx",
+            "PRS-CSx (five ancestries)",
+            "CT-SLEB",
+            "CT-SLEB (five ancestries)"
+))
+
 
 n.single = 9
-
-
-single.color =  brewer.pal(n.single, "Blues")[c(4,7)]
 n.EUR = 9
 
-
-EUR.color = brewer.pal(n.EUR, "Greens")[c(4,7)]
-
-
 n.multi = 9
-multi.color = brewer.pal(n.multi, "Oranges")[c(3,5,7,9)]
-#multi.color = brewer.pal(n.multi, "Oranges")[c(3,7,9)]
-colour = c(single.color,EUR.color,multi.color)
+single.color =  brewer.pal(n.single, "Blues")[c(4,7)]
+
+EUR.color = brewer.pal(n.EUR, "RdPu")[c(4,7)]
+
+weighted.color = brewer.pal(n.multi, "Greens")[c(3,5,7)]
+
+bayes.color = brewer.pal(n.multi, "Oranges")[c(3,5,7)]
+
+propose.method = brewer.pal(n.multi, "Purples")[c(4,7)]
+
+
+
+colour = c(single.color,EUR.color,weighted.color,
+           bayes.color,propose.method)
+
 col_df = tibble(
-  colour = c(single.color,EUR.color,multi.color),
+  colour = c(single.color,EUR.color,weighted.color,
+             bayes.color,propose.method),
   method_vec = uvals,
   category = case_when(method_vec%in%c("CT",
                                        "LDpred2") ~ "Single ancestry method",
-                       method_vec%in%c("Best EUR SNP (CT)",
-                                       "Best EUR SNP (LDpred2)"
+                       method_vec%in%c("Best EUR PRS (CT)",
+                                       "Best EUR PRS (LDpred2)"
                        ) ~ "EUR PRS based method",
-                       method_vec%in%c("Weighted PRS",
+                       method_vec%in%c("Weighted PRS (CT)",
+                                       "Weighted PRS (LDpred2)",
+                                       "PolyPred+"
+                       ) ~ "Weighted PRS method",
+                       method_vec%in%c("XPASS",
                                        "PRS-CSx",
-                                       "CT-SLEB (two ancestries)",
-                                       "CT-SLEB (five ancestries)") ~ "Multi-ancestry method")
-) %>%   mutate(category = factor(category,levels = c("Single ancestry method",
-                                                                 "EUR PRS based method",
-                                                                 "Multi-ancestry method")))
+                                       "PRS-CSx (five ancestries)") ~"Bayesian method",
+                       method_vec%in%c("CT-SLEB",
+                                       "CT-SLEB (five ancestries)") ~ "Proposed method")
+) %>% 
+  mutate(category = factor(category,levels = c("Single ancestry method",
+                                               "EUR PRS based method",
+                                               "Weighted PRS method",
+                                               "Bayesian method",
+                                               "Proposed method")))
 prediction.result = prediction.result %>% 
   left_join(col_df)
 getLegend <- function(p) {
@@ -290,7 +342,8 @@ run_plot = function(filler, values) {
 legs = lapply(sort(unique(col_df$category)), run_plot)
 
 legs = lapply(legs, getLegend)
-p.leg = plot_grid(NULL,NULL,legs[[1]],legs[[2]], legs[[3]],NULL,align="v",ncol=1,rel_heights=c(1,1,0.7,1,1.2,1))
+p.leg = plot_grid(NULL,legs[[1]],legs[[2]], legs[[3]],legs[[4]],legs[[5]], NULL,align="v",ncol=1,rel_heights=c(1.2,1,1,1,1,1,1,1.2))
+
 print(p.leg)
 
 

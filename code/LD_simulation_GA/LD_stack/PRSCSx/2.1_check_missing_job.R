@@ -17,7 +17,7 @@ resubmit_code = rep("c",264000)
 temp = 1
 
  for(l in 1:3){
-   for(m in 1:4){
+   for(m in 1:3){
 for(i_rep in 1:10){
   print(i_rep)
   for(i1 in 1:5){
@@ -25,7 +25,7 @@ for(i_rep in 1:10){
       for(k in 1:4){
         
         #for(i in 1:5){
-          file = paste0("rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_",eth[1],
+          file = paste0("update_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_",eth[1],
                         "_pst_eff_a1_b0.5_phi",phi[k],"_chr",j,".txt")
           if(file%in%files==F){
             resubmit_code[[temp]] = paste0("Rscript /data/zhangh24/multi_ethnic/code/LD_simulation_GA/LD_stack/PRSCSx/2.5_rerun_prscsx_five.R ",

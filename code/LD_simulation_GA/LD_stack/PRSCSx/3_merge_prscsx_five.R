@@ -24,11 +24,19 @@ setwd(out.dir)
     for(i in 1:5){
       result.list.tar = list()
     for(j in 1:22){
-      
-        file = paste0("rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_",eth[i],
-                      "_pst_eff_a1_b0.5_phi",phi[k],"_chr",j,".txt")
-        data = fread(file)
-        result.list.tar[[j]] = data
+        if(m==4){
+          file = paste0("rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_",eth[i],
+                        "_pst_eff_a1_b0.5_phi",phi[k],"_chr",j,".txt")
+          data = fread(file)
+          result.list.tar[[j]] = data
+          
+        }else{
+          file = paste0("update_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_",eth[i],
+                        "_pst_eff_a1_b0.5_phi",phi[k],"_chr",j,".txt")
+          data = fread(file)
+          result.list.tar[[j]] = data
+          
+        }
         
         
       }

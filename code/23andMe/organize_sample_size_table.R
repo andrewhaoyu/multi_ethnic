@@ -48,9 +48,22 @@ for(l in 1:length(trait)){
 write.csv(sample.size.table,file = "/Users/zhangh24/GoogleDrive/multi_ethnic/result/23andme/23andme_sample_size.csv")
 sample.size.table$total = rowSums(sample.size.table[,3:8])
 library(dplyr)
-sample.size.table %>% 
+sample.size.sum = sample.size.table %>% 
   group_by(eth) %>% 
-  summarize(average = mean(total))
+  summarize(average = max(total))
+sum(sample.size.sum$average)
+
+
+
+
+
+
+
+
+
+
+
+
 sample.size.table %>% filter(trait%in%c("Heart metabolic disease burden",
                                         "Height")==F) %>% 
   group_by(eth) %>% 
