@@ -126,7 +126,30 @@ EBpost <- function(beta_tar,sd_tar,
   return(beta_mat_post)
 }
 
+summary.com.prior = summary.com.match
+beta_tar <- summary.com.prior$beta_tar
+sd_tar <- summary.com.prior$sd_tar
+beta_eur <- summary.com.prior$beta_eur
+sd_eur <- summary.com.prior$sd_eur
 
+EBprior = EstimatePrior(beta_tar,sd_tar,
+                        beta_eur,sd_eur)
+beta_tar <- summary.com.match$beta_tar
+sd_tar <- summary.com.match$sd_tar
+beta_eur <- summary.com.match$beta_eur
+sd_eur <- summary.com.match$sd_eur
+
+post_beta_mat = EBpost(beta_tar,sd_tar,beta_eur,sd_eur,EBprior)
+idx <- which(is.na(post_beta_mat[,2]))
+post_beta_mat[idx,2] = 0
+
+summary.com  = summary.com.match
+summary.com = cbind(summary.com,post_beta_mat)
+#remove duplicated snp
+idx <- which(duplicated(summary.com$SNP))
+if(length(idx)!=0){
+  summary.com = summary.com[-idx,]
+}
 
 #post_beta_tar = post_beta_mat[,1,drop=F]
 
@@ -143,32 +166,7 @@ for(r_ind in 1:length(r2_vec)){
     LD <- as.data.frame(fread(paste0(out.dir,eth[i],"/LD_clump_two_way_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped")))
     clump.snp <- LD[,1,drop=F] 
     clump.snp <- LD
-    summary.com.prior = left_join(clump.snp,summary.com.match,by="SNP") %>% 
-      filter(peur<p.k1|
-               P<p.k2)
-    beta_tar <- summary.com.prior$beta_tar
-    sd_tar <- summary.com.prior$sd_tar
-    beta_eur <- summary.com.prior$beta_eur
-    sd_eur <- summary.com.prior$sd_eur
-    
-    EBprior = EstimatePrior(beta_tar,sd_tar,
-                            beta_eur,sd_eur)
-    beta_tar <- summary.com.match$beta_tar
-    sd_tar <- summary.com.match$sd_tar
-    beta_eur <- summary.com.match$beta_eur
-    sd_eur <- summary.com.match$sd_eur
-    
-    post_beta_mat = EBpost(beta_tar,sd_tar,beta_eur,sd_eur,EBprior)
-    idx <- which(is.na(post_beta_mat[,2]))
-    post_beta_mat[idx,2] = 0
-    
-    summary.com  = summary.com.match
-    summary.com = cbind(summary.com,post_beta_mat)
-    #remove duplicated snp
-    idx <- which(duplicated(summary.com$SNP))
-    if(length(idx)!=0){
-      summary.com = summary.com[-idx,]
-    }
+
     #read the target ethnic group summary level statistics
     #combine the statistics with SNPs after clumping
     prs.all <- left_join(clump.snp,summary.com,by="SNP") 
@@ -353,7 +351,7 @@ model <- lm(y.vad~y.pred[[1]])
 r2.stack <- summary(model)$r.square
 r2.list <- list(r2.stack)
 #update based on including both eur and target coefficients
-save(r2.list,file = paste0(out.dir,eth[i],"/r2.list_ebfirst_rho_eb_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
+save(r2.list,file = paste0(out.dir,eth[i],"/r2.list_ebct_rho_eb_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
 # 
 # #pthres <- c(1E-10,1E-09,5E-08,1E-07,2.5E-07,5E-07,7.5E-07,1E-06,2.5E-06,5E-06,7.5E-06,1E-05,2.5e-05,5E-05,7.5e-05,1E-04,2.5E-04,5E-04,7.5E-04,1E-03)
 # 

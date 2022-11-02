@@ -54,11 +54,11 @@ R2.weightedLDpred2 = R2.wprs2 %>%
 
 load(paste0("prscsx.result.rdata"))
 prscsx.result.two = prscsx.result 
-# load(paste0("prscsx_five.result.rdata"))
-# prscsx.result.all = prscsx.result 
-prscsx.result.all = prscsx.result %>% 
-  mutate(r2.vec = r2.vec*1.1,
-         method_vec = "PRS-CSx (five ancestries)")
+load(paste0("prscsx_five.result.rdata"))
+prscsx.result.all = prscsx.result
+# prscsx.result.all = prscsx.result %>% 
+#   mutate(r2.vec = r2.vec*1.1,
+#          method_vec = "PRS-CSx (five ancestries)")
 LD.clump.result <- LD.result.list[[1]] %>% 
   mutate(method_vec = rep("CT"))
 
