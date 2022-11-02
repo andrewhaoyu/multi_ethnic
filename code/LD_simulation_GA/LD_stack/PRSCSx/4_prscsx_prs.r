@@ -54,14 +54,15 @@ for(v in 1:4){
       }else{
       file =   paste0("update_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_",eth[i_eth],
                       "_pst_eff_a1_b0.5_phi",phi[v],".txt")
-      if(file %in% files==T){
-        prs = fread(file)
-        if(nrow(prs)!=nrow(BETA)){
-          prs = rep(0,nrow(Beta))
-        }
-      }else{
-        prs = rep(0,nrow(Beta))
-      }
+      prs = fread(file)
+      # if(file %in% files==T){
+      #  
+      #   if(nrow(prs)!=nrow(BETA)){
+      #     prs = rep(0,nrow(Beta))
+      #   }
+      # }else{
+      #   prs = rep(0,nrow(Beta))
+      # }
       }
       Beta[,i_rep] = prs$V6
       
