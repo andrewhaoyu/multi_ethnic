@@ -56,8 +56,11 @@ for(v in 1:4){
                       "_pst_eff_a1_b0.5_phi",phi[v],".txt")
       if(file %in% files==T){
         prs = fread(file)
+        if(nrow(prs)!=nrow(BETA)){
+          prs = rep(0,nrow(Beta))
+        }
       }else{
-        prs = rep(0,nrow(prs))
+        prs = rep(0,nrow(Beta))
       }
       }
       Beta[,i_rep] = prs$V6

@@ -1,3 +1,5 @@
+#test eb step performance using simulation dataset
+#the eb step is performed right after each clumping without using all SNPs
 #use plink2 to calculate prs
 #load LD_clump_file
 #i is the ethnic
@@ -63,12 +65,12 @@ summary.com.match = summary.com.match %>%
          z_stat_tar = STAT,
          z_stat_eur = beta_eur/sd_eur)
 #estimate the prior
-load(paste0(out.dir,eth[i],"/r2.list_rho_2DLD_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
-
-p.k1 =r2.list[[3]][[3]]
-p.k2 = r2.list[[3]][[4]]
-r_ind = r2.list[[3]][[5]]
-w_ind = r2.list[[3]][[6]]
+# load(paste0(out.dir,eth[i],"/r2.list_rho_2DLD_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
+# 
+# p.k1 =r2.list[[3]][[3]]
+# p.k2 = r2.list[[3]][[4]]
+# r_ind = r2.list[[3]][[5]]
+# w_ind = r2.list[[3]][[6]]
 EstimatePrior <- function(beta_tar,sd_tar,
                           beta_eur,sd_eur){
   beta_tar = as.numeric(beta_tar)
@@ -125,45 +127,43 @@ EBpost <- function(beta_tar,sd_tar,
   return(beta_mat_post)
 }
 
-LD <- as.data.frame(fread(paste0(out.dir,eth[i],"/LD_clump_two_way_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped")))
-clump.snp <- LD
-summary.com.prior = left_join(clump.snp,summary.com.match,by="SNP") %>% 
-  filter(peur<p.k1|
-           P<p.k2)
-beta_tar <- summary.com.prior$beta_tar
-sd_tar <- summary.com.prior$sd_tar
-beta_eur <- summary.com.prior$beta_eur
-sd_eur <- summary.com.prior$sd_eur
-
-EBprior = EstimatePrior(beta_tar,sd_tar,
-                        beta_eur,sd_eur)
-beta_tar <- summary.com.match$beta_tar
-sd_tar <- summary.com.match$sd_tar
-beta_eur <- summary.com.match$beta_eur
-sd_eur <- summary.com.match$sd_eur
-
-post_beta_mat = EBpost(beta_tar,sd_tar,beta_eur,sd_eur,EBprior)
-
-post_beta_tar = post_beta_mat[,1,drop=F]
-
-
-
-#summary.com.match$BETA = post_beta_tar
-
-
-summary.com  = summary.com.match
-
-#remove duplicated snp
-idx <- which(duplicated(summary.com$SNP))
-if(length(idx)!=0){
-  summary.com = summary.com[-idx,]
-}
 for(r_ind in 1:length(r2_vec)){
   wc_vec = wc_base_vec/r2_vec[r_ind]
   for(w_ind in 1:length(wc_vec)){
     print(c(r_ind,w_ind))
     
     
+    LD <- as.data.frame(fread(paste0(out.dir,eth[i],"/LD_clump_two_way_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped")))
+    clump.snp <- LD
+    summary.com.prior = left_join(clump.snp,summary.com.match,by="SNP") 
+    beta_tar <- summary.com.prior$beta_tar
+    sd_tar <- summary.com.prior$sd_tar
+    beta_eur <- summary.com.prior$beta_eur
+    sd_eur <- summary.com.prior$sd_eur
+    
+    EBprior = EstimatePrior(beta_tar,sd_tar,
+                            beta_eur,sd_eur)
+    beta_tar <- summary.com.match$beta_tar
+    sd_tar <- summary.com.match$sd_tar
+    beta_eur <- summary.com.match$beta_eur
+    sd_eur <- summary.com.match$sd_eur
+    
+    post_beta_mat = EBpost(beta_tar,sd_tar,beta_eur,sd_eur,EBprior)
+    
+    post_beta_tar = post_beta_mat[,1,drop=F]
+    
+    
+    
+    summary.com.match$BETA = post_beta_tar
+    
+    
+    summary.com  = summary.com.match
+    
+    #remove duplicated snp
+    idx <- which(duplicated(summary.com$SNP))
+    if(length(idx)!=0){
+      summary.com = summary.com[-idx,]
+    }
     #read LD clumped SNPs
     LD <- as.data.frame(fread(paste0(out.dir,eth[i],"/LD_clump_two_way_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped")))
     clump.snp <- LD[,1,drop=F] 
@@ -205,11 +205,7 @@ for(r_ind in 1:length(r2_vec)){
       }
       q_range = q_range[1:(temp-1),]
       write.table(q_range,file = paste0(temp.dir.prs,"q_range_file"),row.names = F,col.names = F,quote=F)
-      res = system(paste0("/data/zhangh24/software/plink2 --q-score-range ",
-                          temp.dir.prs,"q_range_file ",temp.dir.prs,"p_value_file header --threads 2 --score ",
-                          temp.dir.prs,"prs_file header no-sum no-mean-imputation --bfile ",
-                          temp.dir,"all_chr_test.mega --exclude ",old.out.dir,eth[i],"/duplicated.id  --out ",
-                          temp.dir.prs,"prs_eb_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1))
+      res = system(paste0("/data/zhangh24/software/plink2 --q-score-range ",temp.dir.prs,"q_range_file ",temp.dir.prs,"p_value_file header --threads 2 --score ",temp.dir.prs,"prs_file header no-sum no-mean-imputation --bfile ",temp.dir,"all_chr_test.mega --exclude ",old.out.dir,eth[i],"/duplicated.id  --out ",temp.dir.prs,"prs_eb_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1))
       print("step2 finished")
       #dup <- fread(paste0(old.out.dir,eth[i],"/duplicated.id"),header = F)
       
