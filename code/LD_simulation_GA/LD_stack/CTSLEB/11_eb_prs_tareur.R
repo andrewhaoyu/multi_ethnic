@@ -159,8 +159,6 @@ summary.com = cbind(summary.com,post_beta_mat)
 idx <- which(duplicated(summary.com$SNP))
 if(length(idx)!=0){
   summary.com = summary.com[-idx,]
-  post_beta_mat = post_beta_mat[-idx,]
-
 }
 for(r_ind in 1:length(r2_vec)){
   wc_vec = wc_base_vec/r2_vec[r_ind]

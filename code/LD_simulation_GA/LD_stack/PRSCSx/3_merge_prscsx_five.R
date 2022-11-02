@@ -31,8 +31,8 @@ setwd(out.dir)
           result.list.tar[[j]] = data
           
         }else{
-          # file = paste0("update_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_",eth[i],
-          #               "_pst_eff_a1_b0.5_phi",phi[k],"_chr",j,".txt")
+          file = paste0("update_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_",eth[i],
+                        "_pst_eff_a1_b0.5_phi",phi[k],"_chr",j,".txt")
           # if(file%in%files){
             data = fread(file)
             result.list.tar[[j]] = data
