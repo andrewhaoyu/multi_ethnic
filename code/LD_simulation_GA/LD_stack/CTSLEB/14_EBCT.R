@@ -1,4 +1,4 @@
-#goal: test the procedure that performs EB after each clumping step instead of finding best snp set
+#goal: test the procedure that performs EB using whole genome data before clumping
 #use plink2 to calculate prs
 #load LD_clump_file
 #i is the ethnic
@@ -143,7 +143,9 @@ for(r_ind in 1:length(r2_vec)){
     LD <- as.data.frame(fread(paste0(out.dir,eth[i],"/LD_clump_two_way_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped")))
     clump.snp <- LD[,1,drop=F] 
     clump.snp <- LD
-    summary.com.prior = left_join(clump.snp,summary.com.match,by="SNP")
+    summary.com.prior = left_join(clump.snp,summary.com.match,by="SNP") %>% 
+      filter(peur<p.k1|
+               P<p.k2)
     beta_tar <- summary.com.prior$beta_tar
     sd_tar <- summary.com.prior$sd_tar
     beta_eur <- summary.com.prior$beta_eur
@@ -270,16 +272,16 @@ for(r_ind in 1:length(r2_vec)){
   wc_vec = wc_base_vec/r2_vec[r_ind]
   for(w_ind in 1:length(wc_vec)){
     print(c(r_ind,w_ind))
-
+    
     LD <- as.data.frame(fread(paste0(out.dir,eth[i],"/LD_clump_two_way_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped")))
     clump.snp <- LD
-
+    
     #    colnames(sum.data)[2] <- "SNP"
-
+    
     #for(k in 1:length(pthres)){
-
+    
     prs.clump = left_join(clump.snp,summary.com,by="SNP")
-
+    
     for(k1 in 1:length(pthres)){
       for(k2 in 1:length(pthres)){
         prs.all <- prs.clump %>%
@@ -287,7 +289,7 @@ for(r_ind in 1:length(r2_vec)){
                    P<=pthres[k2])
         if(nrow(prs.all)>0){
           filename <- paste0(temp.dir.prs,"prs_eb_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1,".p_value_",k2,".sscore")
-
+          
           prs.temp <- fread(filename)
           prs.score <- prs.temp[,5:6]
           prs.test <- prs.score[(1):(n.test)]
@@ -298,10 +300,10 @@ for(r_ind in 1:length(r2_vec)){
           prs.mat[,temp:(temp+1)] = 0
           temp = temp+2
         }
-
+        
       }
     }
-
+    
   }
 }
 prs.sum = colSums(prs.mat)
