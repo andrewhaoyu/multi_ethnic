@@ -4,7 +4,7 @@ com.args = commandArgs(trailingOnly = T)
 i1 = as.numeric(com.args[[1]])
 i2 = as.numeric(com.args[[2]])
 eth <- c("EUR","AFR","AMR","EAS","SAS")
-eth_name = c("EUR","AFR","HIS","EAS","SAS")
+eth_name = c("European","African","Latino","East Asian","South Asian")
 trait <- c("HDL","LDL",
            "logTG",
            "nonHDL",
