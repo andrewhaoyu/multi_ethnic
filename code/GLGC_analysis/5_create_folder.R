@@ -73,3 +73,15 @@ for(k in 1:length(method_vec)){
   }
   
 }
+
+
+system(paste0("mkdir /data/zhangh24/multi_ethnic/result/GLGC/herit/"))
+for(i in 1:5){
+  system(paste0("mkdir /data/zhangh24/multi_ethnic/result/GLGC/herit/",eth[i],"/"))
+}
+for(i in 1:5){
+  for(l in 1:4){
+    system(paste0("cd /data/zhangh24/multi_ethnic/result/GLGC/herit/",eth[i],";",
+                  "mkdir ",trait[l],"/"))  
+  }
+}
