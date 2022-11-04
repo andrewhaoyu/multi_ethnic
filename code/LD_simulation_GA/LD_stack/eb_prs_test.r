@@ -1,4 +1,4 @@
-#use plink2 to calculate prs
+#use plink2 to calculate prs using posterior from EUR population
 #load LD_clump_file
 #i is the ethnic
 #l is the causal proportion

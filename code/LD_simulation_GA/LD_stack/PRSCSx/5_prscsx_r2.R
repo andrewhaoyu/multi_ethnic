@@ -8,7 +8,10 @@
 #q for three different methods
 
 #i_rep = as.numeric(args[[5]])
-
+args = commandArgs(trailingOnly = T)
+i = as.numeric(args[[1]])
+i1 = as.numeric(args[[2]])
+l = as.numeric(args[[3]])
 
 library(dplyr)
 library(data.table)
@@ -27,7 +30,7 @@ out.dir <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/LD_stack/"
 setwd("/data/zhangh24/multi_ethnic/")
 
 
-total <- 4*3*4*5
+total <- 4
 eth.vec <- rep("c",total)
 r2.result <- rep(0,total)
 l_vec <- rep(0,total)
@@ -37,9 +40,9 @@ method_vec <- rep("PRS-CSx (five ancestries)",total)
 temp= 1
 #phi = c("1e-02","1e-04","1e-06")
 phi = c("1e+00","1e-02","1e-04","1e-06")
-for(i in 2:5){
-  for(i1 in 1:5){
-    for(l in 1:3){
+# for(i in 2:5){
+#   for(i1 in 1:5){
+#     for(l in 1:3){
       #load the phenotype file
       y <- as.data.frame(fread(paste0(out.dir.sum,eth[i],"/phenotypes_rho",l,"_",i1,".phen")))
       y <- y[,2+(1:n.rep)]
@@ -53,10 +56,10 @@ for(i in 2:5){
         r2.vad.rep <- rep(0,n.rep)
         
         for(i_rep in 1:n.rep){
-          r2.test.rep <- rep(0,4)
+          r2.test.rep <- rep(0,3)
           coef.mat = matrix(NA,4,length(eth))
           #find the best phi
-          for(v in 1:4){
+          for(v in 2:4){
             prs_list = list()
             #load target prs
             for(i_eth in 1:5){
@@ -102,11 +105,11 @@ for(i in 2:5){
         
       }
       # }
-    }
-    
-    
-  }
-}
+#     }
+#     
+#     
+#   }
+# }
 
 prscsx.result <- data.frame(eth.vec,
                             r2.vec = r2.result,
@@ -116,7 +119,7 @@ prscsx.result <- data.frame(eth.vec,
                             method_vec = method_vec)
 
 save(prscsx.result,file = paste0(out.dir,
-                                 "prscsx_five.result.rdata"))
+                                 "prscsx_five.result_sub_ga_",i1,"_eth_",i,"_rho_",l,".rdata"))
 
 
 

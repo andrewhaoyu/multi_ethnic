@@ -1,3 +1,4 @@
+#calculate R2 for PRS using both target and EUR posterior
 #merge the prs by chromosome to one for different ethnic groups
 #i for different ethnic groups
 #l for different causal proportion
