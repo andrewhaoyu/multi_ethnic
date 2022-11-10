@@ -128,7 +128,7 @@ m = 1
       #scale_fill_manual(values = colour) +
       theme(axis.text = element_text(size = rel(0.9)),
             legend.text = element_text(size = rel(0.9)))+
-      ggtitle(title)
+      ggtitle("CT-SLEB performance under different tuning sample size")
       
     png(file = paste0("./tun_sample_size_compare.png"),
         width = 19, height = 12, res = 300,units = "in")

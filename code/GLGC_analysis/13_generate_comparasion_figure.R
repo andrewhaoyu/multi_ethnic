@@ -15,7 +15,7 @@ LD.clump.result = final_result
 load("best_eur.rdata")
 eursnp.result = final_result
 eursnp.result = eursnp.result %>% 
-  mutate(method = "Best EUR SNP (CT)")
+  mutate(method = "Best EUR PRS (CT)")
 load("weighted_prs.rdata")
 weightedprs.result = final_result %>% 
   mutate(method = "Weighted PRS (CT)")
@@ -25,12 +25,12 @@ polypred.result = final_result %>%
 load("xpass.rdata")
 xpass.result = final_result
 load("prscsx.rdata")
-prscsx.result = final_result %>% mutate(method = "PRS-CSx (two ancestries)")
+prscsx.result = final_result %>% mutate(method = "PRS-CSx")
 load("prscsx_all.rdata")
 prscsx.all.result = final_result %>% mutate(method = "PRS-CSx (five ancestries)")
 load("ct_sleb.rdata")
 ct.sleb = final_result
-ct.sleb = ct.sleb %>% mutate(method = "CT-SLEB (two ancestries)")
+ct.sleb = ct.sleb %>% mutate(method = "CT-SLEB")
 load("ct_sleb_all.rdata")
 ct.sleb.all = final_result
 load("glgc-weighted-ldpred2-2grps.rdata")
@@ -53,7 +53,9 @@ ldpred2.result = fread("glgc-jin.txt") %>%
          r2 = R2) %>% 
   filter(trait!= "nonHDL" ) %>% 
   select(eth, trait, method, r2) 
+#increase of ct-sleb over prs
 
+increase = cbind(ct.sleb[,1:2],increase = (ct.sleb$r2-prscsx.result$r2)/prscsx.result$r2)
 
   
 
@@ -76,43 +78,43 @@ prediction.result = prediction.result %>%
          method_vec = factor(method_vec,
                              levels = c("CT",
                                         "LDpred2",
-                                        "Best EUR SNP (CT)",
+                                        "Best EUR PRS (CT)",
                                         "Best EUR PRS (LDpred2)",
                                         "Weighted PRS (CT)",
                                         "Weighted PRS (LDpred2)",
                                         "PolyPred+", 
                                         "XPASS", 
-                                        "PRS-CSx (two ancestries)",
+                                        "PRS-CSx",
                                         "PRS-CSx (five ancestries)",
-                                        "CT-SLEB (two ancestries)",
+                                        "CT-SLEB",
                                         "CT-SLEB (five ancestries)"
                              )))
 
-#save(prediction.result,file = "prediction.result.summary.rdata")
+save(prediction.result,file = "prediction.result.summary.rdata")
 uvals = factor(c("CT",
                   "LDpred2",
-                  "Best EUR SNP (CT)",
+                  "Best EUR PRS (CT)",
                   "Best EUR PRS (LDpred2)",
                   "Weighted PRS (CT)",
                   "Weighted PRS (LDpred2)",
                   "PolyPred+", 
                   "XPASS", 
-                  "PRS-CSx (two ancestries)",
+                  "PRS-CSx",
                   "PRS-CSx (five ancestries)",
-                  "CT-SLEB (two ancestries)",
+                  "CT-SLEB",
                   "CT-SLEB (five ancestries)"
 )
   ,levels = c("CT",
                    "LDpred2",
-                   "Best EUR SNP (CT)",
+                   "Best EUR PRS (CT)",
                    "Best EUR PRS (LDpred2)",
                    "Weighted PRS (CT)",
                    "Weighted PRS (LDpred2)",
                    "PolyPred+", 
                    "XPASS", 
-                   "PRS-CSx (two ancestries)",
+                   "PRS-CSx",
                    "PRS-CSx (five ancestries)",
-                   "CT-SLEB (two ancestries)",
+                   "CT-SLEB",
                    "CT-SLEB (five ancestries)"
 ))
 
@@ -156,7 +158,7 @@ col_df = tibble(
   method_vec = uvals,
   category = case_when(method_vec%in%c("CT",
                                        "LDpred2") ~ "Single ancestry method",
-                       method_vec%in%c("Best EUR SNP (CT)",
+                       method_vec%in%c("Best EUR PRS (CT)",
                                        "Best EUR PRS (LDpred2)"
                        ) ~ "EUR PRS based method",
                        method_vec%in%c("Weighted PRS (CT)",
@@ -164,9 +166,9 @@ col_df = tibble(
                                        "PolyPred+"
                        ) ~ "Weighted PRS method",
                        method_vec%in%c("XPASS",
-                                       "PRS-CSx (two ancestries)",
+                                       "PRS-CSx",
                                        "PRS-CSx (five ancestries)") ~"Bayesian method",
-                       method_vec%in%c("CT-SLEB (two ancestries)",
+                       method_vec%in%c("CT-SLEB",
                                        "CT-SLEB (five ancestries)") ~ "Proposed method")
 ) %>% 
   mutate(category = factor(category,levels = c("Single ancestry method",

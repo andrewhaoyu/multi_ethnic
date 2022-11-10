@@ -59,7 +59,7 @@ phi = c("1e+00","1e-02","1e-04","1e-06")
           r2.test.rep <- rep(0,3)
           coef.mat = matrix(NA,4,length(eth))
           #find the best phi
-          for(v in 2:4){
+          for(v in 1:4){
             prs_list = list()
             #load target prs
             for(i_eth in 1:5){

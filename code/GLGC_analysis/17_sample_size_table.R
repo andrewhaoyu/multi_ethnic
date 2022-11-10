@@ -46,8 +46,8 @@ me23_sample_size_update = me23_sample_size %>%
   select(eth_update, trait, total) %>% 
   rename(eth = eth_update,
          sample_size = total)
-me23_sample_size_sum =  me23_sample_size %>% group_by(eth) %>% 
-  summarize(max_size = max(total))
+me23_sample_size_sum =  me23_sample_size_update %>% group_by(eth) %>% 
+  summarize(max_size = max(sample_size))
 sum(me23_sample_size_sum$max_size)
 me23_sample_size_sum_noEUR = me23_sample_size %>% filter(eth != "European") %>% 
   group_by(eth) %>% summarize(max_size = max(total))
@@ -65,10 +65,15 @@ sum(glgc_sample_size_sum_noEUR$max_size)+
   sum(me23_sample_size_sum_noEUR$max_size)
 
 
-
-com_data = rbind(glgc_sample_size_update, aou_sample_size_update, ukb_sample_size_update,me23_sample_size_update )
-com_data_sum = com_data %>% group_by(eth) %>% 
-  summarise(max_N = max(sample_size))
+temp = data.frame(eth = glgc_sample_size_sum$ethnic,
+           sample_size = as.numeric(
+  glgc_sample_size_sum$max_size+
+  me23_sample_size_sum$max_size+
+  c(aou_sample_size_sum$max_size[1:2],0,aou_sample_size_sum$max_size[3],0)+
+  c(ukb_sample_size_sum$max_size[1:3],0,ukb_sample_size_sum$max_size[4])))
+# com_data = rbind(glgc_sample_size_update, aou_sample_size_update, ukb_sample_size_update,me23_sample_size_update )
+# com_data_sum = com_data %>% group_by(eth) %>% 
+#   summarise(max_N = max(sample_size))
 
 
 

@@ -224,7 +224,7 @@ prediction.result$eth = factor(prediction.result$eth,
                        levels = c("European","African American",
                                   "Latino","East Asian","South Asian"))
 
-#save(prediction.result,file = "/Users/zhangh24/GoogleDrive/multi_ethnic/result/23andme/prediction_summary.rdata")
+save(prediction.result,file = "/Users/zhangh24/GoogleDrive/multi_ethnic/result/23andme/prediction_summary.rdata")
 #write.csv(prediction.result, file = "/Users/zhangh24/GoogleDrive/multi_ethnic/result/23andme/prediction_summary.csv")
 sigma2toauc = function(x){
   ifelse(x==0,0.50,round(pnorm(0.5*sqrt(x)),2))
@@ -401,7 +401,7 @@ p.null <- ggplot(prediction.result.sub)+
            position = position_dodge(),
            stat = "identity")+
   theme_Publication()+
-  ylab("AUC")+
+  ylab("Adjusted AUC")+
   facet_grid(vars(trait),vars(eth))+
   theme_Publication()+
   coord_cartesian(ylim = c(0.47, 0.67)) +
@@ -463,7 +463,7 @@ p.null <- ggplot(prediction.result.sub)+
            position = position_dodge(),
            stat = "identity")+
   theme_Publication()+
-  ylab(expression(bold(R^2)))+
+  ylab(expression(bold(paste("Adjusted ",R^2))))+
   facet_grid(vars(trait),vars(eth),scales = "free")+
   theme_Publication()+
   #coord_cartesian(ylim = c(0.47, 0.65)) +

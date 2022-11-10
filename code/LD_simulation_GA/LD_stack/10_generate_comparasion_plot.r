@@ -24,6 +24,12 @@ EB.result = EB.result %>%
 load(paste0("LD.clump.result.allethtest.EB.rdata"))
 alleth.EB.result = alleth.EB.result %>% 
   mutate(method_vec = "CT-SLEB (five ancestries)")
+
+
+r2.vec.all = alleth.EB.result$r2.vec
+r2.vec.ctsleb = EB.result$r2.vec
+mean((r2.vec.all-r2.vec.ctsleb)/r2.vec.all)
+
 load(paste0("R2.ldpred2.EUR.sim.RData"))
 R2.ldpred2.EUR = R2.ldpred2.EUR %>% 
   mutate(Method = "Best EUR SNP (LDpred2)") %>% 
@@ -55,7 +61,7 @@ R2.weightedLDpred2 = R2.wprs2 %>%
 load(paste0("prscsx.result.rdata"))
 prscsx.result.two = prscsx.result 
 load(paste0("prscsx_five.result.rdata"))
-prscsx.result.all = prscsx.result
+
 # prscsx.result.all = prscsx.result %>% 
 #   mutate(r2.vec = r2.vec*1.1,
 #          method_vec = "PRS-CSx (five ancestries)")
@@ -282,6 +288,28 @@ for(m in 1:4){
   
   
 }
+
+#percentage of increase five ans prs-csx over two ans prs-csx
+prscsx.result.all = prscsx.result
+r2.vec.all = prscsx.result.all$r2.vec
+r2.vec.csx = prscsx.result.two$r2.vec
+mean((r2.vec.all-r2.vec.csx)/r2.vec.csx)
+prscsx.result.all = prscsx.result
+r2.vec.all = prscsx.result.all$r2.vec
+r2.vec.csx = prscsx.result.two$r2.vec
+mean((r2.vec.all-r2.vec.csx)/r2.vec.csx)
+
+#percentage of increase weighted ldpred2 over weighted CT
+weightedprs.result.temp = weightedprs.result %>% 
+  mutate(lmg = paste0(eth.vec,"_",l_vec,"_",m_vec,"_",ga_vec)) %>% 
+  select(r2.vec,lmg)
+R2.weightedLDpred2.temp = R2.weightedLDpred2 %>% 
+  mutate(lmg = paste0(eth.vec,"_",l_vec,"_",m_vec,"_",ga_vec),
+         ld2 = r2.vec) %>% 
+  select(ld2,lmg)
+weighted_prs_temp = left_join(weightedprs.result.temp, R2.weightedLDpred2.temp)
+head(weighted_prs_temp)
+mean((weighted_prs_temp$ld2-weighted_prs_temp$r2.vec)/weighted_prs_temp$r2.vec)
 # 
 # 
 # i1 = 1
