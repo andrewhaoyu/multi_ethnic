@@ -18,14 +18,14 @@ cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_new/"
 old.out.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
 out.dir <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/LD_stack/"
 #j = as.numeric(args[[3]])
-sid <- Sys.getenv("SLURM_JOB_ID")
-dir.create(paste0('/lscratch/',sid,'/test/'),showWarnings = F)
-temp.dir = paste0('/lscratch/',sid,'/test/')
-dir.create(paste0('/lscratch/',sid,'/test/prs/'),showWarnings = FALSE)
-temp.dir.prs = paste0('/lscratch/',sid,'/test/prs/')
+# sid <- Sys.getenv("SLURM_JOB_ID")
+# dir.create(paste0('/lscratch/',sid,'/test/'),showWarnings = F)
+# temp.dir = paste0('/lscratch/',sid,'/test/')
+# dir.create(paste0('/lscratch/',sid,'/test/prs/'),showWarnings = FALSE)
+# temp.dir.prs = paste0('/lscratch/',sid,'/test/prs/')
 
-system(paste0("cp ",cur.dir,eth[i],"/all_chr_test.mega.* ",temp.dir))
-system(paste0("ls ",temp.dir))
+# system(paste0("cp ",cur.dir,eth[i],"/all_chr_test.mega.* ",temp.dir))
+# system(paste0("ls ",temp.dir))
 library(dplyr)
 library(data.table)
 setwd("/data/zhangh24/multi_ethnic/")
@@ -106,7 +106,7 @@ sd_tar = as.numeric(sd_tar)
 beta_eur = as.numeric(beta_eur)
 sd_eur = as.numeric(sd_eur)
 prior.sigma = EstimatePrior(beta_tar,sd_tar,beta_eur,sd_eur)
-gr = prior.sigma[1,2]/(prior.sigma[1,2]*prior.sigma[2,2])
+gr = prior.sigma[1,2]/(sqrt(prior.sigma[1,2]*prior.sigma[2,2]))
 out.dir = "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/LD_stack/"
 
 save(gr, file = paste0(out.dir,eth[i],"/gr_esitmate_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
