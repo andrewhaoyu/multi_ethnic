@@ -1,6 +1,5 @@
 #merge the r2 results of AUC
 total <- 5*4*3*4
-eth <- c("EUR","AFR","AMR","EAS","SAS")
 pthres <- c(5E-08,5E-07,5E-06,5E-05,5E-04,5E-03,5E-02,5E-01)
 
 
@@ -11,13 +10,12 @@ l_vec <- rep(0,total)
 m_vec <- rep(0,total)
 method_vec <- rep("c",total)
 ga_vec <- rep(0,total)
-gr_vec <- rep(0,total)
 temp = 1
 n.rep=n_rep = 10
 for(i in 2:5){
   filedir <- paste0(out.dir,eth[i])
-  
-  for(i1 in 1:1){
+  files <- dir(path = filedir,pattern=paste0("r2.list_rho_eb_*"),full.names = T)
+  for(i1 in 1:5){
     
     #r2.mat <- matrix(0,length(pthres),total)
     
@@ -26,34 +24,34 @@ for(i in 2:5){
     for(l in 1:3){
       for(m in 1:4){
         r2.temp <- rep(0,n_rep)
-        gr_vec.temp = rep(0,n_rep)
+        r2.stack.temp = rep(0,n_rep)
         
         
         
         for(i_rep in 1:n.rep){
-          filename = paste0(out.dir,eth[i],"/gr_esitmate_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)
+          filename = paste0(out.dir,eth[i],"/r2.list_rho_eb_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)
           
           load(filename)
-          gr_vec.temp[i_rep] = gr
+          r2.stack.temp[i_rep] = r2.list[[1]]
           
-       
+          r2.temp[i_rep] = r2.list[[2]]  
           
           
         }
-        eth.vec[temp:(temp+1)] = rep(eth[i],1)
-        gr_vec[temp:(temp+1)] <- c(mean(gr_vec.temp))
-        l_vec[temp:(temp+1)] <- rep(l,1)
-        m_vec[temp:(temp+1)] <- rep(m,1)
-        ga_vec[temp:(temp+1)] <- rep(i1,1)
-        method_vec[temp:(temp+1)] <- c("CT-SLEB")
-        temp = temp+1
+        eth.vec[temp:(temp+1)] = rep(eth[i],2)
+        r2.vec[temp:(temp+1)] <- c(mean(r2.temp),mean(r2.stack.temp))
+        l_vec[temp:(temp+1)] <- rep(l,2)
+        m_vec[temp:(temp+1)] <- rep(m,2)
+        ga_vec[temp:(temp+1)] <- rep(i1,2)
+        method_vec[temp:(temp+1)] <- c("TDLD-EB","TDLD-SLEB")
+        temp = temp+2
       }
     }
   }
   #best r2 result by varying the p-value threshold
   
 }  
-gr.result <- data.frame(eth.vec,gr_vec,l_vec,m_vec,method_vec,ga_vec)
+EB.result <- data.frame(eth.vec,r2.vec,l_vec,m_vec,method_vec,ga_vec)
 save(EB.result,file = paste0(out.dir,"LD.clump.result.EB.rdata"))
 
 # #r2 result for different p-value threshold
