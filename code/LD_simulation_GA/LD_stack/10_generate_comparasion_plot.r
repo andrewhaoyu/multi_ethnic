@@ -15,7 +15,7 @@ load(paste0("LD.clump.result.SCT.rdata"))
 load(paste0("eur.snp.reult.rdata"))
 eursnp.result = eursnp.result %>% 
   filter(method_vec == "Best EUR SNP (C+T)") %>% 
-  mutate(method_vec = "Best EUR SNP (CT)")
+  mutate(method_vec = "Best EUR PRS (CT)")
 load(paste0("weightedprs.result.rdata"))
 #load(paste0("LD.clump.result.2DLD.rdata"))
 load(paste0("LD.clump.result.EBtest.rdata"))
@@ -32,7 +32,7 @@ mean((r2.vec.all-r2.vec.ctsleb)/r2.vec.all)
 
 load(paste0("R2.ldpred2.EUR.sim.RData"))
 R2.ldpred2.EUR = R2.ldpred2.EUR %>% 
-  mutate(Method = "Best EUR SNP (LDpred2)") %>% 
+  mutate(Method = "Best EUR PRS (LDpred2)") %>% 
   rename(eth.vec = race,
          r2.vec = R2,
          l_vec = rho,
@@ -61,7 +61,7 @@ R2.weightedLDpred2 = R2.wprs2 %>%
 load(paste0("prscsx.result.rdata"))
 prscsx.result.two = prscsx.result 
 load(paste0("prscsx_five.result.rdata"))
-
+prscsx.result.all = prscsx.result
 # prscsx.result.all = prscsx.result %>% 
 #   mutate(r2.vec = r2.vec*1.1,
 #          method_vec = "PRS-CSx (five ancestries)")
@@ -114,7 +114,7 @@ prediction.result = prediction.result %>%
          method_vec = factor(method_vec,
                              levels = c("CT",
                                         "LDpred2",
-                                        "Best EUR SNP (CT)",
+                                        "Best EUR PRS (CT)",
                                         "Best EUR PRS (LDpred2)",
                                         "Weighted PRS (CT)",
                                         "Weighted PRS (LDpred2)",
@@ -136,7 +136,7 @@ save(prediction.result,file = "prediction.result.summary.rdata")
 
 uvals = factor(c("CT",
                  "LDpred2",
-                 "Best EUR SNP (CT)",
+                 "Best EUR PRS (CT)",
                  "Best EUR PRS (LDpred2)",
                  "Weighted PRS (CT)",
                  "Weighted PRS (LDpred2)",
@@ -149,7 +149,7 @@ uvals = factor(c("CT",
 )
 ,levels = c("CT",
             "LDpred2",
-            "Best EUR SNP (CT)",
+            "Best EUR PRS (CT)",
             "Best EUR PRS (LDpred2)",
             "Weighted PRS (CT)",
             "Weighted PRS (LDpred2)",
@@ -187,7 +187,7 @@ col_df = tibble(
   method_vec = uvals,
   category = case_when(method_vec%in%c("CT",
                                        "LDpred2") ~ "Single ancestry method",
-                       method_vec%in%c("Best EUR SNP (CT)",
+                       method_vec%in%c("Best EUR PRS (CT)",
                                        "Best EUR PRS (LDpred2)"
                        ) ~ "EUR PRS based method",
                        method_vec%in%c("Weighted PRS (CT)",
@@ -236,7 +236,7 @@ run_plot = function(filler, values) {
 }
 setwd("/Users/zhangh24/GoogleDrive/multi_ethnic/result/LD_simulation_GA/LD_stack/simulation_result_figure/")
 library(cowplot)
-m = 1
+m = 1‘
 for(m in 1:4){
   for(i1 in 1:5){
     

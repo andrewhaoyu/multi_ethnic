@@ -18,13 +18,14 @@ library(dplyr)
   data <- fread(paste0(eth[i1],"/",trait[i2],".txt"),header=T)  
   
   data = data %>% 
-    mutate(CHR = as.integer(CHROM),
+    mutate(CHR = as.integer(CHR),
            BP = as.integer(POS_b37),
-           FREQ_A1 = as.numeric(A1_AF_1000G),
-           P = as.numeric(pvalue),
-           rsid = rsID) %>% 
+           FREQ_A1 = as.numeric(A1_FREQ_1000G),
+           P = as.numeric(P),
+           rsid = rsID,
+           N = as.integer(N)) %>% 
     mutate(P = ifelse(P==0,1E-300,P)) %>% 
-    select(rsid,CHR,BP,FREQ_A1,P)
+    select(rsid,CHR,BP,FREQ_A1,P,N)
 
 
 
@@ -33,20 +34,13 @@ dat = data %>%
   select(rsid,CHR,BP,P,MAF) %>% 
   rename(SNP = rsid)
 
-sample_size <- as.data.frame(read.csv("/data/zhangh24/multi_ethnic/data/GLGC_samplesize_clean.csv",header=T))
-sample_size[4,1] = "AMR"
-colnames(sample_size) = c("eth","N_effect")
-
-sample_size = sample_size %>% 
-  mutate(N_effect = as.numeric(gsub(",", "", N_effect)))
 
 library(readr)
 library(dplyr)
 x = dat$P
 z = qnorm(x / 2)
 lambda = round(median(z^2) / qchisq(0.5,1), 3)
-idx <- which(sample_size$eth==eth[i1])
-N.effect  <- sample_size[idx,"N_effect"]
+N.effect = median(data$N)
 lambda_1000 = round(1+1000*(lambda-1)/N.effect  ,3)
 
 

@@ -7,6 +7,7 @@ library(RColorBrewer)
 library(grid)
 library(gridExtra)
 library(data.table)
+library(tidyverse)
 eth <- c("EUR","AFR","AMR")
 trait <-c("height","bmi")
 trait_name = c("Height","BMI")
@@ -87,7 +88,7 @@ prediction.result = prediction.result %>%
 save(prediction.result,file = "prediction.result.summary.rdata")
 uvals = factor(c("CT",
                   "LDpred2",
-                  "Best EUR SNP (CT)",
+                  "Best EUR PRS (CT)",
                   "Best EUR PRS (LDpred2)",
                   "Weighted PRS (CT)",
                   "Weighted PRS (LDpred2)",
@@ -100,7 +101,7 @@ uvals = factor(c("CT",
 )
   ,levels = c("CT",
                    "LDpred2",
-                   "Best EUR SNP (CT)",
+                   "Best EUR PRS (CT)",
                    "Best EUR PRS (LDpred2)",
                    "Weighted PRS (CT)",
                    "Weighted PRS (LDpred2)",
