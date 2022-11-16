@@ -117,7 +117,15 @@ prediction.result$index = rep("1",nrow(prediction.result))
 prediction.result = prediction.result %>% 
   mutate(trait = 
            case_when(trait == "height" ~ "Height",
-                     trait == "bmi" ~ "BMI",))
+                     trait == "bmi" ~ "BMI"))
+head(prediction.result)
+prediction.result = prediction.result %>% 
+  mutate(eth_name = 
+           case_when(
+             eth == "EUR" ~ "European",
+             eth == "AFR" ~ "African",
+             eth == "AMR" ~ "Latino"
+           ))
 prediction.result.sub = prediction.result %>% 
   filter(eth!="AMR") 
 save(prediction.result,file = "aou.prediction.result.summary.rdata")
@@ -223,7 +231,7 @@ p.null <- ggplot(prediction.result.sub)+
            stat = "identity")+
   theme_Publication()+
   ylab(expression(bold(paste("Adjusted ",R^2))))+
-facet_grid(vars(trait),vars(eth),scales = "free")+
+facet_grid(vars(trait),vars(eth_name),scales = "free")+
   theme_Publication()+
   #coord_cartesian(ylim = c(0.47, 0.67)) +
   theme(axis.title.x=element_blank(),

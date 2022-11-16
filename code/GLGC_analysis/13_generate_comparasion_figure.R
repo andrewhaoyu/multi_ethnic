@@ -70,7 +70,7 @@ prediction.result <- rbind(LD.clump.result,
                            prscsx.all.result,
                            ct.sleb,
                            ct.sleb.all) %>% 
-  rename(result = r2)
+  rename(result = r2) 
 
 prediction.result = prediction.result %>% 
   mutate(method_vec = method) %>% 
@@ -125,6 +125,16 @@ prediction.result = prediction.result %>%
                      trait == "LDL" ~ "LDL",
                       trait == "logTG" ~ "logTG",
                      trait == "TC" ~ "TC"))
+prediction.result = prediction.result %>% 
+  mutate(eth_name = 
+           case_when(
+             eth == "EUR" ~ "European",
+             eth == "AFR" ~ "African",
+             eth == "AMR" ~ "Latino",
+             eth == "EAS" ~ "East Asian",
+             eth == "SAS" ~ "South Asian"
+           ))
+
 prediction.result.sub = prediction.result %>% 
   filter(eth!="AMR") 
 
@@ -214,7 +224,6 @@ run_plot = function(filler, values) {
     scale_fill_manual(values = values)
 }
 
-
 legs = lapply(sort(unique(col_df$category)), run_plot)
 
 legs = lapply(legs, getLegend)
@@ -231,7 +240,7 @@ p.null <- ggplot(prediction.result.sub)+
            stat = "identity")+
   theme_Publication()+
   ylab(expression(bold(paste("Adjusted ",R^2))))+
-facet_grid(vars(trait),vars(eth),scales = "free")+
+facet_grid(vars(trait),vars(eth_name),scales = "free")+
   theme_Publication()+
   #coord_cartesian(ylim = c(0.47, 0.67)) +
   theme(axis.title.x=element_blank(),
