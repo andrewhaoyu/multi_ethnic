@@ -62,6 +62,7 @@ r2thr = 0.1
 kbpthr = 500#cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
 #code <- rep("c",5*3*3)
 #system(paste0("/data/zhangh24/software/plink2 --bfile /data/zhangh24/KG.plink/",eth[i],"/chr_all --clump ",cur.dir,eth[i],"/summary_out_MAF_rho_",l,"_size_",m,"_rep_",i_rep,".out --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out ",cur.dir,eth[i],"/LD_clump_rho_",l,"_size_",m,"_rep_",i_rep))
+#plink2 is actually PLINK1.9
 res = system(paste0("/data/zhangh24/software/plink2 --bfile ",temp.dir,eth,"all_chr --clump ",temp.dir,"all_chr_assoc.txt --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out ",temp.dir,"LD_clump"))
 system(paste0("mv ",temp.dir,"LD_clump.clumped ",out.dir))
 if(res==2){
@@ -109,7 +110,9 @@ for(k in 1:length(pthres)){
 q_range = q_range[1:(temp-1),]
 write.table(q_range,file = paste0(temp.dir,"q_range_file"),row.names = F,col.names = F,quote=F)
 
-
+#plink2_alpha is plink2
+#PRS = G*beta/(2*number of SNPs) #column header is SCORE_AVG
+#PRS = G*beta
 res <- system(paste0("/data/zhangh24/software/plink2_alpha --q-score-range ",temp.dir,"q_range_file ",temp.dir,"p_value header --threads 2 --score ",temp.dir,"prs_coeff cols=+scoresums,-scoreavgs header no-mean-imputation  --bfile ",temp.dir,"ukb/all_chr --out ",temp.dir,"prs"))
 system(paste0("ls ",temp.dir,""))
 if(res==2){

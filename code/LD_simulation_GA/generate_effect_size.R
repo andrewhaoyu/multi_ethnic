@@ -492,7 +492,7 @@ for(l in 1:3){
     idx <- which(eth.bi[,i]==1)
     
     #scale factor for heritability
-    u = gamma[,i]*(2*MAF[,i]*(1-MAF[,i]))^0.375
+    u = gamma[,i]*(2 * MAF[,i] * (1-MAF[,i]) )^0.375
     #scale factor for heritability
     total.heritabillity = sum(u^2)
     

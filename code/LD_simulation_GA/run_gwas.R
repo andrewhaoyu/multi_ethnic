@@ -37,6 +37,9 @@ for(i_rep in 1:10){
   system(paste0('rm -rf /lscratch/',sid,'/test'))
   
 }
+
+var_m = function(x){2*x*(1-x)}
+log(1.3)^2*var_m(0.81)+log(1.38)^2*var_m(0.61)+log(1.38)^2*var_m(0.60)
 # for(i in 1:5){
 #   fam <- data.frame(fread(paste0(cur.dir,eth[i],"/all_chr.tag.fam")))
 #     for(j in 1:22){
