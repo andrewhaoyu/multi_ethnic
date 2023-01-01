@@ -279,7 +279,6 @@ for(k1 in 1:length(pthres)){
 }
 #find best cutoff for EUR by using all data as tuning
 
-
 prs_list = list()
 temp = 1
 #take the column name of different clumping parameters
@@ -300,6 +299,9 @@ for(k1 in 1:length(pthres)){
 prs_mat = as.data.frame(cbind(prs_temp[,1:2],bind_cols(prs_list)))
 colnames(prs_mat)[2] = "id"
 prs_score = prs_mat[,-c(1:2)]
+#move the prs to the prs file
+out.dir.prs = paste0("/data/zhangh24/multi_ethnic/result/GLGC/prs/CT_SLEB_all/",eth,"/",trait,"/")
+system(paste0("cp ",temp.dir,"eb_prs_p_other_*.sscore ",out.dir.prs))
 
 #############EB step finish############################
 
@@ -340,6 +342,8 @@ prs_tun_clean = prs_tun %>%
   select(-all_of(drop))
 prs_vad_clean = prs_vad %>% 
   select(-all_of(drop))
+prs_all_clean = prs_score %>% 
+  select(-all_of(drop))
 library(ranger)
 library(SuperLearner)
 #choose the prediction algorithms
@@ -373,5 +377,14 @@ r2_ctsleb <- summary(model)$r.square
 
 
 save(r2_ctsleb, file = paste0(out.dir, "CTSLEB_all.result"))
+
+#save the best prs
+prs_max_score = predict(sl, prs_all_clean, onlySL = TRUE)[[1]]
+prs_max = cbind(prs_temp[1:4], prs_max_score)
+write.table(prs_max, file = paste0(out.dir.prs, "best_prs.sscore"),
+            row.names = F,
+            col.names = T,
+            quote = F)
+#evaluate on validation
 
 
