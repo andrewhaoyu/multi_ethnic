@@ -71,7 +71,7 @@ res = system(paste0("/data/zhangh24/software/plink2_alpha ",
 
 prs_mat = fread(paste0(temp.dir,"PRS.sscore"))
 out.dir.prs = paste0("/data/zhangh24/multi_ethnic/result/GLGC/prs/PRSCSX_all/",eth[i],"/",trait_vec[l],"/")
-system("cp ",temp.dir,"PRS.sscore ",out.dir.prs)
+system(paste0("cp ",temp.dir,"PRS.sscore ",out.dir.prs))
 prs_score = prs_mat[,5:ncol(prs_mat)]
 colnames(prs_mat)[2] = "id"
 pheno.dir = "/data/zhangh24/multi_ethnic/data/UKBB/phenotype/"
