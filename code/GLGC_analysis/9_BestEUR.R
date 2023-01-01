@@ -79,6 +79,8 @@ res <- system(paste0("/data/zhangh24/software/plink2_alpha ",
                     "--threads 2 --score ",temp.dir,"prs_coeff cols=+scoresums,-scoreavgs header no-mean-imputation ",
                     "--bfile ",temp.dir,"ukb/all_chr --out ",temp.dir,"prs"))
 system(paste0("ls ",temp.dir,""))
+out.dir.prs = paste0("/data/zhangh24/multi_ethnic/result/GLGC/prs/EURPRS/",eth,"/",trait,"/")
+system(paste0("cp ",temp.dir,"prs.sscore ",out.dir.prs))
 #load prs
 prs = fread(paste0(temp.dir,"prs.sscore"))
 colnames(prs)[2] = "id"
