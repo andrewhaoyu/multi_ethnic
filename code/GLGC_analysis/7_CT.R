@@ -115,10 +115,12 @@ write.table(q_range,file = paste0(temp.dir,"q_range_file"),row.names = F,col.nam
 #PRS = G*beta
 res <- system(paste0("/data/zhangh24/software/plink2_alpha --q-score-range ",temp.dir,"q_range_file ",temp.dir,"p_value header --threads 2 --score ",temp.dir,"prs_coeff cols=+scoresums,-scoreavgs header no-mean-imputation  --bfile ",temp.dir,"ukb/all_chr --out ",temp.dir,"prs"))
 system(paste0("ls ",temp.dir,""))
+system(paste0("cp ",temp.dir,"*.sscore ",out.dir.prs))
 if(res==2){
     stop()
 }
 print("PRS calculation ended")
+
 
 
 
@@ -163,6 +165,12 @@ for(k in 1:length(pthres)){
 }
 #find best idx
 idx = which.max(r2_tun_vec)
+#write down best prs in the prs folder
+prs_max = fread(paste0(temp.dir,"prs.p_value_",idx,".sscore"))
+write.table(prs_max, file = paste0(out.dir.prs, "best_prs.sscore"),
+            row.names = F,
+            col.names = T,
+            quote = F)
 #evaluate on validation
 model.vad.null  =  lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=pheno_vad)
 prs = pheno_vad[,paste0("p_value_",idx)]
@@ -178,74 +186,74 @@ r2.result = data.frame(eth = eth,
 
 
 ct.result = list(r2.result,r2_tun_vec)
-
-
 save(ct.result, file = paste0(out.dir, "CT.result"))
+
+
 #find best cutoff for EUR by using all data as tuning
 
 
 #########R2 calculation################# 
 # 
 # 
-pheno.dir = "/data/zhangh24/multi_ethnic/data/UKBB/phenotype/"
-pheno = as.data.frame(fread(paste0(pheno.dir,trait,"/tuning+validation/",eth,"_all_data.txt")))
-pheno = pheno[,1:2]
-covar <- as.data.frame(fread(paste0(pheno.dir,"/covariates/tuning+validation/",eth,"_all_data.txt")))
-pheno <- left_join(pheno, covar)
-colnames(pheno) = c('id','y','sex','age',paste0('pc',1:10))
-pheno_com = pheno[complete.cases(pheno$y),]
-
-#combine prs with pheno_all
-pheno_all = left_join(pheno_com,prs_mat,by = "id")
-
-n_fold = 20
-r2_vec = rep(0,n_fold)
-for (fold in 1:n_fold){
-  set.seed(123*fold)
-  ids1 = sample(1:nrow(pheno_all), ceiling(nrow(pheno_all)/2), replace = F)
-  ids2 = setdiff(1:nrow(pheno_all), ids1)
-
-  pheno_tuning = pheno_all[ids1,]
-  pheno_validation = pheno_all[ids2,]
-  r2_tun_vec = rep(0,length(pthres))
-  #calculate R2 for each of the tuning dataset
-  model.null <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=pheno_tuning)
-  for(k in 1:length(pthres)){
-    prs = pheno_tuning[,paste0("p_value_",k)]
-    model.prs <- lm(model.null$residual~prs,data=pheno_tuning)
-    r2_tun_vec[k] = summary(model.prs)$r.square
-  }
-  #find best idx
-  idx = which.max(r2_tun_vec)
-  #evaluate on validation
-  model.vad.null  =  lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=pheno_validation)
-  prs = pheno_validation[,paste0("p_value_",idx)]
-  model.vad.prs <- lm(model.vad.null$residual~prs,data=pheno_validation)
-  r2_vec[fold] = summary(model.vad.prs)$r.square
-
-}
-r2 = mean(r2_vec)
-
-r2.result = data.frame(eth = eth,
-                       trait = trait,
-                       method = "CT",
-                       r2 = r2
-)
-#find best cutoff for EUR by using all data as tuning
-
-  pheno_tuning = pheno_all
-  r2_tun_vec = rep(0,length(pthres))
-  #calculate R2 for each of the tuning dataset
-  model.null <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=pheno_tuning)
-  for(k in 1:length(pthres)){
-    prs = pheno_tuning[,paste0("p_value_",k)]
-    model.prs <- lm(model.null$residual~prs,data=pheno_tuning)
-    r2_tun_vec[k] = summary(model.prs)$r.square
-  }
-
-  ct.result = list(r2.result,r2_tun_vec)
-
-
-save(ct.result, file = paste0(out.dir, "CT.result"))
+# pheno.dir = "/data/zhangh24/multi_ethnic/data/UKBB/phenotype/"
+# pheno = as.data.frame(fread(paste0(pheno.dir,trait,"/tuning+validation/",eth,"_all_data.txt")))
+# pheno = pheno[,1:2]
+# covar <- as.data.frame(fread(paste0(pheno.dir,"/covariates/tuning+validation/",eth,"_all_data.txt")))
+# pheno <- left_join(pheno, covar)
+# colnames(pheno) = c('id','y','sex','age',paste0('pc',1:10))
+# pheno_com = pheno[complete.cases(pheno$y),]
+# 
+# #combine prs with pheno_all
+# pheno_all = left_join(pheno_com,prs_mat,by = "id")
+# 
+# n_fold = 20
+# r2_vec = rep(0,n_fold)
+# for (fold in 1:n_fold){
+#   set.seed(123*fold)
+#   ids1 = sample(1:nrow(pheno_all), ceiling(nrow(pheno_all)/2), replace = F)
+#   ids2 = setdiff(1:nrow(pheno_all), ids1)
+# 
+#   pheno_tuning = pheno_all[ids1,]
+#   pheno_validation = pheno_all[ids2,]
+#   r2_tun_vec = rep(0,length(pthres))
+#   #calculate R2 for each of the tuning dataset
+#   model.null <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=pheno_tuning)
+#   for(k in 1:length(pthres)){
+#     prs = pheno_tuning[,paste0("p_value_",k)]
+#     model.prs <- lm(model.null$residual~prs,data=pheno_tuning)
+#     r2_tun_vec[k] = summary(model.prs)$r.square
+#   }
+#   #find best idx
+#   idx = which.max(r2_tun_vec)
+#   #evaluate on validation
+#   model.vad.null  =  lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=pheno_validation)
+#   prs = pheno_validation[,paste0("p_value_",idx)]
+#   model.vad.prs <- lm(model.vad.null$residual~prs,data=pheno_validation)
+#   r2_vec[fold] = summary(model.vad.prs)$r.square
+# 
+# }
+# r2 = mean(r2_vec)
+# 
+# r2.result = data.frame(eth = eth,
+#                        trait = trait,
+#                        method = "CT",
+#                        r2 = r2
+# )
+# #find best cutoff for EUR by using all data as tuning
+# 
+#   pheno_tuning = pheno_all
+#   r2_tun_vec = rep(0,length(pthres))
+#   #calculate R2 for each of the tuning dataset
+#   model.null <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=pheno_tuning)
+#   for(k in 1:length(pthres)){
+#     prs = pheno_tuning[,paste0("p_value_",k)]
+#     model.prs <- lm(model.null$residual~prs,data=pheno_tuning)
+#     r2_tun_vec[k] = summary(model.prs)$r.square
+#   }
+# 
+#   ct.result = list(r2.result,r2_tun_vec)
+# 
+# 
+# save(ct.result, file = paste0(out.dir, "CT.result"))
 #   }
 # }
