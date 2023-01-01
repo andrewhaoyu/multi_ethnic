@@ -111,3 +111,15 @@ for(i in 1:5){
   }
 }
 
+
+system(paste0("mkdir /data/zhangh24/multi_ethnic/result/GLGC/prs/PRSCSX_all"))
+for(i in 1:5){
+  system(paste0("mkdir /data/zhangh24/multi_ethnic/result/GLGC/prs/PRSCSX_all/",eth[i],"/"))
+}
+for(i in 1:5){
+  for(l in 1:4){
+    system(paste0("cd /data/zhangh24/multi_ethnic/result/GLGC/prs/PRSCSX_all/",eth[i],";",
+                  "mkdir ",trait[l],"/"))  
+  }
+}
+

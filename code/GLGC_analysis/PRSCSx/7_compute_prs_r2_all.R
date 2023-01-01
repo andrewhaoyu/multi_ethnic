@@ -70,6 +70,8 @@ res = system(paste0("/data/zhangh24/software/plink2_alpha ",
                     " --out ",temp.dir,"PRS"))
 
 prs_mat = fread(paste0(temp.dir,"PRS.sscore"))
+out.dir.prs = paste0("/data/zhangh24/multi_ethnic/result/GLGC/prs/PRSCSX_all/",eth[i],"/",trait_vec[l],"/")
+system("cp ",temp.dir,"PRS.sscore ",out.dir.prs)
 prs_score = prs_mat[,5:ncol(prs_mat)]
 colnames(prs_mat)[2] = "id"
 pheno.dir = "/data/zhangh24/multi_ethnic/data/UKBB/phenotype/"
@@ -130,6 +132,26 @@ r2.result = data.frame(eth = eth[i],
 )
 out.dir = paste0("/data/zhangh24/multi_ethnic/result/GLGC/PRSCSX/",eth[i],"/",trait,"/")
 save(r2.result, file = paste0(out.dir, "prscsx_all.result"))
+
+#save the best prs
+score1 = prs_score[, 5*max_ind-4]
+score2 = prs_score[, 5*max_ind-3]
+score3 = prs_score[, 5*max_ind-2]
+score4 = prs_score[, 5*max_ind-1]
+score5 = prs_score[, 5*max_ind]
+
+prs_max_score = cbind(score1, score2, score3, 
+                score4, score5)%*%coef
+prs_max = cbind(prs_mat[,1:4],prs_max_score)
+write.table(prs_max, file = paste0(out.dir.prs, "best_prs.sscore"),
+            row.names = F,
+            col.names = T,
+            quote = F)
+
+
+
+
+
 #     system(paste0("rm -rf ", temp.dir))
 #   }
 # }
