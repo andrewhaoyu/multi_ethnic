@@ -137,3 +137,15 @@ for(i in 1:3){
   }
 }
 
+
+
+system(paste0("mkdir /data/zhangh24/multi_ethnic/result/AOU/prs/CT_SLEB_all"))
+for(i in 1:3){
+  system(paste0("mkdir /data/zhangh24/multi_ethnic/result/AOU/prs/CT_SLEB_all/",eth[i],"/"))
+}
+for(i in 1:3){
+  for(l in 1:2){
+    system(paste0("cd /data/zhangh24/multi_ethnic/result/AOU/prs/CT_SLEB_all/",eth[i],";",
+                  "mkdir ",trait[l],"/"))  
+  }
+}

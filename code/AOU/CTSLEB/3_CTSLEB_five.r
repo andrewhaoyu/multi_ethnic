@@ -329,6 +329,8 @@ colnames(prs_mat)[2] = "id"
 prs_score = prs_mat[,-c(1:2)]
 
 #############EB step finish############################
+out.dir.prs = paste0("/data/zhangh24/multi_ethnic/result/AOU/prs/CT_SLEB_all/",eth,"/",trait,"/")
+system(paste0("cp ",temp.dir,"eb_prs_p_other_*.sscore ",out.dir.prs))
 
 
 
@@ -400,5 +402,14 @@ r2_ctsleb <- summary(model)$r.square
 
 
 save(r2_ctsleb, file = paste0(out.dir, "CTSLEB_all.result"))
+
+#save the best prs
+prs_max_score = predict(sl, prs_all_clean, onlySL = TRUE)[[1]]
+prs_max = cbind(prs_temp[1:4], prs_max_score)
+write.table(prs_max, file = paste0(out.dir.prs, "best_prs.sscore"),
+            row.names = F,
+            col.names = T,
+            quote = F)
+#evaluate on validation
 
 
