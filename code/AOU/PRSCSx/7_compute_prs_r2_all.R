@@ -66,6 +66,8 @@ res = system(paste0("/data/zhangh24/software/plink2_alpha ",
                     "--score ",temp.dir,"prs_prep cols=+scoresums,-scoreavgs header no-mean-imputation ",
                     "--bfile ",ref_gene_pred,
                     " --out ",temp.dir,"PRS"))
+out.dir.prs = paste0("/data/zhangh24/multi_ethnic/result/AOU/prs/PRSCSX_all/",eth[i],"/",trait_vec[l],"/")
+system(paste0("cp ",temp.dir,"PRS.sscore ",out.dir.prs))
 
 prs_mat = fread(paste0(temp.dir,"PRS.sscore"))
 prs_score = prs_mat[,5:ncol(prs_mat)]
@@ -126,3 +128,15 @@ save(r2.result, file = paste0(out.dir, "prscsx_all.result"))
 #     system(paste0("rm -rf ", temp.dir))
 #   }
 # }
+
+score1 = prs_vad[, 3*max_ind-2]
+score2= prs_vad[, 3*max_ind-1]
+score3= prs_vad[, 3*max_ind]
+
+prs_max_score =  cbind(score1, score2, score3)%*%coef
+prs_max = cbind(prs_mat[,1:4],prs_max_score)
+write.table(prs_max, file = paste0(out.dir.prs, "best_prs.sscore"),
+            row.names = F,
+            col.names = T,
+            quote = F)
+
