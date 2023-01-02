@@ -79,6 +79,9 @@ system(paste0("ls ",temp.dir,""))
 #load prs
 prs = fread(paste0(temp.dir,"prs.sscore"))
 colnames(prs)[2] = "id"
+out.dir.prs = paste0("/data/zhangh24/multi_ethnic/result/AOU/prs/EURPRS/",eth,"/",trait,"/")
+system(paste0("cp ",temp.dir,"prs.sscore ",out.dir.prs))
+
 #########R2 calculation################# 
 pheno.dir = "/data/zhangh24/multi_ethnic/data/UKBB/phenotype/"
 pheno = as.data.frame(fread(paste0(pheno.dir,trait,"/tuning+validation/",eth,"_all_data.txt")))
