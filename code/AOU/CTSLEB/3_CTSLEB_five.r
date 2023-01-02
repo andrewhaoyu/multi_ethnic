@@ -369,6 +369,9 @@ prs_tun_clean = prs_tun %>%
   select(-all_of(drop))
 prs_vad_clean = prs_vad %>% 
   select(-all_of(drop))
+prs_all_clean = prs_score %>% 
+  select(-all_of(drop))
+
 library(ranger)
 library(SuperLearner)
 #choose the prediction algorithms
