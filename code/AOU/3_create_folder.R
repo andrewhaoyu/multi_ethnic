@@ -123,3 +123,17 @@ for(i in 1:3){
 }
 
 
+
+
+
+system(paste0("mkdir /data/zhangh24/multi_ethnic/result/AOU/prs/PT"))
+for(i in 1:3){
+  system(paste0("mkdir /data/zhangh24/multi_ethnic/result/AOU/herit/",eth[i],"/"))
+}
+for(i in 1:3){
+  for(l in 1:2){
+    system(paste0("cd /data/zhangh24/multi_ethnic/result/AOU/herit/",eth[i],";",
+                  "mkdir ",trait[l],"/"))  
+  }
+}
+
