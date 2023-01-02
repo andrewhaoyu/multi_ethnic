@@ -142,3 +142,10 @@ result = data.frame(eth = eth,
 
 save(result, file = paste0(out.dir, "weighted_prs_ct_three_ans.result"))
 
+out.dir.prs = paste0("/data/zhangh24/multi_ethnic/result/AOU/prs/weightedprsall/",eth,"/",trait,"/")
+prs_max_score = prs_score%*%coeff
+prs_max = cbind(prs_infor, prs_max_score)
+write.table(prs_max, file = paste0(out.dir.prs, "best_prs.sscore"),
+            row.names = F,
+            col.names = T,
+            quote = F)
