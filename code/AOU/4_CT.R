@@ -111,6 +111,7 @@ write.table(q_range,file = paste0(temp.dir,"q_range_file"),row.names = F,col.nam
 
 res <- system(paste0("/data/zhangh24/software/plink2_alpha --q-score-range ",temp.dir,"q_range_file ",temp.dir,"p_value header --threads 2 --score ",temp.dir,"prs_coeff cols=+scoresums,-scoreavgs header no-mean-imputation  --bfile ",temp.dir,"ukb/all_chr --out ",temp.dir,"prs"))
 system(paste0("ls ",temp.dir,""))
+system(paste0("cp ",temp.dir,"*.sscore ",out.dir.prs))
 if(res==2){
   stop()
 }
@@ -177,6 +178,12 @@ ct.result = list(r2.result,r2_tun_vec)
 
 
 save(ct.result, file = paste0(out.dir, "CT.result"))
+prs_max =  fread(paste0(temp.dir,"prs.p_value_",idx,".sscore"))
+write.table(prs_max, file = paste0(out.dir.prs, "best_prs.sscore"),
+            row.names = F,
+            col.names = T,
+            quote = F)
+
 #find best cutoff for EUR by using all data as tuning
 
 
