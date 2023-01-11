@@ -277,6 +277,8 @@ colnames(prs_mat)[2] = "id"
 prs_score = prs_mat[,-c(1:2)]
 
 #############EB step finish############################
+out.dir.prs = paste0("/data/zhangh24/multi_ethnic/result/GLGC/prs/CTSLEB/",eth,"/",trait,"/")
+system(paste0("cp ",temp.dir,"eb_prs_p_other_*.sscore ",out.dir.prs))
 
 
 

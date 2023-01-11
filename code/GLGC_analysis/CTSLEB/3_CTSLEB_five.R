@@ -305,7 +305,7 @@ system(paste0("cp ",temp.dir,"eb_prs_p_other_*.sscore ",out.dir.prs))
 
 #############EB step finish############################
 
-system(past)
+#system(past)
 
 
 

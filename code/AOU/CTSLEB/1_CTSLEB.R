@@ -171,6 +171,8 @@ for(k1 in 1:length(pthres)){
 }
 prs_mat = as.data.frame(cbind(prs_temp[,1:2],bind_cols(prs_list)))
 colnames(prs_mat)[2] = "id"
+out.dir.prs = paste0("/data/zhangh24/multi_ethnic/result/AOU/prs/CTSLEB/",eth,"/",trait,"/")
+system(paste0("cp ",temp.dir,"eb_prs_p_other_*.sscore ",out.dir.prs))
 
 
 
