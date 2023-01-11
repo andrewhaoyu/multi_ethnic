@@ -174,14 +174,26 @@ write.table(prs_max, file = paste0(out.dir.prs, "best_prs.sscore"),
 #evaluate on validation
 model.vad.null  =  lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=pheno_vad)
 prs = pheno_vad[,paste0("p_value_",idx)]
-model.vad.prs <- lm(model.vad.null$residual~prs,data=pheno_vad)
+model.vad.prs <- lm(model.vad.null$residual~prs)
 r2 = summary(model.vad.prs)$r.square
 
+data = data.frame(y = model.vad.null$residual, x = prs)
+R2Boot = function(data,indices){
+  boot_data = data[indices, ]
+  model = lm(y ~ x, data = boot_data)
+  result = summary(model)$r.square
+  return(c(result))
+}
+library(boot)
+boot_r2 = boot(data = data, statistic = R2Boot, R = 10000)
 
+ci_result = boot.ci(boot_r2, type = "bca")
 r2.result = data.frame(eth = eth,
                        trait = trait,
                        method = "CT",
-                       r2 = r2
+                       r2 = r2,
+                       r2_low = ci_result$bca[4],
+                       r2_high = ci_result$bca[5]
 )
 
 

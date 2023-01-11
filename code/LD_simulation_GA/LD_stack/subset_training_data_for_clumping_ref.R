@@ -37,7 +37,11 @@ sub.snp.list = unique(snp.match[,1,drop=F])
 write.table(sub.snp.list,file = paste0(temp.dir,"/sub.snp.list"),row.names=F,col.names=F,quote=F)
 
 
-res = system(paste0("/data/zhangh24/software/plink2 --threads 2 --bfile ",cur.dir,eth[i],"/all_chr.tag --keep ",temp.dir,"/ref_fam.fam --extract ",temp.dir,"/sub.snp.list --out ",temp.dir,"/clump_ref_all_chr --make-bed"))
+res = system(paste0("/data/zhangh24/software/plink2 --threads 2 ",
+                    "--bfile ",cur.dir,eth[i],"/all_chr.tag ",
+                    "--keep ",temp.dir,"/ref_fam.fam ",
+                    "--extract ",temp.dir,"/sub.snp.list ",
+                    "--out ",temp.dir,"/clump_ref_all_chr --make-bed"))
 if(res==2){
   stop()
 }
