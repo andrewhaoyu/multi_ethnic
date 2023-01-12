@@ -101,7 +101,7 @@ model.null  =  lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=pheno_
   model.vad.prs <- lm(model.null$residual~prs,data=pheno_all)
   r2 = summary(model.vad.prs)$r.square
   
-data = data.frame(y = model.vad.null$residual, x = prs)
+data = data.frame(y = model.null$residual, x = prs)
 R2Boot = function(data,indices){
     boot_data = data[indices, ]
     model = lm(y ~ x, data = boot_data)
