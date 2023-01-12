@@ -2,7 +2,7 @@ eth_vec <- c("EUR","AFR","AMR","EAS","SAS")
 trait_vec <- c("HDL","LDL",
                "logTG",
                "TC")
-
+library(data.table)
 result = list()
 temp = 1
   for(l in 1:4){
