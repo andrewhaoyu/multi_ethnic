@@ -150,6 +150,7 @@ out.dir = paste0("/data/zhangh24/multi_ethnic/result/GLGC/PRSCSX/",eth[i],"/",tr
 save(r2.result, file = paste0(out.dir, "prscsx_all.result"))
 
 #save the best prs
+prs_score = as.data.frame(prs_score)
 score1 = prs_score[, 5*max_ind-4]
 score2 = prs_score[, 5*max_ind-3]
 score3 = prs_score[, 5*max_ind-2]
