@@ -23,6 +23,7 @@ setwd("/data/zhangh24/multi_ethnic/")
 data.dir = "/data/zhangh24/multi_ethnic/data/AOU_cleaned/"
 out.dir = paste0("/data/zhangh24/multi_ethnic/result/AOU/clumping_result/PT/",eth,"/",trait,"/")
 out.dir.prs = paste0("/data/zhangh24/multi_ethnic/result/AOU/prs/CT_SLEB_all/",eth,"/",trait,"/")
+pthres <- c(5E-08,5E-07,5E-06,5E-05,5E-04,5E-03,5E-02,5E-01,1.0)
 prs_list = list()
 temp = 1
 #take the column name of different clumping parameters
