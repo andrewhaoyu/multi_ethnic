@@ -144,9 +144,9 @@ save(r2.result, file = paste0(out.dir, "prscsx_all.result"))
 #   }
 # }
 prs_score = as.data.frame(prs_score)
-score1 = prs_vad[, 3*max_ind-2]
-score2= prs_vad[, 3*max_ind-1]
-score3= prs_vad[, 3*max_ind]
+score1 = prs_score[, 3*max_ind-2]
+score2= prs_score[, 3*max_ind-1]
+score3= prs_score[, 3*max_ind]
 
 prs_max_score =  cbind(score1, score2, score3)%*%coef
 prs_max = cbind(prs_mat[,1:4],prs_max_score)
