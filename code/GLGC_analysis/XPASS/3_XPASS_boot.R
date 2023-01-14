@@ -72,7 +72,7 @@ R2Boot = function(data,indices){
   return(c(result))
 }
 library(boot)
-boot_r2 = boot(data = data, statistic = R2Boot, R = 10000)
+boot_r2 = boot(data = data, statistic = R2Boot, R = 20000)
 
 ci_result = boot.ci(boot_r2, type = "bca")
 
