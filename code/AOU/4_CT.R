@@ -185,13 +185,6 @@ r2.result = data.frame(eth = eth,
                        r2_high = ci_result$bca[5]
 )
 
-r2.result = data.frame(eth = eth,
-                       trait = trait,
-                       method = "CT",
-                       r2 = r2
-)
-
-
 ct.result = list(r2.result,r2_tun_vec)
 
 
