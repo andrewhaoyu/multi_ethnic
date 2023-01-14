@@ -81,7 +81,7 @@ ci_result = boot.ci(boot_r2, type = "bca")
 r2_xpass = data.frame(eth = eth[i],
                        trait = trait_vec[l],
                        method = "XPASS",
-                       r2 = r2,
+                       r2 = r2_xpass,
                        r2_low = ci_result$bca[4],
                        r2_high = ci_result$bca[5]
 )
