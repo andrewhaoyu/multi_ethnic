@@ -118,17 +118,32 @@ prs_vad = cbind(score1, score2, score3)%*%coef
 
 model = lm(y_vad~ prs_vad)
 r2 = summary(model)$r.square
+
+data = data.frame(y = y_vad, x = prs_vad)
+R2Boot = function(data,indices){
+  boot_data = data[indices, ]
+  model = lm(y ~ x, data = boot_data)
+  result = summary(model)$r.square
+  return(c(result))
+}
+library(boot)
+boot_r2 = boot(data = data, statistic = R2Boot, R = 10000)
+
+ci_result = boot.ci(boot_r2, type = "bca")
+
 r2.result = data.frame(eth = eth[i],
                        trait = trait_vec[l],
                        method = "PRS-CSx （three ancestries)",
-                       r2 = r2
+                       r2 = r2,
+                       r2_low = ci_result$bca[4],
+                       r2_high = ci_result$bca[5]
 )
 out.dir = paste0("/data/zhangh24/multi_ethnic/result/AOU/PRSCSX/",eth[i],"/",trait,"/")
 save(r2.result, file = paste0(out.dir, "prscsx_all.result"))
 #     system(paste0("rm -rf ", temp.dir))
 #   }
 # }
-
+prs_score = as.data.frame(prs_score)
 score1 = prs_vad[, 3*max_ind-2]
 score2= prs_vad[, 3*max_ind-1]
 score3= prs_vad[, 3*max_ind]
