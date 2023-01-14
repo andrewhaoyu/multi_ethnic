@@ -100,12 +100,26 @@ model.vad.prs <- lm(model.null$residual~prs,data=pheno_all)
 r2 = summary(model.vad.prs)$r.square
 
 
+data = data.frame(y = model.null$residual, x = prs)
+R2Boot = function(data,indices){
+  boot_data = data[indices, ]
+  model = lm(y ~ x, data = boot_data)
+  result = summary(model)$r.square
+  return(c(result))
+}
+library(boot)
+boot_r2 = boot(data = data, statistic = R2Boot, R = 20000)
 
+ci_result = boot.ci(boot_r2, type = "bca")
 
 r2.result = data.frame(eth = eth,
                        trait = trait,
                        method = "BestEUR_CT",
-                       r2 = r2
+                       r2 = r2,
+                       r2_low = ci_result$bca[4],
+                       r2_high = ci_result$bca[5]
 )
+
+
 
 save(r2.result, file = paste0(out.dir, "BestEUR.result"))
