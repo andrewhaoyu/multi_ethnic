@@ -12,13 +12,8 @@ for(l in 1:4){
     trait = trait_vec[l]
     out.dir = paste0("/data/zhangh24/multi_ethnic/result/GLGC/XPASS/",eth,"/",trait,"/")
     load(paste0(out.dir, "XPASS.result"))
-    r2.result = data.frame(eth = eth_vec[i],
-                           trait = trait_vec[l],
-                           method = "XPASS",
-                           r2 = r2_xpass
-    )
     
-    result_list[[temp]] = r2.result
+    result_list[[temp]] = r2_xpass
     temp = temp+ 1
   }
 }

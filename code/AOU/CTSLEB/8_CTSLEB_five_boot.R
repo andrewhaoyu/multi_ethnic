@@ -134,7 +134,7 @@ result = data.frame(eth = eth,
 
 
 
-save(r2_ctsleb, file = paste0(out.dir, "CTSLEB_all.result"))
+save(result, file = paste0(out.dir, "CTSLEB_all.result"))
 
 #save the best prs
 prs_max_score = predict(sl, prs_all_clean, onlySL = TRUE)[[1]]

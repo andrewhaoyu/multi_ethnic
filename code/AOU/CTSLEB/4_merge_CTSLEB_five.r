@@ -9,13 +9,9 @@ for(l in 1:2){
     trait = trait_vec[l]
     out.dir = paste0("/data/zhangh24/multi_ethnic/result/AOU/clumping_result/PT/",eth,"/",trait,"/")
     load(paste0(out.dir, "CTSLEB_all.result"))
-    r2.result = data.frame(eth = eth_vec[i],
-                           trait = trait_vec[l],
-                           method = "CT-SLEB (three ancestries)",
-                           r2 = r2_ctsleb
-    )
     
-    result_list[[temp]] = r2.result
+    
+    result_list[[temp]] = r2_ctsleb
     temp = temp+ 1
   }
 }
