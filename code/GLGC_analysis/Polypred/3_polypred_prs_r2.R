@@ -162,7 +162,7 @@ prs = as.matrix(prs_vad)%*%coef
 model = lm(y_vad~ prs)
 r2 = summary(model)$r.square
 
-data = data.frame(y = y, x = prs)
+data = data.frame(y = y_vad, x = prs)
 R2Boot = function(data,indices){
   boot_data = data[indices, ]
   model = lm(y ~ x, data = boot_data)
