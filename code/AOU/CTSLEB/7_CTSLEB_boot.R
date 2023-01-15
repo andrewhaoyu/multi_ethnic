@@ -25,61 +25,12 @@ out.dir = paste0("/data/zhangh24/multi_ethnic/result/AOU/clumping_result/PT/",et
 pthres <- c(5E-08,5E-07,5E-06,5E-05,5E-04,5E-03,5E-02,5E-01,1.0)
 
 
-
-
-
-
-#############EB step start############################
-
-#Get the SNP set with the best performance in the CT step
-snp_set_ind = colnames(prs_mat)[max_ind+2]
-SNP_set = GetSNPSet(snp_set_ind,
-                    score_file,
-                    unique_infor)
-save(SNP_set, file = paste0(out.dir, "single_SNP_set.rdata"))
-#SNP_set is used for estimating the covariance matrix for the prior distribution
-#Estimate the EB posterior mean for all SNPs in unqiue_infor
-unique_infor_post = EBpost(unique_infor,SNP_set)
-
-post_beta_mat = cbind(unique_infor_post$BETA_EB_target,unique_infor_post$BETA_EB_other)
-colnames(post_beta_mat) = c("EB_target","EB_eur")
-
-#EB step preparsion
-plink_file_eb = PreparePlinkFileEB(snp_list,
-                                   unique_infor_post,
-                                   post_beta_mat)
-score_file = plink_file_eb[[1]]
-write.table(score_file,file = paste0(temp.dir,"score_file_eb"),row.names = F,col.names = F,quote=F)
-#p_value_file description
-#the first column is the same as score_file
-#the second column is the p-values of SNPs from the GWAS of the target population
-p_value_file = plink_file_eb[[2]]
-
-
-p_value_file_temp = p_value_file
-for(k1 in 1:length(pthres)){
-  #keep al the SNPs with P_EUR less than pthres[k1] in the analyses
-  idx <- which(unique_infor$P_other<=pthres[k1])
-  p_value_file_temp$P[idx] = 0
-  write.table(p_value_file_temp,file = paste0(temp.dir,"p_value_file"),col.names = F,row.names = F,quote=F)
-  n_col = ncol(score_file)
-  
-  res = system(paste0(soft.dir,"plink2_alpha ",
-                      "--q-score-range ",temp.dir,"q_range_file ",temp.dir,"p_value_file ",
-                      "--score-col-nums 3-",n_col," ",
-                      "--score ",temp.dir,"score_file_eb cols=+scoresums,-scoreavgs ",
-                      "--bfile ",temp.dir,"ukb/all_chr ",
-                      "--out ",temp.dir,"eb_prs_p_other_",k1))
-  #the output of plink2 create 9 different files named as prs_p_other_k1.p_tar_k2.sscore
-  #this output file contains 16 columns
-  #the column 1-4 are: family ID, individual ID, 2*total number of SNPs in the PRS, the sum of allele count
-  #column 5-16 are the PRS scores with SNP of p_target<p_thres[k2]|p_eur<p_thres[k1] for different combinations of r2-cutoff and base_window_size
-}
+out.dir.prs = paste0("/data/zhangh24/multi_ethnic/result/AOU/prs/CTSLEB/",eth,"/",trait,"/")
 
 prs_list = list()
 temp = 1
 #take the column name of different clumping parameters
-names = colnames(score_file)[3:ncol(score_file)]
+#names = colnames(score_file)[3:ncol(score_file)]
 for(k1 in 1:length(pthres)){
   for(k2 in 1:length(pthres)){
     #the --score file cols=+scoresums,-scoreavgs command in plink2 computes PRS as G*beta
@@ -89,13 +40,15 @@ for(k1 in 1:length(pthres)){
     # times (2*number of SNPs)
     prs_list[[temp]] = prs_temp[,5:ncol(prs_temp)]
     
-    colnames(prs_list[[temp]]) = paste0(names,"_","p_other_",pthres[k1],"_p_tar_",pthres[k2])
+ #   colnames(prs_list[[temp]]) = paste0(names,"_","p_other_",pthres[k1],"_p_tar_",pthres[k2])
     temp = temp + 1
   }
 }
 prs_mat = as.data.frame(cbind(prs_temp[,1:2],bind_cols(prs_list)))
 colnames(prs_mat)[2] = "id"
 prs_score = prs_mat[,-c(1:2)]
+
+
 
 #############EB step finish############################
 
