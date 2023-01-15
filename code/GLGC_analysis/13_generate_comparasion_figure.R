@@ -1,5 +1,5 @@
-setwd("/Users/zhangh24/GoogleDrive/multi_ethnic/result/GLGC/analysis_result/")
-source("/Users/zhangh24/GoogleDrive/multi_ethnic//code/LD_simulation_large/theme_Publication.R")
+setwd("/Users/zhangh24/Library/CloudStorage/Box-Box/multi_ethnic/result/GLGC/analysis_result/")
+source("/Users/zhangh24/Library/CloudStorage/Box-Box/multi_ethnic/code/LD_simulation_large/theme_Publication.R")
 library(ggplot2)
 library(ggsci)
 library(dplyr)
@@ -33,26 +33,26 @@ ct.sleb = final_result
 ct.sleb = ct.sleb %>% mutate(method = "CT-SLEB")
 load("ct_sleb_all.rdata")
 ct.sleb.all = final_result
-load("glgc-weighted-ldpred2-2grps.rdata")
-R2 = as.data.frame(R2)
-R2$trait = row.names(R2)
-weighted.ldpred2.result = as.data.frame(R2) %>% gather("eth","r2",1:5) %>% 
+load("R2-weighted_ldpred2-bootstrap.RData")
+weighted.ldpred2.result = r2.result %>% 
   filter(eth!="EUR"&trait !="nonHDL") %>% 
   mutate(method = "Weighted PRS (LDpred2)") %>% 
-  select(eth,trait,method,r2)
-
-
-ldpred2.result = fread("glgc-jin.txt") %>% 
-  filter(Method%in% c("LDpred2", "EUR LDpred2")) %>% 
-  mutate(method = case_when(
-    Method == "EUR LDpred2" ~ "Best EUR PRS (LDpred2)",
-    Method == "LDpred2" ~ "LDpred2"
+  select(eth,trait,method,r2, r2_low, r2_high)
+load("R2-ldpred2-bootstrap.RData")
+r2.result_ldpred2 = r2.result
+load("R2-eurldpred2-bootstrap.RData")
+r2.result_eurldpred2 = r2.result
+ldpred2.result = rbind(r2.result_ldpred2, 
+                       r2.result_eurldpred2) %>% 
+    mutate(method = case_when(
+    method == "EUR LDpred2" ~ "Best EUR PRS (LDpred2)",
+    method == "LDpred2" ~ "LDpred2"
   )) %>% 
-  rename(trait = Trait,
-         eth = Race,
-         r2 = R2) %>% 
   filter(trait!= "nonHDL" ) %>% 
-  select(eth, trait, method, r2) 
+  select(eth,trait,method, r2, r2_low, r2_high) 
+
+
+
 #increase of ct-sleb over prs
 
 increase = cbind(ct.sleb[,1:2],increase = (ct.sleb$r2-prscsx.result$r2)/prscsx.result$r2)

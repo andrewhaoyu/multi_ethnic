@@ -1,5 +1,5 @@
-setwd("/Users/zhangh24/GoogleDrive/multi_ethnic/result/GLGC/analysis_result/")
-source("/Users/zhangh24/GoogleDrive/multi_ethnic//code/LD_simulation_large/theme_Publication.R")
+setwd("/Users/zhangh24/Library/CloudStorage/Box-Box/multi_ethnic/result/GLGC")
+source("/Users/zhangh24/Library/CloudStorage/Box-Box/multi_ethnic//code/LD_simulation_large/theme_Publication.R")
 library(ggplot2)
 library(ggsci)
 library(dplyr)
@@ -27,7 +27,7 @@ xpass.result = final_result
 load("prscsx_all.rdata")
 prscsx.all.result = final_result %>% mutate(method = "PRS-CSx")
 
-load("ct_sleb_five_cut_test.rdata")
+load("ct_sleb_all.rdata")
 ct.sleb.all = final_result %>% mutate(method = "CT-SLEB")
 load("glgc.jin.Rdata")
 ldpred2.result = res %>% 
