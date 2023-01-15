@@ -36,7 +36,7 @@ for(k1 in 1:length(pthres)){
     #the --score file cols=+scoresums,-scoreavgs command in plink2 computes PRS as G*beta
     #If you compute PRS by chromosome, you need to sum the PRS scores for all chromosomes. 
     #load PRS for SNPs with p_target<p_thres[k2]|p_eur<p_thres[k1] 
-    prs_temp = fread(paste0(temp.dir,"eb_prs_p_other_",k1,".p_tar_",k2,".sscore"))
+    prs_temp = fread(paste0(out.dir.prs,"eb_prs_p_other_",k1,".p_tar_",k2,".sscore"))
     # times (2*number of SNPs)
     prs_list[[temp]] = prs_temp[,5:ncol(prs_temp)]
     
