@@ -140,7 +140,7 @@ result = data.frame(eth = eth,
 
 
 
-save(r2_ctsleb, file = paste0(out.dir, "CTSLEB.result"))
+save(result, file = paste0(out.dir, "CTSLEB.result"))
 
 
 
