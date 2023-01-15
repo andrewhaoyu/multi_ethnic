@@ -117,6 +117,25 @@ y_pred <- predict(sl, prs_vad_clean, onlySL = TRUE)
 model <- lm(y_vad~y_pred[[1]])
 r2_ctsleb <- summary(model)$r.square
 
+data = data.frame(y = y_vad, x = y_pred[[1]])
+R2Boot = function(data,indices){
+  boot_data = data[indices, ]
+  model = lm(y ~ x, data = boot_data)
+  result = summary(model)$r.square
+  return(c(result))
+}
+library(boot)
+boot_r2 = boot(data = data, statistic = R2Boot, R = 10000)
+
+ci_result = boot.ci(boot_r2, type = "bca")
+
+result = data.frame(eth = eth,
+                    trait = trait,
+                    method = "CT-SLEB",
+                    r2 = r2_ctsleb,
+                    r2_low = ci_result$bca[4],
+                    r2_high = ci_result$bca[5]
+)
 
 
 
