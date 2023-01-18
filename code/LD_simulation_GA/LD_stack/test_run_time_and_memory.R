@@ -425,7 +425,7 @@ res = system(paste0("/data/zhangh24/software/plink2_alpha --score-col-nums 3 --t
 time_prs_csx_calculate_prs_end = proc.time()
 r2.vec.test = rep(0,4)
 for(k in 1:4){
-  fileanme = paste0(temp.dir.prs,"prs_csx_",eth[i],"_phi",phi[k])
+  filename = paste0(temp.dir.prs,"prs_csx_",eth[i],"_phi",phi[k])
   prs.temp <- fread(filename) 
   prs.score <- prs.temp$SCORE
   prs.test <- prs.score[(1):(n.test)]
