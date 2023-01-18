@@ -341,14 +341,14 @@ sl = SuperLearner(Y = y_test, X = prs.mat, family = gaussian(),
                   # For a real analysis we would use V = 10.
                   # V = 3,
                   SL.library = SL.libray)
-# y.pred <- predict(sl, x.vad, onlySL = TRUE)
-# model = lm(y_test~y.pred)
 time_super_learning_end = proc.time()
-
-total_time = time_super_learning_end-time_ct_sleb_start
-train_time = time_ct_end - time_ct_sleb_start + time_eb_end - time_first_compute_r2_end
+y.pred <- predict(sl, prs.mat, onlySL = TRUE)
+model = lm(y_test~y.pred[[1]])
+time_ct_sleb_end = proc.time()
+total_time = time_super_learning_end-time_ct_sleb_end
+train_time = time_ct_end - time_ct_sleb_start + time_eb_end - time_first_compute_r2_end + time_super_learning_end - time_prs2_end
 prs_time = time_prs1_end - time_ct_end + time_prs2_end - time_eb_end
-compute_r2_time = time_first_compute_r2_end - time_prs1_end + time_super_learning_end - time_prs2_end
+compute_r2_time = time_first_compute_r2_end - time_prs1_end + time_ct_sleb_end - time_super_learning_end
 time_vec = rbind(total_time,train_time,prs_time,compute_r2_time)
 
 save(time,file = paste0(out.dir,"TDLD_SLEB_trep_",t_rep,".rdata"))
@@ -424,14 +424,28 @@ write.table(prs.file,file = paste0(temp.dir.prs,"prs_file"),col.names = T,row.na
 res = system(paste0("/data/zhangh24/software/plink2_alpha --score-col-nums 3 --threads 2 --score ",temp.dir.prs,"prs_file  header no-mean-imputation --bfile ",temp.dir,"AFR_ref_chr22  --out ",temp.dir.prs,"prs_csx_",eth[i],"_phi",phi[k]))
 time_prs_csx_calculate_prs_end = proc.time()
 r2.vec.test = rep(0,4)
+weight_matrix = c(0,4,2)
 for(k in 1:4){
-  filename = paste0(temp.dir.prs,"prs_csx_",eth[i],"_phi",phi[k])
+  filename = paste0(temp.dir.prs,"prs_csx_",eth[1],"_phi",phi[k])
   prs.temp <- fread(filename) 
-  prs.score <- prs.temp$SCORE
-  prs.test <- prs.score[(1):(n.test)]
-  model1 <- lm(y_test~prs.test)
+  prs.score1 <- prs.temp$SCORE[(1):(n.test)]
+  filename = paste0(temp.dir.prs,"prs_csx_",eth[2],"_phi",phi[k])
+  prs.temp <- fread(filename) 
+  prs.score2 <- prs.temp$SCORE[(1):(n.test)]
+  model1 <- lm(y_test~prs.score1+prs.score2)
   r2.vec.test[k] = summary(model1)$r.square
+  weight_matrix[k,] = coef(model1)[2:3]
+  
 }
+idx_max <- which.max(r2.vec.test)
+filename = paste0(temp.dir.prs,"prs_csx_",eth[1],"_phi",phi[idx_max])
+prs.temp <- fread(filename) 
+prs.score1 <- prs.temp$SCORE[(1):(n.test)]
+filename = paste0(temp.dir.prs,"prs_csx_",eth[2],"_phi",phi[idx_max])
+prs.temp <- fread(filename) 
+prs.score2 <- prs.temp$SCORE[(1):(n.test)]
+best_prs = as.matrix(cbind(prs.score1,prs.score2))%*%weight_matrix[idx_max,]
+model1 <- lm(y_test~best_prs)
 time_prs_csx_calculate_r2_end = proc.time()
 
 

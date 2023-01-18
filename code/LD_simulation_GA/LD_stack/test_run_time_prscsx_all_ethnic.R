@@ -6,7 +6,7 @@ sid<-Sys.getenv('SLURM_JOB_ID')
 dir.create(paste0('/lscratch/',sid,'/test'),showWarnings = FALSE)
 temp.dir = paste0('/lscratch/',sid,'/test/')
 dir.create(paste0('/lscratch/',sid,'/test/1KGLD'),showWarnings = FALSE)
-
+time_prscsx_start = proc.time()
 system(paste0("cp -r /data/zhangh24/software/PRScsx/1KGLD/ldblk_1kg_eur ",temp.dir,"1KGLD"))
 system(paste0("cp -r /data/zhangh24/software/PRScsx/1KGLD/ldblk_1kg_afr ",temp.dir,"1KGLD"))
 system(paste0("cp -r /data/zhangh24/software/PRScsx/1KGLD/ldblk_1kg_amr ",temp.dir,"1KGLD"))
@@ -14,7 +14,7 @@ system(paste0("cp -r /data/zhangh24/software/PRScsx/1KGLD/ldblk_1kg_eas ",temp.d
 system(paste0("cp -r /data/zhangh24/software/PRScsx/1KGLD/ldblk_1kg_sas ",temp.dir,"1KGLD"))
 system(paste0("cp /data/zhangh24/software/PRScsx/1KGLD/snpinfo_mult_1kg_hm3 ",temp.dir,"1KGLD"))
 
-time1 = proc.time()
+
 i = 2
 phi = c(1,1E-02,1E-04,1E-06)
 library(data.table)
@@ -38,6 +38,7 @@ system(paste0("export MKL_NUM_THREADS=2; export NUMEXPR_NUM_THREADS=2; export OM
               " --phi=",phi[k], 
               " --out_dir=",out.dir,
               " --out_name=test_five"))
+time_prs_csx_train_end = proc.time()
 #calculate prs for the two coefficients
 phi_ch = c("1e+00","1e-02","1e-04","1e-06")
 #calcualte prs for all
@@ -93,10 +94,57 @@ res = system(paste0("/data/zhangh24/software/plink2_alpha ",
                     "--score ",temp.dir,"prs_file cols=+scoresums,-scoreavgs header no-mean-imputation ",
                     "--bfile ", temp.dir,"AFR_test_mega_chr22 ",
                     "--out ",temp.dir.prs,"prs_csx_",eth[i],"_phi",phi[k]))
-
-time = proc.time()-time1
+time_prs_csx_calculate_prs_end = proc.time()
+r2.vec.test = rep(0,4)
+weight_matrix = c(0,4,5)
+for(k in 1:4){
+  filename = paste0(temp.dir.prs,"prs_csx_",eth[1],"_phi",phi[k])
+  prs.temp <- fread(filename) 
+  prs.score1 <- prs.temp$SCORE[(1):(n.test)]
+  filename = paste0(temp.dir.prs,"prs_csx_",eth[2],"_phi",phi[k])
+  prs.temp <- fread(filename) 
+  prs.score2 <- prs.temp$SCORE[(1):(n.test)]
+  filename = paste0(temp.dir.prs,"prs_csx_",eth[3],"_phi",phi[k])
+  prs.temp <- fread(filename) 
+  prs.score3 <- prs.temp$SCORE[(1):(n.test)]
+  filename = paste0(temp.dir.prs,"prs_csx_",eth[4],"_phi",phi[k])
+  prs.temp <- fread(filename) 
+  prs.score4 <- prs.temp$SCORE[(1):(n.test)]
+  filename = paste0(temp.dir.prs,"prs_csx_",eth[5],"_phi",phi[k])
+  prs.temp <- fread(filename) 
+  prs.score5 <- prs.temp$SCORE[(1):(n.test)]
+  model1 <- lm(y_test~prs.score1+prs.score2+prs.score3+prs.score4+prs.score5)
+  r2.vec.test[k] = summary(model1)$r.square
+  weight_matrix[k,] = coef(model1)[2:5]
+  
+}
+idx_max <- which.max(r2.vec.test)
+filename = paste0(temp.dir.prs,"prs_csx_",eth[1],"_phi",phi[idx_max])
+filename = paste0(temp.dir.prs,"prs_csx_",eth[1],"_phi",phi[k])
+prs.temp <- fread(filename) 
+prs.score1 <- prs.temp$SCORE[(1):(n.test)]
+filename = paste0(temp.dir.prs,"prs_csx_",eth[2],"_phi",phi[k])
+prs.temp <- fread(filename) 
+prs.score2 <- prs.temp$SCORE[(1):(n.test)]
+filename = paste0(temp.dir.prs,"prs_csx_",eth[3],"_phi",phi[k])
+prs.temp <- fread(filename) 
+prs.score3 <- prs.temp$SCORE[(1):(n.test)]
+filename = paste0(temp.dir.prs,"prs_csx_",eth[4],"_phi",phi[k])
+prs.temp <- fread(filename) 
+prs.score4 <- prs.temp$SCORE[(1):(n.test)]
+filename = paste0(temp.dir.prs,"prs_csx_",eth[5],"_phi",phi[k])
+prs.temp <- fread(filename) 
+prs.score5 <- prs.temp$SCORE[(1):(n.test)]
+best_prs = as.matrix(cbind(prs.score1,prs.score2,prs.score3,prs.score4,prs.score5))%*%weight_matrix[idx_max,]
+model1 <- lm(y_test~best_prs)
+time_prs_csx_calculate_r2_end = proc.time()
 time_prs = proc.time()-time2
-time_list = c(time, time_prs)
+
+total_time = time_prs_csx_calculate_r2_end - time_prscsx_start
+train_time = time_prs_csx_train_end - time_prscsx_start
+prs_time = time_prs_csx_calculate_prs_end - time_prs_csx_train_end 
+compute_r2_time = time_prs_csx_calculate_r2_end - time_prs_csx_calculate_prs_end
+time_vec = rbind(total_time,train_time,prs_time,compute_r2_time)
 save(time_list,file = paste0(out.dir,"prscsx_five_trep_",t_rep,"_phi_",k,".rdata"))
 #system(paste0("mv ",temp.dir.prs,"/prs_csx_",eth[i],"_rho_",l,"_size_",m,"_GA_",i1,"_phi",phi[v],".sscore ",out.dir.sum,eth[i],"/prscsx/"))
 
