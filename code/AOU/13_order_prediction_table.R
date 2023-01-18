@@ -1,4 +1,4 @@
-load("/Users/zhangh24/GoogleDrive/multi_ethnic/result/AOU/analysis_result/prediction.result.summary.rdata")
+load("/Users/zhangh24/Library/CloudStorage/Box-Box/multi_ethnic/result/AOU/analysis_result/prediction.result.summary.rdata")
 order.trait =  c("bmi",
                  "height")
 trait_name = c("Body mass index",
@@ -33,7 +33,7 @@ for(l in 1:length(order.trait)){
                  trait==order.trait[l]) %>% 
         mutate(trait_name = trait_name[l],
                eth_name = eth_name[i]) %>% 
-        select(eth_name,trait_name, method_vec,result)
+        select(eth_name,trait_name, method_vec,result, r2_low, r2_high)
       if(nrow(prediction.sub)!=0){
         result.list[[temp]] = prediction.sub
         temp = temp+1
@@ -41,6 +41,6 @@ for(l in 1:length(order.trait)){
     }
   }
 }
-order.result = rbindlist(result.list) %>% filter(eth_name != "Latino")
+order.result = rbindlist(result.list) %>% filter(eth_name != "Latino") 
 
-write.csv(order.result, file = "/Users/zhangh24/GoogleDrive/multi_ethnic/result/AOU/analysis_result/prediction_summary.csv")
+write.csv(order.result, file = "/Users/zhangh24/Library/CloudStorage/Box-Box/multi_ethnic/result/AOU/analysis_result/prediction_summary.csv")

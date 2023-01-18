@@ -10,7 +10,7 @@ for(l in 1:2){
     out.dir = paste0("/data/zhangh24/multi_ethnic/result/AOU/clumping_result/PT/",eth,"/",trait,"/")
     load(paste0(out.dir, "CTSLEB.result"))
  
-    result_list[[temp]] = r2_ctsleb
+    result_list[[temp]] = result
     temp = temp+ 1
   }
 }

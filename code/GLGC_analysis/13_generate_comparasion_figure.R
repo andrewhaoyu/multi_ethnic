@@ -41,7 +41,7 @@ weighted.ldpred2.result = r2.result %>%
 load("R2-ldpred2-bootstrap.RData")
 r2.result_ldpred2 = r2.result
 load("R2-eurldpred2-bootstrap.RData")
-r2.result_eurldpred2 = r2.result
+r2.result_eurldpred2 = r2.result %>% filter(eth!="EUR")
 ldpred2.result = rbind(r2.result_ldpred2, 
                        r2.result_eurldpred2) %>% 
     mutate(method = case_when(

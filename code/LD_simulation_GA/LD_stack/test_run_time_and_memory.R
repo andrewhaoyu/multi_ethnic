@@ -1,7 +1,7 @@
 args = commandArgs(trailingOnly = T)
 t_rep = args[[1]]
 #test the running time and memory for TDLD-SLEB and PRS-CSx on CHR 22
-time1 = proc.time()
+time_ct_sleb_start = proc.time()
 i = 2
 library(data.table)
 library(dplyr)
@@ -103,7 +103,7 @@ for(r_ind in 1:length(r2_vec)){
 system(paste0("rm ",temp.dir,"*.bim"))
 system(paste0("rm ",temp.dir,"*.bed"))
 system(paste0("rm ",temp.dir,"*.fam"))
-
+time_ct_end = proc.time()
 dir.create(paste0('/lscratch/',sid,'/test/prs/'),showWarnings = FALSE)
 temp.dir.prs = paste0('/lscratch/',sid,'/test/prs/')
 #combine the LD clumping results
@@ -170,7 +170,7 @@ for(r_ind in 1:length(r2_vec)){
   
     
 }
-
+time_prs1_end = proc.time()
 #find the optimal r2 performance based on testing data
 load(paste0(out.dir,"y_test.rdata"))
 r2.vec.test <- rep(0,length(pthres)^2*length(r2_vec)*length(wc_base_vec))
@@ -207,6 +207,7 @@ p.k1 =pthres_vec1[idx]
 p.k2 = pthres_vec2[idx]
 r_ind = r2_ind_vec[idx]
 w_ind = wc_ind_vec[idx]
+time_first_compute_r2_end = proc.time()
 #compute the prs based on TDLD clumping results
 source("/data/zhangh24/multi_ethnic/code/stratch/EB_function.R")
 LD.EUR <- as.data.frame(fread(paste0(temp.dir,eth[1],"_LD_clump_two_dim_rind_",r_ind,"_wcind_",w_ind,".clumped")))
@@ -215,7 +216,6 @@ LD.tar <- as.data.frame(fread(paste0(temp.dir,eth[i],"_LD_clump_two_dim_rind_",r
 LD.EUR <- LD.EUR[,3,drop=F]
 LD.tar <- LD.tar[,3,drop=F]
 LD <- rbind(LD.EUR,LD.tar)
-
 #combine the statistics with SNPs after clumping
 summary.com.prior = left_join(LD,summary.com,by="SNP") %>% 
   filter(peur<p.k1|
@@ -233,6 +233,7 @@ beta_eur <- summary.com$beta_eur
 sd_eur <- summary.com$sd_eur
 
 post_beta_tar = EBpost(beta_tar,sd_tar,beta_eur,sd_eur,EBprior)[,1,drop=F]
+time_eb_end = proc.time()
 
 summary.com$BETA  = post_beta_tar
 #calculate the prs using TDLD-EB
@@ -305,6 +306,7 @@ for(r_ind in 1:length(r2_vec)){
     }
   }
 }
+time_prs2_end = proc.time()
 prs.sum = colSums(prs.mat)
 idx <- which(prs.sum!=0)
 #drop the prs with all 0
@@ -339,13 +341,22 @@ sl = SuperLearner(Y = y_test, X = prs.mat, family = gaussian(),
                   # For a real analysis we would use V = 10.
                   # V = 3,
                   SL.library = SL.libray)
-#y.pred <- predict(sl, x.vad, onlySL = TRUE)
-time = proc.time()-time1
+# y.pred <- predict(sl, x.vad, onlySL = TRUE)
+# model = lm(y_test~y.pred)
+time_super_learning_end = proc.time()
+
+total_time = time_super_learning_end-time_ct_sleb_start
+train_time = time_ct_end - time_ct_sleb_start + time_eb_end - time_first_compute_r2_end
+prs_time = time_prs1_end - time_ct_end + time_prs2_end - time_eb_end
+compute_r2_time = time_first_compute_r2_end - time_prs1_end + time_super_learning_end - time_prs2_end
+time_vec = rbind(total_time,train_time,prs_time,compute_r2_time)
+
 save(time,file = paste0(out.dir,"TDLD_SLEB_trep_",t_rep,".rdata"))
 
 #prs-csx run time
 rm(list = ls())
-time1 = proc.time()
+time_prscsx_start = proc.time()
+
 i = 2
 phi = c(1,1E-02,1E-04,1E-06)
 library(data.table)
@@ -380,6 +391,7 @@ for(k in 1:4){
                 " --out_name=test"))
   
 }
+time_prs_csx_train_end = proc.time()
 #calculate prs for the two coefficients
 phi_ch = c("1e+00","1e-02","1e-04","1e-06")
 #calcualte prs for EUR
@@ -410,5 +422,23 @@ colSums(is.na(prs.file))
 write.table(prs.file,file = paste0(temp.dir.prs,"prs_file"),col.names = T,row.names = F,quote=F)
 
 res = system(paste0("/data/zhangh24/software/plink2_alpha --score-col-nums 3 --threads 2 --score ",temp.dir.prs,"prs_file  header no-mean-imputation --bfile ",temp.dir,"AFR_ref_chr22  --out ",temp.dir.prs,"prs_csx_",eth[i],"_phi",phi[k]))
-time = proc.time()-time1
+time_prs_csx_calculate_prs_end = proc.time()
+r2.vec.test = rep(0,4)
+for(k in 1:4){
+  fileanme = paste0(temp.dir.prs,"prs_csx_",eth[i],"_phi",phi[k])
+  prs.temp <- fread(filename) 
+  prs.score <- prs.temp$SCORE
+  prs.test <- prs.score[(1):(n.test)]
+  model1 <- lm(y_test~prs.test)
+  r2.vec.test[k] = summary(model1)$r.square
+}
+time_prs_csx_calculate_r2_end = proc.time()
+
+
+total_time = time_prs_csx_calculate_r2_end - time_prscsx_start
+train_time = time_prs_csx_train_end - time_prscsx_start
+prs_time = time_prs_csx_calculate_prs_end - time_prs_csx_train_end 
+compute_r2_time = time_prs_csx_calculate_r2_end - time_prs_csx_calculate_prs_end
+time_vec = rbind(total_time,train_time,prs_time,compute_r2_time)
+
 save(time,file = paste0(out.dir,"prscsx_trep_",t_rep,"_phi_",k,".rdata"))
