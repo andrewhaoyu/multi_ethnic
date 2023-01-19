@@ -87,7 +87,7 @@ colnames(prs_file)[1] = "SNP"
 n_col = ncol(prs_file)
 #file_out = paste0("/data/zhangh24/multi_ethnic/result/AOU/prs/PRSCSx/",eth[i],"/",trait,"")
 write.table(prs_file,file = paste0(temp.dir,"prs_file"),col.names = T,row.names = F,quote=F)
-
+load(paste0(out.dir,"y_test.rdata"))
 ncol = ncol(prs_file)
 res = system(paste0("/data/zhangh24/software/plink2_alpha ",
                     "--score-col-nums 3-",n_col," --threads 2 ",
@@ -97,11 +97,11 @@ res = system(paste0("/data/zhangh24/software/plink2_alpha ",
 time_prs_csx_calculate_prs_end = proc.time()
 
 
-  filename = paste0(temp.dir.prs,"prs_csx_",eth[i],"_phi",phi[k],".sscore")
-  prs.temp <- fread(filename) 
-  prs.score <- as.matrix(prs.temp[(1):(n.test),5:9])
-  model1 <- lm(y_test~prs.score)
-  r2.vec.test = summary(model1)$r.square
+filename = paste0(temp.dir.prs,"prs_csx_",eth[i],"_phi",phi[k],".sscore")
+prs.temp <- fread(filename) 
+prs.score <- as.matrix(prs.temp[(1):(n.test),5:9])
+model1 <- lm(y_test~prs.score)
+r2.vec.test = summary(model1)$r.square
 time_prs_csx_calculate_r2_end = proc.time()
 total_time = time_prs_csx_calculate_r2_end - time_prscsx_start
 train_time = time_prs_csx_train_end - time_prscsx_start

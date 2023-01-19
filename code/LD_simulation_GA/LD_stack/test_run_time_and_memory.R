@@ -356,6 +356,7 @@ save(time_vec,file = paste0(out.dir,"TDLD_SLEB_trep_",t_rep,".rdata"))
 #prs-csx run time
 rm(list = ls())
 time_prscsx_start = proc.time()
+load(paste0(out.dir,"y_test.rdata"))
 n.test = 10000
 i = 2
 phi = c(1,1E-02,1E-04,1E-06)
