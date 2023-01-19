@@ -366,6 +366,7 @@ sid<-Sys.getenv('SLURM_JOB_ID')
 dir.create(paste0('/lscratch/',sid,'/test'),showWarnings = FALSE)
 temp.dir = paste0('/lscratch/',sid,'/test/')
 dir.create(paste0('/lscratch/',sid,'/test/1KGLD'),showWarnings = FALSE)
+
 #copy the LD reference data to lscratch
 system(paste0("cp -r /data/zhangh24/software/PRScsx/1KGLD/ldblk_1kg_eur ",temp.dir,"1KGLD"))
 system(paste0("cp -r /data/zhangh24/software/PRScsx/1KGLD/ldblk_1kg_",tolower(eth[i])," ",temp.dir,"1KGLD"))
@@ -394,6 +395,12 @@ for(k in 1:4){
 time_prs_csx_train_end = proc.time()
 #calculate prs for the two coefficients
 phi_ch = c("1e+00","1e-02","1e-04","1e-06")
+dir.create(paste0('/lscratch/',sid,'/test/prs/'),showWarnings = FALSE)
+temp.dir.prs = paste0('/lscratch/',sid,'/test/prs/')
+system(paste0("cp ",out.dir,"AFR_test_mega_chr22.bed ",temp.dir,"AFR_test_mega_chr22.bed"))
+system(paste0("cp ",out.dir,"AFR_test_mega_chr22.bim ",temp.dir,"AFR_test_mega_chr22.bim"))
+system(paste0("cp ",out.dir,"AFR_test_mega_chr22.fam ",temp.dir,"AFR_test_mega_chr22.fam"))
+
 for(k in 1:4){
   data_list = list()
   for(i_eth in 1:2){
