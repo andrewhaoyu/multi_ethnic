@@ -46,6 +46,7 @@ system(paste0("cp ",out.dir,"EUR_ref_chr22.fam ",temp.dir,"EUR_ref_chr22.fam"))
 setwd("/data/zhangh24/multi_ethnic/")
 r2_vec = c(0.01,0.05,0.1,0.2,0.5,0.8)
 wc_base_vec = c(50,100)
+n.test = 10000
 for(r_ind in 1:length(r2_vec)){
   wc_vec = wc_base_vec/r2_vec[r_ind]
   for(w_ind in 1:length(wc_vec)){
@@ -180,7 +181,7 @@ r2_ind_vec <- rep(0,length(pthres)^2*length(r2_vec)*length(wc_base_vec))
 wc_ind_vec <- rep(0,length(pthres)^2*length(r2_vec)*length(wc_base_vec))
 
 temp = 1
-n.test = 10000
+
 for(r_ind in 1:length(r2_vec)){
   wc_vec = wc_base_vec/r2_vec[r_ind]
   for(w_ind in 1:length(wc_vec)){
@@ -283,7 +284,6 @@ r2_ind_vec <- rep(0,length(pthres)^2*length(r2_vec)*length(wc_base_vec))
 wc_ind_vec <- rep(0,length(pthres)^2*length(r2_vec)*length(wc_base_vec))
 prs.mat <- matrix(0,n.test,length(pthres)^2*length(r2_vec)*length(wc_base_vec))
 temp = 1
-n.test = 10000
 for(r_ind in 1:length(r2_vec)){
   wc_vec = wc_base_vec/r2_vec[r_ind]
   for(w_ind in 1:length(wc_vec)){
@@ -356,7 +356,7 @@ save(time_vec,file = paste0(out.dir,"TDLD_SLEB_trep_",t_rep,".rdata"))
 #prs-csx run time
 rm(list = ls())
 time_prscsx_start = proc.time()
-
+n.test = 10000
 i = 2
 phi = c(1,1E-02,1E-04,1E-06)
 library(data.table)
@@ -451,7 +451,7 @@ weight_matrix = matrix(0,4,2)
 for(k in 1:4){
   filename = paste0(temp.dir.prs,"prs_csx_",eth[i],"_phi",phi[k],".sscore")
   prs.temp <- fread(filename) 
-  prs.score <- as.matrix(prs.temp[(1):(n.test),5:6])
+  prs.score <- as.matrix(prs.temp[(1:n.test),5:6])
   model1 <- lm(y_test~prs.score)
   r2.vec.test[k] = summary(model1)$r.square
   weight_matrix[k,] = coef(model1)[2:3]
@@ -460,7 +460,7 @@ for(k in 1:4){
 idx_max <- which.max(r2.vec.test)
 filename = paste0(temp.dir.prs,"prs_csx_",eth[i],"_phi",phi[idx_max],".sscore")
 prs.temp <- fread(filename) 
-prs.score <- as.matrix(prs.temp[(1):(n.test),5:6])
+prs.score <- as.matrix(prs.temp[(1:n.test),5:6])
 best_prs = prs.score%*%weight_matrix[idx_max,]
 model1 <- lm(y_test~best_prs)
 time_prs_csx_calculate_r2_end = proc.time()

@@ -1,7 +1,7 @@
 args = commandArgs(trailingOnly = T)
 t_rep = as.numeric(args[[1]])
 #test the running time and memory for TDLD-SLEB and PRS-CSx on CHR 22
-time1 = proc.time()
+time_ct_sleb_start = proc.time()
 i = 2
 library(data.table)
 library(dplyr)
@@ -82,7 +82,7 @@ for(r_ind in 1:length(r2_vec)){
     temp = temp + 1
   }
 }
-
+time_ct_end = proc.time()
 #combine the LD clumping results
 #calculate prs
 #create q-value file for prs analysis
@@ -166,7 +166,7 @@ prs_tun = prs_mat[1:10000,]
 #create prediction r2 vector to store r2 for different prs
 n.total.prs = length(pthres)^2*length(r2_vec)*length(wc_base_vec)
 prs_r2_vec_test = rep(0,n.total.prs)
-  
+time_prs1_end = proc.time()
 
 
 #find the optimal r2 performance based on testing data
@@ -214,6 +214,7 @@ p.k1 =pthres_vec1[idx]
 p.k2 = pthres_vec2[idx]
 r_ind = r2_ind_vec[idx]
 w_ind = wc_ind_vec[idx]
+time_first_compute_r2_end = proc.time()
 #compute the prs based on TDLD clumping results
 source("/data/zhangh24/multi_ethnic/code/stratch/EB_function.R")
 LD.EUR <- as.data.frame(fread(paste0(temp.dir,eth[1],"_LD_clump_two_dim_rind_",r_ind,"_wcind_",w_ind,".clumped")))
@@ -256,6 +257,7 @@ post_beta_tar = EBpostMulti(beta_tar,sd_tar,
                             sd_other_mat,
                             prior.sigma)[,1,drop=F]
 summary.com$BETA = post_beta_tar
+time_eb_end = proc.time()
 #calculate the prs using TDLD-EB
 for(r_ind in 1:length(r2_vec)){
   wc_vec = wc_base_vec/r2_vec[r_ind]
@@ -295,6 +297,7 @@ for(r_ind in 1:length(r2_vec)){
   
   
 }
+
 load(paste0(out.dir,"y_test.rdata"))
 r2.vec.test <- rep(0,length(pthres)^2*length(r2_vec)*length(wc_base_vec))
 pthres_vec1 <- rep(0,length(pthres)^2*length(r2_vec)*length(wc_base_vec))
@@ -326,6 +329,7 @@ for(r_ind in 1:length(r2_vec)){
     }
   }
 }
+time_prs2_end = proc.time()
 prs.sum = colSums(prs.mat)
 idx <- which(prs.sum!=0)
 #drop the prs with all 0
@@ -361,5 +365,13 @@ sl = SuperLearner(Y = y_test, X = prs.mat, family = gaussian(),
                   # V = 3,
                   SL.library = SL.libray)
 #y.pred <- predict(sl, x.vad, onlySL = TRUE)
-time = proc.time()-time1
-save(time,file = paste0(out.dir,"TDLD_SLEBalleth_trep_",t_rep,".rdata"))
+time_super_learning_end = proc.time()
+y.pred <- predict(sl, prs.mat, onlySL = TRUE)
+model = lm(y_test~y.pred[[1]])
+time_ct_sleb_end = proc.time()
+total_time = time_ct_sleb_end-time_ct_sleb_start
+train_time = time_ct_end - time_ct_sleb_start + time_eb_end - time_first_compute_r2_end + time_super_learning_end - time_prs2_end
+prs_time = time_prs1_end - time_ct_end + time_prs2_end - time_eb_end
+compute_r2_time = time_first_compute_r2_end - time_prs1_end + time_ct_sleb_end - time_super_learning_end
+time_vec = rbind(total_time,train_time,prs_time,compute_r2_time)
+save(time_vec,file = paste0(out.dir,"TDLD_SLEBalleth_trep_",t_rep,".rdata"))
