@@ -345,13 +345,13 @@ time_super_learning_end = proc.time()
 y.pred <- predict(sl, prs.mat, onlySL = TRUE)
 model = lm(y_test~y.pred[[1]])
 time_ct_sleb_end = proc.time()
-total_time = time_super_learning_end-time_ct_sleb_end
+total_time = time_ct_sleb_end-time_ct_sleb_start
 train_time = time_ct_end - time_ct_sleb_start + time_eb_end - time_first_compute_r2_end + time_super_learning_end - time_prs2_end
 prs_time = time_prs1_end - time_ct_end + time_prs2_end - time_eb_end
 compute_r2_time = time_first_compute_r2_end - time_prs1_end + time_ct_sleb_end - time_super_learning_end
 time_vec = rbind(total_time,train_time,prs_time,compute_r2_time)
 
-save(time,file = paste0(out.dir,"TDLD_SLEB_trep_",t_rep,".rdata"))
+save(time_vec,file = paste0(out.dir,"TDLD_SLEB_trep_",t_rep,".rdata"))
 
 #prs-csx run time
 rm(list = ls())
@@ -394,57 +394,67 @@ for(k in 1:4){
 time_prs_csx_train_end = proc.time()
 #calculate prs for the two coefficients
 phi_ch = c("1e+00","1e-02","1e-04","1e-06")
-#calcualte prs for EUR
-prs = fread(paste0(out.dir,"test_",eth[i],
-                   "_pst_eff_a1_b0.5_phi",phi_ch[k],"_chr22.txt"))
-prs = prs %>% select(V1,V2,V6)
-#load AFR summary data
-load(paste0(out.dir,"tar_sumdata.rdata"))
-prs.match = left_join(prs,summary.tar,by=c("V2"="rs_id"))
-dir.create(paste0('/lscratch/',sid,'/test/prs/'),showWarnings = FALSE)
-temp.dir.prs = paste0('/lscratch/',sid,'/test/prs/')
-system(paste0("cp ",out.dir,"AFR_ref_chr22.bed ",temp.dir,"AFR_ref_chr22.bed"))
-system(paste0("cp ",out.dir,"AFR_ref_chr22.bim ",temp.dir,"AFR_ref_chr22.bim"))
-system(paste0("cp ",out.dir,"AFR_ref_chr22.fam ",temp.dir,"AFR_ref_chr22.fam"))
-prs.file <- prs.match %>% 
-  select(SNP,A1,BETA)
-colSums(is.na(prs.file))
-write.table(prs.file,file = paste0(temp.dir.prs,"prs_file"),col.names = T,row.names = F,quote=F)
-
-res = system(paste0("/data/zhangh24/software/plink2_alpha --score-col-nums 3 --threads 2 --score ",temp.dir.prs,"prs_file  header no-mean-imputation --bfile ",temp.dir,"AFR_ref_chr22  --out ",temp.dir.prs,"prs_csx_",eth[i],"_phi",phi[k]))
-prs = fread(paste0(out.dir,"test_",eth[1],
-                   "_pst_eff_a1_b0.5_phi",phi_ch[k],"_chr22.txt"))
-prs = prs %>% select(V1,V2,V6)
-prs.match = left_join(prs,summary.tar,by=c("V2"="rs_id"))
-prs.file <- prs.match %>% 
-  select(SNP,A1,BETA)
-colSums(is.na(prs.file))
-write.table(prs.file,file = paste0(temp.dir.prs,"prs_file"),col.names = T,row.names = F,quote=F)
-
-res = system(paste0("/data/zhangh24/software/plink2_alpha --score-col-nums 3 --threads 2 --score ",temp.dir.prs,"prs_file  header no-mean-imputation --bfile ",temp.dir,"AFR_ref_chr22  --out ",temp.dir.prs,"prs_csx_",eth[i],"_phi",phi[k]))
+for(k in 1:4){
+  data_list = list()
+  for(i_eth in 1:2){
+    data = fread(paste0(out.dir,"test_",eth[i_eth],
+                        "_pst_eff_a1_b0.5_phi",phi_ch[k],"_chr22.txt"))
+    data_temp = data %>% select(V2, V4)
+    data_list[[i_eth]] = data_temp
+  }
+  snp_set = rbindlist(data_list) %>% distinct()
+  colnames(snp_set) = c("SNP", "A1")
+  BETA_mat = matrix(0,nrow(snp_set),2)
+  temp = 1
+  for(i_eth in 1:2){
+    data = fread(paste0(out.dir,"test_",eth[i_eth],
+                        "_pst_eff_a1_b0.5_phi",phi_ch[k],"_chr22.txt"))
+    data_tar = data %>% select(V2, V6)
+    snp_set_temp = left_join(snp_set, data_tar, by = c("SNP"="V2")) %>% 
+      mutate(BETA = ifelse(is.na(V6),0,V6))
+    BETA_mat[, temp] = snp_set_temp$BETA
+    temp = temp + 1
+  }
+  load(paste0(out.dir,"tar_sumdata.rdata"))
+  summary.tar.select = summary.tar %>% 
+    select(SNP,rs_id)
+  prs_file = cbind(snp_set,BETA_mat)
+  colnames(prs_file)[1] = "rs_id"
+  prs.match = left_join(prs_file,summary.tar.select,by="rs_id")
+  #replace the rs_id with SNP ID in 1KG genomes
+  prs_file[,1] = prs.match[,"SNP"]
+  colnames(prs_file)[1] = "SNP"
+  
+  n_col = ncol(prs_file)
+  #file_out = paste0("/data/zhangh24/multi_ethnic/result/AOU/prs/PRSCSx/",eth[i],"/",trait,"")
+  write.table(prs_file,file = paste0(temp.dir,"prs_file"),col.names = T,row.names = F,quote=F)
+  
+  ncol = ncol(prs_file)
+  res = system(paste0("/data/zhangh24/software/plink2_alpha ",
+                      "--score-col-nums 3-",n_col," --threads 2 ",
+                      "--score ",temp.dir,"prs_file cols=+scoresums,-scoreavgs header no-mean-imputation ",
+                      "--bfile ", temp.dir,"AFR_test_mega_chr22 ",
+                      "--out ",temp.dir.prs,"prs_csx_",eth[i],"_phi",phi[k]))
+  
+  
+}
 time_prs_csx_calculate_prs_end = proc.time()
 r2.vec.test = rep(0,4)
-weight_matrix = c(0,4,2)
+weight_matrix = matrix(0,4,2)
 for(k in 1:4){
-  filename = paste0(temp.dir.prs,"prs_csx_",eth[1],"_phi",phi[k])
+  filename = paste0(temp.dir.prs,"prs_csx_",eth[i],"_phi",phi[k],".sscore")
   prs.temp <- fread(filename) 
-  prs.score1 <- prs.temp$SCORE[(1):(n.test)]
-  filename = paste0(temp.dir.prs,"prs_csx_",eth[2],"_phi",phi[k])
-  prs.temp <- fread(filename) 
-  prs.score2 <- prs.temp$SCORE[(1):(n.test)]
-  model1 <- lm(y_test~prs.score1+prs.score2)
+  prs.score <- as.matrix(prs.temp[(1):(n.test),5:6])
+  model1 <- lm(y_test~prs.score)
   r2.vec.test[k] = summary(model1)$r.square
   weight_matrix[k,] = coef(model1)[2:3]
   
 }
 idx_max <- which.max(r2.vec.test)
-filename = paste0(temp.dir.prs,"prs_csx_",eth[1],"_phi",phi[idx_max])
+filename = paste0(temp.dir.prs,"prs_csx_",eth[i],"_phi",phi[idx_max],".sscore")
 prs.temp <- fread(filename) 
-prs.score1 <- prs.temp$SCORE[(1):(n.test)]
-filename = paste0(temp.dir.prs,"prs_csx_",eth[2],"_phi",phi[idx_max])
-prs.temp <- fread(filename) 
-prs.score2 <- prs.temp$SCORE[(1):(n.test)]
-best_prs = as.matrix(cbind(prs.score1,prs.score2))%*%weight_matrix[idx_max,]
+prs.score <- as.matrix(prs.temp[(1):(n.test),5:6])
+best_prs = prs.score%*%weight_matrix[idx_max,]
 model1 <- lm(y_test~best_prs)
 time_prs_csx_calculate_r2_end = proc.time()
 
@@ -455,4 +465,4 @@ prs_time = time_prs_csx_calculate_prs_end - time_prs_csx_train_end
 compute_r2_time = time_prs_csx_calculate_r2_end - time_prs_csx_calculate_prs_end
 time_vec = rbind(total_time,train_time,prs_time,compute_r2_time)
 
-save(time,file = paste0(out.dir,"prscsx_trep_",t_rep,"_phi_",k,".rdata"))
+save(time_vec,file = paste0(out.dir,"prscsx_trep_",t_rep,"_phi_",k,".rdata"))

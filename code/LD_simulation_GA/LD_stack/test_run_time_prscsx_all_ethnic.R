@@ -53,7 +53,7 @@ temp.dir.prs = paste0('/lscratch/',sid,'/test/prs/')
 system(paste0("cp ",out.dir,"AFR_test_mega_chr22.bed ",temp.dir,"AFR_test_mega_chr22.bed"))
 system(paste0("cp ",out.dir,"AFR_test_mega_chr22.bim ",temp.dir,"AFR_test_mega_chr22.bim"))
 system(paste0("cp ",out.dir,"AFR_test_mega_chr22.fam ",temp.dir,"AFR_test_mega_chr22.fam"))
-time2 = proc.time()
+
 data_list = list()
 for(i_eth in 1:5){
   data = fread(paste0(out.dir,"test_five_",eth[i_eth],
@@ -95,56 +95,19 @@ res = system(paste0("/data/zhangh24/software/plink2_alpha ",
                     "--bfile ", temp.dir,"AFR_test_mega_chr22 ",
                     "--out ",temp.dir.prs,"prs_csx_",eth[i],"_phi",phi[k]))
 time_prs_csx_calculate_prs_end = proc.time()
-r2.vec.test = rep(0,4)
-weight_matrix = c(0,4,5)
-for(k in 1:4){
-  filename = paste0(temp.dir.prs,"prs_csx_",eth[1],"_phi",phi[k])
-  prs.temp <- fread(filename) 
-  prs.score1 <- prs.temp$SCORE[(1):(n.test)]
-  filename = paste0(temp.dir.prs,"prs_csx_",eth[2],"_phi",phi[k])
-  prs.temp <- fread(filename) 
-  prs.score2 <- prs.temp$SCORE[(1):(n.test)]
-  filename = paste0(temp.dir.prs,"prs_csx_",eth[3],"_phi",phi[k])
-  prs.temp <- fread(filename) 
-  prs.score3 <- prs.temp$SCORE[(1):(n.test)]
-  filename = paste0(temp.dir.prs,"prs_csx_",eth[4],"_phi",phi[k])
-  prs.temp <- fread(filename) 
-  prs.score4 <- prs.temp$SCORE[(1):(n.test)]
-  filename = paste0(temp.dir.prs,"prs_csx_",eth[5],"_phi",phi[k])
-  prs.temp <- fread(filename) 
-  prs.score5 <- prs.temp$SCORE[(1):(n.test)]
-  model1 <- lm(y_test~prs.score1+prs.score2+prs.score3+prs.score4+prs.score5)
-  r2.vec.test[k] = summary(model1)$r.square
-  weight_matrix[k,] = coef(model1)[2:5]
-  
-}
-idx_max <- which.max(r2.vec.test)
-filename = paste0(temp.dir.prs,"prs_csx_",eth[1],"_phi",phi[idx_max])
-filename = paste0(temp.dir.prs,"prs_csx_",eth[1],"_phi",phi[k])
-prs.temp <- fread(filename) 
-prs.score1 <- prs.temp$SCORE[(1):(n.test)]
-filename = paste0(temp.dir.prs,"prs_csx_",eth[2],"_phi",phi[k])
-prs.temp <- fread(filename) 
-prs.score2 <- prs.temp$SCORE[(1):(n.test)]
-filename = paste0(temp.dir.prs,"prs_csx_",eth[3],"_phi",phi[k])
-prs.temp <- fread(filename) 
-prs.score3 <- prs.temp$SCORE[(1):(n.test)]
-filename = paste0(temp.dir.prs,"prs_csx_",eth[4],"_phi",phi[k])
-prs.temp <- fread(filename) 
-prs.score4 <- prs.temp$SCORE[(1):(n.test)]
-filename = paste0(temp.dir.prs,"prs_csx_",eth[5],"_phi",phi[k])
-prs.temp <- fread(filename) 
-prs.score5 <- prs.temp$SCORE[(1):(n.test)]
-best_prs = as.matrix(cbind(prs.score1,prs.score2,prs.score3,prs.score4,prs.score5))%*%weight_matrix[idx_max,]
-model1 <- lm(y_test~best_prs)
-time_prs_csx_calculate_r2_end = proc.time()
-time_prs = proc.time()-time2
 
+
+  filename = paste0(temp.dir.prs,"prs_csx_",eth[i],"_phi",phi[k],".sscore")
+  prs.temp <- fread(filename) 
+  prs.score <- as.matrix(prs.temp[(1):(n.test),5:9])
+  model1 <- lm(y_test~prs.score)
+  r2.vec.test = summary(model1)$r.square
+time_prs_csx_calculate_r2_end = proc.time()
 total_time = time_prs_csx_calculate_r2_end - time_prscsx_start
 train_time = time_prs_csx_train_end - time_prscsx_start
 prs_time = time_prs_csx_calculate_prs_end - time_prs_csx_train_end 
 compute_r2_time = time_prs_csx_calculate_r2_end - time_prs_csx_calculate_prs_end
 time_vec = rbind(total_time,train_time,prs_time,compute_r2_time)
-save(time_list,file = paste0(out.dir,"prscsx_five_trep_",t_rep,"_phi_",k,".rdata"))
+save(time_vec,file = paste0(out.dir,"prscsx_five_trep_",t_rep,"_phi_",k,".rdata"))
 #system(paste0("mv ",temp.dir.prs,"/prs_csx_",eth[i],"_rho_",l,"_size_",m,"_GA_",i1,"_phi",phi[v],".sscore ",out.dir.sum,eth[i],"/prscsx/"))
 
