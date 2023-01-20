@@ -182,21 +182,6 @@ pthres_vec2 <- rep(0,length(pthres)^2*length(r2_vec)*length(wc_base_vec))
 r2_ind_vec <- rep(0,length(pthres)^2*length(r2_vec)*length(wc_base_vec))
 wc_ind_vec <- rep(0,length(pthres)^2*length(r2_vec)*length(wc_base_vec))
 
-for(p_ind in 1:n.total.prs){
-  #the first two columns of prs_tun are family id and individual id
-  #prs starts from the third column
-  model = lm(y_test~prs_tun[,(2+p_ind)])
-  prs_r2_vec_test[p_ind] = summary(model)$r.square
-}
-max_ind = which.max(prs_r2_vec_test)
-#+2 is due to the first two columns are family id and individual id
-print(colnames(prs_tun)[max_ind+2])
-r2.vec.test <- rep(0,length(pthres)^2*length(r2_vec)*length(wc_base_vec))
-pthres_vec1 <- rep(0,length(pthres)^2*length(r2_vec)*length(wc_base_vec))
-pthres_vec2 <- rep(0,length(pthres)^2*length(r2_vec)*length(wc_base_vec))
-r2_ind_vec <- rep(0,length(pthres)^2*length(r2_vec)*length(wc_base_vec))
-wc_ind_vec <- rep(0,length(pthres)^2*length(r2_vec)*length(wc_base_vec))
-
 temp = 1
 n.test = 10000
 for(r_ind in 1:length(r2_vec)){
