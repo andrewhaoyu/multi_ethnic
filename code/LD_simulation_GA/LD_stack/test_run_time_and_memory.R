@@ -356,7 +356,7 @@ save(time_vec,file = paste0(out.dir,"TDLD_SLEB_trep_",t_rep,".rdata"))
 #prs-csx run time
 rm(list = ls())
 time_prscsx_start = proc.time()
-load(paste0(out.dir,"y_test.rdata"))
+
 n.test = 10000
 i = 2
 phi = c(1,1E-02,1E-04,1E-06)
@@ -373,6 +373,7 @@ system(paste0("cp -r /data/zhangh24/software/PRScsx/1KGLD/ldblk_1kg_eur ",temp.d
 system(paste0("cp -r /data/zhangh24/software/PRScsx/1KGLD/ldblk_1kg_",tolower(eth[i])," ",temp.dir,"1KGLD"))
 system(paste0("cp /data/zhangh24/software/PRScsx/1KGLD/snpinfo_mult_1kg_hm3 ",temp.dir,"1KGLD"))
 out.dir <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/time_mem/"
+load(paste0(out.dir,"y_test.rdata"))
 phi = c(1,1E-02,1E-04,1E-06)
 m = 1;j = 22
 path_to_ref = paste0(temp.dir,"1KGLD")
