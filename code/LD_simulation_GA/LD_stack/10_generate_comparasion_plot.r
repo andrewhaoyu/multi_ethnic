@@ -1,4 +1,4 @@
-setwd("/Users/zhangh24/GoogleDrive/multi_ethnic/result/LD_simulation_GA/LD_stack/")
+setwd("/Users/zhangh24/Library/CloudStorage/Box-Box/multi_ethnic/result/LD_simulation_GA/LD_stack/")
 source("../../../code/LD_simulation_large/theme_Publication.R")
 library(ggplot2)
 library(ggsci)
@@ -75,7 +75,7 @@ load(paste0("LDpredEUR.result.rdata"))
 load("xpass.result.rdata")
 load("polypred.result.rdata")
 polypred.result = polypred.result %>% 
-  mutate(method_vec = "PolyPred+")
+  mutate(method_vec = "PolyPred-S+")
 prediction.result <- rbind(LD.clump.result,
                            R2.ldpred2,
                            eursnp.result,
@@ -118,7 +118,7 @@ prediction.result = prediction.result %>%
                                         "Best EUR PRS (LDpred2)",
                                         "Weighted PRS (CT)",
                                         "Weighted PRS (LDpred2)",
-                                        "PolyPred+", 
+                                        "PolyPred-S+", 
                                         "XPASS", 
                                         "PRS-CSx",
                                         "PRS-CSx (five ancestries)",
@@ -140,7 +140,7 @@ uvals = factor(c("CT",
                  "Best EUR PRS (LDpred2)",
                  "Weighted PRS (CT)",
                  "Weighted PRS (LDpred2)",
-                 "PolyPred+", 
+                 "PolyPred-S+", 
                  "XPASS", 
                  "PRS-CSx",
                  "PRS-CSx (five ancestries)",
@@ -153,7 +153,7 @@ uvals = factor(c("CT",
             "Best EUR PRS (LDpred2)",
             "Weighted PRS (CT)",
             "Weighted PRS (LDpred2)",
-            "PolyPred+", 
+            "PolyPred-S+", 
             "XPASS", 
             "PRS-CSx",
             "PRS-CSx (five ancestries)",
@@ -168,7 +168,7 @@ n.multi = 9
 
 single.color =  brewer.pal(n.single, "Blues")[c(4,7)]
 
-EUR.color = brewer.pal(n.EUR, "RdPu")[c(4,7)]
+EUR.color = brewer.pal(n.EUR, "Reds")[c(4,7)]
 
 weighted.color = brewer.pal(n.multi, "Greens")[c(3,5,7)]
 
@@ -192,7 +192,7 @@ col_df = tibble(
                        ) ~ "EUR PRS based method",
                        method_vec%in%c("Weighted PRS (CT)",
                                        "Weighted PRS (LDpred2)",
-                                       "PolyPred+"
+                                       "PolyPred-S+"
                        ) ~ "Weighted PRS method",
                        method_vec%in%c("XPASS",
                                        "PRS-CSx",
@@ -234,9 +234,9 @@ run_plot = function(filler, values) {
     labs(fill = filler)+
     scale_fill_manual(values = values)
 }
-setwd("/Users/zhangh24/GoogleDrive/multi_ethnic/result/LD_simulation_GA/LD_stack/simulation_result_figure/")
+setwd("/Users/zhangh24/Library/CloudStorage/Box-Box/multi_ethnic/result/LD_simulation_GA/LD_stack/simulation_result_figure/")
 library(cowplot)
-m = 1‘
+m = 1
 for(m in 1:4){
   for(i1 in 1:5){
     
@@ -259,7 +259,7 @@ for(m in 1:4){
     p.null <- ggplot(prediction.result.sub,aes(x= sample_size,y=r2.vec,group=method_vec))+
       geom_bar(aes(fill=method_vec),
                stat="identity",
-               position = position_dodge())+
+               position = position_dodge(1))+
       #geom_point(aes(color=method_vec))+
       theme_Publication()+
       ylab(expression(bold(R^2)))+
@@ -276,7 +276,7 @@ for(m in 1:4){
     #print(p.null)
     
     p = plot_grid(p.null,p.leg,nrow=1,rel_widths = c(3.5,1))
-    #print(p)
+    print(p)
     #print(p)
     png(file = paste0("./method_compare_result_size_",m,"_summary_GA_",i1,".png"),
         width = 19, height = 12, res = 300,units = "in")

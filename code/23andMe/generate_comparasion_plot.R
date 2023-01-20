@@ -1,4 +1,4 @@
-setwd("/Users/zhangh24/GoogleDrive/multi_ethnic/result/23andme/PT_summary/")
+setwd("/Users/zhangh24/Library/CloudStorage/Box-Box/multi_ethnic/result/23andme/PT_summary/")
 eth_group = c("european","african_american",
               "latino","east_asian","south_asian")
 eth_name = c("European","African American",
@@ -40,14 +40,14 @@ method_name = c("CT","Best EUR PRS (CT)",
                 "CT-SLEB",
                 "CT-SLEB (five ancestries)",
                 "XPASS", 
-                "PolyPred+",
+                "PolyPred-S+",
                 "PRS-CSx (five ancestries)",
                 "Weighted PRS (LDpred2)")
 
 besteur_methodname = c("Best EUR PRS (CT)",
                        "Best EUR PRS + target coefficients (CT)",
                        "Best EUR PRS + EB coefficients (CT)")
-source("/Users/zhangh24/GoogleDrive/multi_ethnic/code/stratch/theme_publication.R")
+source("/Users/zhangh24/Library/CloudStorage/Box-Box/multi_ethnic/code/stratch/theme_publication.R")
 pthres <- c(5E-08,5E-07,5E-06,5E-05,5E-04,5E-03,5E-02,5E-01,1.0)
 #load all results
 plot.data.list = list()
@@ -121,7 +121,7 @@ temp = 1
                                eth = rep(eth_name[i],3),
                                trait = rep(trait_name[l],3),
                                method_vec = c("XPASS", 
-                               "PolyPred+",
+                               "PolyPred-S+",
                                "PRS-CSx (five ancestries)"))
         colnames(plot.data)[1] = "result"
         plot.data.list[[temp]] = plot.data
@@ -157,7 +157,7 @@ temp = 1
 }
 prediction.result = rbindlist(plot.data.list)
 #load LDPred2 single ethic results
-load("/Users/zhangh24/GoogleDrive/multi_ethnic/result/23andme/R2.ldpred2.RData")
+load("/Users/zhangh24/Library/CloudStorage/Box-Box/multi_ethnic/result/23andme/R2.ldpred2.RData")
 eth_group = c("european","african_american",
               "latino","east_asian","south_asian")
 eth_name = c("European","African American",
@@ -212,7 +212,7 @@ prediction.result$method_vec = factor(prediction.result$method_vec,
                                                  "Best EUR PRS (LDpred2)",
                                                  "Weighted PRS (CT)",
                                                  "Weighted PRS (LDpred2)",
-                                                 "PolyPred+",
+                                                 "PolyPred-S+",
                                                  "XPASS",
                                                  "PRS-CSx",
                                                  "PRS-CSx (five ancestries)",
@@ -224,8 +224,8 @@ prediction.result$eth = factor(prediction.result$eth,
                        levels = c("European","African American",
                                   "Latino","East Asian","South Asian"))
 
-save(prediction.result,file = "/Users/zhangh24/GoogleDrive/multi_ethnic/result/23andme/prediction_summary.rdata")
-#write.csv(prediction.result, file = "/Users/zhangh24/GoogleDrive/multi_ethnic/result/23andme/prediction_summary.csv")
+save(prediction.result,file = "/Users/zhangh24/Library/CloudStorage/Box-Box/multi_ethnic/result/23andme/prediction_summary.rdata")
+#write.csv(prediction.result, file = "/Users/zhangh24/Library/CloudStorage/Box-Box/multi_ethnic/result/23andme/prediction_summary.csv")
 sigma2toauc = function(x){
   ifelse(x==0,0.50,round(pnorm(0.5*sqrt(x)),2))
 }
@@ -234,7 +234,7 @@ prediction.result.table = prediction.result %>%
   mutate(sigma2 = ifelse(trait%in%
                            c("Heart metabolic disease burden","Height"),NA,sigma2)) %>% 
   select(eth,trait,Method,result,sigma2)
-# write.csv(prediction.result.table,file = "/Users/zhangh24/GoogleDrive/multi_ethnic/result/23andme/prediction_summary.csv",row.names = F)
+# write.csv(prediction.result.table,file = "/Users/zhangh24/Library/CloudStorage/Box-Box/multi_ethnic/result/23andme/prediction_summary.csv",row.names = F)
 
 uvals = factor(c("CT",
                  "LDpred2",
@@ -242,7 +242,7 @@ uvals = factor(c("CT",
                  "Best EUR PRS (LDpred2)",
                  "Weighted PRS (CT)",
                  "Weighted PRS (LDpred2)",
-                 "PolyPred+", 
+                 "PolyPred-S+", 
                  "XPASS", 
                  "PRS-CSx",
                  "PRS-CSx (five ancestries)",
@@ -255,7 +255,7 @@ uvals = factor(c("CT",
             "Best EUR PRS (LDpred2)",
             "Weighted PRS (CT)",
             "Weighted PRS (LDpred2)",
-            "PolyPred+", 
+            "PolyPred-S+", 
             "XPASS", 
             "PRS-CSx",
             "PRS-CSx (five ancestries)",
@@ -270,7 +270,7 @@ n.EUR = 9
 n.multi = 9
 single.color =  brewer.pal(n.single, "Blues")[c(4,7)]
 
-EUR.color = brewer.pal(n.EUR, "RdPu")[c(4,7)]
+EUR.color = brewer.pal(n.EUR, "Reds")[c(4,7)]
 
 weighted.color = brewer.pal(n.multi, "Greens")[c(3,5,7)]
 
@@ -294,7 +294,7 @@ col_df = tibble(
                        ) ~ "EUR PRS based method",
                        method_vec%in%c("Weighted PRS (CT)",
                                        "Weighted PRS (LDpred2)",
-                                       "PolyPred+"
+                                       "PolyPred-S+"
                        ) ~ "Weighted PRS method",
                        method_vec%in%c("XPASS",
                                        "PRS-CSx",
@@ -398,7 +398,7 @@ prediction.result.sub = prediction.result.sub %>%
 
 p.null <- ggplot(prediction.result.sub)+
   geom_bar(aes(x = index,y = result,fill=method_vec),
-           position = position_dodge(),
+           position = position_dodge(1),
            stat = "identity")+
   theme_Publication()+
   ylab("Adjusted AUC")+
@@ -460,7 +460,7 @@ prediction.result.sub = prediction.result %>%
 
 p.null <- ggplot(prediction.result.sub)+
   geom_bar(aes(x = index,y = result,fill=method_vec),
-           position = position_dodge(),
+           position = position_dodge(1),
            stat = "identity")+
   theme_Publication()+
   ylab(expression(bold(paste("Adjusted ",R^2))))+
@@ -518,3 +518,4 @@ result %>%
   group_by(eth) %>% 
   summarise(mean(relative_R2))
 prediction.result.sub %>% filter(trait =="Any CVD")
+

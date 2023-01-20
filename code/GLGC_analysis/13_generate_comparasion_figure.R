@@ -21,7 +21,7 @@ weightedprs.result = final_result %>%
   mutate(method = "Weighted PRS (CT)")
 load("polypred.rdata")
 polypred.result = final_result %>% 
-  mutate(method = "PolyPred+")
+  mutate(method = "PolyPred-S+")
 load("xpass.rdata")
 xpass.result = final_result
 load("prscsx.rdata")
@@ -82,7 +82,7 @@ prediction.result = prediction.result %>%
                                         "Best EUR PRS (LDpred2)",
                                         "Weighted PRS (CT)",
                                         "Weighted PRS (LDpred2)",
-                                        "PolyPred+", 
+                                        "PolyPred-S+", 
                                         "XPASS", 
                                         "PRS-CSx",
                                         "PRS-CSx (five ancestries)",
@@ -97,7 +97,7 @@ uvals = factor(c("CT",
                   "Best EUR PRS (LDpred2)",
                   "Weighted PRS (CT)",
                   "Weighted PRS (LDpred2)",
-                  "PolyPred+", 
+                  "PolyPred-S+", 
                   "XPASS", 
                   "PRS-CSx",
                   "PRS-CSx (five ancestries)",
@@ -110,7 +110,7 @@ uvals = factor(c("CT",
                    "Best EUR PRS (LDpred2)",
                    "Weighted PRS (CT)",
                    "Weighted PRS (LDpred2)",
-                   "PolyPred+", 
+                   "PolyPred-S+", 
                    "XPASS", 
                    "PRS-CSx",
                    "PRS-CSx (five ancestries)",
@@ -149,7 +149,7 @@ n.multi = 9
 
 single.color =  brewer.pal(n.single, "Blues")[c(4,7)]
 
-EUR.color = brewer.pal(n.EUR, "RdPu")[c(4,7)]
+EUR.color = brewer.pal(n.EUR, "Reds")[c(4,7)]
 
 weighted.color = brewer.pal(n.multi, "Greens")[c(3,5,7)]
 
@@ -173,7 +173,7 @@ col_df = tibble(
                        ) ~ "EUR PRS based method",
                        method_vec%in%c("Weighted PRS (CT)",
                                        "Weighted PRS (LDpred2)",
-                                       "PolyPred+"
+                                       "PolyPred-S+"
                        ) ~ "Weighted PRS method",
                        method_vec%in%c("XPASS",
                                        "PRS-CSx",
@@ -215,7 +215,7 @@ run_plot = function(filler, values) {
         group=method_vec))+
     geom_bar(aes(fill = method_vec),
              stat="identity",
-             position = position_dodge())+
+             position = position_dodge(1))+
     #geom_point(aes(color=method_vec))+
     theme_Publication()+
     ylab("R2")+
@@ -236,7 +236,7 @@ library(cowplot)
 
 p.null <- ggplot(prediction.result.sub)+
   geom_bar(aes(x = index,y = result,fill=method_vec),
-           position = position_dodge(),
+           position = position_dodge(1),
            stat = "identity")+
   theme_Publication()+
   ylab(expression(bold(paste("Adjusted ",R^2))))+

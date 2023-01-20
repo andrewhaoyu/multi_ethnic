@@ -27,36 +27,38 @@ for(t_rep in 1:50){
 TDLD_SLEBalleth_time = apply(TDLD_SLEBalleth_time_vec, 2, time_function )
 
 #prs-csx two ancestries
-prscsx_time_vec = rep(0,30)
+prscsx_time_vec = matrix(0,30,4)
 for(t_rep in 1:30){
   
   #prs csx split into four sub jobs
-  total.time = 0
+  total.time = rep(0,4)
   for(k in 1:4){
-    load(paste0(out.dir,"prscsx_trep_",t_rep,"_phi_",k,".rdata"))
-    total.time = total.time + time[3]
+    load(paste0(out.dir,"prscsx_new_trep_",t_rep,"_phi_",k,".rdata"))
+    total.time = total.time + time_vec[,3]
   }
   
   
-  prscsx_time_vec[t_rep] =  total.time
+  prscsx_time_vec[t_rep,] =  total.time
 }
-prscsx_time = mean(prscsx_time_vec)/60
+prscsx_time = apply(prscsx_time_vec, 2, time_function )
 
 #prs-csx five ancestries
-prscsx_time_vec = rep(0,30)
+prscsx_time_vec = matrix(0,30,4)
 for(t_rep in 1:30){
   
   #prs csx split into four sub jobs
-  total.time = 0
+  total.time = rep(0,4)
   for(k in 1:4){
     load(paste0(out.dir,"prscsx_five_trep_",t_rep,"_phi_",k,".rdata"))
-    total.time = total.time + time_list[3]
+    total.time = total.time + time_vec[,3]
   }
   
   
-  prscsx_time_vec[t_rep] =  total.time
+  prscsx_time_vec[t_rep, ] =  total.time
 }
-prscsx_time_five = mean(prscsx_time_vec)/60
+prscsx_time_five = apply(prscsx_time_vec, 2, time_function )
 
 
-running_time = c(TDLD_SLEB_time,TDLD_SLEBalleth_time,prscsx_time)
+running_time = rbind(TDLD_SLEB_time,TDLD_SLEBalleth_time,prscsx_time,prscsx_time_five)
+
+
