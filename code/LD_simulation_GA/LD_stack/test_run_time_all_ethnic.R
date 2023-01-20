@@ -12,77 +12,101 @@ dir.create(paste0('/lscratch/',sid,'/test/LD/'),showWarnings = FALSE)
 temp.dir.LD <- paste0('/lscratch/',sid,'/test/LD/')
 eth <- c("EUR","AFR","AMR","EAS","SAS")
 out.dir <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/time_mem/"
-library(CTSLEB)
 #load EUR summary data
 load(paste0(out.dir,"eur_sumdata.rdata"))
+#only keep the id and p-value for mathching
+summary.eur.select = summary.eur %>% 
+  rename(beta_eur = BETA) %>% 
+  mutate(sd_eur=beta_eur/STAT) %>% 
+  select(SNP,A1,beta_eur,sd_eur,peur) %>% 
+  rename(A1.EUR = A1)
 #load AFR summary data
 load(paste0(out.dir,"tar_sumdata.rdata"))
-summary.eur = summary.eur %>% 
-  mutate(SE = BETA/STAT) %>% 
-  rename(P = peur)
-summary.tar = summary.tar %>% 
-  mutate(SE = BETA/STAT)
+summary.com <- left_join(summary.tar,summary.eur.select,by="SNP")
+#match alleles
+idx <- which(summary.com$A1!=summary.com$A1.EUR)
+summary.com$A1.EUR[idx] <- summary.com$A1[idx]
+summary.com$beta_eur[idx] <- -summary.com$beta_eur[idx]
+summary.com = summary.com %>% 
+  rename(beta_tar = BETA) %>% 
+  mutate(sd_tar = beta_tar/STAT)
+#select the SNPs from EUR p-value
+idx <- which(summary.com$peur<summary.com$P)
+#generate assoc files for clumping using EUR as reference
+assoc =  summary.com[idx,] %>%
+  select(SNP,peur) %>% 
+  rename(P=peur
+  )
 
-sum_com <- AlignSum(sum_tar = summary.tar,
-                    sum_other = summary.eur)
-#split the SNPs into two groups
-sum_com_split <- SplitSum(sum_com)
-#sum_com_split is a list with two data frame
-#the first data frame contains SNPs with p_eur < p_target, the P value column is from p_eur
-sum_other_ref = sum_com_split[[1]]
-#the second data frame contains target population-specific SNPs or p_eur < p_target. The p-value column is from p_target. 
-sum_tar_ref = sum_com_split[[2]]
+write.table(assoc,paste0("/lscratch/",sid,"/test/",eth[1],"_assoc.out"),col.names = T,row.names = F,quote=F)
 
-r2_vec = c(0.01,0.05,0.1,0.2,0.5,0.8)
-wc_base_vec = c(50,100)
-data.dir = temp.dir 
-soft.dir = "/data/zhangh24/software/"
-write.table(sum_other_ref,paste0(temp.dir,"sum_other_ref"),col.names = T,row.names = F,quote=F)
-write.table(sum_tar_ref,paste0(temp.dir,"sum_tar_ref"),col.names = T,row.names = F,quote=F)
 system(paste0("cp ",out.dir,"EUR_ref_chr22.bed ",temp.dir,"EUR_ref_chr22.bed"))
 system(paste0("cp ",out.dir,"EUR_ref_chr22.bim ",temp.dir,"EUR_ref_chr22.bim"))
 system(paste0("cp ",out.dir,"EUR_ref_chr22.fam ",temp.dir,"EUR_ref_chr22.fam"))
+setwd("/data/zhangh24/multi_ethnic/")
+r2_vec = c(0.01,0.05,0.1,0.2,0.5,0.8)
+wc_base_vec = c(50,100)
+n.test = 10000
+for(r_ind in 1:length(r2_vec)){
+  wc_vec = wc_base_vec/r2_vec[r_ind]
+  for(w_ind in 1:length(wc_vec)){
+    print(c(r_ind,w_ind))
+    pthr = 0.5
+    r2thr = r2_vec[r_ind]
+    kbpthr = wc_vec[w_ind]
+    eth <- c("EUR","AFR","AMR","EAS","SAS")
+    
+    #code <- rep("c",5*3*3)
+    #system(paste0("/data/zhangh24/software/plink2 --bfile /data/zhangh24/KG.plink/",eth[i],"/chr_all --clump ",cur.dir,eth[i],"/summary_out_MAF_rho_",l,"_size_",m,"_rep_",i_rep,".out --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out ",cur.dir,eth[i],"/LD_clump_rho_",l,"_size_",m,"_rep_",i_rep))
+    res = system(paste0("/data/zhangh24/software/plink2 --threads 2 --bfile ",temp.dir,"EUR_ref_chr22 --clump ",temp.dir,eth[1],"_assoc.out --clump-p1 ",pthr," --clump-r2 ",r2thr,"  --clump-kb ",kbpthr," --out ", temp.dir,eth[1],"_LD_clump_two_dim_rind_",r_ind,"_wcind_",w_ind))
+    if(res==2){
+      stop()
+    }
+    #system(paste0("mv ",temp.dir,"LD_clump_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".clumped ",out.dir,eth[i],"/"))
+  }
+}
+
+system(paste0("rm ",temp.dir,"*.bim"))
+system(paste0("rm ",temp.dir,"*.bed"))
+system(paste0("rm ",temp.dir,"*.fam"))
+
+idx <- which((summary.com$P<summary.com$peur)|is.na(summary.com$peur))
+assoc <- summary.com[idx,] %>% 
+  select(SNP,P) 
+#%>% 
+#rename(P=peur)
+write.table(assoc,paste0("/lscratch/",sid,"/test/",eth[i],"_assoc.out"),col.names = T,row.names = F,quote=F)
 system(paste0("cp ",out.dir,"AFR_ref_chr22.bed ",temp.dir,"AFR_ref_chr22.bed"))
 system(paste0("cp ",out.dir,"AFR_ref_chr22.bim ",temp.dir,"AFR_ref_chr22.bim"))
 system(paste0("cp ",out.dir,"AFR_ref_chr22.fam ",temp.dir,"AFR_ref_chr22.fam"))
 
-setwd("/data/zhangh24/multi_ethnic/")
-snp_list = list()
-temp = 1
+
 for(r_ind in 1:length(r2_vec)){
-  #create the window size given the clumping r2
   wc_vec = wc_base_vec/r2_vec[r_ind]
   for(w_ind in 1:length(wc_vec)){
-    pthr = 1
+    print(c(r_ind,w_ind))
+    pthr = 0.5
     r2thr = r2_vec[r_ind]
     kbpthr = wc_vec[w_ind]
-    #for the first group, we perform clumping using EUR as reference   
-    system(paste0(soft.dir,"plink2 ",
-                  "--bfile ",data.dir,"EUR_ref_chr22 ",
-                  "--clump ",temp.dir,"sum_other_ref ",
-                  "--clump-p1 ",pthr," ",
-                  "--clump-r2 ",r2thr," ",
-                  "--clump-kb ",kbpthr," ",
-                  "--out ", temp.dir,"EUR_ref_CT_rind_",r_ind,"_wcind_",w_ind))
-    #for the second group, we perform clumping using AFR as reference
-    system(paste0(soft.dir,"plink2 ",
-                  "--bfile ",data.dir,"AFR_ref_chr22 ",
-                  "--clump ",temp.dir,"sum_tar_ref ",
-                  "--clump-p1 ",pthr," ",
-                  "--clump-r2 ",r2thr," ",
-                  "--clump-kb ",kbpthr," ",
-                  "--out ", temp.dir,"AFR_ref_CT_rind_",r_ind,"_wcind_",w_ind))
+    eth <- c("EUR","AFR","AMR","EAS","SAS")
     
-    #combine the SNPs from the two clumping groups
-    LD_EUR= fread(paste0(temp.dir,"EUR_ref_CT_rind_",r_ind,"_wcind_",w_ind,".clumped"))[,3,drop=F]
-    LD_tar = fread(paste0(temp.dir,"AFR_ref_CT_rind_",r_ind,"_wcind_",w_ind,".clumped"))[,3,drop=F]
-    LD  = rbind(LD_EUR,LD_tar)
-    snp_list[[temp]] = LD
-    names(snp_list[[temp]]) = paste0("clump_r2_",r2thr,"_ws_",kbpthr)
-    temp = temp + 1
+    res = system(paste0("/data/zhangh24/software/plink2 --threads 2 ",
+                        "--bfile ",temp.dir,"AFR_ref_chr22 ",
+                        "--clump ",temp.dir,eth[i],"_assoc.out ",
+                        "--clump-p1 ",pthr," --clump-r2 ",r2thr,"  ",
+                        "--clump-kb ",kbpthr," --out ", temp.dir,eth[i],"_LD_clump_two_dim_rind_",r_ind,"_wcind_",w_ind))
+    if(res==2){
+      stop()
+    }
+    
   }
 }
+system(paste0("rm ",temp.dir,"*.bim"))
+system(paste0("rm ",temp.dir,"*.bed"))
+system(paste0("rm ",temp.dir,"*.fam"))
 time_ct_end = proc.time()
+dir.create(paste0('/lscratch/',sid,'/test/prs/'),showWarnings = FALSE)
+temp.dir.prs = paste0('/lscratch/',sid,'/test/prs/')
 #combine the LD clumping results
 #calculate prs
 #create q-value file for prs analysis
@@ -91,86 +115,73 @@ system(paste0("cp ",out.dir,"AFR_test_mega_chr22.bim ",temp.dir,"AFR_test_mega_c
 system(paste0("cp ",out.dir,"AFR_test_mega_chr22.fam ",temp.dir,"AFR_test_mega_chr22.fam"))
 
 
-plink_file = PreparePlinkFile(snp_list,sum_com)
+pthres <- c(5E-08,5E-07,5E-06,5E-05,5E-04,5E-03,5E-02,5E-01)
+n_pthres = length(pthres)
+q_range = data.frame(rep("p_value",n_pthres),rep(0,n_pthres),rep(0.5,n_pthres))
+temp = 1
 
-#score_file description
-#the first column contains the unique SNPs after clumping results under all combinations of r2-cutoff and window_size
-#the second column is the effect allele
-#the third to the last columns contains the regression coefficients of the target population for SNPs after LD-clumping under a specific combination of r2-cutoff and base_window_size
-#the coefficients is put as 0 if a SNP doesn't exist in the clumping results under a specific combination of r2-cutoff and base_window_size
-score_file = plink_file[[1]]
-write.table(score_file,file = paste0(temp.dir,"score_file"),row.names = F,col.names = F,quote=F)
-#p_value_file description
-#the first column is the same as score_file
-#the second column is the p-values of SNPs from the GWAS of the target population
-p_value_file = plink_file[[2]]
-# unique_infor description
-#unique_infor contains the information for all SNPs after the clumping step
-#unique_infor has SNP, CHR, BP, A1 (effect_allele), 
-#(BETA, SE, P) for the target population, 
-#(BETA_other, SE_other,P_other) for the EUR  population
-unique_infor = plink_file[[3]]
-#specific p-value threshold
-pthres <- c(5E-08,5E-07,5E-06,5E-05,5E-04,5E-03,5E-02,5E-01,1.0)
-#create q-range file
-q_range = CreateQRange(pthres)
-
-write.table(q_range,file = paste0(temp.dir,"q_range_file"),row.names = F,col.names = F,quote=F)
-
-#create a temporary p_value_file
-p_value_file_temp = p_value_file
-for(k1 in 1:length(pthres)){
-  #keep al the SNPs with P_EUR less than pthres[k1] in the analyses
-  idx <- which(unique_infor$P_other<=pthres[k1])
-  p_value_file_temp$P[idx] = 0
-  write.table(p_value_file_temp,file = paste0(temp.dir,"p_value_file"),col.names = F,row.names = F,quote=F)
-  n_col = ncol(score_file)
-  #the output of plink2 create 9 different files named as prs_p_other_k1.p_tar_k2.sscore
-  #this output file contains 16 columns
-  #the column 1-4 are: family ID, individual ID, 2*total number of SNPs in the PRS, the sum of allele count
-  #column 5-16 are the PRS scores with SNP of p_target<p_thres[k2]|p_eur<p_thres[k1] for different combinations of r2-cutoff and base_window_size
-  res = system(paste0(soft.dir,"plink2_alpha ",
-                      "--q-score-range ",temp.dir,"q_range_file ",temp.dir,"p_value_file ",
-                      "--score-col-nums 3-",n_col," ",
-                      "--score ",temp.dir,"score_file  ",
-                      "--bfile ",data.dir,"AFR_test_chr22 ",
-                      "--out ",temp.dir,"prs_p_other_",k1))
+for(k2 in 1:length(pthres)){
+  
+  
+  q_range[temp,1] = paste0("p_value_",k2)
+  q_range[temp,3] = pthres[k2]
+  temp = temp+1
   
 }
-#combine all the prs
-prs_list = list()
-temp = 1
-#take the column name of different clumping parameters
-names = colnames(score_file)[3:ncol(score_file)]
-for(k1 in 1:length(pthres)){
-  for(k2 in 1:length(pthres)){
-    #the --score command in plink2 computes PRS as G*beta/(2*number of SNPs)
-    #This doesn't affect prediction R2 of the PRS if you compute PRS for all chromosomes together
-    #But if you compute PRS by chromosome, you need to times (2*number of SNPs) before sum the score together
-    #here I am scaling the score by (2*number of SNPs) to aviod this potential
+q_range = q_range[1:(temp-1),]
+write.table(q_range,file = paste0(temp.dir.prs,"q_range_file"),row.names = F,col.names = F,quote=F)
+
+
+for(r_ind in 1:length(r2_vec)){
+  wc_vec = wc_base_vec/r2_vec[r_ind]
+  for(w_ind in 1:length(wc_vec)){
+    print(c(r_ind,w_ind))
+    LD.EUR <- as.data.frame(fread(paste0(temp.dir,eth[1],"_LD_clump_two_dim_rind_",r_ind,"_wcind_",w_ind,".clumped")))
+    LD.tar <- as.data.frame(fread(paste0(temp.dir,eth[i],"_LD_clump_two_dim_rind_",r_ind,"_wcind_",w_ind,".clumped")))
     
-    #load PRS for SNPs with p_target<p_thres[k2]|p_eur<p_thres[k1] 
-    prs_temp = fread(paste0(temp.dir,"prs_p_other_",k1,".p_tar_",k2,".sscore"))
-    # times (2*number of SNPs)
-    prs_list[[temp]] = prs_temp[,5:ncol(prs_temp)]*2*nrow(score_file)
+    LD.EUR <- LD.EUR[,3,drop=F]
+    LD.tar <- LD.tar[,3,drop=F]
+    LD <- rbind(LD.EUR,LD.tar)
     
-    colnames(prs_list[[temp]]) = paste0(names,"_","p_other_",pthres[k1],"_p_tar_",pthres[k2])
-    temp = temp + 1
+    #combine the statistics with SNPs after clumping
+    prs.all <- left_join(LD,summary.com,by="SNP") 
+    colSums(is.na(prs.all))
+    
+    for(k1 in 1:length(pthres)){
+      #keep al the SNPs with peur pass the threshold
+      prs.file = prs.all %>% 
+        mutate(P = replace(P,peur<=pthres[k1],1E-20)) %>% 
+        rename(BETA=beta_tar) %>% 
+        select(SNP,A1,BETA,P)
+      write.table(prs.file,file = paste0(temp.dir.prs,"prs_file"),col.names = T,row.names = F,quote=F)
+      
+      p.value.file <- prs.file %>% 
+        select(SNP,P)
+      write.table(p.value.file,file = paste0(temp.dir.prs,"p_value_file"),col.names = T,row.names = F,quote=F)
+      
+      old.out.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
+      res = system(paste0("/data/zhangh24/software/plink2 --q-score-range ",temp.dir.prs,"q_range_file ",temp.dir.prs,"p_value_file header --threads 2 --score ",temp.dir.prs,"prs_file header no-sum no-mean-imputation --bfile ",temp.dir,"AFR_test_mega_chr22 --exclude ",old.out.dir,eth[i],"/duplicated.id --out ",temp.dir.prs,"prs_2DLD_rind_",r_ind,"_wcind_",w_ind,"p_value_",k1))
+      print("step2 finished")
+      
+      
+      #system(paste0("/data/zhangh24/software/plink2 --score ",cur.dir,eth[i],"/prs/prs_file_pvalue_",k,"_rho_",l,"_size_",m,,"_rep_",i_rep," no-sum no-mean-imputation --bfile ",cur.dir,eth[i],"/all_chr.tag --exclude /data/zhangh24/multi_ethnic/result/LD_simulation/",eth[i],"/duplicated.id  --out ",cur.dir,eth[i],"/prs/prs_",k,"_rho_",l,"_size_",m))
+    }
+    
   }
+  
+  
 }
-prs_mat = as.data.frame(cbind(prs_temp[,1:2],bind_cols(prs_list)))
-prs_tun = prs_mat[1:10000,]
-
-#find the best R-square among the all the PRSs to find candidate set
-#we use this candidate for estimating covariance matrix for the prior distribution
-#create prediction r2 vector to store r2 for different prs
-n.total.prs = length(pthres)^2*length(r2_vec)*length(wc_base_vec)
-prs_r2_vec_test = rep(0,n.total.prs)
 time_prs1_end = proc.time()
-
 
 #find the optimal r2 performance based on testing data
 load(paste0(out.dir,"y_test.rdata"))
+load(paste0(out.dir,"y_test.rdata"))
+r2.vec.test <- rep(0,length(pthres)^2*length(r2_vec)*length(wc_base_vec))
+pthres_vec1 <- rep(0,length(pthres)^2*length(r2_vec)*length(wc_base_vec))
+pthres_vec2 <- rep(0,length(pthres)^2*length(r2_vec)*length(wc_base_vec))
+r2_ind_vec <- rep(0,length(pthres)^2*length(r2_vec)*length(wc_base_vec))
+wc_ind_vec <- rep(0,length(pthres)^2*length(r2_vec)*length(wc_base_vec))
+
 for(p_ind in 1:n.total.prs){
   #the first two columns of prs_tun are family id and individual id
   #prs starts from the third column
