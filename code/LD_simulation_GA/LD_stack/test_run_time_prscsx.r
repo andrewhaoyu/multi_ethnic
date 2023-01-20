@@ -2,7 +2,7 @@ args = commandArgs(trailingOnly = T)
 t_rep = as.numeric(args[[1]])
 k = as.numeric(args[[2]])
 #test the running time and memory for TDLD-SLEB and PRS-CSx on CHR 22
-time1 = proc.time()
+time_prscsx_start = proc.time()
 i = 2
 phi = c(1,1E-02,1E-04,1E-06)
 library(data.table)
@@ -44,7 +44,7 @@ system(paste0("cp ",out.dir,"AFR_test_mega_chr22.bed ",temp.dir,"AFR_test_mega_c
 system(paste0("cp ",out.dir,"AFR_test_mega_chr22.bim ",temp.dir,"AFR_test_mega_chr22.bim"))
 system(paste0("cp ",out.dir,"AFR_test_mega_chr22.fam ",temp.dir,"AFR_test_mega_chr22.fam"))
 
-time2 = proc.time()
+time_prs_csx_train_end = proc.time()
 #find unique snp set
 data_list = list()
 for(i_eth in 1:2){
@@ -87,9 +87,20 @@ res = system(paste0("/data/zhangh24/software/plink2_alpha ",
                     "--bfile ", temp.dir,"AFR_test_mega_chr22 ",
                     "--out ",temp.dir.prs,"prs_csx_",eth[i],"_phi",phi[k]))
                     
-time = proc.time()-time1
-time_prs = proc.time()-time2
-time_list = c(time, time_prs)
-save(time_list,file = paste0(out.dir,"prscsx_new_trep_",t_rep,"_phi_",k,".rdata"))
+time_prs_csx_calculate_prs_end = proc.time()
+load(paste0(out.dir,"y_test.rdata"))
+filename = paste0(temp.dir.prs,"prs_csx_",eth[i],"_phi",phi[k],".sscore")
+prs.temp <- fread(filename) 
+n.test = 10000
+prs.score <- as.matrix(prs.temp[(1:n.test),5:6])
+model1 <- lm(y_test~prs.score)
+time_prs_csx_calculate_r2_end  = proc.time()
+
+total_time = time_prs_csx_calculate_r2_end - time_prscsx_start
+train_time = time_prs_csx_train_end - time_prscsx_start
+prs_time = time_prs_csx_calculate_prs_end - time_prs_csx_train_end 
+compute_r2_time = time_prs_csx_calculate_r2_end - time_prs_csx_calculate_prs_end
+time_vec = rbind(total_time,train_time,prs_time,compute_r2_time)
+save(time_vec,file = paste0(out.dir,"prscsx_new_trep_",t_rep,"_phi_",k,".rdata"))
 #system(paste0("mv ",temp.dir.prs,"/prs_csx_",eth[i],"_rho_",l,"_size_",m,"_GA_",i1,"_phi",phi[v],".sscore ",out.dir.sum,eth[i],"/prscsx/"))
 

@@ -355,6 +355,8 @@ save(time_vec,file = paste0(out.dir,"TDLD_SLEB_trep_",t_rep,".rdata"))
 
 #prs-csx run time
 rm(list = ls())
+args = commandArgs(trailingOnly = T)
+t_rep = as.numeric(args[[1]])
 time_prscsx_start = proc.time()
 
 n.test = 10000
