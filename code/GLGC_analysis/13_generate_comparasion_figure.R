@@ -33,8 +33,8 @@ ct.sleb = final_result
 ct.sleb = ct.sleb %>% mutate(method = "CT-SLEB")
 load("ct_sleb_all.rdata")
 ct.sleb.all = final_result
-load("R2-weighted_ldpred2-bootstrap.RData")
-weighted.ldpred2.result = r2.result %>% 
+load("R2-weighted_ldpred2-bootstrap-update.RData")
+weighted.ldpred2.result = weighted.ldpred2.result %>% 
   filter(eth!="EUR"&trait !="nonHDL") %>% 
   mutate(method = "Weighted PRS (LDpred2)") %>% 
   select(eth,trait,method,r2, r2_low, r2_high)

@@ -1,4 +1,4 @@
-setwd("/Users/zhangh24/GoogleDrive/multi_ethnic/result/LD_simulation_GA/LD_stack/")
+setwd("/Users/zhangh24/Library/CloudStorage/Box-Box/multi_ethnic/result/LD_simulation_GA/LD_stack/")
 source("../../../code/LD_simulation_large/theme_Publication.R")
 library(ggplot2)
 library(ggsci)
@@ -106,7 +106,7 @@ run_plot = function(filler, values) {
     labs(fill = filler)+
     scale_fill_manual(values = values)
 }
-setwd("/Users/zhangh24/GoogleDrive/multi_ethnic/result/LD_simulation_GA/LD_stack/simulation_tun_sample_size/")
+setwd("/Users/zhangh24/Library/CloudStorage/Box-Box/multi_ethnic/result/LD_simulation_GA/LD_stack/simulation_tun_sample_size/")
 library(cowplot)
 m = 1
 
@@ -117,7 +117,7 @@ m = 1
     p <- ggplot(prediction.result.sub,aes(x= sample_size,y=r2.vec,group=tun_sample))+
       geom_bar(aes(fill=tun_sample),
                stat="identity",
-               position = position_dodge())+
+               position = position_dodge(0.95))+
       #geom_point(aes(color=method_vec))+
       theme_Publication()+
       ylab(expression(bold(R^2)))+

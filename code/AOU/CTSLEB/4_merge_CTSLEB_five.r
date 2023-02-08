@@ -11,7 +11,7 @@ for(l in 1:2){
     load(paste0(out.dir, "CTSLEB_all.result"))
     
     
-    result_list[[temp]] = r2_ctsleb
+    result_list[[temp]] = result
     temp = temp+ 1
   }
 }

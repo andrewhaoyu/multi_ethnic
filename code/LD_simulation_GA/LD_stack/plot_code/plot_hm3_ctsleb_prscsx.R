@@ -1,5 +1,5 @@
 
-setwd("/Users/zhangh24/GoogleDrive/multi_ethnic/result/LD_simulation_GA/LD_stack/")
+setwd("/Users/zhangh24/Library/CloudStorage/Box-Box/multi_ethnic/result/LD_simulation_GA/LD_stack/")
 source("../../../code/LD_simulation_large/theme_Publication.R")
 library(ggplot2)
 library(ggsci)
@@ -60,7 +60,7 @@ for(m in 1:4){
     p <- ggplot(prediction.result.sub,aes(x= sample_size,y=r2.vec,group=method_vec))+
       geom_bar(aes(fill=method_vec),
                stat="identity",
-               position = position_dodge())+
+               position = position_dodge(0.95))+
       #geom_point(aes(color=method_vec))+
       theme_Publication()+
       ylab(expression(bold(R^2)))+

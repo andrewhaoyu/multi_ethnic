@@ -35,15 +35,15 @@ ct.sleb = final_result
 ct.sleb = ct.sleb %>% mutate(method = "CT-SLEB")
 load("ct_sleb_all.rdata")
 ct.sleb.all = final_result  %>% mutate(method = "CT-SLEB (three ancestries)")
-load("R2-weighted_ldpred2-bootstrap.RData")
-weighted.ldpred2.result = r2.result %>% 
+load("R2-weighted_ldpred2-bootstrap-update.RData")
+weighted.ldpred2.result = weighted.ldpred2.result %>% 
   filter(eth!="EUR"&trait !="nonHDL") %>% 
   mutate(method = "Weighted PRS (LDpred2)") %>% 
   select(eth,trait,method,r2, r2_low, r2_high)
 load("R2-ldpred2-bootstrap.RData")
-r2.result_ldpred2 = r2.result
+r2.result_ldpred2 = r2.result %>% mutate(method = "LDpred2")
 load("R2-eurldpred2-bootstrap.RData")
-r2.result_eurldpred2 = r2.result %>% filter(eth!="EUR")
+r2.result_eurldpred2 = r2.result %>% filter(eth!="EUR") 
 ldpred2.result = rbind(r2.result_ldpred2, 
                        r2.result_eurldpred2) %>% 
   mutate(method = case_when(
