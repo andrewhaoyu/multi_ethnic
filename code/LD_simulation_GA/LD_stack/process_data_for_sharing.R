@@ -259,12 +259,87 @@ n.rep = 10
                            "unzip ",filename,".zip; ",
                            "mv ",filename," ",update_filename,"; ",
                            "zip ",update_filename,".zip ",update_filename,"; ",
-                           "rm ",filename,".zip")
+                           "rm ",filename,".zip; ",
+                           "rm ",update_filename)
           system(command)
         }
+#########################################################################################
+
+
+system(paste0("mkdir /data/zhangh24/multi_ethnic/result/LD_simulation_GA/summary_data"))
+for(i in 1:5){
+  command = paste0("cd ",out.dir.sum,eth[i],"; ",
+                   "cp -r summary_combine /data/zhangh24/multi_ethnic/result/LD_simulation_GA/summary_data/",eth[i],"_summary_combine")
+  system(command)
+}
+
 #       }
 #     }
 #   }
 # }
 #   
 ###############################################################################
+
+
+
+####################compress summary statistics#########################################
+# out.dir.sum <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
+# eth <- c("EUR","AFR","AMR","EAS","SAS")
+# for(i in 1:5){
+#   system(paste0("cd " ,out.dir.sum,eth[i]," ; ",
+#                       "zip -r ",eth[i],"_summary_combine.zip ",
+#                       "summary_combine ;"))
+# }
+#  for(i in 1:5){
+#   system(paste0("cd " ,out.dir.sum,eth[i]," ; ",
+#                 "rm -rf summary_combine;"))
+# }
+################################################################################################
+
+
+
+
+
+
+
+######################rename the phenotype data to reflect the ancestry prefix_
+
+library(data.table)
+library(dplyr)
+
+out.dir.sum <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
+eth <- c("EUR","AFR","AMR","EAS","SAS")
+n.rep = 10
+ for(i in 1:5){
+   for(l in 1:3){
+#     for(m in 1:4){
+       for(i1 in 1:5){
+
+  filename = paste0("pheno_rho_",l,"_GA_",i1)
+  update_filename = paste0(eth[i],"_",filename)
+  command = paste0("cd ",out.dir.sum,eth[i],"/pheno_combine/; ",
+                   "unzip ",filename,".zip; ",
+                   "mv ",filename," ",update_filename,"; ",
+                   "zip ",update_filename,".zip ",update_filename,"; ",
+                   "rm ",filename,".zip; ",
+                   "rm ",update_filename)
+  system(command)
+
+       }
+     }
+   }
+
+system(paste0("mkdir /data/zhangh24/multi_ethnic/result/LD_simulation_GA/phenotypes"))
+for(i in 1:5){
+  command = paste0("cd ",out.dir.sum,eth[i],"; ",
+                   "cp -r pheno_combine /data/zhangh24/multi_ethnic/result/LD_simulation_GA/phenotypes/",eth[i],"_pheno_combine")
+  system(command)
+}
+command =  paste0("cd /data/zhangh24/multi_ethnic/result/LD_simulation_GA/;",
+                  "zip -r phenotypes.zip phenotypes")
+system(command)
+##########################################################################
+
+
+
+
