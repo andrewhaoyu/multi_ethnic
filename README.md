@@ -1,7 +1,8 @@
 ## Multi Ancestry PRS development
-Simulation and Data Analyses for Multi-Ancestry PRS Development in Zhang et al. "Novel Methods for Multi-Ancestry Polygenic Prediction and their Evaluations in 5.1 Million Individuals of Diverse Ancestry." Biorxiv, 2022
+Simulation and Data Analyses for Multi-Ancestry PRS Development in Zhang et al. "Novel Methods for Multi-Ancestry Polygenic Prediction and their Evaluations in 5.1 Million Individuals of Diverse Ancestry." Biorxiv, 2022.
 
 - Goal 
+
 Polygenic risk scores (PRS) are becoming increasingly predictive of complex traits. However, their suboptimal performance in non-European ancestry populations raises questions about their clinical applications and the impact on health inequities. The goal of this study is to:
 1. Develop a powerful and scalable method, CT-SLEB, based on ancestry-specific GWAS summary statistics from multi-ancestry training samples. The method integrates multiple techniques, including clumping and thresholding, empirical Bayes, and super learning.
 2. Evaluate cutting-edge PRS approaches, including LDPred2, PRS-CSx, S-PolyPred+, etc.
