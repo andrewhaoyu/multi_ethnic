@@ -12,7 +12,7 @@ plot.data = data.frame(risk,y) %>%
                                            "High risk")))
 library(ggplot2)
 
- p = ggplot(plot.data,aes(risk,y))+
+p = ggplot(plot.data,aes(risk,y))+
   geom_line()+theme_Publication()+
   theme(axis.text.y=element_blank())+
   ylab("Density")+
@@ -26,9 +26,9 @@ library(ggplot2)
   theme(panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(),
         legend.position = "none")+
-   
+  
   ggtitle(NULL)+
-   guides(fill=guide_legend(title="Risk category"))
+  guides(fill=guide_legend(title="Risk category"))
 png(file = paste0("./result/presentation_plot/EUR_risk_stratition.png"),width = 12, height = 6, units = "in",res = 300)
 print(p)
 dev.off()
@@ -55,7 +55,7 @@ p = ggplot(plot.data,aes(risk,y))+
 png(file = paste0("./result/presentation_plot/EUR_risk_stratition_legend.png"),width = 12, height = 6, units = "in",res = 300)
 print(p)
 dev.off()
-  
+
 p = ggplot(plot.data,aes(risk,y))+
   geom_line(size = 2)+theme_Publication()+
   theme(axis.text.y=element_blank(),
@@ -108,7 +108,7 @@ p = ggplot(plot.data,aes(risk,y))+
   theme(panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(),
         legend.position = "none")+
-png(file = paste0("./result/presentation_plot/AFR_risk_stratition.png"),width = 12, height = 6, units = "in",res = 300)
+  png(file = paste0("./result/presentation_plot/AFR_risk_stratition.png"),width = 12, height = 6, units = "in",res = 300)
 print(p)
 dev.off()
 
@@ -157,7 +157,6 @@ print(p)
 png(file = paste0("./result/presentation_plot/EUR_risk_stratition.png"),width = 12, height = 6, units = "in",res = 300)
 print(p)
 dev.off()
-
 
 
 
