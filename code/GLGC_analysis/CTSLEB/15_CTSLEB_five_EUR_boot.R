@@ -410,30 +410,6 @@ model.null <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=pheno_v
 y_vad = model.null$residual
 prs_vad = pheno_vad[,colnames(prs_score)]
 
-
-cor_prs = cor(prs_tun)
-prs_r2_vec_test = rep(0,n.total.prs)
-y_tun = model.null$residual
-prs_tun = pheno_tuning[, colnames(prs_mat)]
-for(p_ind in 1:n.total.prs){
-  #the first two columns of prs_tun are family id and individual id
-  #prs starts from the third column
-  model = lm(y_tun~prs_tun[,(2+p_ind)])
-  prs_r2_vec_test[p_ind] = summary(model)$r.square
-}
-
-prs_tun_order = order(-all_par0$r2_tun)
-
-ix_keep = prs_tun_order[1]
-for (i in 2:length(prs_tun_order)) {
-  if (max(abs(cor_prs[ix_keep, prs_tun_order[i]])) < 0.98) 
-    ix_keep = c(ix_keep, prs_tun_order[i])
-}
-
-print(paste0(length(ix_keep), ' independent PRS'))
-
-
-
 prs_tun_clean = prs_tun[,ix_keep,drop = F]
   
 prs_vad_clean = prs_vad[,ix_keep,drop = F]
