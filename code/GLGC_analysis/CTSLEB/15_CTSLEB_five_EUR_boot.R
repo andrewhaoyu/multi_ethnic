@@ -470,7 +470,7 @@ save(result, file = paste0(out.dir, "CTSLEB_all.result"))
 
 #save the best prs
 prs_max_score = predict(sl, prs_all_clean, onlySL = TRUE)[[1]]
-prs_max = cbind(prs_temp[1:4], prs_max_score)
+prs_max = cbind(prs_temp[,1:4], prs_max_score)
 write.table(prs_max, file = paste0(out.dir.prs, "best_prs.sscore"),
             row.names = F,
             col.names = T,
