@@ -116,7 +116,7 @@ max_ind = which.max(r2_vec_tun)
 score1 = prs_vad[, 2*max_ind-1]
 score2= prs_vad[, 2*max_ind]
 coef = coef_mat[max_ind,]
-1
+
 prs_vad = cbind(score1, score2)%*%coef
 
 model = lm(y_vad~ prs_vad)

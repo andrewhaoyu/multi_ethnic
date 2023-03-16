@@ -307,7 +307,7 @@ EBpostMultiEUR = function (unique_infor, SNP_set, sum_com, other_ans_names){
 unique_infor_post = EBpostMultiEUR(unique_infor,SNP_set,
                                 sum_com,other_ans_names)
 
-eb_post_col_names = c("BETA_EB_target",paste0("BETA_EB_",other_ans_names[1]))
+eb_post_col_names = c("BETA_EB_target")s
 post_beta_mat = unique_infor_post %>% 
   select(all_of(eb_post_col_names))
 
