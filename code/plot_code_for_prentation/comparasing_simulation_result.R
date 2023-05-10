@@ -1,4 +1,4 @@
-setwd("/Users/zhangh24/GoogleDrive/multi_ethnic/result/LD_simulation_GA/LD_stack/")
+setwd("/Users/zhangh24/Library/CloudStorage/Box-Box/multi_ethnic/result/LD_simulation_GA/LD_stack/")
 source("../../../code/LD_simulation_large/theme_Publication.R")
 library(ggplot2)
 library(ggsci)
@@ -67,7 +67,7 @@ load(paste0("LDpredEUR.result.rdata"))
 load("xpass.result.rdata")
 load("polypred.result.rdata")
 polypred.result = polypred.result %>% 
-  mutate(method_vec = "PolyPred+")
+  mutate(method_vec = "PolyPred-S+")
 prediction.result <- rbind(LD.clump.result,
                            R2.ldpred2,
                            eursnp.result,
@@ -110,7 +110,7 @@ prediction.result = prediction.result %>%
                                         "Best EUR PRS (LDpred2)",
                                         "Weighted PRS (CT)",
                                         "Weighted PRS (LDpred2)",
-                                        "PolyPred+", 
+                                        "PolyPred-S+", 
                                         "XPASS", 
                                         "PRS-CSx",
                                         "PRS-CSx (five ancestries)",
@@ -132,7 +132,7 @@ uvals = factor(c("CT",
                  "Best EUR PRS (LDpred2)",
                  "Weighted PRS (CT)",
                  "Weighted PRS (LDpred2)",
-                 "PolyPred+", 
+                 "PolyPred-S+", 
                  "XPASS", 
                  "PRS-CSx",
                  "PRS-CSx (five ancestries)",
@@ -145,7 +145,7 @@ uvals = factor(c("CT",
             "Best EUR PRS (LDpred2)",
             "Weighted PRS (CT)",
             "Weighted PRS (LDpred2)",
-            "PolyPred+", 
+            "PolyPred-S+", 
             "XPASS", 
             "PRS-CSx",
             "PRS-CSx (five ancestries)",
@@ -185,7 +185,7 @@ col_df = tibble(
                        ) ~ "EUR PRS based method",
                        method_vec%in%c("Weighted PRS (CT)",
                                        "Weighted PRS (LDpred2)",
-                                       "PolyPred+"
+                                       "PolyPred-S+"
                        ) ~ "Weighted PRS method",
                        method_vec%in%c("XPASS",
                                        "PRS-CSx",
@@ -219,7 +219,7 @@ run_plot = function(filler, values) {
         group=method_vec))+
     geom_bar(aes(fill = method_vec),
              stat="identity",
-             position = position_dodge())+
+             position = position_dodge(1))+
     #geom_point(aes(color=method_vec))+
     theme_Publication()+
     ylab(expression(paste0(R^2)))+
@@ -253,7 +253,7 @@ library(cowplot)
     p.null <- ggplot(prediction.result.sub,aes(x= sample_size,y=r2.vec,group=method_vec))+
       geom_bar(aes(fill=method_vec),
                stat="identity",
-               position = position_dodge())+
+               position = position_dodge(1))+
       #geom_point(aes(color=method_vec))+
       theme_Publication()+
       ylab(NULL)+
@@ -284,7 +284,7 @@ library(cowplot)
     p.null <- ggplot(prediction.result.sub,aes(x= sample_size,y=r2.vec,group=method_vec))+
       geom_bar(aes(fill=method_vec),
                stat="identity",
-               position = position_dodge())+
+               position = position_dodge(1))+
       #geom_point(aes(color=method_vec))+
       theme_Publication()+
       ylab("R2")+
@@ -313,7 +313,7 @@ library(cowplot)
     p.null <- ggplot(prediction.result.sub,aes(x= sample_size,y=r2.vec,group=method_vec))+
       geom_bar(aes(fill=method_vec),
                stat="identity",
-               position = position_dodge())+
+               position = position_dodge(1))+
       #geom_point(aes(color=method_vec))+
       theme_Publication()+
       ylab("R2")+
@@ -342,7 +342,7 @@ library(cowplot)
     p.null <- ggplot(prediction.result.sub,aes(x= sample_size,y=r2.vec,group=method_vec))+
       geom_bar(aes(fill=method_vec),
                stat="identity",
-               position = position_dodge())+
+               position = position_dodge(1))+
       #geom_point(aes(color=method_vec))+
       theme_Publication()+
       ylab("R2")+

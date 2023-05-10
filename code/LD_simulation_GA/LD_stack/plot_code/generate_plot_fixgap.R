@@ -1,4 +1,4 @@
-setwd("/Users/zhangh24/GoogleDrive/multi_ethnic/result/LD_simulation_GA/LD_stack/")
+setwd("/Users/zhangh24/Library/CloudStorage/Box-Box/multi_ethnic/result/LD_simulation_GA/LD_stack/")
 source("../../../code/LD_simulation_large/theme_Publication.R")
 library(ggplot2)
 library(ggsci)

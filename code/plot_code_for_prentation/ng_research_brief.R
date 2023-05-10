@@ -332,6 +332,7 @@ run_plot = function(filler, values) {
              position = position_dodge())+
     #geom_point(aes(color=method_vec))+
     theme_Publication()+
+    theme(legend.text = element_text(size = 18))+
     ylab("R2")+
     xlab("Sample Size")+
     labs(fill = filler)+
@@ -342,18 +343,17 @@ run_plot = function(filler, values) {
 legs = lapply(sort(unique(col_df$category)), run_plot)
 
 legs = lapply(legs, getLegend)
-p.leg = plot_grid(NULL,legs[[1]],legs[[2]], legs[[3]],legs[[4]],legs[[5]], NULL,align="v",ncol=1,rel_heights=c(1.2,1,1,1,1,1,1,1.2))
+p.leg = plot_grid(NULL,legs[[1]],legs[[2]], legs[[3]],legs[[4]],legs[[5]], NULL,align="v",ncol=1,rel_heights=c(1,1,1,1.2,1.2,1,1))
 
 print(p.leg)
 
 
-
 prediction.result.sub = prediction.result %>% 
   filter(trait %in% c("Any CVD")&
-           eth == "African American") %>% 
+           eth %in% c("African American","Latino")) %>% 
   filter(eth!="European") %>% 
   mutate(eth = factor(eth,
-                      levels = c("African American")))
+                      levels = c("African American","Latino")))
 
 #create benchmark C+T or LDPred2 results for european to plot for other ethnic group
 prediction.result.European.CT = prediction.result %>% 
@@ -400,113 +400,8 @@ p.null <- ggplot(prediction.result.sub)+
   geom_hline(data = prediction.result.European, aes(yintercept = newresult), linetype = "dashed",color = "red")
 
 print(p.null)
-p = plot_grid(p.null,p.leg,nrow=1,rel_widths = c(3,1))
-png(filename = "../../presentation_plot/23andme_cvd.png",width=17,height = 12,units = "in",res = 300)
+p = plot_grid(p.null,p.leg,nrow=1,rel_widths = c(4,1))
+png(filename = "../../presentation_plot/research_briefing_fig.png",width=30,height = 10,units = "in",res = 300)
 print(p)
 dev.off()
-
-
-
-
-
-# #convert AUC to liability scale variance
-# #AUC = pnorm(sqrt(sigma^2/2))
-# #sigma^2 = qnorm(AUC)^2*2
-# prediction.result.sub = prediction.result.sub %>% 
-#   mutate(sigma2 = ifelse(result<0.5,0,qnorm(result)^2*2))
-# 
-# p.null <- ggplot(prediction.result.sub)+
-#   geom_bar(aes(x = index,y = sigma2,fill=method_vec),
-#            position = position_dodge(),
-#            stat = "identity")+
-#   theme_Publication()+
-#   ylab("Liability scale variance")+
-#   facet_grid(vars(trait),vars(eth))+
-#   theme_Publication()+
-#   #coord_cartesian(ylim = c(0.47, 0.65)) +
-#   theme(axis.title.x=element_blank(),
-#         axis.text.x=element_blank(),
-#         axis.ticks.x=element_blank())+
-#   scale_fill_manual(values = colour) +
-#   theme(legend.position = "none")
-# 
-# p = plot_grid(p.null,p.leg,nrow=1,rel_widths = c(3,1))
-# png(filename = "../comparasion_plot/bin_comparasion_r2.png",width=17,height = 11,units = "in",res = 300)
-# print(p)
-# dev.off()
-
-
-
-prediction.result.European = prediction.result %>% 
-  filter(trait %in% c("Heart metabolic disease burden")) %>% 
-  filter(eth=="European") %>% 
-  group_by(trait) %>% 
-  summarize(newresult = max(result))
-prediction.result.sub = prediction.result %>% 
-  filter(trait %in% c("Heart metabolic disease burden")&
-           eth == "African American") %>% 
-  filter(eth!="European") %>% 
-  mutate(eth = factor(eth,
-                      levels = c("African American")))
-
-p.null <- ggplot(prediction.result.sub)+
-  geom_bar(aes(x = index,y = result,fill=method_vec),
-           position = position_dodge(1),
-           stat = "identity")+
-  theme_Publication()+
-  ylab(expression(bold(paste("Adjusted ",R^2))))+
-  facet_grid(vars(trait),vars(eth),scales = "free")+
-  theme_Publication()+
-  #coord_cartesian(ylim = c(0.47, 0.65)) +
-  theme(axis.title.x=element_blank(),
-        axis.text.x=element_blank(),
-        axis.ticks.x=element_blank())+
-  scale_fill_manual(values = colour) +
-  theme(legend.position = "none")+
-  geom_hline(data = prediction.result.European, aes(yintercept = newresult), linetype = "dashed",color = "red")
-
-
-
-p = plot_grid(p.null,p.leg,nrow=1,rel_widths = c(3,1))
-#theme(strip.text.y = element_blank())
-#library(RColorBrewer)
-png(filename = "../../presentation_plot/23andme_heart.png",width=17,height = 12,units = "in",res = 300)
-print(p)
-dev.off()
-
-
-
-
-
-#change AUC to R2
-prediction.result.sub = prediction.result %>% 
-  mutate(R2 = ifelse(trait %in% c("Heart metabolic disease burden","Height"),
-                     result,
-                     ifelse(result<0.5,0,qnorm(result)^2*2))) %>% 
-  filter(method_vec%in%c("Weighted PRS","CT-SLEB (two ancestries)"))
-
-#generate relative R2 improvment
-trait = rep("c",1000)
-eth = rep("c",1000)
-relative_R2 = rep(0,1000)
-temp = 1
-for(k in 1:(nrow(prediction.result.sub)/2)){
-  relative_R2[temp] = as.numeric((prediction.result.sub[2*temp,"R2"]-prediction.result.sub[2*temp-1,"R2"])/prediction.result.sub[2*temp-1,"R2"])
-  trait[temp] = as.character(prediction.result.sub[2*temp,"trait"])
-  eth[temp] = as.character(prediction.result.sub$eth[2*temp])
-  temp = temp + 1
-}
-
-relative_R2 = relative_R2[1:(temp-1)]
-trait = trait[1:(temp-1)]
-eth = eth[1:(temp-1)]
-
-result = data.frame(relative_R2,trait,eth)
-
-
-result %>% 
-  filter(trait%in%c("Heart metabolic disease burden","Height")==F) %>% 
-  group_by(eth) %>% 
-  summarise(mean(relative_R2))
-prediction.result.sub %>% filter(trait =="Any CVD")
 

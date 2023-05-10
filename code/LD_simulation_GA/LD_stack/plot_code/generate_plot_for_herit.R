@@ -3,7 +3,7 @@ herit = c(0.32,0.21,0.16,0.19,0.17)
 n.cau = c(14798,9755,7541,8536,7997)
 averaged.effect = 0.4/n.cau
 data = data.frame(eth,herit,n.cau,averaged.effect)
-setwd("/Users/zhangh24/GoogleDrive/multi_ethnic/result/LD_simulation_GA")
+setwd("/Users/zhangh24/Library/CloudStorage/Box-Box/multi_ethnic/result/LD_simulation_GA")
 source("../../code/LD_simulation_large/theme_Publication.R")
 
 p <- ggplot(data,aes(x= eth,y=herit,fill=eth))+

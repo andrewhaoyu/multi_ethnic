@@ -227,7 +227,7 @@ prediction.result$eth = factor(prediction.result$eth,
 save(prediction.result,file = "/Users/zhangh24/Library/CloudStorage/Box-Box/multi_ethnic/result/23andme/prediction_summary.rdata")
 #write.csv(prediction.result, file = "/Users/zhangh24/Library/CloudStorage/Box-Box/multi_ethnic/result/23andme/prediction_summary.csv")
 sigma2toauc = function(x){
-  ifelse(x==0,0.50,round(pnorm(0.5*sqrt(x)),2))
+  ifelse(x==0,0.50,round(pnorm(sqrt(0.5*x)),2))
 }
 prediction.result.table = prediction.result %>% 
   mutate(sigma2 = ifelse(result<0.5,0,qnorm(result)^2*2)) %>% 

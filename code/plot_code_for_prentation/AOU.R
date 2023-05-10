@@ -1,5 +1,5 @@
-setwd("/Users/zhangh24/GoogleDrive/multi_ethnic/result/AOU/analysis_result/")
-source("/Users/zhangh24/GoogleDrive/multi_ethnic//code/LD_simulation_large/theme_Publication.R")
+setwd("/Users/zhangh24/Library/CloudStorage/Box-Box/multi_ethnic/result/AOU/analysis_result/")
+source("/Users/zhangh24/Library/CloudStorage/Box-Box/multi_ethnic//code/LD_simulation_large/theme_Publication.R")
 library(ggplot2)
 library(ggsci)
 library(dplyr)
@@ -7,6 +7,7 @@ library(RColorBrewer)
 library(grid)
 library(gridExtra)
 library(data.table)
+library(tidyverse)
 eth <- c("EUR","AFR","AMR")
 trait <-c("height","bmi")
 trait_name = c("Height","BMI")
@@ -16,13 +17,13 @@ LD.clump.result = final_result
 load("best_eur.rdata")
 eursnp.result = final_result
 eursnp.result = eursnp.result %>% 
-  mutate(method = "Best EUR SNP (CT)")
+  mutate(method = "Best EUR PRS (CT)")
 load("weighted_prs.rdata")
 weightedprs.result = final_result %>% 
   mutate(method = "Weighted PRS (CT)")
 load("polypred.rdata")
 polypred.result = final_result %>% 
-  mutate(method = "PolyPred+")
+  mutate(method = "PolyPred-S+")
 load("xpass.rdata")
 xpass.result = final_result
 load("prscsx.rdata")
@@ -33,25 +34,24 @@ load("ct_sleb.rdata")
 ct.sleb = final_result
 ct.sleb = ct.sleb %>% mutate(method = "CT-SLEB")
 load("ct_sleb_all.rdata")
-ct.sleb.all = final_result
-load("aou-weighted-ldpred2-2grps.rdata")
-R2 = as.data.frame(R2)
-R2$trait = row.names(R2)
-weighted.ldpred2.result = R2 %>% gather("eth", "r2", 1:3) %>% 
-  filter(eth!="EUR"&eth!="AMR") %>% 
+ct.sleb.all = final_result  %>% mutate(method = "CT-SLEB (three ancestries)")
+load("R2-weighted_ldpred2-bootstrap-update.RData")
+weighted.ldpred2.result = weighted.ldpred2.result %>% 
+  filter(eth!="EUR"&trait !="nonHDL") %>% 
   mutate(method = "Weighted PRS (LDpred2)") %>% 
-  select(eth, trait, method, r2)
-ldpred2.result = fread("allofus-jin.txt") %>% 
-  filter(Method%in% c("LDpred2", "EUR LDpred2")) %>% 
+  select(eth,trait,method,r2, r2_low, r2_high)
+load("R2-ldpred2-bootstrap.RData")
+r2.result_ldpred2 = r2.result %>% mutate(method = "LDpred2")
+load("R2-eurldpred2-bootstrap.RData")
+r2.result_eurldpred2 = r2.result %>% filter(eth!="EUR") 
+ldpred2.result = rbind(r2.result_ldpred2, 
+                       r2.result_eurldpred2) %>% 
   mutate(method = case_when(
-    Method == "EUR LDpred2" ~ "Best EUR PRS (LDpred2)",
-    Method == "LDpred2" ~ "LDpred2"
+    method == "EUR LDpred2" ~ "Best EUR PRS (LDpred2)",
+    method == "LDpred2" ~ "LDpred2"
   )) %>% 
-  rename(trait = Trait,
-         eth = Race,
-         r2 = R2) %>% 
-  select(eth, trait, method, r2) 
-
+  filter(trait!= "nonHDL" ) %>% 
+  select(eth,trait,method, r2, r2_low, r2_high)   
 
 prediction.result <- rbind(LD.clump.result,
                            eursnp.result,
@@ -72,11 +72,11 @@ prediction.result = prediction.result %>%
     method_vec = factor(method_vec,
                         levels = c("CT",
                                    "LDpred2",
-                                   "Best EUR SNP (CT)",
+                                   "Best EUR PRS (CT)",
                                    "Best EUR PRS (LDpred2)",
                                    "Weighted PRS (CT)",
                                    "Weighted PRS (LDpred2)",
-                                   "PolyPred+", 
+                                   "PolyPred-S+", 
                                    "XPASS", 
                                    "PRS-CSx",
                                    "PRS-CSx (three ancestries)",
@@ -87,11 +87,11 @@ prediction.result = prediction.result %>%
 #save(prediction.result,file = "prediction.result.summary.rdata")
 uvals = factor(c("CT",
                  "LDpred2",
-                 "Best EUR SNP (CT)",
+                 "Best EUR PRS (CT)",
                  "Best EUR PRS (LDpred2)",
                  "Weighted PRS (CT)",
                  "Weighted PRS (LDpred2)",
-                 "PolyPred+", 
+                 "PolyPred-S+", 
                  "XPASS", 
                  "PRS-CSx",
                  "PRS-CSx (three ancestries)",
@@ -100,11 +100,11 @@ uvals = factor(c("CT",
 )
 ,levels = c("CT",
             "LDpred2",
-            "Best EUR SNP (CT)",
+            "Best EUR PRS (CT)",
             "Best EUR PRS (LDpred2)",
             "Weighted PRS (CT)",
             "Weighted PRS (LDpred2)",
-            "PolyPred+", 
+            "PolyPred-S+", 
             "XPASS", 
             "PRS-CSx",
             "PRS-CSx (three ancestries)",
@@ -116,10 +116,18 @@ prediction.result$index = rep("1",nrow(prediction.result))
 prediction.result = prediction.result %>% 
   mutate(trait = 
            case_when(trait == "height" ~ "Height",
-                     trait == "bmi" ~ "BMI",))
+                     trait == "bmi" ~ "BMI"))
+head(prediction.result)
+prediction.result = prediction.result %>% 
+  mutate(eth_name = 
+           case_when(
+             eth == "EUR" ~ "European",
+             eth == "AFR" ~ "African",
+             eth == "AMR" ~ "Latino"
+           ))
 prediction.result.sub = prediction.result %>% 
   filter(eth!="AMR") 
-#save(prediction.result,file = "aou.prediction.result.summary.rdata")
+save(prediction.result,file = "prediction.result.summary.rdata")
 prediction.result.sub = prediction.result %>% 
   filter(eth!="EUR"&eth!="AMR") 
 n.single = 9
@@ -130,7 +138,7 @@ n.multi = 9
 
 single.color =  brewer.pal(n.single, "Blues")[c(4,7)]
 
-EUR.color = brewer.pal(n.EUR, "RdPu")[c(4,7)]
+EUR.color = brewer.pal(n.EUR, "Reds")[c(4,7)]
 
 weighted.color = brewer.pal(n.multi, "Greens")[c(3,5,7)]
 
@@ -149,12 +157,12 @@ col_df = tibble(
   method_vec = uvals,
   category = case_when(method_vec%in%c("CT",
                                        "LDpred2") ~ "Single ancestry method",
-                       method_vec%in%c("Best EUR SNP (CT)",
+                       method_vec%in%c("Best EUR PRS (CT)",
                                        "Best EUR PRS (LDpred2)"
                        ) ~ "EUR PRS based method",
                        method_vec%in%c("Weighted PRS (CT)",
                                        "Weighted PRS (LDpred2)",
-                                       "PolyPred+"
+                                       "PolyPred-S+"
                        ) ~ "Weighted PRS method",
                        method_vec%in%c("XPASS",
                                        "PRS-CSx",
@@ -196,7 +204,7 @@ run_plot = function(filler, values) {
         group=method_vec))+
     geom_bar(aes(fill = method_vec),
              stat="identity",
-             position = position_dodge())+
+             position = position_dodge(1))+
     #geom_point(aes(color=method_vec))+
     theme_Publication()+
     ylab("R2")+
@@ -218,11 +226,11 @@ library(cowplot)
 
 p.null <- ggplot(prediction.result.sub)+
   geom_bar(aes(x = index,y = result,fill=method_vec),
-           position = position_dodge(),
+           position = position_dodge(1),
            stat = "identity")+
   theme_Publication()+
-  ylab(expression(bold(R^2)))+
-  facet_grid(vars(trait),vars(eth),scales = "free")+
+  ylab(expression(bold(paste("Adjusted ",R^2))))+
+  facet_grid(vars(trait),vars(eth_name),scales = "free")+
   theme_Publication()+
   #coord_cartesian(ylim = c(0.47, 0.67)) +
   theme(axis.title.x=element_blank(),
@@ -234,6 +242,6 @@ p.null <- ggplot(prediction.result.sub)+
 
 print(p.null)
 p = plot_grid(p.null,p.leg,nrow=1,rel_widths = c(3,1))
-png(filename = "../../presentation_plot/AOU_result.png",width=20,height = 12,units = "in",res = 300)
+png(filename = "../../presentation_plot/AOU_result.png",width=17,height = 12,units = "in",res = 300)
 print(p)
 dev.off()
