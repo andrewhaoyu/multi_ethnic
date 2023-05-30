@@ -255,7 +255,9 @@ p = plot_grid(p.null,p.leg,nrow=1,rel_widths = c(3,1))
 png(filename = "./GLGC_result.png",width=17,height = 12,units = "in",res = 300)
 print(p)
 dev.off()
-
+pdf(file = "./GLGC_result.pdf",width=17,height = 12)
+print(p)
+dev.off()
 # 
 # png(filename = "./GLGC_result_poster.png",width=20,height = 12,units = "in",res = 300)
 # print(p)

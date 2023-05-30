@@ -417,7 +417,9 @@ p = plot_grid(p.null,p.leg,nrow=1,rel_widths = c(3,1))
 png(filename = "../comparasion_plot/bin_comparasion.png",width=17,height = 12,units = "in",res = 300)
 print(p)
 dev.off()
-
+pdf(file = "../comparasion_plot/bin_comparasion.pdf",width=17,height = 12)
+print(p)
+dev.off()
 # #convert AUC to liability scale variance
 # #AUC = pnorm(sqrt(sigma^2/2))
 # #sigma^2 = qnorm(AUC)^2*2
@@ -484,7 +486,11 @@ print(p)
 dev.off()
 
 
-  
+pdf(file = "../comparasion_plot/con_comparasion.pdf",width=17, height = 12)
+print(p)
+dev.off()
+
+
 
 
 #change AUC to R2
