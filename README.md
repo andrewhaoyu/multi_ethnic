@@ -1,3 +1,4 @@
+[![DOI](https://zenodo.org/badge/214069397.svg)](https://zenodo.org/badge/latestdoi/214069397)
 ## Multi Ancestry PRS development
 Simulation and Data Analyses for Multi-Ancestry PRS Development in Zhang et al. "Novel Methods for Multi-Ancestry Polygenic Prediction and their Evaluations in 5.1 Million Individuals of Diverse Ancestry." Biorxiv, 2022.
 
