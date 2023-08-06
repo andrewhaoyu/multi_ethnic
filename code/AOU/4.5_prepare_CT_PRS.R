@@ -48,7 +48,7 @@ sum.data.assoc = sum.data %>%
   mutate(P = as.numeric(P)) %>% 
   rename(SNP = rsID,
          BP = pos37) %>% 
-  select(CHR,SNP,BP,A1,BETA,P) 
+  select(CHR,SNP,BP,A1,A2,BETA,P) 
 
 #sum.data.assoc = sum.data.assoc[,c("CHR","SNP","BP","A1","BETA","P")]
 #idx <- which(sum.data.assoc$SNP=="rs4970836")
