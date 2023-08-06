@@ -44,6 +44,10 @@ setwd("/data/zhangh24/multi_ethnic/")
 #load sum data
 sum = as.data.frame(fread(paste0(data.dir,eth[i],"/",trait[l],".txt"),header=T))
 colnames(sum)[1] = "rsid"
+#Note to DG: You don't need to match with SBayesR
+#You need to use this file to match the rsID: /data/BB_Bioinformatics/ProjectData/KG.plink/KG.all.chr.bim
+#Using CHR and Pos
+#Subset to SNPs with CHR2 and Position: 27719900-27746463
 #match summary data with the reference data of SBayesR
 LD_info = fread("/data/zhangh24/software/SBayesR/ukbEURu_hm3_shrunk_sparse/ukbEURu_hm3_all_v3_50k.ldm.sparse.info", header = F)
 colnames(LD_info)[1:6] = c("CHR", "rsid", "no1", "BP", "A1", "A2")
@@ -65,6 +69,7 @@ ma = summary_update %>%
 
 write.table(ma, paste0(temp.dir, "sumstats"), row.names = F, col.names = T, quote = F)
 
+#####################################################################
 
 ############step1: munge the summary statistics to parquet format ###########
 summary_path = paste0(temp.dir, "sumstats")
@@ -118,9 +123,8 @@ system(paste0( "cd /data/zhangh24/software/polyfun; ",
                "--allow-missing ",
                "--out-prefix ",out_prefix_temp," ",
                "--jobs-file ",temp.dir,"job.sh "))
-system(paste0("more /lscratch/5316720/test/job.sh"))
 #####################################################################
-
+system("more /lscratch/5320356/test/job.sh")
 
 #run the polyfun file in parallel
 no.cores <- 8

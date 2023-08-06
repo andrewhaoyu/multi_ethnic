@@ -1,0 +1,8 @@
+B1 = matrix(c(0.6,0.1,0.1,0.6),2,2)
+B2 = matrix(0.1,1,1)
+library(Matrix)
+B = bdiag(B1,B2)
+g = matrix(c(-1,0,-1,0,-1,0),3,2)
+solve(B)
+solve(t(g)%*%solve(B)%*%g)
+solve(B1)
