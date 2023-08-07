@@ -8,7 +8,7 @@ i = as.numeric(args[[1]])
 l = as.numeric(args[[2]])
 library(data.table)
 library(dplyr)
-library(CTSLEB)
+library("CTSLEB", lib.loc = "/home/zhangh24/R/4.2/library")
 eth_vec <- c("EUR","AFR","AMR")
 trait_vec <-c("height","bmi")
 eth_EUR = "EUR"
