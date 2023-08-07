@@ -367,7 +367,7 @@ write.table(prs_coef,file = paste0(temp.dir,"score_file_final_test"),row.names =
   print(r2_ctsleb)
   save(r2_ctsleb, file = paste0(out.dir, "CTSLEB_all_pgs.result"))
   #prepare PRS for PGS catalog format
-  prs_infor = left_join(prs_coef,sum_tar,by = c("SNP"="rsID")) %>% 
+  prs_select = left_join(prs_coef,sum_tar,by = c("SNP"="rsID")) %>% 
     rename(rsID = SNP,
            chr_name = CHR,
            chr_position = POS_b37,

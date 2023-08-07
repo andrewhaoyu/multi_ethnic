@@ -351,27 +351,6 @@ for (weight_name in names(final_coefs)) {
 }
 
 
-
-sum_tar = as.data.frame(fread(paste0(data.dir,eth,"/",trait,".txt"),header=T))
-
-sum_tar = sum_tar %>% 
-  select(rsID, CHR, POS_b37, A2)
-#prepare PRS for PGS catalog format
-prs_infor = left_join(prs_coef,sum_tar,by = c("SNP"="rsID")) %>% 
-  rename(rsID = SNP,
-         chr_name = CHR,
-         chr_position = POS_b37,
-         effect_allele = A1,
-         other_allele = A2,
-         effect_weight = final_weighted_score) %>% 
-  select(rsID, chr_name, chr_position,
-         effect_allele, other_allele, effect_weight)
-
-out_filename = paste0("/data/zhangh24/multi_ethnic/result/AOU/pgs_catalog/",
-                      trait,"_",eth,"_","CTSLEB.txt.gz")
-write.table(prs_select, file = gzfile(out_filename), sep = "\t", 
-            row.names = FALSE, quote = FALSE, col.names = TRUE)
-
 #verify the pgs
 prs_coef = cbind(score_file[,c("SNP","A1")],results)
 write.table(prs_coef,file = paste0(temp.dir,"score_file_final_test"),row.names = F,col.names = F,quote=F)
@@ -414,15 +393,22 @@ save(r2_ctsleb, file = paste0(out.dir, "CTSLEB_all_pgs.result"))
 
 
 
-save(r2_ctsleb, file = paste0(out.dir, "CTSLEB_all.result"))
+sum_tar = as.data.frame(fread(paste0(data.dir,eth,"/",trait,"_update.txt"),header=T))
+sum_tar = sum_tar %>% 
+  select(rsID, CHR, pos37, A2)
 
-#save the best prs
-prs_max_score = predict(sl, prs_all_clean, onlySL = TRUE)[[1]]
-prs_max = cbind(prs_temp[1:4], prs_max_score)
-write.table(prs_max, file = paste0(out.dir.prs, "best_prs.sscore"),
-            row.names = F,
-            col.names = T,
-            quote = F)
-#evaluate on validation
+#prepare PRS for PGS catalog format
+prs_select = left_join(prs_coef,sum_tar,by = c("SNP"="rsID")) %>% 
+  rename(rsID = SNP,
+         chr_name = CHR,
+         chr_position = pos37,
+         effect_allele = A1,
+         other_allele = A2,
+         effect_weight = final_weighted_score) %>% 
+  select(rsID, chr_name, chr_position,
+         effect_allele, other_allele, effect_weight)
 
-
+out_filename = paste0("/data/zhangh24/multi_ethnic/result/AOU/pgs_catalog/",
+                      trait,"_",eth,"_","CTSLEB.txt.gz")
+write.table(prs_select, file = gzfile(out_filename), sep = "\t", 
+            row.names = FALSE, quote = FALSE, col.names = TRUE)
