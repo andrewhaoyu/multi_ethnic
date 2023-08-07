@@ -323,19 +323,7 @@ sum_tar = as.data.frame(fread(paste0(data.dir,eth,"/",trait,".txt"),header=T))
 
 sum_tar = sum_tar %>% 
   select(rsID, CHR, POS_b37, A2)
-#prepare PRS for PGS catalog format
-prs_infor = left_join(prs_coef,sum_tar,by = c("SNP"="rsID")) %>% 
-  rename(rsID = SNP,
-         chr_name = CHR,
-         chr_position = POS_b37,
-         effect_allele = A1,
-         other_allele = A2,
-         effect_weight = final_weighted_score) %>% 
-  select(rsID, chr_name, chr_position,
-         effect_allele, other_allele, effect_weight)
 
-out_filename = paste0("/data/zhangh24/multi_ethnic/result/GLGC/pgs_catalog/",
-                      trait,"_",eth,"_","CTSLEB.txt.gz")
 write.table(prs_select, file = gzfile(out_filename), sep = "\t", 
             row.names = FALSE, quote = FALSE, col.names = TRUE)
 
@@ -378,3 +366,16 @@ write.table(prs_coef,file = paste0(temp.dir,"score_file_final_test"),row.names =
   r2_ctsleb <- summary(model)$r.square
   print(r2_ctsleb)
   save(r2_ctsleb, file = paste0(out.dir, "CTSLEB_all_pgs.result"))
+  #prepare PRS for PGS catalog format
+  prs_infor = left_join(prs_coef,sum_tar,by = c("SNP"="rsID")) %>% 
+    rename(rsID = SNP,
+           chr_name = CHR,
+           chr_position = POS_b37,
+           effect_allele = A1,
+           other_allele = A2,
+           effect_weight = final_weighted_score) %>% 
+    select(rsID, chr_name, chr_position,
+           effect_allele, other_allele, effect_weight)
+  
+  out_filename = paste0("/data/zhangh24/multi_ethnic/result/GLGC/pgs_catalog/",
+                        trait,"_",eth,"_","CTSLEB.txt.gz")

@@ -130,97 +130,7 @@ q_range = CreateQRange(pthres)
 head(q_range)
 write.table(q_range,file = paste0(temp.dir,"q_range_file"),row.names = F,col.names = F,quote=F)
 
-p_value_file_temp = p_value_file
-for(k1 in 1:length(pthres)){
-  #keep al the SNPs with P_EUR less than pthres[k1] in the analyses
-  idx <- which(unique_infor$P_other<=pthres[k1])
-  p_value_file_temp$P[idx] = 0
-  write.table(p_value_file_temp,file = paste0(temp.dir,"p_value_file"),col.names = F,row.names = F,quote=F)
-  n_col = ncol(score_file)
-  #the output of plink2 create 9 different files named as prs_p_other_k1.p_tar_k2.sscore
-  #this output file contains 16 columns
-  #the column 1-4 are: family ID, individual ID, 2*total number of SNPs in the PRS, the sum of allele count
-  #column 5-16 are the PRS scores with SNP of p_target<p_thres[k2]|p_eur<p_thres[k1] for different combinations of r2-cutoff and base_window_size
-  #AFR_test_chr22 contains 20,000 subjects
-  #we use the first 10,000 subjects as tuning dataset
-  #we use the second 10,000 subjects as validation dataset      
-  res = system(paste0(soft.dir,"plink2_alpha ",
-                      "--q-score-range ",temp.dir,"q_range_file ",temp.dir,"p_value_file ",
-                      "--score-col-nums 3-",n_col," ",
-                      "--score ",temp.dir,"score_file cols=+scoresums,-scoreavgs ",
-                      "--bfile ",temp.dir,"ukb/all_chr ",
-                      "--out ",temp.dir,"prs_p_other_",k1))
-  
-}
-prs_list = list()
-temp = 1
-#take the column name of different clumping parameters
-names = colnames(score_file)[3:ncol(score_file)]
-for(k1 in 1:length(pthres)){
-  for(k2 in 1:length(pthres)){
-    #the --score file cols=+scoresums,-scoreavgs command in plink2 computes PRS as G*beta
-    #If you compute PRS by chromosome, you need to sum the PRS scores for all chromosomes. 
-    #load PRS for SNPs with p_target<p_thres[k2]|p_eur<p_thres[k1] 
-    prs_temp = fread(paste0(temp.dir,"prs_p_other_",k1,".p_tar_",k2,".sscore"))
-    # times (2*number of SNPs)
-    prs_list[[temp]] = prs_temp[,5:ncol(prs_temp)]
-    
-    colnames(prs_list[[temp]]) = paste0(names,"_","p_other_",pthres[k1],"_p_tar_",pthres[k2])
-    temp = temp + 1
-  }
-}
-prs_mat = as.data.frame(cbind(prs_temp[,1:2],bind_cols(prs_list)))
-colnames(prs_mat)[2] = "id"
-
-
-
-#find the best R-square among the all the PRSs to find candidate set
-#we use this candidate for estimating covariance matrix for the prior distribution
-#create prediction r2 vector to store r2 for different prs
-n.total.prs = length(pthres)^2*length(r2_vec)*length(wc_base_vec)
-prs_r2_vec_test = rep(0,n.total.prs)
-#load the phenotype data for the tuning set
-pheno.dir = "/data/zhangh24/multi_ethnic/data/UKBB/phenotype/"
-pheno_tuning = as.data.frame(fread(paste0(pheno.dir,trait,"/tuning+validation/",eth,"_tuning.txt")))
-pheno_tuning = pheno_tuning[,1:2]
-covar <- as.data.frame(fread(paste0(pheno.dir,"/covariates/tuning+validation/",eth,"_all_data.txt")))
-pheno_tuning <- left_join(pheno_tuning, covar)
-colnames(pheno_tuning) = c('id','y','sex','age',paste0('pc',1:10))
-pheno_tuning_com = pheno_tuning[complete.cases(pheno_tuning$y),]
-pheno_tuning = left_join(pheno_tuning_com,prs_mat,by = "id")
-model.null <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=pheno_tuning)
-y_tun = model.null$residual
-prs_tun = pheno_tuning[, colnames(prs_mat)]
-for(p_ind in 1:n.total.prs){
-  #the first two columns of prs_tun are family id and individual id
-  #prs starts from the third column
-  model = lm(y_tun~prs_tun[,(2+p_ind)])
-  prs_r2_vec_test[p_ind] = summary(model)$r.square
-}
-#+2 is due to the first two columns are family id and individual id
-max_ind = which.max(prs_r2_vec_test)
-print(colnames(prs_mat)[max_ind+2])
-
-######################PRS step finished#############
-
-
-
-
-#############EB step start############################
-
-#Get the SNP set with the best performance in the CT step
-snp_set_ind = colnames(prs_mat)[max_ind+2]
-SNP_set = GetSNPSet(snp_set_ind,
-                    score_file,
-                    unique_infor)
-
-
-
-save(SNP_set, file = paste0(out.dir, "all_SNP_set.rdata"))
-
-
-
-
+load(paste0(out.dir, "all_SNP_set.rdata"))
 
 AlignSumMulti = function(sum_tar,sum_other_list,
                          other_ans_names){
@@ -286,26 +196,7 @@ write.table(score_file,file = paste0(temp.dir,"score_file_eb"),row.names = F,col
 p_value_file = plink_file_eb[[2]]
 
 
-p_value_file_temp = p_value_file
-for(k1 in 1:length(pthres)){
-  #keep al the SNPs with P_EUR less than pthres[k1] in the analyses
-  idx <- which(unique_infor$P_other<=pthres[k1])
-  p_value_file_temp$P[idx] = 0
-  write.table(p_value_file_temp,file = paste0(temp.dir,"p_value_file"),col.names = F,row.names = F,quote=F)
-  n_col = ncol(score_file)
-  
-  res = system(paste0(soft.dir,"plink2_alpha ",
-                      "--q-score-range ",temp.dir,"q_range_file ",temp.dir,"p_value_file ",
-                      "--score-col-nums 3-",n_col," ",
-                      "--score ",temp.dir,"score_file_eb cols=+scoresums,-scoreavgs ",
-                      "--bfile ",temp.dir,"ukb/all_chr ",
-                      "--out ",temp.dir,"eb_prs_p_other_",k1))
-  #the output of plink2 create 9 different files named as prs_p_other_k1.p_tar_k2.sscore
-  #this output file contains 16 columns
-  #the column 1-4 are: family ID, individual ID, 2*total number of SNPs in the PRS, the sum of allele count
-  #column 5-16 are the PRS scores with SNP of p_target<p_thres[k2]|p_eur<p_thres[k1] for different combinations of r2-cutoff and base_window_size
-}
-#find best cutoff for EUR by using all data as tuning
+out.dir.prs = paste0("/data/zhangh24/multi_ethnic/result/AOU/prs/CT_SLEB_all/",eth,"/",trait,"/")
 
 
 prs_list = list()
@@ -317,7 +208,7 @@ for(k1 in 1:length(pthres)){
     #the --score file cols=+scoresums,-scoreavgs command in plink2 computes PRS as G*beta
     #If you compute PRS by chromosome, you need to sum the PRS scores for all chromosomes. 
     #load PRS for SNPs with p_target<p_thres[k2]|p_eur<p_thres[k1] 
-    prs_temp = fread(paste0(temp.dir,"eb_prs_p_other_",k1,".p_tar_",k2,".sscore"))
+    prs_temp = fread(paste0(out.dir.prs,"eb_prs_p_other_",k1,".p_tar_",k2,".sscore"))
     # times (2*number of SNPs)
     prs_list[[temp]] = prs_temp[,5:ncol(prs_temp)]
     
@@ -330,8 +221,6 @@ colnames(prs_mat)[2] = "id"
 prs_score = prs_mat[,-c(1:2)]
 
 #############EB step finish############################
-out.dir.prs = paste0("/data/zhangh24/multi_ethnic/result/AOU/prs/CT_SLEB_all/",eth,"/",trait,"/")
-system(paste0("cp ",temp.dir,"eb_prs_p_other_*.sscore ",out.dir.prs))
 
 
 
@@ -378,8 +267,7 @@ library(SuperLearner)
 #choose the prediction algorithms
 SL.libray <- c(
   "SL.glmnet",
-  "SL.ridge",
-  "SL.nnet"
+  "SL.ridge"
   #"SL.bayesglm"
   #"SL.stepAIC"
   #"SL.xgboost"
@@ -399,9 +287,130 @@ sl = SuperLearner(Y = y_tun, X = prs_tun_clean, family = gaussian(),
 y_pred <- predict(sl, prs_vad_clean, onlySL = TRUE)
 #evaluate the CT-SLEB prs performance on the validation
 model <- lm(y_vad~y_pred[[1]])
+r2_ctsleb_true <- summary(model)$r.square
+
+
+
+
+
+
+sl_fit = sl
+#algorithm weight
+alg_weights <- sl_fit$coef
+#glmnet
+glmnet_obj = sl_fit$fitLibrary$SL.glmnet$object
+best_lambda <- glmnet_obj$lambda[which.min(glmnet_obj$cvm)]
+glmnet_coefs <- coef(glmnet_obj, s = best_lambda)
+#ridge
+ridge_coefs = sl_fit$fitLibrary$SL.ridge_All$bestCoef
+#final
+final_coefs <- alg_weights[1] * glmnet_coefs + alg_weights[2] * ridge_coefs
+#remove the intercept
+final_coefs = final_coefs[2:nrow(final_coefs),]
+#remove weight 0 coefficients
+final_coefs = final_coefs[final_coefs!=0]
+#clean ` in final_coefs
+updated_name = gsub("`","",names(final_coefs))
+names(final_coefs) = updated_name
+
+modified_weights_names <- gsub("_p_other_.*", "", names(final_coefs))
+
+# 1. Extract Relevant Columns from Score File
+subset_score_columns <- score_file[, colnames(score_file) %in% c("SNP","A1",modified_weights_names), drop = FALSE]
+p_value_file = score_file %>% 
+  select(SNP) %>% 
+  left_join(unique_infor_post) %>% 
+  select(SNP,P,P_other)
+
+# Function to extract p-value thresholds from weight names
+extract_pvals <- function(weight_name) {
+  p_other <- as.numeric(gsub(".*_p_other_([0-9e.-]+)_.*", "\\1", weight_name))
+  p_tar <- as.numeric(gsub(".*_p_tar_([0-9e.-]+)$", "\\1", weight_name))
+  return(list(p_other = p_other, p_tar = p_tar))
+}
+
+
+# Initialize an empty matrix to store results
+results <- matrix(0, nrow = nrow(subset_score_columns), ncol = 1)
+rownames(results) <- subset_score_columns$SNP
+colnames(results) <- "final_weighted_score"
+
+# Loop through each weight and apply the operations
+for (weight_name in names(final_coefs)) {
+  pvals <- extract_pvals(weight_name)
+  score_colname <- gsub("_p_other_.*", "", weight_name)
+  
+  
+  # Filter SNPs based on p-value criteria
+  selected_snps <- na.omit(p_value_file$SNP[p_value_file$P <= pvals$p_tar | p_value_file$P_other <= pvals$p_other])
+  
+  # Multiply scores with the weight
+  idx <- match(selected_snps, subset_score_columns$SNP)
+  results[selected_snps, "final_weighted_score"] <- results[selected_snps, "final_weighted_score"] + 
+    subset_score_columns[idx, score_colname] * final_coefs[weight_name]
+}
+
+
+
+sum_tar = as.data.frame(fread(paste0(data.dir,eth,"/",trait,".txt"),header=T))
+
+sum_tar = sum_tar %>% 
+  select(rsID, CHR, POS_b37, A2)
+#prepare PRS for PGS catalog format
+prs_infor = left_join(prs_coef,sum_tar,by = c("SNP"="rsID")) %>% 
+  rename(rsID = SNP,
+         chr_name = CHR,
+         chr_position = POS_b37,
+         effect_allele = A1,
+         other_allele = A2,
+         effect_weight = final_weighted_score) %>% 
+  select(rsID, chr_name, chr_position,
+         effect_allele, other_allele, effect_weight)
+
+out_filename = paste0("/data/zhangh24/multi_ethnic/result/AOU/pgs_catalog/",
+                      trait,"_",eth,"_","CTSLEB.txt.gz")
+write.table(prs_select, file = gzfile(out_filename), sep = "\t", 
+            row.names = FALSE, quote = FALSE, col.names = TRUE)
+
+#verify the pgs
+prs_coef = cbind(score_file[,c("SNP","A1")],results)
+write.table(prs_coef,file = paste0(temp.dir,"score_file_final_test"),row.names = F,col.names = F,quote=F)
+
+res = system(paste0(soft.dir,"plink2_alpha ",
+                    "--score-col-nums 3 ",
+                    "--score ",temp.dir,"score_file_final_test cols=+scoresums,-scoreavgs ",
+                    "--bfile ",temp.dir,"ukb/all_chr ",
+                    "--out ",temp.dir,"eb_prs_final"))
+
+prs_temp = fread(paste0(temp.dir,"eb_prs_final.sscore"))
+# times (2*number of SNPs)
+prs_mat = prs_temp[,c(1,2,5)]
+colnames(prs_mat)[2] = "id"
+
+pheno.dir = "/data/zhangh24/multi_ethnic/data/UKBB/phenotype/"
+pheno_tuning = as.data.frame(fread(paste0(pheno.dir,trait,"/tuning+validation/",eth,"_tuning.txt")))
+pheno_tuning = pheno_tuning[,1:2]
+covar <- as.data.frame(fread(paste0(pheno.dir,"/covariates/tuning+validation/",eth,"_all_data.txt")))
+pheno_tuning <- left_join(pheno_tuning, covar)
+colnames(pheno_tuning) = c('id','y','sex','age',paste0('pc',1:10))
+pheno_tuning_com = pheno_tuning[complete.cases(pheno_tuning$y),]
+pheno_tuning = left_join(pheno_tuning_com,prs_mat,by = "id")
+model.null <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=pheno_tuning)
+y_tun = model.null$residual
+prs_tun = pheno_tuning[,"SCORE1_SUM"]
+pheno_vad = as.data.frame(fread(paste0(pheno.dir,trait,"/tuning+validation/",eth,"_validation.txt")))
+pheno_vad = pheno_vad[,1:2]
+pheno_vad <- left_join(pheno_vad, covar)
+colnames(pheno_vad) = c('id','y','sex','age',paste0('pc',1:10))
+pheno_vad_com = pheno_vad[complete.cases(pheno_vad$y),]
+pheno_vad = left_join(pheno_vad_com,prs_mat,by = "id")
+model.null <- lm(y~pc1+pc2+pc3+pc4+pc5+pc6+pc7+pc8+pc9+pc10+age+sex,data=pheno_vad)
+y_vad = model.null$residual
+prs_vad = pheno_vad[,"SCORE1_SUM"]
+model <- lm(y_vad~prs_vad)
 r2_ctsleb <- summary(model)$r.square
-
-
+print(r2_ctsleb)
+save(r2_ctsleb, file = paste0(out.dir, "CTSLEB_all_pgs.result"))
 
 
 
