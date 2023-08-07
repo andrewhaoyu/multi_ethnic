@@ -379,3 +379,6 @@ write.table(prs_coef,file = paste0(temp.dir,"score_file_final_test"),row.names =
   
   out_filename = paste0("/data/zhangh24/multi_ethnic/result/GLGC/pgs_catalog/",
                         trait,"_",eth,"_","CTSLEB.txt.gz")
+  write.table(prs_select, file = gzfile(out_filename), sep = "\t", 
+              row.names = FALSE, quote = FALSE, col.names = TRUE)
+  
