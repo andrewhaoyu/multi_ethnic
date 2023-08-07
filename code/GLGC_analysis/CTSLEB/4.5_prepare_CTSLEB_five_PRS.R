@@ -176,29 +176,10 @@ write.table(score_file,file = paste0(temp.dir,"score_file_eb"),row.names = F,col
 p_value_file = plink_file_eb[[2]]
 
 
-p_value_file_temp = p_value_file
-for(k1 in 1:length(pthres)){
-  #keep al the SNPs with P_EUR less than pthres[k1] in the analyses
-  idx <- which(unique_infor$P_other<=pthres[k1])
-  p_value_file_temp$P[idx] = 0
-  write.table(p_value_file_temp,file = paste0(temp.dir,"p_value_file"),col.names = F,row.names = F,quote=F)
-  n_col = ncol(score_file)
-  
-  res = system(paste0(soft.dir,"plink2_alpha ",
-                      "--q-score-range ",temp.dir,"q_range_file ",temp.dir,"p_value_file ",
-                      "--score-col-nums 3-",n_col," ",
-                      "--score ",temp.dir,"score_file_eb cols=+scoresums,-scoreavgs ",
-                      "--bfile ",temp.dir,"ukb/all_chr ",
-                      "--out ",temp.dir,"eb_prs_p_other_",k1))
-  system(paste0("cp -r ",temp.dir," /data/zhangh24/multi_ethnic/result/temp_data/"))
-  #the output of plink2 create 9 different files named as prs_p_other_k1.p_tar_k2.sscore
-  #this output file contains 16 columns
-  #the column 1-4 are: family ID, individual ID, 2*total number of SNPs in the PRS, the sum of allele count
-  #column 5-16 are the PRS scores with SNP of p_target<p_thres[k2]|p_eur<p_thres[k1] for different combinations of r2-cutoff and base_window_size
-}
-#find best cutoff for EUR by using all data as tuning
 #save.image("/data/zhangh24/CT_SLEB_workspace.RData")
 #temp.dir = "/data/zhangh24/multi_ethnic/result/temp_data/test/"
+#move the prs to the prs file
+out.dir.prs = paste0("/data/zhangh24/multi_ethnic/result/GLGC/prs/CT_SLEB_all/",eth,"/",trait,"/")
 prs_list = list()
 temp = 1
 #take the column name of different clumping parameters
@@ -208,7 +189,7 @@ for(k1 in 1:length(pthres)){
     #the --score file cols=+scoresums,-scoreavgs command in plink2 computes PRS as G*beta
     #If you compute PRS by chromosome, you need to sum the PRS scores for all chromosomes. 
     #load PRS for SNPs with p_target<p_thres[k2]|p_eur<p_thres[k1] 
-    prs_temp = fread(paste0(temp.dir,"eb_prs_p_other_",k1,".p_tar_",k2,".sscore"))
+    prs_temp = fread(paste0(out.dir.prs,"eb_prs_p_other_",k1,".p_tar_",k2,".sscore"))
     # times (2*number of SNPs)
     prs_list[[temp]] = prs_temp[,5:ncol(prs_temp)]
     
@@ -219,17 +200,6 @@ for(k1 in 1:length(pthres)){
 prs_mat = as.data.frame(cbind(prs_temp[,1:2],bind_cols(prs_list)))
 colnames(prs_mat)[2] = "id"
 prs_score = prs_mat[,-c(1:2)]
-#move the prs to the prs file
-out.dir.prs = paste0("/data/zhangh24/multi_ethnic/result/GLGC/prs/CT_SLEB_all/",eth,"/",trait,"/")
-system(paste0("cp ",temp.dir,"eb_prs_p_other_*.sscore ",out.dir.prs))
-
-#############EB step finish############################
-
-#system(past)
-
-
-
-
 
 ############SL step start#############################
 pheno.dir = "/data/zhangh24/multi_ethnic/data/UKBB/phenotype/"
