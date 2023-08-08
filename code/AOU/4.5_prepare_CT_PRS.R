@@ -175,3 +175,11 @@ out_filename = paste0("/data/zhangh24/multi_ethnic/result/AOU/pgs_catalog/",
                       trait,"_",eth,"_","CT.txt.gz")
 write.table(prs_select, file = gzfile(out_filename), sep = "\t", 
             row.names = FALSE, quote = FALSE, col.names = TRUE)
+
+ref_gene_pred = paste0(temp.dir,"ukb/all_chr")
+res = system(paste0("/data/zhangh24/software/plink2_alpha ",
+                    "--score-col-nums 3 --threads 2 ",
+                    "--score ",temp.dir,"prs_prep cols=+scoresums,-scoreavgs header no-mean-imputation ",
+                    "--bfile ",ref_gene_pred,
+                    " --out ",temp.dir,"PRS_final"))
+prs_mat = fread(paste0(temp.dir,"PRS_final.sscore"))
