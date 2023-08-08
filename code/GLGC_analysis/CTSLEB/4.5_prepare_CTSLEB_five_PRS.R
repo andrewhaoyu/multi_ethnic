@@ -324,9 +324,6 @@ sum_tar = as.data.frame(fread(paste0(data.dir,eth,"/",trait,".txt"),header=T))
 sum_tar = sum_tar %>% 
   select(rsID, CHR, POS_b37, A2)
 
-write.table(prs_select, file = gzfile(out_filename), sep = "\t", 
-            row.names = FALSE, quote = FALSE, col.names = TRUE)
-
 #verify the pgs
 prs_coef = cbind(score_file[,c("SNP","A1")],results)
 write.table(prs_coef,file = paste0(temp.dir,"score_file_final_test"),row.names = F,col.names = F,quote=F)
