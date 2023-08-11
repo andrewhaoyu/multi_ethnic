@@ -9,9 +9,9 @@
 args = commandArgs(trailingOnly = T)
 i = as.numeric(args[[1]])
 l = as.numeric(args[[2]])
-# m = as.numeric(args[[3]])
+m = as.numeric(args[[3]])
 # q = as.numeric(args[[4]])
-i1 = as.numeric(args[[3]])
+i1 = as.numeric(args[[4]])
 #i_rep = as.numeric(args[[5]])
 
 method <- c("Weighted-PRS")
@@ -51,7 +51,7 @@ temp= 1
       n <- nrow(y)
       y_test_mat <- y[(100000+1):110000,]
       y_vad_mat <- y[(110001):120000,]
-      for(m in 1:4){
+     # for(m in 1:4){
         print(m)
         
         r2_low = r2_high =  r2.test.rep <- rep(0,n.rep)
@@ -116,7 +116,7 @@ temp= 1
         method_vec[temp] <- method
         temp = temp+1
         
-      }
+#      }
 #     }
 #   }
 #   
@@ -135,7 +135,7 @@ weightedprs.result <- data.frame(eth.vec,
 
 save(weightedprs.result,file = paste0(out.dir,
                                       "weightedprs.result.ci_eth_",i,"_rho_",
-                                      l,"_GA_",i1,".rdata"))
+                                      l,"_GA_",i1,"_size_",m,".rdata"))
 
 
 
