@@ -111,11 +111,6 @@ for(r_ind in 1:length(r2_vec)){
     
   }
 }
-result.data <- data.frame(r2.vec.test,r2.vec.vad,
-                          pthres_vec1,pthres_vec2,
-                          r2_ind_vec,
-                          wc_ind_vec)
-
 
 prs.list <- list()
 temp = 1
@@ -180,15 +175,20 @@ y.pred <- predict(sl, x.vad, onlySL = TRUE)
 #evaluate the best prs performance on the validation
 model <- lm(y.vad~y.pred[[1]])
 r2.stack <- summary(model)$r.square
-result.data <- data.frame(r2.vec.test,r2.vec.vad,
-                          pthres_vec1,pthres_vec2,
-                          r2_ind_vec,
-                          wc_ind_vec)
-#standard C+T
-idx <- which.max(r2.vec.test)
-r2.max <- r2.vec.vad[idx]
-r2.list <- list(r2.stack)
-save(r2.list,file = paste0(out.dir,eth[i],"/r2.list_rho_allethebtest_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
+library(boot)
+r2_function <- function(data, indices) {
+  sample_data <- data[indices, ]
+  model <- lm(y.vad ~ prs.vad, data = sample_data)
+  return(summary(model)$r.square)
+}
+data <- data.frame(y.vad = y.vad, prs.vad = y.pred[[1]])  # assuming y.vad and prs.vad are your data vectors
+results <- boot(data = data, statistic = r2_function, R = 1000)
+ci_result = boot.ci(results, type = "perc")
+r2_low = ci_result$percent[4]
+r2_high = ci_result$percent[5]
+
+r2.list <- data.frame(r2 = r2.stack, ci_low = r2_low, ci_high = r2_high)
+save(r2.list,file = paste0(out.dir,eth[i],"/r2.list_rho_allethebtest_95CI_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
 #write.csv(r2.mat,file = "/data/zhangh24/multi_ethnic/result/LD_simulation/ld.clump.auc.csv")
 # load(paste0(out.dir,eth[i],"/r2.list_rho_alletheb_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1))
 # 

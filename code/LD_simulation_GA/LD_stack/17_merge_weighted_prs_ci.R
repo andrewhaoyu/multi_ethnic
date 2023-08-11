@@ -13,22 +13,24 @@ ga_vec = rep(0,total)
 temp = 1
 result.table.list = list()
 for(i1 in 1:5){
-  for(i in 1:5){
+  for(i in 2:5){
     for(l in 1:3){
       for(m in 1:4){
         
         
         
-        load(paste0(out.dir,eth[i],"/ct95_",l,"_size_",m,"_GA_",i1))
+        load( paste0(out.dir,
+                     "weightedprs.result.ci_eth_",i,"_rho_",
+                     l,"_GA_",i1,"_size_",m,".rdata"))
         
-        
+        result.data = weightedprs.result[1,2:4]
         eth.vec[temp] = eth[i]
-       
+        
         l_vec[temp] <- l
         m_vec[temp] <- m
         ga_vec[temp] <- i1
         result.table.list[[temp]] = data.frame(eth_vec = eth[i],
-                                              result.data,
+                                               result.data,
                                                l_vec = l,
                                                ga_vec = i1,
                                                m_vec = m)
@@ -45,7 +47,7 @@ library(data.table)
 result.table = rbindlist(result.table.list)
 
 #LD.clump.result.p.rep)
-save(LD.result.list,file = paste0(out.dir,"LD.clump.result.CT.95CI.rdata"))
+save(result.table,file = paste0(out.dir,"weightedprs.CT.95CI.rdata"))
 
 
 
