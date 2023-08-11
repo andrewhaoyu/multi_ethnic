@@ -9,9 +9,9 @@
 args = commandArgs(trailingOnly = T)
 i = as.numeric(args[[1]])
 l = as.numeric(args[[2]])
-# m = as.numeric(args[[3]])
+m = as.numeric(args[[3]])
 # q = as.numeric(args[[4]])
-i1 = as.numeric(args[[3]])
+i1 = as.numeric(args[[4]])
 #i_rep = as.numeric(args[[5]])
 library(boot)
 method <- c("Best EUR SNP (C+T)",
@@ -54,7 +54,7 @@ temp= 1
       y <- y[,2+(1:n.rep)]
       n <- nrow(y)
       y_test_mat <- y[(100000+1):nrow(y),]
-      for(m in 1:4){
+      #for(m in 1:4){
         for(q in 1:3){
           print(q)
           r2.test.rep <- rep(0,n.rep)
@@ -98,7 +98,7 @@ temp= 1
           temp = temp+1
           
         }
-      }
+ #     }
 #     }
 #     
 #     
@@ -115,7 +115,8 @@ eursnp.result <- data.frame(eth.vec,
                             method_vec = method_vec)
 
 save(eursnp.result,file = paste0(out.dir,
-                                 "eur.snp.reult.95CI_GA",i1,"_rho_",l,"_eth_",i,".rdata"))
+                                 "eur.snp.reult.95CI_GA",i1,"_rho_",l,"_eth_",i,"_size_"
+                                 ,m,".rdata"))
 
 
 
