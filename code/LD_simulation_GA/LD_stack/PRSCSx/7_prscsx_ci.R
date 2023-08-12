@@ -126,6 +126,8 @@ y_test_mat <- y[(100000+1):nrow(y),]
 
 prscsx.result <- data.frame(eth.vec,
                             r2.vec = r2.result,
+                            ci_low = ci_low,
+                            ci_high = ci_high,
                             l_vec,
                             m_vec,
                             ga_vec=ga_vc,
