@@ -23,17 +23,13 @@ for(i1 in 1:5){
                      "prscsx_five.result_95ci_ga_",i1,"_eth_",i,"_rho_",l,
                      "_size_",m,".rdata"))
         
-        result.data = weightedprs.result[1,2:4]
-        eth.vec[temp] = eth[i]
-        
-        l_vec[temp] <- l
-        m_vec[temp] <- m
-        ga_vec[temp] <- i1
-        result.table.list[[temp]] = data.frame(eth_vec = eth[i],
-                                               result.data,
-                                               l_vec = l,
-                                               ga_vec = i1,
-                                               m_vec = m)
+        # result.data = prscsx.result[1,2:4]
+        # eth.vec[temp] = eth[i]
+        # 
+        # l_vec[temp] <- l
+        # m_vec[temp] <- m
+        # ga_vec[temp] <- i1
+        result.table.list[[temp]] = prscsx.result
         temp = temp+1
       }
     }
@@ -47,7 +43,7 @@ library(data.table)
 result.table = rbindlist(result.table.list)
 
 #LD.clump.result.p.rep)
-save(result.table,file = paste0(out.dir,"weightedprs.CT.95CI.rdata"))
+save(result.table,file = paste0(out.dir,"prscsx.95CI.rdata"))
 
 
 
