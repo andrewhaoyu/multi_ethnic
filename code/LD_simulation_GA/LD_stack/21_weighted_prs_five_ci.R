@@ -146,8 +146,8 @@ weightedprs.result = data.frame(r2 = r2,
                                 ci_low = ci_low,
                                 ci_high = ci_high)
 
-save(weightedprs.result,file = paste0(out.dir,
-                                      "weighted_prs_five_ci_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".rdata"))
+save(weightedprs.result,file = paste0(out.dir,eth[i],
+                                      "/weighted_prs_five_ci_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".rdata"))
 
 
 
