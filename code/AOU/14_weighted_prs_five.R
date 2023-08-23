@@ -134,11 +134,29 @@ prs  = prs_vad%*%coeff
 model.vad.prs <- lm(model.vad.null$residual~prs,data=pheno_vad)
 r2 = summary(model.vad.prs)$r.square
 
+library(boot)
+
+r2_function <- function(data, indices) {
+  sample_data <- data[indices, ]
+  model <- lm(y.vad ~ prs.vad, data = sample_data)
+  return(summary(model)$r.square)
+}
+data <- data.frame(y.vad = model.vad.null$residual, prs.vad = prs)  # assuming y.vad and prs.vad are your data vectors
+results <- boot(data = data, statistic = r2_function, R = 1000)
+ci_result = boot.ci(results, type = "perc")
+ci_low= ci_result$percent[4]
+ci_high = ci_result$percent[5]
+
+
+
 result = data.frame(eth = eth,
                     trait = trait,
-                    method = "Weighted PRS (C + T) three ancestries",
-                    r2 = r2
+                    method = "Weighted PRS (C + T) five ancestries",
+                    r2 = r2,
+                    r2_low = ci_low,
+                    r2_high = ci_high
 )
+
 
 save(result, file = paste0(out.dir, "weighted_prs_ct_three_ans.result"))
 
