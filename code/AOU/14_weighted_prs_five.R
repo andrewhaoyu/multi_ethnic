@@ -151,7 +151,7 @@ ci_high = ci_result$percent[5]
 
 result = data.frame(eth = eth,
                     trait = trait,
-                    method = "Weighted PRS (C + T) three ancestries",
+                    method = "Weighted PRS (C + T) five ancestries",
                     r2 = r2,
                     r2_low = ci_low,
                     r2_high = ci_high
