@@ -17,12 +17,15 @@ for(i1 in 1:5){
     for(l in 1:3){
       for(m in 1:4){
         
+        result.data.temp.list = list()
+        for(i_rep in 1:10){
+          load( paste0(out.dir,eth[i],
+                       "/weighted_prs_five_ci_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".rdata"))
+          result.data.temp.list[[i_rep]] = weightedprs.result
+        }
         
         
-        load(paste0(out.dir,
-                    "weighted_prs_five_ci_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,".rdata"))
-        
-        result.data = weightedprs.result
+        result.data = colMeans(result.data.temp)
         eth.vec[temp] = eth[i]
         
         l_vec[temp] <- l
