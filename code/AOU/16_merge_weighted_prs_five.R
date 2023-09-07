@@ -9,7 +9,7 @@ for(l in 1:2){
     trait = trait_vec[l]
     out.dir = paste0("/data/zhangh24/multi_ethnic/result/AOU/weighted_prs/",eth,"/",trait,"/")
     load(paste0(out.dir, "weighted_prs_ct_three_ans.result"))
-    result_list[[temp]] = result
+    result_list[[temp]] = result %>% mutate(method = "Weighted PRS (C + T) three ancestries")
     temp = temp+ 1
   }
 }

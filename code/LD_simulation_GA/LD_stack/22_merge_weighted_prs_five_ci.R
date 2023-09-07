@@ -24,16 +24,20 @@ for(i1 in 1:5){
           result.data.temp.list[[i_rep]] = weightedprs.result
         }
         
+        result.data.temp = rbindlist(result.data.temp.list)
         
-        result.data = colMeans(result.data.temp)
+        result.data = as.vector(colMeans(result.data.temp))
+        r2_result = data.frame(r2 = result.data[1],
+                               r2_low = result.data[2],
+                               r2_high = result.data[3])
         eth.vec[temp] = eth[i]
         
         l_vec[temp] <- l
         m_vec[temp] <- m
         ga_vec[temp] <- i1
         result.table.list[[temp]] = data.frame(eth_vec = eth[i],
-                                               result.data,
-                                               l_vec = l,
+                                          r2_result,
+                                             l_vec = l,
                                                ga_vec = i1,
                                                m_vec = m)
         temp = temp+1

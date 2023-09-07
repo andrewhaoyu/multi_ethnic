@@ -257,10 +257,6 @@ model <- lm(y_vad~y_pred[[1]])
 r2_ctsleb_true <- summary(model)$r.square
 
 
-
-
-
-
 sl_fit = sl
 #algorithm weight
 alg_weights <- sl_fit$coef
@@ -272,6 +268,7 @@ glmnet_coefs <- coef(glmnet_obj, s = best_lambda)
 ridge_coefs = sl_fit$fitLibrary$SL.ridge_All$bestCoef
 #final
 final_coefs <- alg_weights[1] * glmnet_coefs + alg_weights[2] * ridge_coefs
+
 #remove the intercept
 final_coefs = final_coefs[2:nrow(final_coefs),]
 #remove weight 0 coefficients

@@ -123,7 +123,7 @@ prediction.result = prediction.result %>%
   mutate(trait = 
            case_when(trait == "HDL" ~ "HDL",
                      trait == "LDL" ~ "LDL",
-                      trait == "logTG" ~ "logTG",
+                      trait == "logTG" ~ "log(TGs)",
                      trait == "TC" ~ "TC"))
 prediction.result = prediction.result %>% 
   mutate(eth_name = 
