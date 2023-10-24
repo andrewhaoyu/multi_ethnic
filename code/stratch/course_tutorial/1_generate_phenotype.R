@@ -1,6 +1,6 @@
 #select causal SNPs
 library(data.table)
-cur_dir <- "/data/zhangh24/multi_ethnic/result/stat_gene_course/"
+cur_dir <- "/data/BB_Bioinformatics/stat_gene_course/"
 setwd(cur_dir)
 snp <- fread("./data/chr22.bim")
 

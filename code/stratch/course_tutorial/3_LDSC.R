@@ -1,5 +1,8 @@
 #Use LDSC to estimate heritability
-cur_dir <- "/data/zhangh24/multi_ethnic/result/stat_gene_course/"
+#Data were obtained from the GWAS summary statistics of breast cancer
+#Three different traits were included: overall breast cancer risk, Luminal A, Triple negative
+#More background of the GWAS can be found in: https://www.nature.com/articles/s41588-020-0609-2
+cur_dir <- "/data/BB_Bioinformatics/stat_gene_course/"
 #look at the data
 #the data is based on breast cancer GWAS
 bcac_overall <- fread(paste0(cur_dir,"data/overall_bc"))
