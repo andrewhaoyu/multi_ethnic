@@ -3,6 +3,7 @@ cur_dir <- "/data/zhangh24/multi_ethnic/result/stat_gene_course/"
 #look at the data
 #the data is based on breast cancer GWAS
 bcac_overall <- fread(paste0(cur_dir,"data/overall_bc"))
+head(bcac_overall)
 #snpid; if the SNP has rs id, then snpid is rsid, otherwise snpid is chr:position
 #CHR: chromosome
 #bp: GRCh37 (hg19)
@@ -18,18 +19,52 @@ system(paste0("module load ldsc; ",
               "munge_sumstats.py ",
               "--sumstats ",cur_dir,"data/overall_bc ",
               "--out ",cur_dir,"result/ldsc_herit_overall ",
-              "--merge-alleles /data/BB_Bioinformatics/software/ldsc_example_data/w_hm3.snplist ",
+              "--merge-alleles ",cur_dir,"data/eur_w_ld_chr/w_hm3.snplist ",
               "--chunksize 500000 ",
               "--signed-sumstats Z,0 --info-min 0.3 --maf-min 0.01"))
 
 munge_result = paste0(cur_dir,"result/ldsc_herit_overall.sumstats.gz")
 
+#the frality scale heritablity is 0.4777
 system(paste0("module load ldsc; ",
        "ldsc.py ",
        "--h2 ", munge_result," ",
        "--ref-ld-chr ", cur_dir,"data/eur_w_ld_chr/ ",
        "--w-ld-chr ", cur_dir,"data/eur_w_ld_chr/ ",
        "--out ", cur_dir,"result/h2_overall "))
-#observed scale heritablity is 0.4777
 
 
+
+#genetic correlation calculation for luminal A and triple negative breast cancer subtypes
+#munge the luminal A and triple negative summary statistics
+lua <- fread(paste0(cur_dir,"data/lua_bc"))
+head(lua)
+system(paste0("module load ldsc; ",
+              "munge_sumstats.py ",
+              "--sumstats ",cur_dir,"data/lua_bc ",
+              "--out ",cur_dir,"result/ldsc_herit_lua ",
+              "--merge-alleles ",cur_dir,"data/eur_w_ld_chr/w_hm3.snplist ",
+              "--chunksize 500000 ",
+              "--signed-sumstats Z,0 --info-min 0.3 --maf-min 0.01"))
+
+munge_result_lua = paste0(cur_dir,"result/ldsc_herit_lua.sumstats.gz")
+
+#munge the luminal A and triple negative summary statistics
+system(paste0("module load ldsc; ",
+              "munge_sumstats.py ",
+              "--sumstats ",cur_dir,"data/tn_bc ",
+              "--out ",cur_dir,"result/ldsc_herit_tn ",
+              "--merge-alleles ",cur_dir,"data/eur_w_ld_chr/w_hm3.snplist ",
+              "--chunksize 500000 ",
+              "--signed-sumstats Z,0 --info-min 0.3 --maf-min 0.01"))
+
+munge_result_tn = paste0(cur_dir,"result/ldsc_herit_tn.sumstats.gz")
+
+#calculate genetic correlation
+system(paste0("module load ldsc; ",
+              "ldsc.py ",
+              "--rg ", munge_result_lua,",",munge_result_tn," ",
+              "--ref-ld-chr ", cur_dir,"data/eur_w_ld_chr/ ",
+              "--w-ld-chr ", cur_dir,"data/eur_w_ld_chr/ ",
+              "--out ", cur_dir,"result/rg_lua_tn "))
+#genetic correlation 0.4829 (s.e. 0.0512)
