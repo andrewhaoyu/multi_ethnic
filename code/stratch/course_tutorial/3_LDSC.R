@@ -82,4 +82,7 @@ system(paste0("module load ldsc; ",
               "--overlap-annot  ",
               "--frqfile-chr ", cur_dir,"data/1000G_Phase3_frq/1000G.EUR.QC. ",
               "--out ", cur_dir,"result/h2_sldsc "))
-
+library(data.table)
+enrichment_result = fread("/data/BB_Bioinformatics/stat_gene_course/result/h2_sldsc.results")
+which.max(enrichment_result$Enrichment)
+enrichment_result[13,]
