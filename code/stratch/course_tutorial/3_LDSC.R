@@ -71,3 +71,15 @@ system(paste0("module load ldsc; ",
               "--w-ld-chr ", cur_dir,"data/eur_w_ld_chr/ ",
               "--out ", cur_dir,"result/rg_lua_tn "))
 #genetic correlation 0.4829 (s.e. 0.0512)
+
+
+#stratified LD-score regression using baseline annotation
+system(paste0("module load ldsc; ",
+              "ldsc.py ",
+              "--h2 ", munge_result," ",
+              "--ref-ld-chr ", cur_dir,"data/1000G_Phase3_baselineLD_ldscores/baselineLD. ",
+              "--w-ld-chr ", cur_dir,"data/1000G_Phase3_weights_hm3_no_MHC/weights.hm3_noMHC. ",
+              "--overlap-annot  ",
+              "--frqfile-chr ", cur_dir,"data/1000G_Phase3_frq/1000G.EUR.QC. ",
+              "--out ", cur_dir,"result/h2_sldsc "))
+
