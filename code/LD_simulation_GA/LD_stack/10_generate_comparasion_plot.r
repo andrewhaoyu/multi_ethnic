@@ -133,7 +133,8 @@ prediction.result = prediction.result %>%
   ))
 
 save(prediction.result,file = "prediction.result.summary.rdata")
-
+write.csv(prediction.result, 
+          file = "./prediction.result.summary.csv")
 uvals = factor(c("CT",
                  "LDpred2",
                  "Best EUR PRS (CT)",

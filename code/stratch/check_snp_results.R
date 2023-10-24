@@ -1,2 +1,2 @@
 data = readRDS("/Users/zhangh24/Downloads/SNPforHaoyu.rds")
-idx <- which()
+idx <- which(data$pos_GRCH38==9998855)
