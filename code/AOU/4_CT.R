@@ -195,6 +195,11 @@ write.table(prs_max, file = paste0(out.dir.prs, "best_prs.sscore"),
             col.names = T,
             quote = F)
 
+
+
+out_dir_boot = paste0("/data/zhangh24/multi_ethnic/result/GLGC/boot_result/PT/",eth,"/",trait,"/")
+boot_result = list(boot_r2,ci_result)
+save(boot_result, file = paste0(out_dir_boot, "boot_result.rdata"))
 #find best cutoff for EUR by using all data as tuning
 
 

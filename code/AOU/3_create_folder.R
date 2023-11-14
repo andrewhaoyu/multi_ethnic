@@ -193,3 +193,32 @@ for(i in 1:3){
                   "mkdir ",trait[l],"/"))  
   }
 }
+
+
+
+
+
+system(paste0("cd /data/zhangh24/multi_ethnic/result/AOU/; mkdir boot_result"))
+
+
+
+
+method_vec = c("PT","weighted_prs", "CTSLEB", "PRSCSX", "BESTEUR")
+
+for(k in 1:length(method_vec)){
+  method = method_vec[k]
+  system(paste0("cd /data/zhangh24/multi_ethnic/result/AOU/boot_result/; mkdir ",method))
+  
+  for(i in 1:3){
+    system(paste0("cd /data/zhangh24/multi_ethnic/result/AOU/boot_result/",method,"/;",
+                  "mkdir ",eth[i]))
+    for(l in 1:2){
+      system(paste0("cd /data/zhangh24/multi_ethnic/result/AOU/boot_result/",method,"/" ,eth[i],"/; ",
+                    "mkdir ",trait[l]))
+    }
+  }
+  
+}
+
+
+
