@@ -165,3 +165,9 @@ result = data.frame(eth = eth,
 )
 save(result, file = paste0(out.dir, "weighted_prs_ct.result"))
 
+
+
+out_dir_boot = paste0("/data/zhangh24/multi_ethnic/result/AOU/boot_result/weighted_prs/",eth,"/",trait,"/")
+boot_result = list(boot_r2,ci_result)
+save(boot_result, file = paste0(out_dir_boot, "boot_result.rdata"))
+
