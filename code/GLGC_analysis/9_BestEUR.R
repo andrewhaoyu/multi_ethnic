@@ -127,4 +127,4 @@ save(r2.result, file = paste0(out.dir, "BestEUR.result"))
 
 out_dir_boot = out.dir = paste0("/data/zhangh24/multi_ethnic/result/GLGC/boot_result/BestEUR/",eth,"/",trait,"/")
 boot_result = list(boot_r2,ci_result)
-save(boot_result, paste0(out_dir_boot, "boot_result.rdata"))
+save(boot_result, file = paste0(out_dir_boot, "boot_result.rdata"))
