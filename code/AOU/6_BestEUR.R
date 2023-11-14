@@ -123,3 +123,7 @@ r2.result = data.frame(eth = eth,
 
 
 save(r2.result, file = paste0(out.dir, "BestEUR.result"))
+
+out_dir_boot = paste0("/data/zhangh24/multi_ethnic/result/AOU/boot_result/BESTEUR/",eth,"/",trait,"/")
+boot_result = list(boot_r2,ci_result)
+save(boot_result, file = paste0(out_dir_boot, "boot_result.rdata"))
