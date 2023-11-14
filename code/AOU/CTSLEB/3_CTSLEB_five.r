@@ -416,4 +416,3 @@ write.table(prs_max, file = paste0(out.dir.prs, "best_prs.sscore"),
             quote = F)
 #evaluate on validation
 
-
