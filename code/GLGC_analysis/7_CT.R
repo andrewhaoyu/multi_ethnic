@@ -205,9 +205,9 @@ r2.result = data.frame(eth = eth,
 ct.result = list(r2.result,r2_tun_vec)
 save(ct.result, file = paste0(out.dir, "CT.result"))
 
-out_dir_boot = "/data/zhangh24/multi_ethnic/result/GLGC/boot_result/PT/"
+out_dir_boot = paste0("/data/zhangh24/multi_ethnic/result/GLGC/boot_result/PT/",eth,"/",trait,"/")
 boot_result = list(boot_r2,ci_result)
-save(boot_result, paste0(out_dir_boot, "boot_result.rdata"))
+save(boot_result, file = paste0(out_dir_boot, "boot_result.rdata"))
 #
 
 #find best cutoff for EUR by using all data as tuning
