@@ -139,8 +139,8 @@ r2_function <- function(data, indices) {
   return(summary(model)$r.square)
 }
 data <- data.frame(y.vad = model.vad.null$residual, prs.vad = prs)  # assuming y.vad and prs.vad are your data vectors
-results <- boot(data = data, statistic = r2_function, R = 1000)
-ci_result = boot.ci(results, type = "perc")
+boot_r2 <- boot(data = data, statistic = r2_function, R = 10000)
+ci_result = boot.ci(boot_r2, type = "perc")
 ci_low= ci_result$percent[4]
 ci_high = ci_result$percent[5]
 
@@ -163,3 +163,11 @@ write.table(prs_max, file = paste0(out.dir.prs, "best_prs.sscore"),
             row.names = F,
             col.names = T,
             quote = F)
+
+
+#weighted prs five
+
+out_dir_boot = "/data/zhangh24/multi_ethnic/result/GLGC/boot_result/weighted_prs/"
+boot_result = list(boot_r2,ci_result)
+save(boot_result, paste0(out_dir_boot, "boot_result.rdata"))
+
