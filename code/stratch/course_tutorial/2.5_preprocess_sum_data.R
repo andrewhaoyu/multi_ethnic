@@ -10,7 +10,7 @@ colnames(standard_result)[1] <- "MarkerName"
 
 bcac_result = fread("/data/zhangh24/ldsc/bcac_result.txt")
 bcac_result = bcac_result[,-c(1:2)]
-write.table(bcac_result,file = "/data/zhangh24/multi_ethnic/result/stat_gene_course/data/overall_bc",
+write.table(bcac_result,file = "/data/BB_Bioinformatics/stat_gene_course/data/overall_bc",
             row.names = F, col.names = T, quote = F)
 
 
@@ -43,7 +43,7 @@ lua_sum <- update_data %>%
          N = effect_sample_size_Luminial_A) %>% 
   select(snpid, CHR, bp, A2, A1, Z, P, info, MAF, N)
 
-write.table(lua_sum,file = "/data/zhangh24/multi_ethnic/result/stat_gene_course/data/lua_bc",
+write.table(lua_sum,file = "/data/BB_Bioinformatics/stat_gene_course/data/lua_bc",
             row.names = F, col.names = T, quote = F)
 
 
@@ -70,5 +70,5 @@ tn_sum <- update_data %>%
          N = effect_sample_size_Triple_Negative) %>% 
   select(snpid, CHR, bp, A2, A1, Z, P, info, MAF, N)
 
-write.table(tn_sum,file = "/data/zhangh24/multi_ethnic/result/stat_gene_course/data/tn_bc",
+write.table(tn_sum,file = "/data/BB_Bioinformatics/stat_gene_course/data/tn_bc",
             row.names = F, col.names = T, quote = F)

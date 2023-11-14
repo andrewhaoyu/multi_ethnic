@@ -6,7 +6,7 @@ snp <- fread("./data/chr22.bim")
 
 causal_snp_idx <- sample(c(1:nrow(snp)),
                      0.05*nrow(snp),
-                     replace = F)
+                     replace = F)q
 causal_snp <- snp[causal_snp_idx,]
 effect <- rnorm(nrow(causal_snp),0,sqrt(0.20/nrow(causal_snp)))
 causal_snp_list <- data.frame(causal_snp$V2,effect)

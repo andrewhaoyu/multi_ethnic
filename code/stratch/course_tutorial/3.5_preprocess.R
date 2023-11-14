@@ -2,6 +2,7 @@ i = 1
 l = 3
 i1 = 1
 n.rep = 10
+library(data.table)
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
 setwd("/data/zhangh24/multi_ethnic/")
 out.dir <-  "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/LD_stack/"

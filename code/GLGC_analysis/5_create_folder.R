@@ -148,3 +148,45 @@ for(i in 1:5){
   }
 }
 
+
+
+
+
+eth <- c("EUR","AFR","AMR","EAS","SAS")
+trait <- c("HDL","LDL",
+           "logTG",
+           "TC")
+
+
+
+system(paste0("mkdir /data/zhangh24/multi_ethnic/result/GLGC/boot_result/;
+cd /data/zhangh24/multi_ethnic/result/GLGC/boot_result/; mkdir PT"))
+
+for(i in 1:5){
+  system(paste0("cd /data/zhangh24/multi_ethnic/result/GLGC/boot_result/PT/; mkdir ",eth[i]))
+}
+for(i in 1:5){
+  for(l in 1:4){
+    system(paste0("cd /data/zhangh24/multi_ethnic/result/GLGC/boot_result/PT/" ,eth[i],"/; ",
+                  "mkdir ",trait[l]))
+  }
+}
+
+
+method_vec = c("BestEUR","weighted_prs", "CTSLEB", "PRSCSX")
+
+for(k in 1:length(method_vec)){
+  method = method_vec[k]
+  system(paste0("cd /data/zhangh24/multi_ethnic/result/GLGC/boot_result/; mkdir ",method))
+  for(i in 1:5){
+    system(paste0("cd /data/zhangh24/multi_ethnic/result/GLGC/boot_result/",method,"/; mkdir ",eth[i]))
+  }
+  
+  
+  for(i in 1:5){
+    for(l in 1:4){
+      system(paste0("cd /data/zhangh24/multi_ethnic/result/GLGC/boot_result/",method,"/" ,eth[i],"/; ",
+                    "mkdir ",trait[l]))
+    }
+  }
+}

@@ -8,7 +8,9 @@ i = as.numeric(args[[1]])
 l = as.numeric(args[[2]])
 library(data.table)
 library(dplyr)
-library(CTSLEB)
+library(devtools)
+install_github("andrewhaoyu/CTSLEB")
+library(CTSLEB,lib.loc = "/home/zhangh24/R/4.2/library/CTSLEB")
 eth_vec <- c("EUR","AFR","AMR","EAS","SAS")
 trait_vec <- c("HDL","LDL",
                "logTG",
@@ -45,15 +47,15 @@ sum_tar = sum_tar %>%
   select(rsID, CHR, POS_b37, BETA, SE, A1, P) %>% 
   rename(SNP = rsID, BP = POS_b37)
 #align allels
-sum_com <- AlignSum(sum_tar = sum_tar,
-                    sum_other = sum_eur)
+sum_com <- AlignSum(sum_target = sum_tar,
+                    sum_ref = sum_eur)
 
 #split the SNPs into two groups
 sum_com_split <- SplitSum(sum_com)
 #sum_com_split is a list with two data frame
 #the first data frame contains SNPs with p_eur < p_target, the p-value column is from p_eur.
 sum_other_ref = sum_com_split[[1]]
-#the second data frame contains target population-specific SNPs or p_eur < p_target. The p-value column is from p_target. 
+#the second data frame contains target population-specific SNPs or p_target < p_eur. The p-value column is from p_target. 
 sum_tar_ref = sum_com_split[[2]]
 
 
