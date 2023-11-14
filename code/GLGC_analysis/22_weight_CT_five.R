@@ -167,7 +167,7 @@ write.table(prs_max, file = paste0(out.dir.prs, "best_prs.sscore"),
 
 #weighted prs five
 
-out_dir_boot = "/data/zhangh24/multi_ethnic/result/GLGC/boot_result/weighted_prs/"
+out_dir_boot = paste0("/data/zhangh24/multi_ethnic/result/GLGC/boot_result/weighted_prs/",eth,"/",trait,"/")
 boot_result = list(boot_r2,ci_result)
 save(boot_result, file = paste0(out_dir_boot, "boot_result.rdata"))
 
