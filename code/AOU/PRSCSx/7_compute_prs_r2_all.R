@@ -155,3 +155,10 @@ write.table(prs_max, file = paste0(out.dir.prs, "best_prs.sscore"),
             col.names = T,
             quote = F)
 
+
+
+out_dir_boot = paste0("/data/zhangh24/multi_ethnic/result/AOU/boot_result/PRSCSX/",eth[i],"/",trait,"/")
+boot_result = list(boot_r2,ci_result)
+save(boot_result, file = paste0(out_dir_boot, "boot_result.rdata"))
+
+
