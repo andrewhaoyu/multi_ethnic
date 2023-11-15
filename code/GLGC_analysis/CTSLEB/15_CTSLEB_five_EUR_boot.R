@@ -52,8 +52,8 @@ PreparePlinkFileEB = function(snp_list,
   #number of ancestry
   n_ans = ncol(post_beta_mat)
   post_beta_mat[is.na(post_beta_mat)] = 0
-  
-  beta_mat = matrix(rep(post_beta_mat,n_col),nrow =n_row,ncol =n_col*n_ans)
+  post_beta_mat = as.matrix(post_beta_mat)
+  beta_mat  = matrix(rep(post_beta_mat,n_col),nrow =n_row,ncol = n_col*n_ans)
   names = rep("c",n_col*n_ans)
   temp = 0
   for(ldx in 1:n_col){
@@ -64,6 +64,7 @@ PreparePlinkFileEB = function(snp_list,
     names[(1:n_ans)+temp] = paste0(names(snp_list[[ldx]]),"_",colnames(post_beta_mat))
     temp = temp + n_ans
   }
+  
   colnames(beta_mat) = names
   score_file = data.frame(SNP = unique_id,A1 = unique_infor_post$A1,beta_mat)
   p_value_file = data.frame(SNP = unique_id,P = unique_infor_post$P)
