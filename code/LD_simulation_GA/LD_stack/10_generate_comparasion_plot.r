@@ -11,6 +11,7 @@ library(gridExtra)
 
 
 load(paste0("LD.clump.result.CT.rdata"))
+
 load(paste0("LD.clump.result.SCT.rdata"))
 load(paste0("eur.snp.reult.rdata"))
 eursnp.result = eursnp.result %>% 
@@ -67,7 +68,9 @@ prscsx.result.all = prscsx.result
 #          method_vec = "PRS-CSx (five ancestries)")
 LD.clump.result <- LD.result.list[[1]] %>% 
   mutate(method_vec = rep("CT"))
-
+LD.clump.result %>% filter(
+  l_vec == 3& m_vec==3 & ga_vec==4 & eth.vec == "SAS"
+)
 weightedprs.result = weightedprs.result %>% 
   mutate(method_vec = "Weighted PRS (CT)")
 load(paste0("LDpredEUR.result.rdata"))

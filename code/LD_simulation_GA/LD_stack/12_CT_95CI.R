@@ -121,17 +121,18 @@ for(i_rep in 1:n.rep){
   idx = which.max(r2.vec.test)
   prs.all <- prs.clump %>% 
     filter(P<=pthres[idx])
-  filename <- paste0(out.dir,eth[i],"/prs/prs_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".p_value_",k,".profile")
+  filename <- paste0(out.dir,eth[i],"/prs/prs_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".p_value_",idx,".profile")
   
   prs.temp <- fread(filename)
+  prs.score = prs.temp$SCORE
   prs.vad <- prs.score[(n.test+1):(n.test+n.vad)]
   y.vad = y_test_mat[(n.test+1):(nrow(y_test_mat)),i_rep]
   model2 <- lm(y.vad~prs.vad)
   data <- data.frame(y.vad = y.vad, prs.vad = prs.vad)  # assuming y.vad and prs.vad are your data vectors
-  results <- boot(data = data, statistic = r2_function, R = 1000)
-  ci_result = boot.ci(results, type = "perc")
-  ci_low[i_rep] = ci_result$percent[4]
-  ci_high[i_rep] = ci_result$percent[5]
+ # results <- boot(data = data, statistic = r2_function, R = 1000)
+  # ci_result = boot.ci(results, type = "perc")
+  # ci_low[i_rep] = ci_result$percent[4]
+  # ci_high[i_rep] = ci_result$percent[5]
   r2_vad[i_rep] = summary(model2)$r.square
 }
 

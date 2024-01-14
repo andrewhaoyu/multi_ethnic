@@ -106,7 +106,7 @@ for(i in 2:5){
           filename = paste0(out.dir,eth[i],"/r2.list_rho_allethebtest_95CI_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)
           
           load(filename)
-          r2.vec[temp] <- c(mean(r2.stack.temp))
+          r2.vec[temp] <- r2.list[1,1]
         eth.vec[temp] = rep(eth[i],1)
         l_vec[temp] <- rep(l,1)
         m_vec[temp] <- rep(m,1)

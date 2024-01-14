@@ -1,11 +1,3 @@
-#calculate the AUC for EUR SNPs with EUR coefficients
-#with target ethnic coefficients
-#with EB coefficients
-#calculate AUC for different ethnic groups
-#i for different ethnic groups
-#l for different causal proportion
-#m for different traning sample size
-#q for three different methods
 
 #i_rep = as.numeric(args[[5]])
 args = commandArgs(trailingOnly = T)
