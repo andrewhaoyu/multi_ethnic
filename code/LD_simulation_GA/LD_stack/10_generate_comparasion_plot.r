@@ -69,7 +69,7 @@ prscsx.result.all = prscsx.result
 LD.clump.result <- LD.result.list[[1]] %>% 
   mutate(method_vec = rep("CT"))
 LD.clump.result %>% filter(
-  l_vec == 3& m_vec==3 & ga_vec==4 & eth.vec == "SAS"
+  l_vec == 1& m_vec==1 & ga_vec==1 & eth.vec == "EUR"
 )
 weightedprs.result = weightedprs.result %>% 
   mutate(method_vec = "Weighted PRS (CT)")

@@ -44,16 +44,12 @@ n.rep = 10
 ci_low = rep(0,10)
 ci_high = rep(0,10)
 r2_vad = rep(0,10)
-r2.vec.test <- rep(0,length(pthres)*length(r2_vec)*length(wc_base_vec)*n.rep)
-r2.vec.vad <- rep(0,length(pthres)*length(r2_vec)*length(wc_base_vec)*n.rep)
-pthres_vec <- rep(0,length(pthres)*length(r2_vec)*length(wc_base_vec)*n.rep)
-r2_ind_vec <- rep(0,length(pthres)*length(r2_vec)*length(wc_base_vec)*n.rep)
-wc_ind_vec <- rep(0,length(pthres)*length(r2_vec)*length(wc_base_vec)*n.rep)
-rep_vec = rep(0,length(pthres)*length(r2_vec)*length(wc_base_vec)*n.rep)
-temp = 1
+r2.vec.test <- rep(0,length(pthres)*length(r2_vec)*length(wc_base_vec))
+r2.vec.vad <- rep(0,length(pthres)*length(r2_vec)*length(wc_base_vec))
+
 for(i_rep in 1:n.rep){
   sum.data <- as.data.frame(fread(paste0("./result/LD_simulation_GA/",eth[i],"/summary_out_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1)))  
-  
+  temp = 1
   for(r_ind in 1:length(r2_vec)){
     wc_vec = wc_base_vec/r2_vec[r_ind]
     for(w_ind in 1:length(wc_vec)){
