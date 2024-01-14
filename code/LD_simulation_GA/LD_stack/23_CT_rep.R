@@ -89,18 +89,10 @@ for(i_rep in 1:n.rep){
           
           r2.vec.test[temp] = summary(model1)$r.square
           
-          pthres_vec[temp] = pthres[k]
-          r2_ind_vec[temp] = r_ind
-          wc_ind_vec[temp] = w_ind
-          rep_vec[temp] = i_rep
-          
+         
           temp = temp+1
         }else{
           r2.vec.test[temp] = 0
-          pthres_vec[temp] = pthres[k]
-          r2_ind_vec[temp] = r_ind
-          wc_ind_vec[temp] = w_ind
-          rep_vec[temp] = i_rep
           temp = temp+1
         }
         
