@@ -129,10 +129,10 @@ for(i_rep in 1:n.rep){
   y.vad = y_test_mat[(n.test+1):(nrow(y_test_mat)),i_rep]
   model2 <- lm(y.vad~prs.vad)
   data <- data.frame(y.vad = y.vad, prs.vad = prs.vad)  # assuming y.vad and prs.vad are your data vectors
- # results <- boot(data = data, statistic = r2_function, R = 1000)
-  # ci_result = boot.ci(results, type = "perc")
-  # ci_low[i_rep] = ci_result$percent[4]
-  # ci_high[i_rep] = ci_result$percent[5]
+ results <- boot(data = data, statistic = r2_function, R = 1000)
+ ci_result = boot.ci(results, type = "perc")
+ ci_low[i_rep] = ci_result$percent[4]
+ ci_high[i_rep] = ci_result$percent[5]
   r2_vad[i_rep] = summary(model2)$r.square
 }
 
