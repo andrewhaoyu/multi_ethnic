@@ -112,6 +112,7 @@ for(i_rep in 1:n.rep){
   filename <- paste0(out.dir,eth[i],"/prs/prs_rho_",l,"_size_",m,"_rep_",i_rep,"_GA_",i1,"_rind_",r_ind,"_wcind_",w_ind,".p_value_",idx,".profile")
   
   prs.temp <- fread(filename)
+  prs.score <- prs.temp$SCORE
   prs.vad <- prs.score[(n.test+1):(n.test+n.vad)]
   y.vad = y_test_mat[(n.test+1):(nrow(y_test_mat)),i_rep]
   model2 <- lm(y.vad~prs.vad)

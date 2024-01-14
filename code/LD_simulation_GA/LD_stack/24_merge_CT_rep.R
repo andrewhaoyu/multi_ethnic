@@ -46,7 +46,12 @@ result.table = rbindlist(result.table.list)
 save(result.table,file = paste0(out.dir,"LD.clump.result.CT.rep.rdata"))
 
 
-
+result.table %>% filter(
+  eth_vec == "SAS"&
+    l_vec == 3 &
+    ga_vec == 4 &
+    m_vec == 3
+)
 
 
 
