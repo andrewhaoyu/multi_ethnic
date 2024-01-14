@@ -89,7 +89,7 @@ for(i_rep in 1:n.rep){
           
           r2.vec.test[temp] = summary(model1)$r.square
          
-          rep_vec[temp] = i_rep
+         
           
           temp = temp+1
         }else{
