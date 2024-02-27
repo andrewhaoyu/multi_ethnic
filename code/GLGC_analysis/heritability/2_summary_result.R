@@ -35,6 +35,9 @@ for(i in 1:1){
 sigma2toauc = function(x){
   ifelse(x==0,0.50,round(pnorm(sqrt(0.5*x)),3))
 }
+auctosigma2 = function(x){
+  qnorm(x)^2*2
+}
 result.long.h2 = data.frame(eth_vec,trait_vec,   h2_new = paste0(round(h2_vec,3)," (",round(se_vec,3),")"))
 
 library(tidyr)

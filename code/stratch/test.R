@@ -1,36 +1,24 @@
-setwd("/Users/zhangh24/GoogleDrive/multi_ethnic/result/LD_simulation_GA/LD_stack/")
-source("../../../code/LD_simulation_large/theme_Publication.R")
 
-label <- paste0("X", 1:6)
-mean  <- c(1.29,0.76,2.43,1.68,1.22,1.7) 
-lower <- c(1.29,0.76,2.43,1.68,1.22,1.7)
-upper <- c(1.29,0.76,2.43,1.68,1.22,1.7)
+library(data.table)
+snp_infor = readRDS("/gpfs/gsfs12/users/BB_Bioinformatics/ProjectData/SNP_infor_GRCh37_38/SNP_GRCh37_38_match_update.rds")
+library(dplyr)
+#load smkces data
+smkces = read.table(gzfile("/gpfs/gsfs11/users/zhangh24/GSCAN/GSCAN_SmkCes_2022_GWAS_SUMMARY_STATS_MULTI.txt.gz"),header= T,sep = "\t")
+#load mds data
+mds = read.table(gzfile("/gpfs/gsfs11/users/zhangh24/GSCAN/GSCAN_SmkCes_2022_MDS_MULTI.txt.gz"),header=T)
+#find SNP rs2459985 
+idx = which(smkces$POS==2067849)
+smkces[idx,]
+#add intercept
+mds = cbind(1,mds)
+gamma_vec = c(-0.013219, -0.000166,5.4e-05,
+              0.000227,0.000953)
+se_vec = c(0.003341,5.8e-05,0.000154,0.000222,0.000867)
+#calcualte beta
+beta_vec = as.matrix(mds)%*%gamma_vec
+#fixed effect-meta analyses
+mds2 = mds^2
+var_vec = as.matrix(mds2)%*%se_vec^2
 
-df <- data.frame(label, mean, lower, upper)
-
-# reverses the factor level ordering for labels after coord_flip()
-df$label <- factor(df$label, levels=rev(df$label))
-
-library(ggplot2)
-fp <- ggplot(data=df, aes(x=label, y=mean)) +
-  geom_point( color = "red", size = 5) + 
-  geom_hline(yintercept=1, lty=2) +  # add a dotted line at x=1 after flip
-  coord_flip() +  # flip coordinates (puts labels on y axis)
-  xlab("Label") + ylab("Mean (95% CI)") +
-  theme_Publication()+ # use a white background  
-  theme(axis.title.x = element_blank(),
-        axis.title.y = element_blank(),
-        axis.text = element_blank(),panel.border = element_rect(fill = NA, 
-                                                                colour = "black",size=3),
-        axis.line = element_line(colour="black",size=0.7)) 
-print(fp)
-
-data_table <- ggplot(data = df, aes(y = label)) +
-  #geom_hline(aes(yintercept = label), size = 7) +
-  geom_text(aes(x = 0, label = label), hjust = 0) +
-  #geom_text(aes(x = 5, label = eventnum)) +
-  #geom_text(aes(x = 7, label = arr), hjust = 1) +
-  scale_colour_identity() +
-  theme_void() + 
-  theme(plot.margin = margin(5, 0, 35, 0))
-grid.arrange(data_table,fp, ncol = 2)
+w_vec = 1/var_vec
+sum(beta_vec*w_vec)/(sum(w_vec))

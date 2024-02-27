@@ -43,5 +43,3 @@ result_sub = result_rep %>% filter(ga_vec==5)
 table(result_sub$method_vec)
 
 load("./result/LD_simulation_GA/LD_stack/simu_result_rep.rdata")
-
-

@@ -378,7 +378,7 @@ write.csv(PGS_sample_data, file = "/data/zhangh24/multi_ethnic/result/GLGC/pgs_c
 
 
 #performance description
-prepare documentation for PGS catalog
+#prepare documentation for PGS catalog
 #score file
 eth_vec <- c("EUR","AFR","EAS","SAS")
 trait_vec <- c("HDL","LDL",
