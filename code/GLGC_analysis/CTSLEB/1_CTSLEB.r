@@ -10,7 +10,7 @@ library(data.table)
 library(dplyr)
 library(devtools)
 install_github("andrewhaoyu/CTSLEB")
-library(CTSLEB,lib.loc = "/home/zhangh24/R/4.2/library/CTSLEB")
+library(CTSLEB,lib.loc = "/home/zhangh24/R/4.2/library/")
 eth_vec <- c("EUR","AFR","AMR","EAS","SAS")
 trait_vec <- c("HDL","LDL",
                "logTG",

@@ -49,7 +49,6 @@ cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
 #i for genetic correlation vec
 #j for negative selection alphs
 temp = 1
-#strong negative selection, common SNPs heritability fixed as 0.4 for each of the five ancestries, cross-ancestry genetic architecture as 0.8. 
 i1 = 1
 # for(i in 1:2){
 #   #for(j in 1:3){
@@ -120,6 +119,7 @@ i1 = 1
                       sigma=Sigma)
       colnames(beta) <- paste0("beta_",c("EUR","AFR","AMR","EAS","SAS"))
       #since this is the effect-size under standardized scale
+      #to use GCTA, we need the original scale effect size
       EUR.bi <- cau.snp.infor$EUR>=0.01&
         cau.snp.infor$EUR<=0.99
       AFR.bi <-  cau.snp.infor$AFR>=0.01&
@@ -147,18 +147,18 @@ i1 = 1
 #   }
 # #}
 # }
-# i1 = 1
-# #generate number of causal SNPs for l = 2
-# l = 2
-# n.cau = rep(0,5)
-# for(i in 1:5){
-#   select.cau <- read.table(paste0(cur.dir,eth[i],"/select.cau_rho",l,"_",i1),header=F)
-#   n.cau[i] = nrow(select.cau)
-# }
-# n.cau[c(2,3,4,1,5)]
-# select.cau1 = select.cau
-# herit <- nrow(select.cau)*var(select.cau$V2)
-# print(herit)
+i1 = 1
+#generate number of causal SNPs for l = 2
+l = 2
+n.cau = rep(0,5)
+for(i in 1:5){
+  select.cau <- read.table(paste0(cur.dir,eth[i],"/select.cau_rho",l,"_",i1),header=F)
+  n.cau[i] = nrow(select.cau)
+}
+n.cau[c(2,3,4,1,5)]
+select.cau1 = select.cau
+herit <- nrow(select.cau)*var(select.cau$V2)
+print(herit)
 
 
 
@@ -177,7 +177,7 @@ i1 = 1
 
 
 
-#strong negative selection, fixed per-SNP heritability for each of the five ancestries, cross-ancestry genetic architecture as 0.8. 
+#all SNPs causal, genetic correlation 0.8
 i1 = 2
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
 for(l in 1:3){
@@ -260,7 +260,7 @@ for(l in 1:3){
 
 
 
-#strong negative selection, fixed per-SNP heritability for each of the five ancestries, cross-ancestry genetic architecture as 0.6.
+#genetic correlation 0.6, all SNPs causal
 i1 = 3
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
 for(l in 1:3){
@@ -339,7 +339,7 @@ total.herit[c(2,3,4,1,5)]
 
 
 
-#no negative selection (alpha = 0), common SNPs heritability fixed as 0.4 for each of the five ancestries, cross-ancestry genetic architecture as 0.8.
+#all SNPs causal, genetic correlation 0.8, alpha = 0
 i1 = 4
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
 for(l in 1:3){
@@ -349,8 +349,6 @@ for(l in 1:3){
   #generate the effect-size for all the SNPs
   #even if the SNPs have 0 MAF in a particular population the effectsize will aslo be generated
   #it's okay since only the extracted genotype are those only existing in a particular population
-  
-  #beta~ N(0,f(1-f)^(1-\alpha)*h2/C)
   
   #get the number of causal SNPs in EUR
   
@@ -427,7 +425,7 @@ for(l in 1:3){
 }
 
 
-#mild negative selection (alpha = -0.25), common SNPs heritability fixed as 0.4 for each of the five ancestries, cross-ancestry genetic architecture as 0.8.
+#all SNPs causal, genetic correlation 0.8, alpha = -0.25
 i1 = 5
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
 for(l in 1:3){
