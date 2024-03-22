@@ -25,7 +25,7 @@ for(l in 1:4){
   # exclude_snp_list = "."
   # write.table(exclude_snp_list, file = "/data/BB_Bioinformatics/ProjectData/1000G_full_data/GRCh37/exclude_snp_list",
   #             row.names  = F, col.names = F, quote = F)
-  if(length(idx)>=0){
+  if(length(idx)>0){
     res = system(paste0("/data/zhangh24/software/plink2_alpha ",
                         "--threads 2 ",
                         "--bfile ",file_path," ",
