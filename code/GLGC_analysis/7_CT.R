@@ -19,6 +19,10 @@ library(data.table)
 #install.packages("vctrs")
 library(dplyr)
 
+#file_list = fread("filname")
+#filename = file_list[i]
+#file_to_read = fread(filename)
+#lscratch
 eth_vec <- c("EUR","AFR","AMR","EAS","SAS")
 trait_vec <- c("HDL","LDL",
            "logTG",
