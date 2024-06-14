@@ -12,5 +12,5 @@ l = as.numeric(args[[2]])
 a = i-l
 print(a)
 
-# save(a, file = 
+# save(a, file =
 #        paste0("/data/zhangh24/a_",i,"_",j,".rdata"))

@@ -40,3 +40,10 @@ scale_colour_Publication <- function(...){
   
 }
 
+scale_fill_rainbow <- function(...){
+  library(scales)
+  discrete_scale("fill","Publication",manual_pal(values = c("#5EBD3E","#FFB900","#F78200","#E23838","#973999","#009cdf")), ...)
+  
+}
+
+

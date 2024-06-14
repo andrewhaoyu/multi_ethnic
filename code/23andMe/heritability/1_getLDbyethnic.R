@@ -32,6 +32,7 @@ eth = c("EUR","AFR","AMR","EAS","SAS")
         system(paste0("module load ldsc; ", 
                       "cd /data/zhangh24/KGref_MEGA/GRCh37/",eth[i],"; ",
                       "python /data/zhangh24/ldsc/ldsc.py ",
+                      #"--print-snps /data/williamsjacr/ldsc_corrected/w_hm3_ldsc_printsnps.snplist"," ",
                       "--bfile ",temp.dir,"chr_clean",j," ",
                       "--l2 --ld-wind-kb 1000 ",
                       "--out /data/zhangh24/KGref_MEGA/GRCh37/",eth[i],"/",eth[i],"_ldsc/",j))

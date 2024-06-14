@@ -55,6 +55,7 @@ library(dplyr)
       
       sum.data = sum.tar %>% 
         mutate(MAF = ifelse(FREQ_A1<=0.5,FREQ_A1,1-FREQ_A1),
+               #N_eff = 1/(SD^2*2*EAF*(1-EAF))
                N = 1/(1/N_control+1/N_case),
                or = exp(BETA),
                se = SD,

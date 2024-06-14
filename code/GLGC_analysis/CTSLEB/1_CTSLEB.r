@@ -50,6 +50,35 @@ sum_tar = sum_tar %>%
 sum_com <- AlignSum(sum_target = sum_tar,
                     sum_ref = sum_eur)
 
+SplitSum <- function(x){
+  print("executing SplitSum() ...")
+  sum_com <- x
+  sum_com_select <- sum_com %>%
+    mutate(split_ind =
+             ifelse(
+               (P<P_ref)|is.na(P_ref),T,F)
+    )%>%
+    select(SNP,P,P_ref,split_ind)
+  
+  sum_com_select_other_ref <- sum_com_select %>%
+    filter(split_ind==F) %>%
+    select(SNP,P_ref) %>%
+    rename(P = P_ref)
+  
+  sum_com_select_tar_ref <- sum_com_select %>%
+    filter(split_ind==T) %>%
+    select(SNP,P)
+  
+  sum_list <- list(sum_com_select_other_ref,
+                   sum_com_select_tar_ref)
+  
+  
+  print("SplitSum() complete ... ")
+  return(sum_list)
+  
+}
+
+
 #split the SNPs into two groups
 sum_com_split <- SplitSum(sum_com)
 #sum_com_split is a list with two data frame
@@ -66,8 +95,11 @@ sum_tar_ref = sum_com_split[[2]]
 # we use plink1.9 for the clumping purpose
 # specify vector for clumping r square and base window size
 #the clumping_window_ize = base_window_size/clumping_r_square so that lower clumping r2 can have larger clumping window size
-r2_vec = c(0.01,0.05,0.1,0.2,0.5,0.8)
-wc_base_vec = c(50,100)
+# r2_vec = c(0.01,0.05,0.1,0.2,0.5,0.8)
+# wc_base_vec = c(50,100)
+
+r2_vec = c(0.01)
+wc_base_vec = c(50)
 
 write.table(sum_other_ref,paste0(temp.dir,"sum_other_ref"),col.names = T,row.names = F,quote=F)
 write.table(sum_tar_ref,paste0(temp.dir,"sum_tar_ref"),col.names = T,row.names = F,quote=F)
