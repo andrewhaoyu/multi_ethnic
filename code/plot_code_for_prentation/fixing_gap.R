@@ -99,7 +99,7 @@ i1 = 1
 
 
   
-  i1 = 3
+  i1 = 2
   result.sub.list = list()
   l = 2
   result.sub = prediction.result %>% 
