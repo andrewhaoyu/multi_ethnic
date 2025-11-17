@@ -1,0 +1,193 @@
+---
+
+title: "Joint Modeling of Genetic and Proteomic Predictors under Partial Observability: Simple Continuous Demo"
+output:
+html_document: default
+pdf_document: default
+date: "2025-09-25"
+------------------
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# Goal
+
+We compare two training strategies for a continuous outcome using the same data-generating process:
+
+* **Two-stage (uses all 500 train):**
+
+  1. Fit $X\sim G$ on the 150 subjects with proteins; impute $\hat X$ for everyone.
+  2. Fit $Y\sim [G, X_{mixed}]$ on all 500 (observed $X$ when available, else $\hat X$).
+
+* **Complete-case (uses only 150 train):** Fit $Y\sim [G, X]$ using only subjects with proteins.
+
+We evaluate both on an independent test set of **100** subjects with full proteins and genotypes, reporting test MSE.
+
+# Settings
+
+```{r settings}
+suppressPackageStartupMessages({
+  library(MASS)   # mvrnorm
+  library(glmnet) # lasso / elastic net
+  library(Matrix) # block-diagonal helpers
+})
+
+set.seed(1)
+
+# Dimensions & sample sizes
+n_train <- 3000       # training subjects (all have G)
+n_withX_train <- 150 # among training, # with proteins observed
+n_test  <- 100       # independent test subjects (full X and G)
+p <- 30              # SNPs
+q <- 6               # proteins
+
+# LD + noise settings
+ld_blocks <- 5; ld_rho <- 0.5
+sigma2_X <- 1; rho_X <- 0.3  # protein residual covariance
+sigma2_e <- 1                # residual variance for Y
+```
+
+# Data Generation
+
+We keep the generator minimal and deterministic given the seed.
+
+```{r helpers}
+# Block AR(1) correlation for LD
+make_block_ar1_corr <- function(p, n_blocks = 5, rho = 0.5) {
+  stopifnot(p >= n_blocks)
+  base <- floor(p / n_blocks)
+  sizes <- rep(base, n_blocks)
+  rmd <- p - sum(sizes)
+  if (rmd > 0) sizes[seq_len(rmd)] <- sizes[seq_len(rmd)] + 1
+  blocks <- lapply(sizes, function(m){
+    i <- seq_len(m); j <- seq_len(m)
+    outer(i, j, function(a,b) rho^abs(a-b))
+  })
+  R <- as.matrix(Matrix::bdiag(blocks)); diag(R) <- 1
+  R
+}
+
+# Genotype simulation via Gaussian copula -> discretize {0,1,2}
+simulate_genotypes <- function(n, p, R) {
+  stopifnot(is.matrix(R) && nrow(R) == p && ncol(R) == p)
+  Z <- MASS::mvrnorm(n, mu = rep(0, p), Sigma = R)
+  mafs <- runif(p, 0.05, 0.45)
+  cut0 <- qnorm((1 - mafs)^2); cut1 <- qnorm(1 - mafs^2)
+  G <- matrix(0, n, p)
+  for (k in seq_len(p)) G[,k] <- (Z[,k] > cut0[k]) + (Z[,k] > cut1[k])
+  colnames(G) <- paste0("SNP", seq_len(p))
+  G
+}
+
+# Sparse parameters shared across train/test
+generate_params <- function(p, q, seed = 1) {
+  set.seed(seed + 100)
+  Gamma <- matrix(0, p, q)
+  for (j in seq_len(q)) Gamma[sample.int(p, min(6, p)), j] <- rnorm(min(6, p), 0, 0.10)
+  beta_G <- rep(0, p); beta_G[sample.int(p, min(8, p))] <- rnorm(min(8, p), 0, 0.06)
+  beta_X <- rep(0, q); beta_X[sample.int(q, min(3, q))] <- rnorm(min(3, q), 0, 0.15)
+  list(Gamma = Gamma, beta_G = beta_G, beta_X = beta_X)
+}
+
+# Protein residual covariance (AR1)
+make_SigmaX <- function(q, sigma2_X = 1, rho_X = 0.3) {
+  S <- rho_X^abs(outer(seq_len(q), seq_len(q), "-"))
+  diag(S) <- 1
+  sigma2_X * S
+}
+
+# Simulate one dataset given parameters
+simulate_dataset <- function(n, p, q, R, Sigma_X, params, sigma2_e, n_with_X = n, seed = 1) {
+  set.seed(seed)
+  G <- simulate_genotypes(n, p, R)
+  X_full <- G %*% params$Gamma + MASS::mvrnorm(n, rep(0, q), Sigma_X)
+  colnames(X_full) <- paste0("Prot", seq_len(q))
+  y <- as.vector(G %*% params$beta_G + X_full %*% params$beta_X + rnorm(n, 0, sqrt(sigma2_e)))
+  # mask proteins to achieve partial observability
+  idx_obs <- sort(sample.int(n, n_with_X, replace = FALSE))
+  X_obs <- matrix(NA_real_, n, q)
+  X_obs[idx_obs, ] <- X_full[idx_obs, ]
+  list(G = G, X_full = X_full, X_obs = X_obs, y = y, idx_obs = idx_obs)
+}
+
+# Stage 1: X ~ G (mgaussian), trained only on observed-X rows
+fit_stage1 <- function(G, X_obs) {
+  obs <- which(rowSums(is.finite(X_obs)) == ncol(X_obs))
+  stopifnot(length(obs) >= 10)
+  optimal_lambda_min <- cv_fit$lambda.min
+  cvfit <- cv.glmnet(G[obs, , drop = FALSE], X_obs[obs, , drop = FALSE], family = "mgaussian", alpha = 1)
+  predict_X <- function(newG) {
+    out <- drop(predict(cvfit, newx = newG, s = "lambda.min"))
+    if (is.null(dim(out))) out <- matrix(out, nrow(newG))
+    out
+  }
+  list(predict_X = predict_X, obs_index = obs)
+}
+
+# Construct X_mixed: observed X where available, otherwise Xhat
+make_X_mixed <- function(X_obs, Xhat) {
+  Xmix <- Xhat
+  obs <- which(rowSums(is.finite(X_obs)) == ncol(X_obs))
+  if (length(obs) > 0) Xmix[obs, ] <- X_obs[obs, ]
+  Xmix
+}
+
+# Stage 2: Y ~ [G, X] (gaussian)
+fit_stage2 <- function(G, X, y) {
+  cvfit <- cv.glmnet(cbind(G, X), y, family = "gaussian", alpha = 1)
+  list(cvfit = cvfit)
+}
+
+predict_stage2 <- function(fit, G, X) {
+  drop(predict(fit$cvfit, newx = cbind(G, X), s = "lambda.min", type = "response"))
+}
+```
+
+# Train/Test Split & Model Comparison
+
+This chunk simulates **shared parameters**, then generates **training** (partial proteins) and **test** (full proteins) sets, fits both models, and reports **test MSE**.
+
+```{r compare}
+# Shared params
+R <- make_block_ar1_corr(p, n_blocks = ld_blocks, rho = ld_rho)
+params <- generate_params(p, q, seed = 1)
+Sigma_X_mat <- make_SigmaX(q, sigma2_X, rho_X)
+
+# Training: 500 total, 150 with proteins
+train <- simulate_dataset(n_train, p, q, R, Sigma_X_mat, params, sigma2_e,
+                          n_with_X = n_withX_train, seed = 11)
+
+# Test: 100 total, full proteins
+test  <- simulate_dataset(n_test,  p, q, R, Sigma_X_mat, params, sigma2_e,
+                          n_with_X = n_test, seed = 21)
+
+# ---- Two-stage (uses all 500) ----
+s1 <- fit_stage1(train$G, train$X_obs)
+Xhat_tr <- s1$predict_X(train$G)
+Xmix_tr <- make_X_mixed(train$X_obs, Xhat_tr)
+fit_ts  <- fit_stage2(train$G, Xmix_tr, train$y)
+
+# Predict on test using true X (fully observed)
+pred_ts <- predict_stage2(fit_ts, test$G, test$X_full)
+MSE_ts  <- mean((test$y - pred_ts)^2)
+
+# ---- Complete-case (uses only the 150 with X) ----
+obs_tr  <- which(rowSums(is.finite(train$X_obs)) == ncol(train$X_obs))
+fit_cc  <- fit_stage2(train$G[obs_tr, ], train$X_obs[obs_tr, ], train$y[obs_tr])
+
+pred_cc <- predict_stage2(fit_cc, test$G, test$X_full)
+MSE_cc  <- mean((test$y - pred_cc)^2)
+
+cat("Test MSE (Two-stage, n=500): ", sprintf("%.4f", MSE_ts), "\n")
+cat("Test MSE (Complete-case, n=150): ", sprintf("%.4f", MSE_cc), "\n")
+
+# Optional: show both in a tiny data.frame
+results <- data.frame(
+  Method = c(paste0("Two-stage (n=",n_train,")"), "Complete-case (n=150)"),
+  Test_MSE = c(MSE_ts, MSE_cc)
+)
+results
+```
+
+

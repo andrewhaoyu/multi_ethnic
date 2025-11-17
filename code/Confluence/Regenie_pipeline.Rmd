@@ -1,0 +1,88 @@
+---
+title: "Regenie GWAS Pipeline on GSA BGEN Data"
+date: "2025-04-16"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This pipeline is designed for testing Regenie on the GSA data. The analyses are restricted to female participants, and only variants with MAC > 30 are considered in final association steps. The current imputed data contains R² > 0.2 across all ancestry/batch combinations. Regenie consists of two main steps:
+
+1. Step 1 fits a ridge regression model using a subset of genotyped or imputed variants to control for stratification.
+2. Step 2 performs Firth logistic regression-based association testing using all variants.
+
+## Step 1: QC for Array data 
+We will generate a pruned genotype dataset suitable for Step 1 of Regenie. Here are the steps:
+
+1. Remove individuals from the array data who lack imputed data.
+2. Filter variants and samples:
+  + Keep variants with MAF ≥ 0.05
+  + Remove variants with missingness > 2%
+  + Remove samples with missingness > 5%
+3. LD-prune to reduce collinearity.
+
+Example code:
+```{bash, eval = FALSE}
+# Filter
+plink2 --bfile subjects_subsetted \
+  --maf 0.05 --geno 0.02 --mind 0.05 \
+  --write-snplist --write-samples --no-id-header \
+  --make-bed --out subjects_subsetted.qc \
+  --threads 8 --memory 16384
+
+# LD pruning
+plink2 --bfile subjects_subsetted.qc \
+  --indep-pairwise 1000 100 0.9 \
+  --out subjects_subsetted.qc --threads 8 --memory 16384
+
+plink2 --bfile subjects_subsetted.qc \
+  --extract subjects_subsetted.qc.prune.in \
+  --make-bed --out subjects_subsetted.qc.pruned \
+  --threads 8 --memory 16384
+```
+
+## Step 2: QC for imputed data
+This will prepare the dataset for Regenie Step 2. The BGEN/VCF dosage data used here already passes basic QC (e.g., R² > 0.2). No additional filtering at this stage, but filtering by INFO, MAC, etc., is handled in Step 2 testing parameters. We need to provide some variant-level QC for external collaborators (e.g. --info or --mac cutoff).
+
+## Step 3: Regenie Step 1, fit whole-genome ridge regression model to estimate phenotype residuals.
+```{bash, eval = FALSE}
+regenie --step 1 \
+  --bed subjects_subsetted.qc.pruned \
+  --extract subjects_subsetted.qc.snplist \
+  --keep subjects_subsetted.qc.id \
+  --phenoFile GSA_Reformatted_Phenotypes.validated.txt \
+  --phenoColList Outcome \
+  --covarFile GSA_Reformatted_Covariates.validated.txt \
+  --covarColList PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
+  --strict \
+  --bsize 1000 --bt \
+  --lowmem --lowmem-prefix tmp_rg \
+  --gz --threads 8 \
+  --use-relative-path \
+  --out regenie_step1_out \
+  --loocv
+```
+Collaborators can add/remove PCs or other covariates as needed.
+
+
+## Step 4: Regenie Step 2, perform GWAS using Firth logistic regression across imputed variants.
+```{bash, eval = FALSE}
+regenie --step 2 \
+  --pgen chr22.dose.merged.vcf \
+  --phenoFile GSA_Reformatted_Phenotypes.validated.txt \
+  --phenoColList Outcome \
+  --bsize 400 \
+  --pred regenie_step1_out_pred.list \
+  --threads 8 \
+  --minMAC 5 --minINFO 0.00 \
+  --bt --firth --approx \
+  --test additive \
+  --gz --no-split \
+  --covarFile GSA_Reformatted_Covariates.validated.txt \
+  --covarColList PC1,PC2,PC3,PC4,PC5,PC6,PC7,PC8,PC9,PC10 \
+  --strict \
+  --rare-mac 1000 \
+  --out chr22.dose.merged.vcf
+```

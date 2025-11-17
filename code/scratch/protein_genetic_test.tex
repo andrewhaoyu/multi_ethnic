@@ -1,0 +1,285 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Joint Modeling of Genetic and Proteomic Predictors under Partial Observability: A Framework for Risk Prediction in Biobank Data},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Joint Modeling of Genetic and Proteomic Predictors under Partial
+Observability: A Framework for Risk Prediction in Biobank Data}
+\author{}
+\date{\vspace{-2.5em}2025-09-25}
+
+\begin{document}
+\maketitle
+
+\section{Background}\label{background}
+
+Large biobank studies often have genome-wide genotypes (\(G\)) measured
+for the full cohort, while expensive proteomic assays (\(X\)) are only
+measured in a subset. We want to predict an outcome (continuous or
+binary) by leveraging both data types despite missing X for many
+participants.
+
+This document demonstrates a simple two-stage estimator:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Stage 1:} Fit a prediction model \(X \sim G\) on subjects with
+  observed proteins and use it to impute \(\hat{X}\).
+\item
+  \textbf{Stage 2:} Fit \(Y \sim [G, X_{mixed}]\), where \$X\_\{mixed\}
+  = X\$ when observed, otherwise \(\hat X\).
+\end{enumerate}
+
+We evaluate \textbf{MSE} for Gaussian outcomes and \textbf{AUC} for
+binary outcomes.
+
+\section{Simulation Settings}\label{simulation-settings}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Packages}
+\FunctionTok{suppressPackageStartupMessages}\NormalTok{(\{}
+  \FunctionTok{library}\NormalTok{(MASS)}
+  \FunctionTok{library}\NormalTok{(glmnet)}
+  \FunctionTok{library}\NormalTok{(Matrix)}
+  \FunctionTok{library}\NormalTok{(pROC)}
+\NormalTok{\})}
+
+\CommentTok{\# User settings}
+\NormalTok{SIM }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{(}
+  \AttributeTok{n1 =} \DecValTok{500}\NormalTok{,     }\CommentTok{\# total subjects}
+  \AttributeTok{n2 =} \DecValTok{150}\NormalTok{,     }\CommentTok{\# subjects with observed X}
+  \AttributeTok{p  =} \DecValTok{30}\NormalTok{,      }\CommentTok{\# SNPs}
+  \AttributeTok{q  =} \DecValTok{6}\NormalTok{,       }\CommentTok{\# proteins}
+  \AttributeTok{outcome =} \StringTok{"gaussian"}\NormalTok{,  }\CommentTok{\# "gaussian" or "binomial"}
+  \AttributeTok{beta0 =} \SpecialCharTok{{-}}\FloatTok{1.8}\NormalTok{,           }\CommentTok{\# intercept for binary outcome}
+  \AttributeTok{ld\_blocks =} \DecValTok{5}\NormalTok{, }\AttributeTok{ld\_rho =} \FloatTok{0.5}\NormalTok{,}
+  \AttributeTok{sigma2\_X =} \DecValTok{1}\NormalTok{, }\AttributeTok{rho\_X =} \FloatTok{0.3}\NormalTok{,}
+  \AttributeTok{sigma2\_e =} \DecValTok{1}\NormalTok{,}
+  \AttributeTok{seed =} \DecValTok{1}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Simulation Functions}\label{simulation-functions}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{make\_block\_ar1\_corr }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(p, }\AttributeTok{n\_blocks =} \DecValTok{5}\NormalTok{, }\AttributeTok{rho =} \FloatTok{0.5}\NormalTok{) \{}
+\NormalTok{  base }\OtherTok{\textless{}{-}} \FunctionTok{floor}\NormalTok{(p }\SpecialCharTok{/}\NormalTok{ n\_blocks)}
+\NormalTok{  sizes }\OtherTok{\textless{}{-}} \FunctionTok{rep}\NormalTok{(base, n\_blocks)}
+\NormalTok{  rmd }\OtherTok{\textless{}{-}}\NormalTok{ p }\SpecialCharTok{{-}} \FunctionTok{sum}\NormalTok{(sizes)}
+  \ControlFlowTok{if}\NormalTok{ (rmd }\SpecialCharTok{\textgreater{}} \DecValTok{0}\NormalTok{) sizes[}\FunctionTok{seq\_len}\NormalTok{(rmd)] }\OtherTok{\textless{}{-}}\NormalTok{ sizes[}\FunctionTok{seq\_len}\NormalTok{(rmd)] }\SpecialCharTok{+} \DecValTok{1}
+\NormalTok{  blocks }\OtherTok{\textless{}{-}} \FunctionTok{lapply}\NormalTok{(sizes, }\ControlFlowTok{function}\NormalTok{(m)\{}
+\NormalTok{    i }\OtherTok{\textless{}{-}} \FunctionTok{seq\_len}\NormalTok{(m); j }\OtherTok{\textless{}{-}} \FunctionTok{seq\_len}\NormalTok{(m)}
+    \FunctionTok{outer}\NormalTok{(i, j, }\ControlFlowTok{function}\NormalTok{(a,b) rho}\SpecialCharTok{\^{}}\FunctionTok{abs}\NormalTok{(a}\SpecialCharTok{{-}}\NormalTok{b))}
+\NormalTok{  \})}
+\NormalTok{  R }\OtherTok{\textless{}{-}} \FunctionTok{as.matrix}\NormalTok{(Matrix}\SpecialCharTok{::}\FunctionTok{bdiag}\NormalTok{(blocks)); }\FunctionTok{diag}\NormalTok{(R) }\OtherTok{\textless{}{-}} \DecValTok{1}
+\NormalTok{  R}
+\NormalTok{\}}
+
+\NormalTok{simulate\_genotypes }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(n, p, R) \{}
+\NormalTok{  Z }\OtherTok{\textless{}{-}}\NormalTok{ MASS}\SpecialCharTok{::}\FunctionTok{mvrnorm}\NormalTok{(n, }\AttributeTok{mu =} \FunctionTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, p), }\AttributeTok{Sigma =}\NormalTok{ R)}
+\NormalTok{  mafs }\OtherTok{\textless{}{-}} \FunctionTok{runif}\NormalTok{(p, }\FloatTok{0.05}\NormalTok{, }\FloatTok{0.45}\NormalTok{)}
+\NormalTok{  cut0 }\OtherTok{\textless{}{-}} \FunctionTok{qnorm}\NormalTok{((}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ mafs)}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{); cut1 }\OtherTok{\textless{}{-}} \FunctionTok{qnorm}\NormalTok{(}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ mafs}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{)}
+\NormalTok{  G }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(}\DecValTok{0}\NormalTok{, n, p)}
+  \ControlFlowTok{for}\NormalTok{ (k }\ControlFlowTok{in} \FunctionTok{seq\_len}\NormalTok{(p)) G[,k] }\OtherTok{\textless{}{-}}\NormalTok{ (Z[,k] }\SpecialCharTok{\textgreater{}}\NormalTok{ cut0[k]) }\SpecialCharTok{+}\NormalTok{ (Z[,k] }\SpecialCharTok{\textgreater{}}\NormalTok{ cut1[k])}
+  \FunctionTok{colnames}\NormalTok{(G) }\OtherTok{\textless{}{-}} \FunctionTok{paste0}\NormalTok{(}\StringTok{"SNP"}\NormalTok{, }\FunctionTok{seq\_len}\NormalTok{(p))}
+\NormalTok{  G}
+\NormalTok{\}}
+
+\NormalTok{simulate\_small }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(SIM) \{}
+  \FunctionTok{set.seed}\NormalTok{(SIM}\SpecialCharTok{$}\NormalTok{seed)}
+\NormalTok{  R }\OtherTok{\textless{}{-}} \FunctionTok{make\_block\_ar1\_corr}\NormalTok{(SIM}\SpecialCharTok{$}\NormalTok{p, SIM}\SpecialCharTok{$}\NormalTok{ld\_blocks, SIM}\SpecialCharTok{$}\NormalTok{ld\_rho)}
+\NormalTok{  G }\OtherTok{\textless{}{-}} \FunctionTok{simulate\_genotypes}\NormalTok{(SIM}\SpecialCharTok{$}\NormalTok{n1, SIM}\SpecialCharTok{$}\NormalTok{p, R)}
+
+\NormalTok{  Gamma }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(}\DecValTok{0}\NormalTok{, SIM}\SpecialCharTok{$}\NormalTok{p, SIM}\SpecialCharTok{$}\NormalTok{q)}
+  \ControlFlowTok{for}\NormalTok{ (j }\ControlFlowTok{in} \FunctionTok{seq\_len}\NormalTok{(SIM}\SpecialCharTok{$}\NormalTok{q)) Gamma[}\FunctionTok{sample.int}\NormalTok{(SIM}\SpecialCharTok{$}\NormalTok{p, }\DecValTok{6}\NormalTok{), j] }\OtherTok{\textless{}{-}} \FunctionTok{rnorm}\NormalTok{(}\DecValTok{6}\NormalTok{, }\DecValTok{0}\NormalTok{, }\FloatTok{0.10}\NormalTok{)}
+\NormalTok{  beta\_G }\OtherTok{\textless{}{-}} \FunctionTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, SIM}\SpecialCharTok{$}\NormalTok{p); beta\_G[}\FunctionTok{sample.int}\NormalTok{(SIM}\SpecialCharTok{$}\NormalTok{p, }\DecValTok{8}\NormalTok{)] }\OtherTok{\textless{}{-}} \FunctionTok{rnorm}\NormalTok{(}\DecValTok{8}\NormalTok{, }\DecValTok{0}\NormalTok{, }\FloatTok{0.06}\NormalTok{)}
+\NormalTok{  beta\_X }\OtherTok{\textless{}{-}} \FunctionTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, SIM}\SpecialCharTok{$}\NormalTok{q); beta\_X[}\FunctionTok{sample.int}\NormalTok{(SIM}\SpecialCharTok{$}\NormalTok{q, }\DecValTok{3}\NormalTok{)] }\OtherTok{\textless{}{-}} \FunctionTok{rnorm}\NormalTok{(}\DecValTok{3}\NormalTok{, }\DecValTok{0}\NormalTok{, }\FloatTok{0.15}\NormalTok{)}
+
+\NormalTok{  Sigma\_X }\OtherTok{\textless{}{-}}\NormalTok{ SIM}\SpecialCharTok{$}\NormalTok{sigma2\_X }\SpecialCharTok{*}\NormalTok{ SIM}\SpecialCharTok{$}\NormalTok{rho\_X}\SpecialCharTok{\^{}}\FunctionTok{abs}\NormalTok{(}\FunctionTok{outer}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\NormalTok{SIM}\SpecialCharTok{$}\NormalTok{q, }\DecValTok{1}\SpecialCharTok{:}\NormalTok{SIM}\SpecialCharTok{$}\NormalTok{q, }\StringTok{"{-}"}\NormalTok{)); }\FunctionTok{diag}\NormalTok{(Sigma\_X) }\OtherTok{\textless{}{-}}\NormalTok{ SIM}\SpecialCharTok{$}\NormalTok{sigma2\_X}
+\NormalTok{  X\_full }\OtherTok{\textless{}{-}}\NormalTok{ G }\SpecialCharTok{\%*\%}\NormalTok{ Gamma }\SpecialCharTok{+}\NormalTok{ MASS}\SpecialCharTok{::}\FunctionTok{mvrnorm}\NormalTok{(SIM}\SpecialCharTok{$}\NormalTok{n1, }\FunctionTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, SIM}\SpecialCharTok{$}\NormalTok{q), Sigma\_X)}
+  \FunctionTok{colnames}\NormalTok{(X\_full) }\OtherTok{\textless{}{-}} \FunctionTok{paste0}\NormalTok{(}\StringTok{"Prot"}\NormalTok{, }\FunctionTok{seq\_len}\NormalTok{(SIM}\SpecialCharTok{$}\NormalTok{q))}
+
+\NormalTok{  lin }\OtherTok{\textless{}{-}} \FunctionTok{as.vector}\NormalTok{(G }\SpecialCharTok{\%*\%}\NormalTok{ beta\_G }\SpecialCharTok{+}\NormalTok{ X\_full }\SpecialCharTok{\%*\%}\NormalTok{ beta\_X)}
+\NormalTok{  y }\OtherTok{\textless{}{-}} \ControlFlowTok{if}\NormalTok{ (SIM}\SpecialCharTok{$}\NormalTok{outcome }\SpecialCharTok{==} \StringTok{"gaussian"}\NormalTok{) \{}
+\NormalTok{    lin }\SpecialCharTok{+} \FunctionTok{rnorm}\NormalTok{(SIM}\SpecialCharTok{$}\NormalTok{n1, }\DecValTok{0}\NormalTok{, }\FunctionTok{sqrt}\NormalTok{(SIM}\SpecialCharTok{$}\NormalTok{sigma2\_e))}
+\NormalTok{  \} }\ControlFlowTok{else}\NormalTok{ \{}
+\NormalTok{    prob }\OtherTok{\textless{}{-}} \FunctionTok{plogis}\NormalTok{(SIM}\SpecialCharTok{$}\NormalTok{beta0 }\SpecialCharTok{+}\NormalTok{ lin); }\FunctionTok{rbinom}\NormalTok{(SIM}\SpecialCharTok{$}\NormalTok{n1, }\DecValTok{1}\NormalTok{, prob)}
+\NormalTok{  \}}
+
+\NormalTok{  idx\_obs }\OtherTok{\textless{}{-}} \FunctionTok{sort}\NormalTok{(}\FunctionTok{sample.int}\NormalTok{(SIM}\SpecialCharTok{$}\NormalTok{n1, SIM}\SpecialCharTok{$}\NormalTok{n2, }\AttributeTok{replace =} \ConstantTok{FALSE}\NormalTok{))}
+\NormalTok{  X\_obs }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(}\ConstantTok{NA\_real\_}\NormalTok{, SIM}\SpecialCharTok{$}\NormalTok{n1, SIM}\SpecialCharTok{$}\NormalTok{q); X\_obs[idx\_obs, ] }\OtherTok{\textless{}{-}}\NormalTok{ X\_full[idx\_obs, ]}
+
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{G=}\NormalTok{G, }\AttributeTok{X\_obs=}\NormalTok{X\_obs, }\AttributeTok{X\_full=}\NormalTok{X\_full, }\AttributeTok{y=}\NormalTok{y, }\AttributeTok{idx\_obs=}\NormalTok{idx\_obs)}
+\NormalTok{\}}
+
+\NormalTok{fit\_stage1\_X\_given\_G }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(G, X\_obs) \{}
+\NormalTok{  obs }\OtherTok{\textless{}{-}} \FunctionTok{which}\NormalTok{(}\FunctionTok{rowSums}\NormalTok{(}\FunctionTok{is.finite}\NormalTok{(X\_obs)) }\SpecialCharTok{==} \FunctionTok{ncol}\NormalTok{(X\_obs))}
+\NormalTok{  cvfit }\OtherTok{\textless{}{-}} \FunctionTok{cv.glmnet}\NormalTok{(G[obs,], X\_obs[obs,], }\AttributeTok{family=}\StringTok{"mgaussian"}\NormalTok{, }\AttributeTok{alpha=}\DecValTok{1}\NormalTok{)}
+\NormalTok{  predict\_X }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(newG) \{}
+\NormalTok{    out }\OtherTok{\textless{}{-}} \FunctionTok{drop}\NormalTok{(}\FunctionTok{predict}\NormalTok{(cvfit, }\AttributeTok{newx=}\NormalTok{newG, }\AttributeTok{s=}\StringTok{"lambda.min"}\NormalTok{))}
+    \ControlFlowTok{if}\NormalTok{ (}\FunctionTok{is.null}\NormalTok{(}\FunctionTok{dim}\NormalTok{(out))) out }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(out, }\FunctionTok{nrow}\NormalTok{(newG))}
+\NormalTok{    out}
+\NormalTok{  \}}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{predict\_X =}\NormalTok{ predict\_X)}
+\NormalTok{\}}
+
+\NormalTok{make\_X\_mixed }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(X\_obs, Xhat) \{}
+\NormalTok{  Xmix }\OtherTok{\textless{}{-}}\NormalTok{ Xhat}
+\NormalTok{  obs }\OtherTok{\textless{}{-}} \FunctionTok{which}\NormalTok{(}\FunctionTok{rowSums}\NormalTok{(}\FunctionTok{is.finite}\NormalTok{(X\_obs)) }\SpecialCharTok{==} \FunctionTok{ncol}\NormalTok{(X\_obs))}
+  \ControlFlowTok{if}\NormalTok{ (}\FunctionTok{length}\NormalTok{(obs) }\SpecialCharTok{\textgreater{}} \DecValTok{0}\NormalTok{) Xmix[obs, ] }\OtherTok{\textless{}{-}}\NormalTok{ X\_obs[obs, ]}
+\NormalTok{  Xmix}
+\NormalTok{\}}
+
+\NormalTok{fit\_stage2\_Y\_on\_G\_X }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(G, Xmix, y, family) \{}
+\NormalTok{  fam }\OtherTok{\textless{}{-}} \ControlFlowTok{if}\NormalTok{ (family}\SpecialCharTok{==}\StringTok{"gaussian"}\NormalTok{) }\StringTok{"gaussian"} \ControlFlowTok{else} \StringTok{"binomial"}
+\NormalTok{  cvfit }\OtherTok{\textless{}{-}} \FunctionTok{cv.glmnet}\NormalTok{(}\FunctionTok{cbind}\NormalTok{(G,Xmix), y, }\AttributeTok{family=}\NormalTok{fam, }\AttributeTok{alpha=}\DecValTok{1}\NormalTok{)}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{cvfit =}\NormalTok{ cvfit)}
+\NormalTok{\}}
+
+\NormalTok{predict\_stage2 }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(fit, G, Xmix) \{}
+  \FunctionTok{drop}\NormalTok{(}\FunctionTok{predict}\NormalTok{(fit}\SpecialCharTok{$}\NormalTok{cvfit, }\AttributeTok{newx=}\FunctionTok{cbind}\NormalTok{(G,Xmix), }\AttributeTok{s=}\StringTok{"lambda.min"}\NormalTok{, }\AttributeTok{type=}\StringTok{"response"}\NormalTok{))}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Run Example}\label{run-example}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dat }\OtherTok{\textless{}{-}} \FunctionTok{simulate\_small}\NormalTok{(SIM)}
+\FunctionTok{set.seed}\NormalTok{(SIM}\SpecialCharTok{$}\NormalTok{seed}\SpecialCharTok{+}\DecValTok{100}\NormalTok{)}
+\NormalTok{tr }\OtherTok{\textless{}{-}} \FunctionTok{sample.int}\NormalTok{(SIM}\SpecialCharTok{$}\NormalTok{n1, }\FunctionTok{floor}\NormalTok{(}\FloatTok{0.7}\SpecialCharTok{*}\NormalTok{SIM}\SpecialCharTok{$}\NormalTok{n1))}
+\NormalTok{te }\OtherTok{\textless{}{-}} \FunctionTok{setdiff}\NormalTok{(}\FunctionTok{seq\_len}\NormalTok{(SIM}\SpecialCharTok{$}\NormalTok{n1), tr)}
+
+\NormalTok{Gtr }\OtherTok{\textless{}{-}}\NormalTok{ dat}\SpecialCharTok{$}\NormalTok{G[tr,]; Gte }\OtherTok{\textless{}{-}}\NormalTok{ dat}\SpecialCharTok{$}\NormalTok{G[te,]}
+\NormalTok{Xobstr }\OtherTok{\textless{}{-}}\NormalTok{ dat}\SpecialCharTok{$}\NormalTok{X\_obs[tr,]; Xobste }\OtherTok{\textless{}{-}}\NormalTok{ dat}\SpecialCharTok{$}\NormalTok{X\_obs[te,]}
+\NormalTok{ytr }\OtherTok{\textless{}{-}}\NormalTok{ dat}\SpecialCharTok{$}\NormalTok{y[tr]; yte }\OtherTok{\textless{}{-}}\NormalTok{ dat}\SpecialCharTok{$}\NormalTok{y[te]}
+
+\NormalTok{s1 }\OtherTok{\textless{}{-}} \FunctionTok{fit\_stage1\_X\_given\_G}\NormalTok{(Gtr, Xobstr)}
+\NormalTok{Xhat\_tr }\OtherTok{\textless{}{-}}\NormalTok{ s1}\SpecialCharTok{$}\FunctionTok{predict\_X}\NormalTok{(Gtr); Xhat\_te }\OtherTok{\textless{}{-}}\NormalTok{ s1}\SpecialCharTok{$}\FunctionTok{predict\_X}\NormalTok{(Gte)}
+\NormalTok{Xmix\_tr }\OtherTok{\textless{}{-}} \FunctionTok{make\_X\_mixed}\NormalTok{(Xobstr, Xhat\_tr)}
+\NormalTok{Xmix\_te }\OtherTok{\textless{}{-}} \FunctionTok{make\_X\_mixed}\NormalTok{(Xobste, Xhat\_te)}
+
+\NormalTok{s2 }\OtherTok{\textless{}{-}} \FunctionTok{fit\_stage2\_Y\_on\_G\_X}\NormalTok{(Gtr, Xmix\_tr, ytr, }\AttributeTok{family=}\NormalTok{SIM}\SpecialCharTok{$}\NormalTok{outcome)}
+\NormalTok{pred }\OtherTok{\textless{}{-}} \FunctionTok{predict\_stage2}\NormalTok{(s2, Gte, Xmix\_te)}
+
+\ControlFlowTok{if}\NormalTok{ (SIM}\SpecialCharTok{$}\NormalTok{outcome}\SpecialCharTok{==}\StringTok{"gaussian"}\NormalTok{) \{}
+\NormalTok{  mse }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{((yte}\SpecialCharTok{{-}}\NormalTok{pred)}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{); mse}
+\NormalTok{\} }\ControlFlowTok{else}\NormalTok{ \{}
+\NormalTok{  auc }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(pROC}\SpecialCharTok{::}\FunctionTok{auc}\NormalTok{(yte, pred)); }\FunctionTok{list}\NormalTok{(}\AttributeTok{AUC=}\NormalTok{auc, }\AttributeTok{Prev=}\FunctionTok{mean}\NormalTok{(yte))}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.896985
+\end{verbatim}
+
+\end{document}

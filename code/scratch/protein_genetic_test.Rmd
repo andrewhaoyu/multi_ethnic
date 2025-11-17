@@ -1,0 +1,165 @@
+---
+title: 'Joint Modeling of Genetic and Proteomic Predictors under Partial Observability:
+  A Framework for Risk Prediction in Biobank Data'
+output:
+  html_document: default
+  pdf_document: default
+date: "2025-09-25"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Background
+
+Large biobank studies often have genome-wide genotypes (\(G\)) measured for the full cohort, while expensive proteomic assays (\(X\)) are only measured in a subset. We want to predict an outcome (continuous or binary) by leveraging both data types despite missing X for many participants. 
+
+
+This document demonstrates a simple two-stage estimator:
+
+1. **Stage 1:** Fit a prediction model $X \sim G$ on subjects with observed proteins and use it to impute $\hat{X}$.
+2. **Stage 2:** Fit $Y \sim [G, X_{mixed}]$, where $X_{mixed} = X$ when observed, otherwise $X_{mixed} = \hat{X}$.
+
+We evaluate **MSE** for Gaussian outcomes and **AUC** for binary outcomes.
+
+# Simulation Settings
+Below we set all the knobs for the simulation in one place.  The cohort sizes (n1, n2), the feature dimensions (p SNPs, q proteins), and the LD strength for genotypes.
+
+```{r settings}
+# Packages
+suppressPackageStartupMessages({
+  library(MASS)
+  library(glmnet)
+  library(Matrix)
+})
+
+# User settings
+SIM <- list(
+  n1 = 500,     # total subjects
+  n2 = 150,     # subjects with observed X
+  p  = 30,      # SNPs
+  q  = 6,       # proteins
+  outcome = "gaussian",  # only continuous outcome now
+  ld_blocks = 5, ld_rho = 0.5,
+  sigma2_X = 1, rho_X = 0.3,
+  sigma2_e = 1,
+  seed = 1
+)
+```
+
+# Simulation Functions
+
+This chunk defines small helper functions used by the demo:
+
+* `make_block_ar1_corr`: builds an LD-like block AR(1) correlation matrix for p SNPs.
+* `simulate_genotypes`: simulates genotypes under HWE with specified LD.
+* `simulate_small`: generates one dataset given `SIM`. It creates sparse pQTL effects (Gamma), protein residual covariance (Sigma_X), and the outcome according to a Gaussian model. 
+* `fit_stage1_X_given_G`: Stage 1 model; fits X ~ G on the observed-X subset using Lasso and returns a function to impute X_hat for any new G.
+* `make_X_mixed`: constructs X_mixed by using observed X when available and X_hat otherwise.
+* `fit_stage2_Y_on_G_X` and `predict_stage2`: Stage 2 risk model; fits Y ~ [G, X_mixed] via glmnet and produces predictions.
+
+```{r functions}
+make_block_ar1_corr <- function(p, n_blocks = 5, rho = 0.5) {
+  base <- floor(p / n_blocks)
+  sizes <- rep(base, n_blocks)
+  rmd <- p - sum(sizes)
+  if (rmd > 0) sizes[seq_len(rmd)] <- sizes[seq_len(rmd)] + 1
+  blocks <- lapply(sizes, function(m){
+    i <- seq_len(m); j <- seq_len(m)
+    outer(i, j, function(a,b) rho^abs(a-b))
+  })
+  R <- as.matrix(Matrix::bdiag(blocks)); diag(R) <- 1
+  R
+}
+
+simulate_genotypes <- function(n, p, R) {
+  Z <- MASS::mvrnorm(n, mu = rep(0, p), Sigma = R)
+  mafs <- runif(p, 0.05, 0.45)
+  cut0 <- qnorm((1 - mafs)^2); cut1 <- qnorm(1 - mafs^2)
+  G <- matrix(0, n, p)
+  for (k in seq_len(p)) G[,k] <- (Z[,k] > cut0[k]) + (Z[,k] > cut1[k])
+  colnames(G) <- paste0("SNP", seq_len(p))
+  G
+}
+
+simulate_small <- function(SIM) {
+  set.seed(SIM$seed)
+  R <- make_block_ar1_corr(SIM$p, SIM$ld_blocks, SIM$ld_rho)
+  G <- simulate_genotypes(SIM$n1, SIM$p, R)
+
+  Gamma <- matrix(0, SIM$p, SIM$q)
+  for (j in seq_len(SIM$q)) Gamma[sample.int(SIM$p, 6), j] <- rnorm(6, 0, 0.10)
+  beta_G <- rep(0, SIM$p); beta_G[sample.int(SIM$p, 8)] <- rnorm(8, 0, 0.06)
+  beta_X <- rep(0, SIM$q); beta_X[sample.int(SIM$q, 3)] <- rnorm(3, 0, 0.15)
+
+  Sigma_X <- SIM$sigma2_X * SIM$rho_X^abs(outer(1:SIM$q, 1:SIM$q, "-")); diag(Sigma_X) <- SIM$sigma2_X
+  X_full <- G %*% Gamma + MASS::mvrnorm(SIM$n1, rep(0, SIM$q), Sigma_X)
+  colnames(X_full) <- paste0("Prot", seq_len(SIM$q))
+
+  lin <- as.vector(G %*% beta_G + X_full %*% beta_X)
+  y <- lin + rnorm(SIM$n1, 0, sqrt(SIM$sigma2_e))
+
+  idx_obs <- sort(sample.int(SIM$n1, SIM$n2, replace = FALSE))
+  X_obs <- matrix(NA_real_, SIM$n1, SIM$q); X_obs[idx_obs, ] <- X_full[idx_obs, ]
+
+  list(G=G, X_obs=X_obs, X_full=X_full, y=y, idx_obs=idx_obs)
+}
+
+fit_stage1_X_given_G <- function(G, X_obs) {
+  obs <- which(rowSums(is.finite(X_obs)) == ncol(X_obs))
+  cvfit <- cv.glmnet(G[obs,], X_obs[obs,], family="mgaussian", alpha=1)
+  predict_X <- function(newG) {
+    out <- drop(predict(cvfit, newx=newG, s="lambda.min"))
+    if (is.null(dim(out))) out <- matrix(out, nrow(newG))
+    out
+  }
+  list(predict_X = predict_X)
+}
+
+make_X_mixed <- function(X_obs, Xhat) {
+  Xmix <- Xhat
+  obs <- which(rowSums(is.finite(X_obs)) == ncol(X_obs))
+  if (length(obs) > 0) Xmix[obs, ] <- X_obs[obs, ]
+  Xmix
+}
+
+fit_stage2_Y_on_G_X <- function(G, Xmix, y) {
+  cvfit <- cv.glmnet(cbind(G,Xmix), y, family="gaussian", alpha=1)
+  list(cvfit = cvfit)
+}
+
+predict_stage2 <- function(fit, G, Xmix) {
+  drop(predict(fit$cvfit, newx=cbind(G,Xmix), s="lambda.min", type="response"))
+}
+```
+
+# Run Example
+
+1. Simulate one dataset.
+2. Split the cohort into 70% train / 30% test.
+3. Stage 1: fit $X \sim G$ on the train subset with observed proteins; impute $\hat{X}$ for all.
+4. Form $X_{mixed}$ for train and test.
+5. Stage 2: fit $Y \sim [G, X_{mixed}]$ on train and evaluate on test using MSE.
+
+```{r run}
+dat <- simulate_small(SIM)
+set.seed(SIM$seed+100)
+tr <- sample.int(SIM$n1, floor(0.7*SIM$n1))
+te <- setdiff(seq_len(SIM$n1), tr)
+
+Gtr <- dat$G[tr,]; Gte <- dat$G[te,]
+Xobstr <- dat$X_obs[tr,]; Xobste <- dat$X_obs[te,]
+ytr <- dat$y[tr]; yte <- dat$y[te]
+
+s1 <- fit_stage1_X_given_G(Gtr, Xobstr)
+Xhat_tr <- s1$predict_X(Gtr); Xhat_te <- s1$predict_X(Gte)
+Xmix_tr <- make_X_mixed(Xobstr, Xhat_tr)
+Xmix_te <- make_X_mixed(Xobste, Xhat_te)
+
+s2 <- fit_stage2_Y_on_G_X(Gtr, Xmix_tr, ytr)
+pred <- predict_stage2(s2, Gte, Xmix_te)
+
+mse <- mean((yte-pred)^2)
+mse
+```
