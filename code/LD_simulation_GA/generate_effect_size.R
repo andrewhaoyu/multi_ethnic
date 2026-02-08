@@ -6,6 +6,7 @@
 #strong mild no negative selection
 #two Genetic architecture, fixed heritbaility for common snps
 #fixed heritibility for all snps
+
 GenSigma <- function(sigma,n1,n2,n3,n4,n5,
                      gr12,gr13,gr14,gr15,
                      gr23,gr24,gr25,
@@ -49,6 +50,19 @@ cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
 #i for genetic correlation vec
 #j for negative selection alphs
 temp = 1
+#i1 represents genetic architecture (GA)
+# GA =1: strong negative selection, common SNPs heritability fixed as 0.4 for each of the five ancestries, cross-ancestry genetic architecture as 0.8. Figure 2 and Supplementary Figure 2 in the Biorxiv preprint are based on this genetic architecture.
+# 
+# GA=2: strong negative selection, fixed per-SNP heritability for each of the five ancestries, cross-ancestry genetic architecture as 0.8. Supplementary Figure  5 in the Biorxiv preprint is based on this genetic architecture.
+# 
+# GA=3: strong negative selection, fixed per-SNP heritability for each of the five ancestries, cross-ancestry genetic architecture as 0.6. Supplementary Figure  6  in the Biorxiv preprint is based on this genetic architecture.
+# 
+# GA=4: no negative selection, common SNPs heritability fixed as 0.4 for each of the five ancestries, cross-ancestry genetic architecture as 0.8. Supplementary Figure  4  in the Biorxiv preprint is based on this genetic architecture.
+# 
+# GA=5: mild negative selection, common SNPs heritability fixed as 0.4 for each of the five ancestries, cross-ancestry genetic architecture as 0.8. Supplementary Figure  3  in the Biorxiv preprint is based on this genetic architecture.
+
+
+
 #strong negative selection, common SNPs heritability fixed as 0.4 for each of the five ancestries, cross-ancestry genetic architecture as 0.8. 
 i1 = 1
 # for(i in 1:2){
