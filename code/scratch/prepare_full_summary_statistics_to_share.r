@@ -17,5 +17,14 @@
 # }
 
 
-temp.code <- "cd /data/DCEG_shared/datashare; tar -czvf simulated_data_meta.tar.gz simulated_data_meta/"
+# temp.code <- "cd /data/DCEG_shared/datashare; tar -czvf simulated_data_meta.tar.gz simulated_data_meta/"
+# system(temp.code)
+
+temp.code <- "rsync -avnc \
+  /data/DCEG_shared/datashare/simulated_data_meta/ \
+  /data/BB_Bioinformatics/HZ/simulated_data_meta/"
+
+system(temp.code)
+
+temp.code <- "cd /data/BB_Bioinformatics/HZ/simulated_data_meta/; tar -czvf simulated_data_meta.tar.gz simulated_data_meta/"
 system(temp.code)
