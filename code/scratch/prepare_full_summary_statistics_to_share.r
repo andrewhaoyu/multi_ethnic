@@ -1,5 +1,5 @@
 cur.dir <- "/data/zhangh24/multi_ethnic/result/LD_simulation_GA/"
-tar.dir <- "/data/BB_Bioinformatics/HZ/simulated_data_meta/"
+tar.dir <- "/data/BB_Bioinformatics/HZ/simulated_data_meta/summary_data/"
 
 
 #five ethnics i
